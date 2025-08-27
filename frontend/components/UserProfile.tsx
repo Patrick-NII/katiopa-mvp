@@ -18,6 +18,7 @@ interface UserProfileProps {
       theme: string
       notifications: boolean
     }
+    subscriptionType?: 'free' | 'premium' | 'enterprise'
   }
   level: number
   experience: number
@@ -45,6 +46,9 @@ interface UserProfileProps {
 export default function UserProfile({ user, level, experience, totalTime, subscription, billing }: UserProfileProps) {
   const { currentSessionTime } = useSession()
   const [avatarUrl, setAvatarUrl] = useState('')
+
+  // Déterminer si c'est un compte gratuit
+  const isFreeAccount = user.subscriptionType === 'free' || !subscription
 
   // Générer un avatar basé sur les initiales
   useEffect(() => {
@@ -93,20 +97,34 @@ export default function UserProfile({ user, level, experience, totalTime, subscr
   }
 
   const formatRegistrationDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const day = date.getDate().toString().padStart(2, '0')
-    const month = (date.getMonth() + 1).toString().padStart(2, '0')
-    const year = date.getFullYear()
-    return `${day}/${month}/${year}`
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) {
+        return 'Date inconnue'
+      }
+      const day = date.getDate().toString().padStart(2, '0')
+      const month = (date.getMonth() + 1).toString().padStart(2, '0')
+      const year = date.getFullYear()
+      return `${day}/${month}/${year}`
+    } catch (error) {
+      return 'Date inconnue'
+    }
   }
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('fr-FR', { 
-      day: '2-digit', 
-      month: '2-digit', 
-      year: 'numeric' 
-    })
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) {
+        return 'Date invalide'
+      }
+      return date.toLocaleDateString('fr-FR', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      })
+    } catch (error) {
+      return 'Date invalide'
+    }
   }
 
   // Calculer le niveau et l'expérience
@@ -117,20 +135,31 @@ export default function UserProfile({ user, level, experience, totalTime, subscr
   const effectiveTotalTime = totalTime + (currentSessionTime * 1000)
 
   // Calculer l'ancienneté
-  const memberSince = new Date(user.createdAt)
-  const now = new Date()
-  const yearsDiff = now.getFullYear() - memberSince.getFullYear()
-  const monthsDiff = now.getMonth() - memberSince.getMonth()
-  const daysDiff = now.getDate() - memberSince.getDate()
-  
-  let membershipDuration = ''
-  if (yearsDiff > 0) {
-    membershipDuration = `${yearsDiff} an${yearsDiff > 1 ? 's' : ''}`
-  } else if (monthsDiff > 0) {
-    membershipDuration = `${monthsDiff} mois`
-  } else {
-    membershipDuration = `${daysDiff} jour${daysDiff > 1 ? 's' : ''}`
+  const calculateMembershipDuration = () => {
+    try {
+      const memberSince = new Date(user.createdAt)
+      if (isNaN(memberSince.getTime())) {
+        return 'Durée inconnue'
+      }
+      
+      const now = new Date()
+      const yearsDiff = now.getFullYear() - memberSince.getFullYear()
+      const monthsDiff = now.getMonth() - memberSince.getMonth()
+      const daysDiff = now.getDate() - memberSince.getDate()
+      
+      if (yearsDiff > 0) {
+        return `${yearsDiff} an${yearsDiff > 1 ? 's' : ''}`
+      } else if (monthsDiff > 0) {
+        return `${monthsDiff} mois`
+      } else {
+        return `${daysDiff} jour${daysDiff > 1 ? 's' : ''}`
+      }
+    } catch (error) {
+      return 'Durée inconnue'
+    }
   }
+
+  const membershipDuration = calculateMembershipDuration()
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
@@ -161,6 +190,13 @@ export default function UserProfile({ user, level, experience, totalTime, subscr
             </span>
             <span className="text-sm text-gray-500 bg-blue-50 px-3 py-1 rounded-full">
               Membre depuis le {formatRegistrationDate(user.createdAt)} ({membershipDuration})
+            </span>
+            <span className={`text-sm px-3 py-1 rounded-full ${
+              isFreeAccount 
+                ? 'text-orange-600 bg-orange-50' 
+                : 'text-green-600 bg-green-50'
+            }`}>
+              {isFreeAccount ? '🆓 Compte Gratuit' : '⭐ Compte Premium'}
             </span>
             {user.phone && (
               <span className="text-sm text-gray-500 bg-green-50 px-3 py-1 rounded-full">
@@ -247,8 +283,8 @@ export default function UserProfile({ user, level, experience, totalTime, subscr
         </div>
       </div>
 
-      {/* Bloc d'abonnements et facturation */}
-      {subscription && (
+      {/* Bloc d'abonnements et facturation - UNIQUEMENT pour les comptes premium */}
+      {!isFreeAccount && subscription && (
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6 mb-6">
           <h3 className="text-lg font-semibold text-blue-900 mb-4">Abonnement et facturation</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -302,6 +338,32 @@ export default function UserProfile({ user, level, experience, totalTime, subscr
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Bloc d'upgrade pour les comptes gratuits */}
+      {isFreeAccount && (
+        <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl border border-orange-200 p-6 mb-6">
+          <h3 className="text-lg font-semibold text-orange-900 mb-4">🚀 Passez à la vitesse supérieure !</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="text-center">
+              <div className="text-2xl mb-2">📊</div>
+              <div className="text-sm text-orange-700 font-medium">Statistiques avancées</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl mb-2">📈</div>
+              <div className="text-sm text-orange-700 font-medium">Graphiques détaillés</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl mb-2">🎯</div>
+              <div className="text-sm text-orange-700 font-medium">Exercices illimités</div>
+            </div>
+          </div>
+          <div className="text-center">
+            <button className="px-6 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors">
+              Découvrir les plans Premium
+            </button>
+          </div>
         </div>
       )}
     </div>
