@@ -6,6 +6,8 @@ import UserProfile from '@/components/UserProfile'
 import UserStats from '@/components/UserStats'
 import PerformanceCharts from '@/components/PerformanceCharts'
 import FreeAccountLimitations from '@/components/FreeAccountLimitations'
+import AnimatedLLMButton from '@/components/AnimatedLLMButton'
+import AdvancedLLMResults from '@/components/AdvancedLLMResults'
 import { useRouter } from 'next/navigation'
 
 interface Activity {
@@ -24,12 +26,39 @@ interface Summary {
 }
 
 interface LLMResponse {
-  assessment: string
-  exercises: Array<{
+  data_sufficiency: 'low' | 'medium' | 'high'
+  confidence: number
+  summary_child: string
+  summary_adult: string
+  key_insights: Array<{
+    title: string
+    evidence: string[]
+    impact: 'low' | 'medium' | 'high'
+  }>
+  risk_flags: string[]
+  recommended_exercises: Array<{
     title: string
     nodeKey: string
-    description: string
+    why_this: string
+    target_minutes: number
+    success_criteria: string
   }>
+  schedule_plan: {
+    next_48h: Array<{
+      when_local: string
+      duration_min: number
+      focus: string
+    }>
+    spaced_practice: Array<{
+      nodeKey: string
+      review_on: string
+      reason: string
+    }>
+  }
+  parent_coaching: string[]
+  teacher_notes: string[]
+  dashboards_to_update: string[]
+  missing_data: string[]
 }
 
 interface User {
@@ -90,7 +119,7 @@ export default function Dashboard() {
     'Accès aux exercices de base',
     'Statistiques simples',
     'Suivi de progression basique',
-    'Évaluation LLM',
+    'Évaluation LLM basique',
     'Support communautaire'
   ]
 
@@ -102,7 +131,11 @@ export default function Dashboard() {
     'Export des données',
     'Support prioritaire',
     'Exercices premium exclusifs',
-    'Personnalisation avancée'
+    'Personnalisation avancée',
+    'Évaluation LLM avancée avec mémoire',
+    'Plan de révision personnalisé',
+    'Notes pour enseignants',
+    'Suivi des risques et alertes'
   ]
 
   // Vérification de l'authentification
@@ -153,10 +186,76 @@ export default function Dashboard() {
     }
   }
 
+  // Préparer les données pour l'évaluation LLM avancée
+  const prepareLLMData = () => {
+    const now = new Date()
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
+    
+    // Activités des 7 derniers jours
+    const activities7d = activities.filter(a => new Date(a.createdAt) >= sevenDaysAgo)
+    const activities14d = activities.filter(a => new Date(a.createdAt) >= fourteenDaysAgo)
+    
+    // Calculer les tendances
+    const scores7d = activities7d.map(a => a.score)
+    const scores14d = activities14d.map(a => a.score)
+    const avgScore7d = scores7d.length > 0 ? scores7d.reduce((a, b) => a + b, 0) / scores7d.length : 0
+    const avgScore14d = scores14d.length > 0 ? scores14d.reduce((a, b) => a + b, 0) / scores14d.length : 0
+    
+    // Calculer la pente des scores
+    const scoreSlope = scores7d.length > 1 ? (scores7d[scores7d.length - 1] - scores7d[0]) / scores7d.length : 0
+    
+    // Analyser les domaines
+    const domainStats = activities7d.reduce((acc, activity) => {
+      if (!acc[activity.domain]) {
+        acc[activity.domain] = { count: 0, totalScore: 0, totalTime: 0 }
+      }
+      acc[activity.domain].count++
+      acc[activity.domain].totalScore += activity.score
+      acc[activity.domain].totalTime += activity.durationMs
+      return acc
+    }, {} as Record<string, { count: number, totalScore: number, totalTime: number }>)
+    
+    // Calculer les risques
+    const riskFlags = []
+    if (activities7d.length === 0) riskFlags.push('inactivity_risk')
+    if (scoreSlope < -5) riskFlags.push('frustration_risk')
+    if (avgScore7d > 80 && activities7d.some(a => a.attempts > 1)) riskFlags.push('underchallenge_risk')
+    if (activities7d.some(a => a.attempts > 3)) riskFlags.push('frustration_risk')
+    
+    return {
+      activities_count_7d: activities7d.length,
+      activities_count_14d: activities14d.length,
+      avg_score_7d: avgScore7d,
+      avg_score_14d: avgScore14d,
+      score_slope_14d: scoreSlope,
+      time_on_task_slope_14d: 0, // À calculer si nécessaire
+      days_inactive_7d: 0, // À calculer si nécessaire
+      domain_stats: domainStats,
+      risk_flags: riskFlags,
+      last_practiced_at: activities.length > 0 ? activities[0].createdAt : null,
+      member_since: user?.createdAt,
+      subscription_type: user?.subscriptionType || 'free'
+    }
+  }
+
   async function evaluateLLM() {
     setLoading(true)
     try {
-      const response = await apiPost<LLMResponse>('/llm/evaluate', { focus })
+      const llmData = prepareLLMData()
+      
+      // Préparer le prompt selon le type de compte
+      const prompt = user?.subscriptionType === 'premium' || user?.subscriptionType === 'enterprise'
+        ? `You are Katiopa's Learning Coach LLM for children (age 5–15, MVP focus 5–7). Your job: produce a rigorous, data-driven assessment + personalized plan. Analyze this user data: ${JSON.stringify(llmData)}`
+        : `Provide a basic assessment for free account: ${JSON.stringify(llmData)}`
+      
+      const response = await apiPost<LLMResponse>('/llm/evaluate', { 
+        focus,
+        prompt,
+        subscriptionType: user?.subscriptionType || 'free',
+        data: llmData
+      })
+      
       setLlmResponse(response)
     } catch (err) {
       console.error('LLM evaluation failed:', err)
@@ -164,6 +263,12 @@ export default function Dashboard() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Gérer la sélection d'un exercice
+  const handleExerciseSelect = (nodeKey: string) => {
+    console.log('Exercice sélectionné:', nodeKey)
+    // Ici vous pouvez rediriger vers l'exercice ou l'ajouter à une liste
   }
 
   // Affichage du chargement pendant la vérification
@@ -266,45 +371,39 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Section LLM */}
+            {/* Section LLM avec bouton animé */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">Évaluation LLM</h3>
-              <div className="flex items-center gap-6 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Évaluation IA Katiopa</h3>
+              <div className="mb-6">
                 <select 
                   value={focus} 
                   onChange={(e) => setFocus(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-[200px]"
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-[200px] mb-4"
                 >
                   <option value="maths">Mathématiques</option>
                   <option value="coding">Programmation</option>
+                  <option value="reading">Lecture</option>
+                  <option value="science">Sciences</option>
                 </select>
-                <button 
-                  onClick={evaluateLLM} 
+                
+                {/* Bouton LLM animé */}
+                <AnimatedLLMButton 
+                  onClick={evaluateLLM}
+                  loading={loading}
                   disabled={loading}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
-                >
-                  {loading ? 'Évaluation...' : 'Évaluer et proposer'}
-                </button>
+                  subscriptionType={user.subscriptionType}
+                  focus={focus}
+                  className="max-w-md"
+                />
               </div>
 
+              {/* Résultats LLM avancés */}
               {llmResponse && (
-                <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                  <h4 className="font-medium text-gray-900 text-base mb-3">Bilan</h4>
-                  <p className="text-gray-700 mb-6">{llmResponse.assessment}</p>
-                  
-                  <h4 className="font-medium text-gray-900 text-base mb-3">Exercices recommandés</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {llmResponse.exercises.map((exercise, index) => (
-                      <div key={index} className="bg-white p-4 rounded-lg border border-gray-200">
-                        <h5 className="font-medium text-gray-900 mb-2">{exercise.title}</h5>
-                        <p className="text-gray-600 mb-3 text-sm">{exercise.description}</p>
-                        <code className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded border">
-                          {exercise.nodeKey}
-                        </code>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <AdvancedLLMResults 
+                  result={llmResponse}
+                  subscriptionType={user.subscriptionType}
+                  onExerciseSelect={handleExerciseSelect}
+                />
               )}
             </div>
 
