@@ -10,13 +10,12 @@ import {
   Award, 
   Medal, 
   Zap,
-  Fire,
+  Flame,
   Heart,
   Sparkles,
   Rocket,
   Diamond,
   Gem,
-  Lightning,
   Sun,
   Moon,
   Cloud,
@@ -25,7 +24,6 @@ import {
   Tree,
   Mountain,
   Wave,
-  Flame,
   Star2,
   Sparkle,
   Zap2,
@@ -335,7 +333,7 @@ export default function UserStats({ userId, activities, memberSince }: UserStats
       case 'Codeur':
         return <Zap size={16} />
       case 'Rapide':
-        return <Lightning size={16} />
+        return <Zap size={16} />
       case 'Précis':
         return <Target size={16} />
       default:
