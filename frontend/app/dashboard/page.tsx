@@ -30,6 +30,20 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<NavigationTab>('dashboard')
   const [showSessionSelector, setShowSessionSelector] = useState(false)
 
+  // Fonction pour changer de session
+  const handleSwitchSession = (sessionId: string) => {
+    // Ici, vous devriez implémenter la logique de changement de session
+    // Pour l'instant, nous allons afficher un message
+    console.log(`Changement de session vers: ${sessionId}`)
+    
+    // Vous pourriez :
+    // 1. Stocker la session cible
+    // 2. Rediriger vers la page de connexion avec la session pré-remplie
+    // 3. Ou implémenter un changement de session sans déconnexion
+    
+    alert(`Fonctionnalité de changement de session vers ${sessionId} à implémenter`)
+  }
+
   // Vérification de l'authentification
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -345,12 +359,6 @@ export default function Dashboard() {
 
   function handleManageSessions() {
     setShowSessionSelector(!showSessionSelector)
-  }
-
-  function handleSwitchSession(sessionId: string) {
-    console.log('Changement de session vers:', sessionId)
-    // Logique pour changer de session
-    setShowSessionSelector(false)
   }
 
   // Utiliser le hook pour le temps global
@@ -671,6 +679,7 @@ export default function Dashboard() {
           user={user}
           account={account}
           onLogout={handleLogout}
+          onSwitchSession={handleSwitchSession}
         />
 
         {/* Contenu des onglets */}
