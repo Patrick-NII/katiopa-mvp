@@ -3,6 +3,16 @@ import { useState, useEffect } from 'react'
 
 interface UserStatsProps {
   userId: string
+  activities: Array<{
+    id: string
+    domain: string
+    nodeKey: string
+    score: number
+    attempts: number
+    durationMs: number
+    createdAt: string
+  }>
+  memberSince: string
 }
 
 interface UserStats {
@@ -13,9 +23,11 @@ interface UserStats {
   averageScore: number
   badges: string[]
   streak: number
+  domains: string[]
+  lastActivity: string | null
 }
 
-export default function UserStats({ userId }: UserStatsProps) {
+export default function UserStats({ userId, activities, memberSince }: UserStatsProps) {
   const [stats, setStats] = useState<UserStats>({
     level: 1,
     experience: 0,
@@ -23,7 +35,9 @@ export default function UserStats({ userId }: UserStatsProps) {
     activitiesCount: 0,
     averageScore: 0,
     badges: [],
-    streak: 0
+    streak: 0,
+    domains: [],
+    lastActivity: null
   })
 
   // Calculer le niveau basé sur l'expérience
@@ -63,7 +77,12 @@ export default function UserStats({ userId }: UserStatsProps) {
     return Math.round(total / activities.length)
   }
 
-  // Générer des badges basés sur les performances
+  // Obtenir les domaines uniques
+  const getUniqueDomains = (activities: any[]): string[] => {
+    return Array.from(new Set(activities.map(a => a.domain)))
+  }
+
+  // Générer des badges basés sur les performances réelles
   const generateBadges = (activities: any[], averageScore: number): string[] => {
     const badges: string[] = []
     
@@ -77,44 +96,100 @@ export default function UserStats({ userId }: UserStatsProps) {
     if (domains.filter(d => d === 'maths').length >= 5) badges.push('🧮 Mathématicien')
     if (domains.filter(d => d === 'coding').length >= 5) badges.push('💻 Codeur')
     
+    // Badge pour la rapidité
+    const fastActivities = activities.filter(a => a.durationMs < 30000)
+    if (fastActivities.length >= 3) badges.push('⚡ Rapide')
+    
+    // Badge pour la précision
+    const accurateActivities = activities.filter(a => a.attempts === 1)
+    if (accurateActivities.length >= 5) badges.push('🎯 Précis')
+    
     return badges
   }
 
-  // Calculer la série de connexions
-  const calculateStreak = (): number => {
-    // Pour l'instant, on simule une série
-    // Plus tard, on pourra l'implémenter avec la base de données
-    return Math.floor(Math.random() * 7) + 1
+  // Calculer la série de connexions (simulation basée sur les activités)
+  const calculateStreak = (activities: any[]): number => {
+    if (activities.length === 0) return 0
+    
+    // Trier les activités par date
+    const sortedActivities = activities.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+    
+    let streak = 1
+    let currentDate = new Date(sortedActivities[0].createdAt)
+    
+    for (let i = 1; i < sortedActivities.length; i++) {
+      const activityDate = new Date(sortedActivities[i].createdAt)
+      const diffTime = Math.abs(currentDate.getTime() - activityDate.getTime())
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+      
+      if (diffDays === 1) {
+        streak++
+        currentDate = activityDate
+      } else if (diffDays > 1) {
+        break
+      }
+    }
+    
+    return Math.min(streak, 7) // Limiter à 7 jours
+  }
+
+  // Obtenir la dernière activité
+  const getLastActivity = (activities: any[]): string | null => {
+    if (activities.length === 0) return null
+    
+    const lastActivity = activities.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )[0]
+    
+    return lastActivity.createdAt
   }
 
   useEffect(() => {
-    // Simuler le chargement des statistiques
-    // Plus tard, on fera un appel API réel
-    const mockActivities = [
-      { score: 85, durationMs: 25000, attempts: 1, domain: 'maths' },
-      { score: 92, durationMs: 18000, attempts: 1, domain: 'coding' },
-      { score: 78, durationMs: 35000, attempts: 2, domain: 'maths' },
-      { score: 88, durationMs: 22000, attempts: 1, domain: 'coding' },
-      { score: 95, durationMs: 15000, attempts: 1, domain: 'maths' }
-    ]
+    if (activities.length > 0) {
+      const experience = calculateExperience(activities)
+      const level = calculateLevel(experience)
+      const totalTime = calculateTotalTime(activities)
+      const averageScore = calculateAverageScore(activities)
+      const badges = generateBadges(activities, averageScore)
+      const streak = calculateStreak(activities)
+      const domains = getUniqueDomains(activities)
+      const lastActivity = getLastActivity(activities)
 
-    const experience = calculateExperience(mockActivities)
-    const level = calculateLevel(experience)
-    const totalTime = calculateTotalTime(mockActivities)
-    const averageScore = calculateAverageScore(mockActivities)
-    const badges = generateBadges(mockActivities, averageScore)
-    const streak = calculateStreak()
+      setStats({
+        level,
+        experience,
+        totalTime,
+        activitiesCount: activities.length,
+        averageScore,
+        badges,
+        streak,
+        domains,
+        lastActivity
+      })
+    }
+  }, [activities])
 
-    setStats({
-      level,
-      experience,
-      totalTime,
-      activitiesCount: mockActivities.length,
-      averageScore,
-      badges,
-      streak
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('fr-FR', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric' 
     })
-  }, [userId])
+  }
+
+  const formatTime = (milliseconds: number) => {
+    const hours = Math.floor(milliseconds / 3600000)
+    const minutes = Math.floor((milliseconds % 3600000) / 60000)
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`
+    } else {
+      return `${minutes}m`
+    }
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
@@ -137,6 +212,24 @@ export default function UserStats({ userId }: UserStatsProps) {
         <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
           <div className="text-2xl font-bold text-yellow-600 mb-1">{stats.badges.length}</div>
           <div className="text-xs text-yellow-700 font-medium">Badges</div>
+        </div>
+      </div>
+
+      {/* Informations supplémentaires */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="text-lg font-bold text-gray-600 mb-1">{stats.domains.length}</div>
+          <div className="text-xs text-gray-500">Domaines actifs</div>
+        </div>
+        <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="text-lg font-bold text-gray-600 mb-1">{formatTime(stats.totalTime)}</div>
+          <div className="text-xs text-gray-500">Temps total</div>
+        </div>
+        <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="text-lg font-bold text-gray-600 mb-1">
+            {stats.lastActivity ? formatDate(stats.lastActivity) : 'Aucune'}
+          </div>
+          <div className="text-xs text-gray-500">Dernière activité</div>
         </div>
       </div>
 
