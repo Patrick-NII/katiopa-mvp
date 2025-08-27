@@ -4,10 +4,21 @@
 
 :root { color-scheme: light; }
 body { @apply bg-gray-50 text-gray-900; }
-.container-narrow { @apply max-w-xl mx-auto px-4; }
 .card { @apply bg-white rounded-2xl shadow p-6; }
 .btn { @apply inline-flex items-center justify-center rounded-lg border px-4 py-2 font-medium hover:opacity-90; }
 .btn-primary { @apply bg-blue-600 text-white; }
 .input { @apply w-full rounded-lg border px-3 py-2; }
 .label { @apply block text-sm font-medium mb-1; }
-.spinner { @apply inline-block h-4 w-4 animate-spin border-2 border-current border-t-transparent rounded-full align-[-0.125em]; }
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
