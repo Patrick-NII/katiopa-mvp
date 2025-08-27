@@ -1,237 +1,314 @@
-import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcryptjs'
+import { PrismaClient, SubscriptionType, Gender, UserType } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('🌱 Début du seeding du système multi-utilisateurs...')
+  console.log('🌱 Début du seeding de la base de données multi-utilisateurs...')
 
-  // 1. Créer un compte principal
-  const account = await prisma.account.create({
+  // Date de référence : 31 mai 2025
+  const referenceDate = new Date('2025-05-31T10:00:00Z')
+  
+  // Nettoyer la base de données
+  await prisma.activity.deleteMany()
+  await prisma.userProfile.deleteMany()
+  await prisma.userSession.deleteMany()
+  await prisma.billingRecord.deleteMany()
+  await prisma.account.deleteMany()
+
+  console.log('🧹 Base de données nettoyée')
+
+  // 1. Créer un compte PRO_PLUS avec 4 sessions
+  const proPlusAccount = await prisma.account.create({
     data: {
-      email: 'famille.dupont@example.com',
-      subscriptionType: 'PRO_PLUS',
+      email: 'famille.dubois@email.com',
+      subscriptionType: SubscriptionType.PRO_PLUS,
       maxSessions: 4,
-      isActive: true
+      createdAt: referenceDate,
+      totalAccountConnectionDurationMs: BigInt(0)
     }
   })
-  console.log('✅ Compte créé:', account.email)
 
-  // 2. Créer plusieurs sessions utilisateur pour ce compte
-  const sessions = [
-    {
-      sessionId: 'enfant1',
-      password: await bcrypt.hash('enfant123', 10),
-      firstName: 'Emma',
-      lastName: 'Dupont',
-      gender: 'FEMALE',
-      userType: 'CHILD',
-      age: 6,
-      grade: 'CP',
-      country: 'France',
-      timezone: 'Europe/Paris'
-    },
-    {
-      sessionId: 'enfant2',
-      password: await bcrypt.hash('enfant456', 10),
-      firstName: 'Lucas',
-      lastName: 'Dupont',
-      gender: 'MALE',
-      userType: 'CHILD',
-      age: 5,
-      grade: 'GS',
-      country: 'France',
-      timezone: 'Europe/Paris'
-    },
-    {
-      sessionId: 'parent1',
-      password: await bcrypt.hash('parent123', 10),
-      firstName: 'Marie',
-      lastName: 'Dupont',
-      gender: 'FEMALE',
-      userType: 'PARENT',
-      age: 35,
-      country: 'France',
-      timezone: 'Europe/Paris'
-    },
-    {
-      sessionId: 'parent2',
-      password: await bcrypt.hash('parent456', 10),
-      firstName: 'Pierre',
-      lastName: 'Dupont',
-      gender: 'MALE',
-      userType: 'PARENT',
-      age: 37,
-      country: 'France',
-      timezone: 'Europe/Paris'
-    }
-  ]
+  console.log('✅ Compte PRO_PLUS créé:', proPlusAccount.email)
 
-  const createdSessions = []
-  for (const sessionData of sessions) {
-    const session = await prisma.userSession.create({
+  // 2. Créer 4 sessions pour ce compte
+  const proPlusSessions = await Promise.all([
+    // Enfant 1 - Lucas (8 ans)
+    prisma.userSession.create({
       data: {
-        ...sessionData,
-        accountId: account.id,
-        isActive: true
+        accountId: proPlusAccount.id,
+        sessionId: 'LUCAS_001',
+        password: 'lucas123',
+        firstName: 'Lucas',
+        lastName: 'Dubois',
+        gender: Gender.MALE,
+        userType: UserType.CHILD,
+        age: 8,
+        grade: 'CE2',
+        country: 'France',
+        timezone: 'Europe/Paris',
+        preferences: {
+          learningStyle: 'visual',
+          preferredSubjects: ['maths', 'sciences'],
+          interests: ['dinosaures', 'espace', 'jeux vidéo']
+        },
+        createdAt: referenceDate,
+        totalConnectionDurationMs: BigInt(0),
+        currentSessionStartTime: null
+      }
+    }),
+
+    // Enfant 2 - Emma (6 ans)
+    prisma.userSession.create({
+      data: {
+        accountId: proPlusAccount.id,
+        sessionId: 'EMMA_002',
+        password: 'emma123',
+        firstName: 'Emma',
+        lastName: 'Dubois',
+        gender: Gender.FEMALE,
+        userType: UserType.CHILD,
+        age: 6,
+        grade: 'CP',
+        country: 'France',
+        timezone: 'Europe/Paris',
+        preferences: {
+          learningStyle: 'kinesthetic',
+          preferredSubjects: ['français', 'arts'],
+          interests: ['dessin', 'danse', 'histoires']
+        },
+        createdAt: referenceDate,
+        totalConnectionDurationMs: BigInt(0),
+        currentSessionStartTime: null
+      }
+    }),
+
+    // Parent 1 - Marie (mère)
+    prisma.userSession.create({
+      data: {
+        accountId: proPlusAccount.id,
+        sessionId: 'MARIE_003',
+        password: 'marie123',
+        firstName: 'Marie',
+        lastName: 'Dubois',
+        gender: Gender.FEMALE,
+        userType: UserType.PARENT,
+        age: 35,
+        country: 'France',
+        timezone: 'Europe/Paris',
+        preferences: {
+          learningGoals: 'Suivre la progression des enfants',
+          interests: ['éducation', 'psychologie enfantine']
+        },
+        createdAt: referenceDate,
+        totalConnectionDurationMs: BigInt(0),
+        currentSessionStartTime: null
+      }
+    }),
+
+    // Parent 2 - Thomas (père)
+    prisma.userSession.create({
+      data: {
+        accountId: proPlusAccount.id,
+        sessionId: 'THOMAS_004',
+        password: 'thomas123',
+        firstName: 'Thomas',
+        lastName: 'Dubois',
+        gender: Gender.MALE,
+        userType: UserType.PARENT,
+        age: 37,
+        country: 'France',
+        timezone: 'Europe/Paris',
+        preferences: {
+          learningGoals: 'Encourager la curiosité scientifique',
+          interests: ['sciences', 'technologie', 'sport']
+        },
+        createdAt: referenceDate,
+        totalConnectionDurationMs: BigInt(0),
+        currentSessionStartTime: null
       }
     })
-    createdSessions.push(session)
-    console.log(`✅ Session créée: ${session.firstName} ${session.lastName} (${session.sessionId})`)
-  }
+  ])
 
-  // 3. Créer des profils détaillés pour les enfants
-  const childSessions = createdSessions.filter(s => s.userType === 'CHILD')
-  
-  for (const childSession of childSessions) {
-    await prisma.userProfile.create({
-      data: {
-        userSessionId: childSession.id,
-        learningGoals: ['Lire couramment', 'Compter jusqu\'à 100', 'Écrire en cursive'],
-        preferredSubjects: ['Mathématiques', 'Français', 'Sciences'],
-        learningStyle: 'visuel',
-        difficulty: 'moyen',
-        interests: ['Dinosaures', 'Espace', 'Animaux', 'Musique'],
-        specialNeeds: [],
-        customNotes: 'Enfant curieux et motivé',
-        parentWishes: 'Souhaite que l\'enfant développe sa confiance en soi et son autonomie'
-      }
-    })
-    console.log(`✅ Profil créé pour: ${childSession.firstName}`)
-  }
+  console.log('✅ 4 sessions PRO_PLUS créées')
 
-  // 4. Créer des activités d'apprentissage pour les enfants
-  const domains = ['Mathématiques', 'Français', 'Sciences', 'IA']
-  const nodeKeys = ['addition', 'soustraction', 'multiplication', 'lecture', 'ecriture', 'vocabulaire', 'logique', 'programmation']
-  
-  for (const childSession of childSessions) {
-    // Créer 10-15 activités par enfant
-    const numActivities = Math.floor(Math.random() * 6) + 10
-    
-    for (let i = 0; i < numActivities; i++) {
-      const domain = domains[Math.floor(Math.random() * domains.length)]
-      const nodeKey = nodeKeys[Math.floor(Math.random() * nodeKeys.length)]
-      const score = Math.floor(Math.random() * 41) + 60 // Score entre 60 et 100
-      const attempts = Math.floor(Math.random() * 3) + 1 // 1 à 3 tentatives
-      const durationMs = Math.floor(Math.random() * 300000) + 60000 // 1 à 6 minutes
-      
-      // Date aléatoire dans les 30 derniers jours
-      const daysAgo = Math.floor(Math.random() * 30)
-      const createdAt = new Date()
-      createdAt.setDate(createdAt.getDate() - daysAgo)
-      
-      await prisma.activity.create({
-        data: {
-          userSessionId: childSession.id,
-          domain,
-          nodeKey,
-          score,
-          attempts,
-          durationMs,
-          createdAt
-        }
-      })
-    }
-    console.log(`✅ ${numActivities} activités créées pour: ${childSession.firstName}`)
-  }
-
-  // 5. Créer un compte gratuit pour démonstration
+  // 3. Créer un compte FREE avec 2 sessions
   const freeAccount = await prisma.account.create({
     data: {
-      email: 'famille.martin@example.com',
-      subscriptionType: 'FREE',
+      email: 'test.gratuit@email.com',
+      subscriptionType: SubscriptionType.FREE,
       maxSessions: 2,
-      isActive: true
+      createdAt: referenceDate,
+      totalAccountConnectionDurationMs: BigInt(0)
     }
   })
-  console.log('✅ Compte gratuit créé:', freeAccount.email)
 
-  // 6. Créer 2 sessions pour le compte gratuit
-  const freeSessions = [
-    {
-      sessionId: 'enfant3',
-      password: await bcrypt.hash('enfant789', 10),
-      firstName: 'Jade',
-      lastName: 'Martin',
-      gender: 'FEMALE',
-      userType: 'CHILD',
-      age: 7,
-      grade: 'CE1',
-      country: 'France',
-      timezone: 'Europe/Paris'
-    },
-    {
-      sessionId: 'parent3',
-      password: await bcrypt.hash('parent789', 10),
-      firstName: 'Sophie',
-      lastName: 'Martin',
-      gender: 'FEMALE',
-      userType: 'PARENT',
-      age: 32,
-      country: 'France',
-      timezone: 'Europe/Paris'
-    }
-  ]
+  console.log('✅ Compte FREE créé:', freeAccount.email)
 
-  for (const sessionData of freeSessions) {
-    const session = await prisma.userSession.create({
+  // 4. Créer 2 sessions pour ce compte
+  const freeSessions = await Promise.all([
+    // Enfant - Léo (7 ans)
+    prisma.userSession.create({
       data: {
-        ...sessionData,
         accountId: freeAccount.id,
-        isActive: true
+        sessionId: 'LEO_005',
+        password: 'leo123',
+        firstName: 'Léo',
+        lastName: 'Martin',
+        gender: Gender.MALE,
+        userType: UserType.CHILD,
+        age: 7,
+        grade: 'CE1',
+        country: 'France',
+        timezone: 'Europe/Paris',
+        preferences: {
+          learningStyle: 'auditory',
+          preferredSubjects: ['français', 'musique'],
+          interests: ['musique', 'lecture', 'nature']
+        },
+        createdAt: referenceDate,
+        totalConnectionDurationMs: BigInt(0),
+        currentSessionStartTime: null
+      }
+    }),
+
+    // Parent - Sophie (mère)
+    prisma.userSession.create({
+      data: {
+        accountId: freeAccount.id,
+        sessionId: 'SOPHIE_006',
+        password: 'sophie123',
+        firstName: 'Sophie',
+        lastName: 'Martin',
+        gender: Gender.FEMALE,
+        userType: UserType.PARENT,
+        age: 32,
+        country: 'France',
+        timezone: 'Europe/Paris',
+        preferences: {
+          learningGoals: 'Découvrir la plateforme',
+          interests: ['éducation alternative', 'développement personnel']
+        },
+        createdAt: referenceDate,
+        totalConnectionDurationMs: BigInt(0),
+        currentSessionStartTime: null
       }
     })
-    console.log(`✅ Session gratuite créée: ${session.firstName} ${session.lastName}`)
-  }
+  ])
 
-  // 7. Créer quelques activités pour le compte gratuit
-  const freeChildSession = await prisma.userSession.findFirst({
-    where: { accountId: freeAccount.id, userType: 'CHILD' }
-  })
+  console.log('✅ 2 sessions FREE créées')
 
-  if (freeChildSession) {
-    for (let i = 0; i < 5; i++) {
-      const domain = domains[Math.floor(Math.random() * domains.length)]
-      const nodeKey = nodeKeys[Math.floor(Math.random() * nodeKeys.length)]
-      const score = Math.floor(Math.random() * 41) + 60
-      const attempts = Math.floor(Math.random() * 3) + 1
-      const durationMs = Math.floor(Math.random() * 300000) + 60000
-      
-      const createdAt = new Date()
-      createdAt.setDate(createdAt.getDate() - Math.floor(Math.random() * 15))
-      
-      await prisma.activity.create({
+  // 5. Créer des profils utilisateur détaillés
+  for (const session of [...proPlusSessions, ...freeSessions]) {
+    if (session.userType === UserType.CHILD) {
+      await prisma.userProfile.create({
         data: {
-          userSessionId: freeChildSession.id,
-          domain,
-          nodeKey,
-          score,
-          attempts,
-          durationMs,
-          createdAt
+          userSessionId: session.id,
+          learningGoals: [
+            'Améliorer les compétences en mathématiques',
+            'Développer la créativité',
+            'Renforcer la confiance en soi'
+          ],
+          preferredSubjects: ['maths', 'français', 'sciences'],
+          learningStyle: 'mixed',
+          difficulty: 'adaptative',
+          sessionPreferences: {
+            sessionDuration: 30,
+            breakFrequency: 10,
+            rewardSystem: true
+          },
+          interests: ['apprentissage', 'découverte', 'jeux éducatifs'],
+          specialNeeds: [],
+          customNotes: 'Enfant curieux et motivé',
+          parentWishes: 'Encourager l\'autonomie et la persévérance'
         }
       })
     }
-    console.log(`✅ 5 activités créées pour le compte gratuit`)
   }
 
+  console.log('✅ Profils utilisateur créés')
+
+  // 6. Créer des activités d'apprentissage pour les enfants
+  const childSessions = [...proPlusSessions, ...freeSessions].filter(s => s.userType === UserType.CHILD)
+  
+  for (const session of childSessions) {
+    // Activités en mathématiques
+    await prisma.activity.createMany({
+      data: [
+        {
+          userSessionId: session.id,
+          domain: 'maths',
+          nodeKey: 'addition_simple',
+          score: 85,
+          attempts: 2,
+          durationMs: 120000 // 2 minutes
+        },
+        {
+          userSessionId: session.id,
+          domain: 'maths',
+          nodeKey: 'soustraction_simple',
+          score: 92,
+          attempts: 1,
+          durationMs: 90000 // 1.5 minutes
+        },
+        {
+          userSessionId: session.id,
+          domain: 'français',
+          nodeKey: 'lecture_mots',
+          score: 78,
+          attempts: 3,
+          durationMs: 180000 // 3 minutes
+        },
+        {
+          userSessionId: session.id,
+          domain: 'sciences',
+          nodeKey: 'animaux_domestiques',
+          score: 95,
+          attempts: 1,
+          durationMs: 150000 // 2.5 minutes
+        }
+      ]
+    })
+  }
+
+  console.log('✅ Activités d\'apprentissage créées')
+
+  // 7. Créer des enregistrements de facturation pour le compte PRO_PLUS
+  await prisma.billingRecord.create({
+    data: {
+      accountId: proPlusAccount.id,
+      amount: 29.99,
+      currency: 'EUR',
+      description: 'Abonnement PRO_PLUS - Mai 2025',
+      status: 'PAID',
+      billingDate: referenceDate,
+      dueDate: referenceDate,
+      paidAt: referenceDate
+    }
+  })
+
+  console.log('✅ Enregistrements de facturation créés')
+
   console.log('\n🎉 Seeding terminé avec succès !')
-  console.log('\n📊 Résumé:')
-  console.log(`- Comptes créés: 2 (1 PRO_PLUS, 1 FREE)`)
-  console.log(`- Sessions totales: ${createdSessions.length + freeSessions.length}`)
-  console.log(`- Profils enfants: ${childSessions.length}`)
-  console.log(`- Activités totales: ~${childSessions.length * 12 + 5}`)
+  console.log('\n📋 Comptes de test créés :')
+  console.log('\n🔐 Compte PRO_PLUS (4 sessions) :')
+  console.log('   Email: famille.dubois@email.com')
+  console.log('   Sessions:')
+  console.log('     - LUCAS_001 / lucas123 (Enfant, 8 ans)')
+  console.log('     - EMMA_002 / emma123 (Enfant, 6 ans)')
+  console.log('     - MARIE_003 / marie123 (Parent, 35 ans)')
+  console.log('     - THOMAS_004 / thomas123 (Parent, 37 ans)')
   
-  console.log('\n🔑 Identifiants de connexion:')
-  console.log('Compte PRO_PLUS (famille.dupont@example.com):')
-  console.log('  - Emma (enfant1): enfant123')
-  console.log('  - Lucas (enfant2): enfant456')
-  console.log('  - Marie (parent1): parent123')
-  console.log('  - Pierre (parent2): parent456')
+  console.log('\n🔐 Compte FREE (2 sessions) :')
+  console.log('   Email: test.gratuit@email.com')
+  console.log('   Sessions:')
+  console.log('     - LEO_005 / leo123 (Enfant, 7 ans)')
+  console.log('     - SOPHIE_006 / sophie123 (Parent, 32 ans)')
   
-  console.log('\nCompte FREE (famille.martin@example.com):')
-  console.log('  - Jade (enfant3): enfant789')
-  console.log('  - Sophie (parent3): parent789')
+  console.log('\n💡 Pour tester :')
+  console.log('   1. Connectez-vous avec n\'importe quelle session')
+  console.log('   2. Vérifiez que les données s\'affichent correctement')
+  console.log('   3. Testez la navigation entre les onglets')
+  console.log('   4. Vérifiez que le LLM reçoit toutes les informations')
 }
 
 main()

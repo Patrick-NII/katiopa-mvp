@@ -16,6 +16,7 @@ model Account {
   isActive          Boolean       @default(true)
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
+  totalAccountConnectionDurationMs BigInt @default(0) // Temps total de connexion du compte
   
   // Relations
   userSessions      UserSession[]
@@ -41,6 +42,8 @@ model UserSession {
   lastLoginAt     DateTime?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
+  totalConnectionDurationMs BigInt @default(0) // Temps total de connexion de cette session
+  currentSessionStartTime DateTime? // Début de la session actuelle
   
   // Relations
   account         Account     @relation(fields: [accountId], references: [id])
