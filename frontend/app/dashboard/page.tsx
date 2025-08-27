@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import NavBar from '@/components/NavBar'
 import UserProfile from '@/components/UserProfile'
 import UserStats from '@/components/UserStats'
+import PerformanceCharts from '@/components/PerformanceCharts'
 import { useRouter } from 'next/navigation'
 
 interface Activity {
@@ -37,6 +38,34 @@ interface User {
   email: string
   role: string
   createdAt: string
+  phone?: string
+  country?: string
+  timezone?: string
+  preferences?: {
+    language: string
+    theme: string
+    notifications: boolean
+  }
+}
+
+interface Subscription {
+  plan: string
+  status: string
+  startDate: string
+  endDate: string
+  nextBilling: string
+  amount: number
+  currency: string
+}
+
+interface Billing {
+  invoices: Array<{
+    id: string
+    date: string
+    amount: number
+    status: string
+  }>
+  totalSpent: number
 }
 
 export default function Dashboard() {
@@ -49,6 +78,26 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false)
   const [focus, setFocus] = useState('maths')
   const [error, setError] = useState<string | null>(null)
+
+  // Données simulées pour l'abonnement (à remplacer par des appels API réels)
+  const [subscription] = useState<Subscription>({
+    plan: 'Premium',
+    status: 'active',
+    startDate: '2024-01-01',
+    endDate: '2024-12-31',
+    nextBilling: '2024-02-01',
+    amount: 29.99,
+    currency: 'EUR'
+  })
+
+  const [billing] = useState<Billing>({
+    invoices: [
+      { id: 'INV-001', date: '2024-01-01', amount: 29.99, status: 'paid' },
+      { id: 'INV-002', date: '2024-02-01', amount: 29.99, status: 'paid' },
+      { id: 'INV-003', date: '2024-03-01', amount: 29.99, status: 'pending' }
+    ],
+    totalSpent: 59.98
+  })
 
   // Vérification de l'authentification
   useEffect(() => {
@@ -130,16 +179,29 @@ export default function Dashboard() {
       <NavBar />
       <div className="min-h-screen bg-gray-50">
         <div className="w-full px-6 py-8">
-          {/* Profil utilisateur */}
+          {/* Profil utilisateur enrichi */}
           <UserProfile 
             user={user}
             level={Math.floor(activities.length * 10 / 100) + 1}
             experience={activities.length * 10}
             totalTime={activities.reduce((total, a) => total + a.durationMs, 0)}
+            subscription={subscription}
+            billing={billing}
           />
 
-          {/* Statistiques détaillées */}
-          <UserStats userId={user.id} />
+          {/* Statistiques détaillées cohérentes */}
+          <UserStats 
+            userId={user.id}
+            activities={activities}
+            memberSince={user.createdAt}
+          />
+
+          {/* Graphiques de performance */}
+          <PerformanceCharts 
+            userId={user.id}
+            memberSince={user.createdAt}
+            activities={activities}
+          />
 
           {/* Dashboard principal */}
           <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
