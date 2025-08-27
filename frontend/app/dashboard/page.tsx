@@ -5,6 +5,7 @@ import NavBar from '@/components/NavBar'
 import UserProfile from '@/components/UserProfile'
 import UserStats from '@/components/UserStats'
 import PerformanceCharts from '@/components/PerformanceCharts'
+import FreeAccountLimitations from '@/components/FreeAccountLimitations'
 import { useRouter } from 'next/navigation'
 
 interface Activity {
@@ -46,6 +47,7 @@ interface User {
     theme: string
     notifications: boolean
   }
+  subscriptionType?: 'free' | 'premium' | 'enterprise'
 }
 
 interface Subscription {
@@ -79,25 +81,29 @@ export default function Dashboard() {
   const [focus, setFocus] = useState('maths')
   const [error, setError] = useState<string | null>(null)
 
-  // Données simulées pour l'abonnement (à remplacer par des appels API réels)
-  const [subscription] = useState<Subscription>({
-    plan: 'Premium',
-    status: 'active',
-    startDate: '2024-01-01',
-    endDate: '2024-12-31',
-    nextBilling: '2024-02-01',
-    amount: 29.99,
-    currency: 'EUR'
-  })
+  // Déterminer le type de compte (par défaut gratuit pour les nouveaux utilisateurs)
+  const [subscription] = useState<Subscription | null>(null) // null = compte gratuit
+  const [billing] = useState<Billing | null>(null)
 
-  const [billing] = useState<Billing>({
-    invoices: [
-      { id: 'INV-001', date: '2024-01-01', amount: 29.99, status: 'paid' },
-      { id: 'INV-002', date: '2024-02-01', amount: 29.99, status: 'paid' },
-      { id: 'INV-003', date: '2024-03-01', amount: 29.99, status: 'pending' }
-    ],
-    totalSpent: 59.98
-  })
+  // Définir les fonctionnalités selon le type de compte
+  const currentFeatures = [
+    'Accès aux exercices de base',
+    'Statistiques simples',
+    'Suivi de progression basique',
+    'Évaluation LLM',
+    'Support communautaire'
+  ]
+
+  const premiumFeatures = [
+    'Graphiques de performance détaillés',
+    'Statistiques avancées et analyses',
+    'Historique complet des activités',
+    'Comparaisons et tendances',
+    'Export des données',
+    'Support prioritaire',
+    'Exercices premium exclusifs',
+    'Personnalisation avancée'
+  ]
 
   // Vérification de l'authentification
   useEffect(() => {
@@ -121,7 +127,12 @@ export default function Dashboard() {
     try {
       const response = await apiGet<{ user: User }>('/auth/me')
       if (response.user) {
-        setUser(response.user)
+        // S'assurer que le type de compte est défini
+        const userWithType = {
+          ...response.user,
+          subscriptionType: response.user.subscriptionType || 'free'
+        }
+        setUser(userWithType)
       }
     } catch (err) {
       console.error('Failed to load user profile:', err)
@@ -174,6 +185,8 @@ export default function Dashboard() {
     )
   }
 
+  const isFreeAccount = user.subscriptionType === 'free'
+
   return (
     <>
       <NavBar />
@@ -196,12 +209,22 @@ export default function Dashboard() {
             memberSince={user.createdAt}
           />
 
-          {/* Graphiques de performance */}
-          <PerformanceCharts 
-            userId={user.id}
-            memberSince={user.createdAt}
-            activities={activities}
-          />
+          {/* Graphiques de performance - UNIQUEMENT pour les comptes premium */}
+          {!isFreeAccount && (
+            <PerformanceCharts 
+              userId={user.id}
+              memberSince={user.createdAt}
+              activities={activities}
+            />
+          )}
+
+          {/* Limitations du compte gratuit */}
+          {isFreeAccount && (
+            <FreeAccountLimitations 
+              currentFeatures={currentFeatures}
+              premiumFeatures={premiumFeatures}
+            />
+          )}
 
           {/* Dashboard principal */}
           <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
