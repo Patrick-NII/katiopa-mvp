@@ -1,0 +1,103 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: katiopa_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: './backend/package-lock.json'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Generate Prisma client
+      run: npm run db:generate
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/katiopa_test
+    
+    - name: Run database migrations
+      run: npm run db:push
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/katiopa_test
+    
+    - name: Run tests (placeholder)
+      run: echo "Tests will be added here"
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/katiopa_test
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: './frontend/package-lock.json'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build application
+      run: npm run build
+    
+    - name: Run tests (placeholder)
+      run: echo "Tests will be added here"
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run security audit
+      run: |
+        cd backend && npm audit --audit-level moderate
+        cd ../frontend && npm audit --audit-level moderate
+
+  deploy-preview:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    needs: [test-backend, test-frontend, security]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to preview environment
+      run: echo "Deploy preview will be configured here" 
