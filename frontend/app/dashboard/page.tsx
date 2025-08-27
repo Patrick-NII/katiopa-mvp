@@ -9,6 +9,8 @@ import FreeAccountLimitations from '@/components/FreeAccountLimitations'
 import AnimatedLLMButton from '@/components/AnimatedLLMButton'
 import AdvancedLLMResults from '@/components/AdvancedLLMResults'
 import { useRouter } from 'next/navigation'
+import DetailedUserInfo from '@/components/DetailedUserInfo'
+import HelpChatButton from '@/components/HelpChatButton'
 
 interface Activity {
   id: string
@@ -109,6 +111,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false)
   const [focus, setFocus] = useState('maths')
   const [error, setError] = useState<string | null>(null)
+  const [userPreferences, setUserPreferences] = useState<any>(null)
 
   // Déterminer le type de compte (par défaut gratuit pour les nouveaux utilisateurs)
   const [subscription] = useState<Subscription | null>(null) // null = compte gratuit
@@ -186,17 +189,39 @@ export default function Dashboard() {
     }
   }
 
+  const handlePreferencesUpdate = (preferences: any) => {
+    setUserPreferences(preferences)
+    // Ici vous pourriez sauvegarder les préférences via API
+    console.log('Préférences mises à jour:', preferences)
+  }
+
   // Préparer les données pour l'évaluation LLM avancée
-  const prepareLLMData = () => {
+  function prepareLLMData() {
+    if (!user) return {}
+    
     const now = new Date()
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-    const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
+    const memberSince = new Date(user.createdAt)
+    const daysSinceRegistration = Math.floor((now.getTime() - memberSince.getTime()) / (1000 * 60 * 60 * 24))
+    const weeksSinceRegistration = Math.floor(daysSinceRegistration / 7)
+    const monthsSinceRegistration = Math.floor(daysSinceRegistration / 30)
     
-    // Activités des 7 derniers jours
-    const activities7d = activities.filter(a => new Date(a.createdAt) >= sevenDaysAgo)
-    const activities14d = activities.filter(a => new Date(a.createdAt) >= fourteenDaysAgo)
+    // Calculer les jours d'inactivité
+    const lastActivity = activities.length > 0 ? new Date(activities[0].createdAt) : null
+    const daysInactive = lastActivity ? Math.floor((now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24)) : daysSinceRegistration
     
-    // Calculer les tendances
+    // Activités des 7 et 14 derniers jours
+    const activities7d = activities.filter(a => {
+      const activityDate = new Date(a.createdAt)
+      const diffDays = Math.floor((now.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24))
+      return diffDays <= 7
+    })
+    
+    const activities14d = activities.filter(a => {
+      const activityDate = new Date(a.createdAt)
+      const diffDays = Math.floor((now.getTime() - activityDate.getTime()) / (1000 * 60 * 60 * 24))
+      return diffDays <= 14
+    })
+    
     const scores7d = activities7d.map(a => a.score)
     const scores14d = activities14d.map(a => a.score)
     const avgScore7d = scores7d.length > 0 ? scores7d.reduce((a, b) => a + b, 0) / scores7d.length : 0
@@ -224,18 +249,76 @@ export default function Dashboard() {
     if (activities7d.some(a => a.attempts > 3)) riskFlags.push('frustration_risk')
     
     return {
+      // Informations de base de l'utilisateur
+      user_id: user.id,
+      user_name: user.name,
+      user_email: user.email,
+      user_age: user.age || 'non spécifié',
+      user_grade: user.grade || 'non spécifié',
+      user_country: user.country || 'non spécifié',
+      user_timezone: user.timezone || 'non spécifié',
+      
+      // Informations d'inscription et de membre
+      member_since: user.createdAt,
+      member_since_formatted: memberSince.toLocaleDateString('fr-FR'),
+      days_since_registration: daysSinceRegistration,
+      weeks_since_registration: weeksSinceRegistration,
+      months_since_registration: monthsSinceRegistration,
+      subscription_type: user.subscriptionType || 'free',
+      
+      // Activité et performance
+      activities_count_total: activities.length,
       activities_count_7d: activities7d.length,
       activities_count_14d: activities14d.length,
-      avg_score_7d: avgScore7d,
-      avg_score_14d: avgScore14d,
-      score_slope_14d: scoreSlope,
-      time_on_task_slope_14d: 0, // À calculer si nécessaire
-      days_inactive_7d: 0, // À calculer si nécessaire
-      domain_stats: domainStats,
-      risk_flags: riskFlags,
+      avg_score_7d: Math.round(avgScore7d),
+      avg_score_14d: Math.round(avgScore14d),
+      score_slope_14d: Math.round(scoreSlope * 100) / 100,
+      
+      // Inactivité et engagement
+      days_inactive: daysInactive,
       last_practiced_at: activities.length > 0 ? activities[0].createdAt : null,
-      member_since: user?.createdAt,
-      subscription_type: user?.subscriptionType || 'free'
+      last_practiced_formatted: activities.length > 0 ? new Date(activities[0].createdAt).toLocaleDateString('fr-FR') : 'jamais',
+      
+      // Statistiques par domaine
+      domain_stats: domainStats,
+      preferred_domain: activities.length > 0 ? 
+        Object.entries(domainStats).sort(([,a], [,b]) => b.count - a.count)[0]?.[0] : 'aucun',
+      
+      // Risques et alertes
+      risk_flags: riskFlags,
+      
+      // Contexte temporel
+      current_date: now.toISOString(),
+      current_date_formatted: now.toLocaleDateString('fr-FR'),
+      current_time: now.toLocaleTimeString('fr-FR'),
+      
+      // Données de session
+      total_practice_time_ms: activities.reduce((acc, a) => acc + a.durationMs, 0),
+      total_practice_time_minutes: Math.round(activities.reduce((acc, a) => acc + a.durationMs, 0) / (1000 * 60)),
+      average_session_duration_minutes: activities.length > 0 ? 
+        Math.round(activities.reduce((acc, a) => acc + a.durationMs, 0) / (activities.length * 1000 * 60)) : 0,
+      
+      // Tentatives et difficulté
+      total_attempts: activities.reduce((acc, a) => acc + a.attempts, 0),
+      average_attempts_per_activity: activities.length > 0 ? 
+        Math.round(activities.reduce((acc, a) => acc + a.attempts, 0) / activities.length * 100) / 100 : 0,
+      
+      // Préférences et habitudes
+      most_active_time: activities.length > 0 ? 
+        activities.reduce((acc, a) => {
+          const hour = new Date(a.createdAt).getHours()
+          acc[hour] = (acc[hour] || 0) + 1
+          return acc
+        }, {} as Record<number, number>) : {},
+      most_active_day: activities.length > 0 ? 
+        activities.reduce((acc, a) => {
+          const day = new Date(a.createdAt).getDay()
+          acc[day] = (acc[day] || 0) + 1
+          return acc
+        }, {} as Record<number, number>) : {},
+      
+      // Préférences utilisateur (si disponibles)
+      user_preferences: userPreferences || null
     }
   }
 
@@ -496,6 +579,17 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      
+      {/* Informations détaillées de l'utilisateur */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <DetailedUserInfo 
+          user={user!} 
+          onPreferencesUpdate={handlePreferencesUpdate}
+        />
+      </div>
+
+      {/* Bouton d'aide flottant */}
+      <HelpChatButton />
     </>
   )
 } 
