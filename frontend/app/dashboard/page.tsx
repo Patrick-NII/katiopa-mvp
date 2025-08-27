@@ -2,6 +2,8 @@
 import { apiGet, apiPost } from '@/lib/api'
 import { useEffect, useState } from 'react'
 import NavBar from '@/components/NavBar'
+import UserProfile from '@/components/UserProfile'
+import UserStats from '@/components/UserStats'
 import { useRouter } from 'next/navigation'
 
 interface Activity {
@@ -28,9 +30,18 @@ interface LLMResponse {
   }>
 }
 
+interface User {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  role: string
+}
+
 export default function Dashboard() {
   const router = useRouter()
   const [ready, setReady] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
   const [activities, setActivities] = useState<Activity[]>([])
   const [summary, setSummary] = useState<Summary[]>([])
   const [llmResponse, setLlmResponse] = useState<LLMResponse | null>(null)
@@ -45,6 +56,7 @@ export default function Dashboard() {
       router.replace('/login')
     } else {
       setReady(true)
+      loadUserProfile()
     }
   }, [router])
 
@@ -54,6 +66,17 @@ export default function Dashboard() {
       loadData()
     }
   }, [ready])
+
+  async function loadUserProfile() {
+    try {
+      const response = await apiGet<{ user: User }>('/auth/me')
+      if (response.user) {
+        setUser(response.user)
+      }
+    } catch (err) {
+      console.error('Failed to load user profile:', err)
+    }
+  }
 
   async function loadData() {
     try {
@@ -83,7 +106,7 @@ export default function Dashboard() {
   }
 
   // Affichage du chargement pendant la vérification
-  if (!ready) {
+  if (!ready || !user) {
     return (
       <>
         <NavBar />
@@ -91,7 +114,7 @@ export default function Dashboard() {
           <div className="card">
             <div className="text-center py-8">
               <div className="spinner mx-auto mb-4"></div>
-              <p>Vérification de l'authentification...</p>
+              <p>Chargement du profil utilisateur...</p>
             </div>
           </div>
         </div>
@@ -103,6 +126,18 @@ export default function Dashboard() {
     <>
       <NavBar />
       <div className="container-narrow">
+        {/* Profil utilisateur */}
+        <UserProfile 
+          user={user}
+          level={Math.floor(activities.length * 10 / 100) + 1}
+          experience={activities.length * 10}
+          totalTime={activities.reduce((total, a) => total + a.durationMs, 0)}
+        />
+
+        {/* Statistiques détaillées */}
+        <UserStats userId={user.id} />
+
+        {/* Dashboard principal */}
         <div className="card mb-6">
           <h1 className="text-2xl font-semibold mb-4">Tableau de bord</h1>
           
