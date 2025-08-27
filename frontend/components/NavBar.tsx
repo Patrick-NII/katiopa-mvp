@@ -1,7 +1,8 @@
 'use client'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import ConnectionTimer from './ConnectionTimer'
+import GlobalConnectionInfo from './GlobalConnectionInfo'
+import { useSession } from '../hooks/useSession'
 
 interface User {
   id: string
@@ -9,11 +10,13 @@ interface User {
   lastName: string
   email: string
   role: string
+  createdAt?: string
 }
 
 export default function NavBar() {
   const [token, setToken] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(null)
+  const { clearSession } = useSession()
   
   useEffect(() => {
     const storedToken = localStorage.getItem('token')
@@ -43,6 +46,7 @@ export default function NavBar() {
 
   const handleLogout = () => {
     localStorage.removeItem('token')
+    clearSession() // Nettoyer la session
     setToken(null)
     setUser(null)
     window.location.href = '/'
@@ -51,16 +55,19 @@ export default function NavBar() {
   return (
     <nav className="container-narrow flex justify-between items-center py-4 border-b border-gray-200">
       <Link href="/" className="font-semibold text-xl text-blue-600">
-        🎯 Katiopa
+        Katiopa
       </Link>
       
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-6">
         {token ? (
           <>
-            {/* Timer de connexion */}
-            <ConnectionTimer />
+            {/* Informations de connexion globale */}
+            <GlobalConnectionInfo 
+              registrationDate={user?.createdAt || new Date().toISOString()}
+              totalConnectionTime={0} // Sera calculé plus tard
+            />
             
-            {/* Profil utilisateur */}
+            {/* Profil utilisateur compact */}
             <div className="flex items-center space-x-3">
               <div className="text-right">
                 <div className="text-sm font-medium text-gray-900">
@@ -81,23 +88,23 @@ export default function NavBar() {
             
             {/* Navigation */}
             <Link href="/dashboard" className="btn">
-              📊 Dashboard
+              Dashboard
             </Link>
             
             <button 
               onClick={handleLogout} 
               className="btn text-red-600 hover:bg-red-50"
             >
-              🚪 Déconnexion
+              Déconnexion
             </button>
           </>
         ) : (
           <>
             <Link href="/login" className="btn">
-              🔑 Connexion
+              Connexion
             </Link>
             <Link href="/register" className="btn btn-primary">
-              ✨ Inscription
+              Inscription
             </Link>
           </>
         )}
