@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { LogIn, User, Lock, Eye, EyeOff, Info } from 'lucide-react'
 import Link from 'next/link'
+import { apiPost } from '../../lib/api'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -21,25 +22,13 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sessionId, password }),
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('user', JSON.stringify(data.user))
-        router.push('/dashboard')
-      } else {
-        setError(data.error || 'Erreur de connexion')
-      }
-    } catch (err) {
-      setError('Erreur de connexion au serveur')
+      const data = await apiPost('/auth/login', { sessionId, password })
+      
+      localStorage.setItem('token', data.token)
+      localStorage.setItem('user', JSON.stringify(data.user))
+      router.push('/dashboard')
+    } catch (err: any) {
+      setError(err.message || 'Erreur de connexion')
     } finally {
       setLoading(false)
     }
@@ -74,6 +63,18 @@ export default function LoginPage() {
       name: 'Sophie (Parent, 32 ans)',
       sessionId: 'SOPHIE_006',
       password: 'sophie123',
+      type: 'FREE'
+    },
+    {
+      name: 'Patrick (Parent, 36 ans)',
+      sessionId: 'PATRICK_007',
+      password: 'patrick123',
+      type: 'FREE'
+    },
+    {
+      name: 'Aylon (Enfant, 6 ans, CP)',
+      sessionId: 'AYLON_008',
+      password: 'aylon123',
       type: 'FREE'
     }
   ]

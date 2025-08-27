@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { User, Mail, Calendar, Baby, Users, Crown, Gift, Check, AlertCircle, Info } from 'lucide-react'
+import { User, Mail, Calendar, Baby, Users, Crown, Gift, Check, AlertCircle, Info, Eye, EyeOff, Lock } from 'lucide-react'
 import Link from 'next/link'
+import { apiPost } from '../../lib/api'
 
 interface FamilyMember {
   id: string
@@ -14,6 +15,8 @@ interface FamilyMember {
   userType: 'CHILD' | 'PARENT'
   dateOfBirth: string
   grade?: string
+  password: string
+  confirmPassword: string
 }
 
 interface AccountData {
@@ -25,7 +28,7 @@ interface AccountData {
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [step, setStep] = useState<'account' | 'family' | 'review' | 'success'>('account')
+  const [step, setStep] = useState<'account' | 'family' | 'passwords' | 'review' | 'success'>('account')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   
@@ -44,8 +47,13 @@ export default function RegisterPage() {
     gender: 'UNKNOWN',
     userType: 'CHILD',
     dateOfBirth: '',
-    grade: ''
+    grade: '',
+    password: '',
+    confirmPassword: ''
   })
+
+  // État pour afficher/masquer les mots de passe
+  const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({})
 
   const subscriptionPlans = [
     {
@@ -100,7 +108,9 @@ export default function RegisterPage() {
       gender: currentMember.gender!,
       userType: currentMember.userType!,
       dateOfBirth: currentMember.dateOfBirth!,
-      grade: currentMember.grade
+      grade: currentMember.grade,
+      password: '',
+      confirmPassword: ''
     }
 
     setAccountData(prev => ({
@@ -115,7 +125,9 @@ export default function RegisterPage() {
       gender: 'UNKNOWN',
       userType: 'CHILD',
       dateOfBirth: '',
-      grade: ''
+      grade: '',
+      password: '',
+      confirmPassword: ''
     })
 
     setError('')
@@ -137,6 +149,41 @@ export default function RegisterPage() {
     }))
   }
 
+  const handlePasswordChange = (memberId: string, field: 'password' | 'confirmPassword', value: string) => {
+    setAccountData(prev => ({
+      ...prev,
+      familyMembers: prev.familyMembers.map(member => 
+        member.id === memberId ? { ...member, [field]: value } : member
+      )
+    }))
+  }
+
+  const validatePasswords = () => {
+    for (const member of accountData.familyMembers) {
+      if (!member.password) {
+        setError(`Veuillez définir un mot de passe pour ${member.firstName} ${member.lastName}`)
+        return false
+      }
+      if (member.password.length < 6) {
+        setError(`Le mot de passe de ${member.firstName} ${member.lastName} doit contenir au moins 6 caractères`)
+        return false
+      }
+      if (member.password !== member.confirmPassword) {
+        setError(`Les mots de passe de ${member.firstName} ${member.lastName} ne correspondent pas`)
+        return false
+      }
+    }
+    return true
+  }
+
+  const handlePasswordsSubmit = () => {
+    if (!validatePasswords()) {
+      return
+    }
+    setStep('review')
+    setError('')
+  }
+
   const handleFinalSubmit = async () => {
     if (accountData.familyMembers.length === 0) {
       setError('Veuillez ajouter au moins un membre de la famille')
@@ -148,29 +195,25 @@ export default function RegisterPage() {
       return
     }
 
+    if (!validatePasswords()) {
+      return
+    }
+
     setLoading(true)
     setError('')
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(accountData),
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
+      const data = await apiPost('/auth/register', accountData)
+      
+      if (data.success) {
         setStep('success')
         // Stocker les informations de connexion
         localStorage.setItem('registrationData', JSON.stringify(data))
       } else {
         setError(data.error || 'Erreur lors de l\'inscription')
       }
-    } catch (err) {
-      setError('Erreur de connexion au serveur')
+    } catch (err: any) {
+      setError(err.message || 'Erreur de connexion au serveur')
     } finally {
       setLoading(false)
     }
@@ -205,6 +248,13 @@ export default function RegisterPage() {
     }
   }
 
+  const togglePasswordVisibility = (memberId: string) => {
+    setShowPasswords(prev => ({
+      ...prev,
+      [memberId]: !prev[memberId]
+    }))
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
       <div className="max-w-4xl mx-auto">
@@ -229,24 +279,24 @@ export default function RegisterPage() {
         {/* Étapes */}
         <div className="flex justify-center mb-8">
           <div className="flex items-center space-x-4">
-            {['account', 'family', 'review', 'success'].map((stepName, index) => (
+            {['account', 'family', 'passwords', 'review', 'success'].map((stepName, index) => (
               <div key={stepName} className="flex items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                   step === stepName 
                     ? 'bg-blue-600 text-white' 
-                    : step === 'success' || ['account', 'family', 'review'].indexOf(step) < index
+                    : step === 'success' || ['account', 'family', 'passwords', 'review'].indexOf(step) < index
                     ? 'bg-green-500 text-white'
                     : 'bg-gray-300 text-gray-600'
                 }`}>
-                  {step === 'success' || ['account', 'family', 'review'].indexOf(step) < index ? (
+                  {step === 'success' || ['account', 'family', 'passwords', 'review'].indexOf(step) < index ? (
                     <Check size={16} />
                   ) : (
                     index + 1
                   )}
                 </div>
-                {index < 3 && (
+                {index < 4 && (
                   <div className={`w-16 h-1 mx-2 ${
-                    step === 'success' || ['account', 'family', 'review'].indexOf(step) < index
+                    step === 'success' || ['account', 'family', 'passwords', 'review'].indexOf(step) < index
                       ? 'bg-green-500'
                       : 'bg-gray-300'
                   }`} />
@@ -531,19 +581,154 @@ export default function RegisterPage() {
                 
                 <motion.button
                   type="button"
-                  onClick={() => setStep('review')}
+                  onClick={() => setStep('passwords')}
                   disabled={accountData.familyMembers.length === 0}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Continuer - Vérifier et confirmer
+                  Continuer - Définir les mots de passe
                 </motion.button>
               </div>
             </motion.div>
           )}
 
-          {/* Étape 3: Vérification et confirmation */}
+          {/* Étape 3: Définition des mots de passe */}
+          {step === 'passwords' && (
+            <motion.div
+              key="passwords"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="bg-white rounded-2xl shadow-xl p-8"
+            >
+              <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">
+                Définissez les mots de passe pour chaque membre
+              </h2>
+
+              <div className="mb-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                <div className="flex items-center gap-2 text-yellow-800">
+                  <Lock size={16} />
+                  <span className="font-medium">Sécurité des mots de passe</span>
+                </div>
+                <p className="text-sm text-yellow-700 mt-1">
+                  Chaque membre aura son propre mot de passe pour se connecter à sa session
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                {accountData.familyMembers.map((member) => (
+                  <div key={member.id} className="bg-gray-50 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                      {member.userType === 'CHILD' ? <Baby size={20} /> : <Users size={20} />}
+                      {member.firstName} {member.lastName}
+                    </h3>
+                    
+                    <div className="grid md:grid-cols-2 gap-4">
+            <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Mot de passe
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showPasswords[member.id] ? 'text' : 'password'}
+                            value={member.password}
+                            onChange={(e) => handlePasswordChange(member.id, 'password', e.target.value)}
+                            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Mot de passe"
+                            required
+                          />
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                          <button
+                            type="button"
+                            onClick={() => togglePasswordVisibility(member.id)}
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          >
+                            {showPasswords[member.id] ? <EyeOff size={16} /> : <Eye size={16} />}
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">Minimum 6 caractères</p>
+            </div>
+                      
+            <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Confirmer le mot de passe
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showPasswords[member.id] ? 'text' : 'password'}
+                            value={member.confirmPassword}
+                            onChange={(e) => handlePasswordChange(member.id, 'confirmPassword', e.target.value)}
+                            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Confirmer le mot de passe"
+                            required
+                          />
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                          <button
+                            type="button"
+                            onClick={() => togglePasswordVisibility(member.id)}
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          >
+                            {showPasswords[member.id] ? <EyeOff size={16} /> : <Eye size={16} />}
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          {member.password && member.confirmPassword && (
+                            member.password === member.confirmPassword ? (
+                              <Check size={14} className="text-green-500" />
+                            ) : (
+                              <AlertCircle size={14} className="text-red-500" />
+                            )
+                          )}
+                          <span className={`text-xs ${
+                            member.password && member.confirmPassword
+                              ? member.password === member.confirmPassword ? 'text-green-600' : 'text-red-600'
+                              : 'text-gray-500'
+                          }`}>
+                            {member.password && member.confirmPassword
+                              ? member.password === member.confirmPassword ? 'Mots de passe identiques' : 'Mots de passe différents'
+                              : 'Confirmez le mot de passe'
+                            }
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {error && (
+                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 mt-6">
+                  <AlertCircle size={16} />
+                  {error}
+                </div>
+              )}
+
+              <div className="flex gap-4 mt-8">
+                <motion.button
+                  type="button"
+                  onClick={() => setStep('family')}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all"
+                >
+                  Retour
+                </motion.button>
+                
+                <motion.button
+                  type="button"
+                  onClick={handlePasswordsSubmit}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all"
+                >
+                  Continuer - Vérifier et confirmer
+                </motion.button>
+            </div>
+            </motion.div>
+          )}
+
+          {/* Étape 4: Vérification et confirmation */}
           {step === 'review' && (
             <motion.div
               key="review"
@@ -564,11 +749,11 @@ export default function RegisterPage() {
                     Informations du compte
                   </h3>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div>
+            <div>
                       <span className="text-sm font-medium text-blue-700">Email:</span>
                       <p className="text-blue-900">{accountData.email}</p>
-                    </div>
-                    <div>
+            </div>
+            <div>
                       <span className="text-sm font-medium text-blue-700">Plan d'abonnement:</span>
                       <p className="text-blue-900">{accountData.subscriptionType}</p>
                     </div>
@@ -595,6 +780,7 @@ export default function RegisterPage() {
                           <div>Type: {getUserTypeLabel(member.userType)}</div>
                           <div>Âge: {calculateAge(member.dateOfBirth)} ans</div>
                           {member.grade && <div>Niveau: {member.grade}</div>}
+                          <div className="text-xs text-gray-600">Mot de passe défini ✓</div>
                         </div>
                       </div>
                     ))}
@@ -608,7 +794,7 @@ export default function RegisterPage() {
                     Informations importantes
                   </h3>
                   <ul className="text-sm text-yellow-800 space-y-2">
-                    <li>• Chaque membre recevra un ID de session unique et un mot de passe</li>
+                    <li>• Chaque membre a son propre mot de passe personnalisé</li>
                     <li>• L'email {accountData.email} servira à la gestion du compte et aux communications</li>
                     <li>• Le paiement se fera par email et ID de compte</li>
                     <li>• La date d'inscription sera automatiquement définie à aujourd'hui</li>
@@ -626,7 +812,7 @@ export default function RegisterPage() {
               <div className="flex gap-4 mt-8">
                 <motion.button
                   type="button"
-                  onClick={() => setStep('family')}
+                  onClick={() => setStep('passwords')}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all"
@@ -655,7 +841,7 @@ export default function RegisterPage() {
             </motion.div>
           )}
 
-          {/* Étape 4: Succès */}
+          {/* Étape 5: Succès */}
           {step === 'success' && (
             <motion.div
               key="success"
@@ -689,8 +875,8 @@ export default function RegisterPage() {
                   <p className="text-sm text-green-700">
                     Les identifiants de connexion ont été envoyés par email à {accountData.email}
                   </p>
-                </div>
-              </div>
+            </div>
+        </div>
               
               <motion.button
                 onClick={() => router.push('/login')}

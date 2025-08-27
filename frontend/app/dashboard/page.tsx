@@ -12,8 +12,10 @@ import HelpChatButton from '../../components/HelpChatButton'
 import PersonalizedWelcome from '../../components/PersonalizedWelcome'
 import AccountOverview from '../../components/AccountOverview'
 import UserSessionInfo from '../../components/UserSessionInfo'
+import AuthGuard from '../../components/AuthGuard'
 import { useGlobalTime } from '../../hooks/useGlobalTime'
 import type { NavigationTab, DashboardUser, DashboardAccount, Activity, Summary, LLMResponse } from '../../types'
+import { apiGet, apiPost } from '../../lib/api'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -67,40 +69,34 @@ export default function Dashboard() {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/auth/me`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
-      if (response.ok) {
-        const userData = await response.json()
-        
+      const userData = await apiGet('/auth/me')
+      
+      if (userData.user) {
         // Transformer les données pour la nouvelle architecture
         const transformedUser: DashboardUser = {
-          id: userData.id,
-          firstName: userData.firstName || userData.name?.split(' ')[0] || 'Utilisateur',
-          lastName: userData.lastName || userData.name?.split(' ').slice(1).join(' ') || '',
-          email: userData.email,
-          gender: userData.gender || 'UNKNOWN',
-          userType: userData.userType || 'CHILD',
-          age: userData.age,
-          grade: userData.grade,
-          subscriptionType: userData.subscriptionType || 'FREE',
-          createdAt: userData.createdAt
+          id: userData.user.id,
+          firstName: userData.user.firstName || 'Utilisateur',
+          lastName: userData.user.lastName || '',
+          email: userData.user.email,
+          gender: userData.user.gender || 'UNKNOWN',
+          userType: userData.user.userType || 'CHILD',
+          age: userData.user.age,
+          grade: userData.user.grade,
+          subscriptionType: userData.user.subscriptionType || 'FREE',
+          createdAt: userData.user.createdAt
         }
 
-        // Créer un compte fictif pour la démonstration (à remplacer par l'API réelle)
-        const mockAccount: DashboardAccount = {
-          id: userData.id || 'acc_mock',
-          email: userData.email,
-          subscriptionType: userData.subscriptionType || 'FREE',
-          maxSessions: userData.subscriptionType === 'PRO_PLUS' ? 4 : 2,
-          createdAt: userData.createdAt
+        // Utiliser les vraies données du compte
+        const realAccount: DashboardAccount = {
+          id: userData.user.account.id,
+          email: userData.user.account.email,
+          subscriptionType: userData.user.account.subscriptionType,
+          maxSessions: userData.user.account.maxSessions,
+          createdAt: userData.user.account.createdAt
         }
 
         setUser(transformedUser)
-        setAccount(mockAccount)
+        setAccount(realAccount)
       } else {
         console.error('Erreur lors du chargement du profil utilisateur')
         router.replace('/login')
@@ -117,27 +113,21 @@ export default function Dashboard() {
       if (!token) return
 
       // Charger les activités
-      const activitiesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/stats/activities`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
-      if (activitiesResponse.ok) {
-        const activitiesData = await activitiesResponse.json()
+      try {
+        const activitiesData = await apiGet('/stats/activities')
         setActivities(activitiesData.activities || [])
+      } catch (error) {
+        console.log('Activités non disponibles:', error)
+        setActivities([])
       }
 
       // Charger le résumé
-      const summaryResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/stats/summary`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
-      if (summaryResponse.ok) {
-        const summaryData = await summaryResponse.json()
+      try {
+        const summaryData = await apiGet('/stats/summary')
         setSummary(summaryData.summary || [])
+      } catch (error) {
+        console.log('Résumé non disponible:', error)
+        setSummary([])
       }
     } catch (error) {
       console.error('Erreur lors du chargement des données:', error)
@@ -154,21 +144,13 @@ export default function Dashboard() {
 
       const llmData = prepareLLMData()
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/llm/evaluate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          focus,
-          userData: llmData
-        })
+      const response = await apiPost('/llm/evaluate', {
+        focus,
+        userData: llmData
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        setLlmResponse(data)
+      if (response.llmResponse) {
+        setLlmResponse(response.llmResponse)
       } else {
         console.error('Erreur lors de l\'évaluation LLM')
         // Utiliser une réponse de test en cas d'erreur
@@ -662,38 +644,40 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Navigation latérale fixe */}
-      <div className="w-64 flex-shrink-0">
-        <SidebarNavigation
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          userSubscriptionType={user.subscriptionType}
-        />
-      </div>
+    <AuthGuard>
+      <div className="min-h-screen bg-gray-50 flex">
+        {/* Navigation latérale fixe */}
+        <div className="w-64 flex-shrink-0">
+          <SidebarNavigation
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            userSubscriptionType={user.subscriptionType}
+          />
+        </div>
 
-      {/* Contenu principal avec en-tête utilisateur */}
-      <div className="flex-1 flex flex-col">
-        {/* En-tête utilisateur personnalisé */}
-        <UserHeader 
-          user={user}
-          account={account}
-          onLogout={handleLogout}
-          onSwitchSession={handleSwitchSession}
-        />
+        {/* Contenu principal avec en-tête utilisateur */}
+        <div className="flex-1 flex flex-col">
+          {/* En-tête utilisateur personnalisé */}
+          <UserHeader 
+            user={user}
+            account={account}
+            onLogout={handleLogout}
+            onSwitchSession={handleSwitchSession}
+          />
 
-        {/* Contenu des onglets */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-8">
-            <AnimatePresence mode="wait">
-              {renderActiveTab()}
-            </AnimatePresence>
+          {/* Contenu des onglets */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-8">
+              <AnimatePresence mode="wait">
+                {renderActiveTab()}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Bouton d'aide flottant */}
-      <HelpChatButton />
-    </div>
+        {/* Bouton d'aide flottant */}
+        <HelpChatButton />
+      </div>
+    </AuthGuard>
   )
 } 
