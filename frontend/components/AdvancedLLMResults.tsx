@@ -334,14 +334,20 @@ export default function AdvancedLLMResults({
           Analyse pour parents/enseignants
         </h4>
         <div className="text-gray-700 space-y-2">
-          {result.summary_adult.split('•').map((point, index) => (
-            point.trim() && (
-              <div key={index} className="flex items-start gap-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                <span>{point.trim()}</span>
-              </div>
-            )
-          ))}
+          {result.summary_adult ? (
+            result.summary_adult.split('•').map((point, index) => (
+              point.trim() && (
+                <div key={index} className="flex items-start gap-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>{point.trim()}</span>
+                </div>
+              )
+            ))
+          ) : (
+            <div className="text-gray-500 italic">
+              Aucune analyse disponible pour le moment.
+            </div>
+          )}
         </div>
       </motion.div>
 
@@ -364,35 +370,41 @@ export default function AdvancedLLMResults({
           Insights clés
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {result.key_insights.map((insight, index) => {
-            const impactInfo = getImpactInfo(insight.impact)
-            return (
-              <motion.div 
-                key={index}
-                className="p-4 border rounded-lg"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                whileHover={{ scale: 1.02 }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  {impactInfo.icon}
-                  <span className="font-medium text-gray-900">{insight.title}</span>
-                  <span className={`px-2 py-1 rounded-full text-xs ${impactInfo.bg} ${impactInfo.color}`}>
-                    {insight.impact}
-                  </span>
-                </div>
-                <div className="text-sm text-gray-600 space-y-1">
-                  {insight.evidence.map((evidence, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
-                      <span>{evidence}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )
-          })}
+          {result.key_insights && result.key_insights.length > 0 ? (
+            result.key_insights.map((insight, index) => {
+              const impactInfo = getImpactInfo(insight.impact)
+              return (
+                <motion.div 
+                  key={index}
+                  className="p-4 border rounded-lg"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    {impactInfo.icon}
+                    <span className="font-medium text-gray-900">{insight.title}</span>
+                    <span className={`px-2 py-1 rounded-full text-xs ${impactInfo.bg} ${impactInfo.color}`}>
+                      {insight.impact}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-600 space-y-1">
+                    {insight.evidence && insight.evidence.map((evidence, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+                        <span>{evidence}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )
+            })
+          ) : (
+            <div className="col-span-2 text-center text-gray-500 italic py-8">
+              Aucun insight disponible pour le moment.
+            </div>
+          )}
         </div>
       </div>
 
@@ -416,38 +428,44 @@ export default function AdvancedLLMResults({
           Exercices recommandés
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {result.recommended_exercises.map((exercise, index) => (
-            <motion.div 
-              key={index}
-              className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
-              whileHover={{ scale: 1.02 }}
-            >
-              <h5 className="font-medium text-gray-900 mb-2">{exercise.title}</h5>
-              <p className="text-sm text-gray-600 mb-3">{exercise.why_this}</p>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-blue-600">⏱️ {exercise.target_minutes} min</span>
-                <span className="text-green-600">🎯 {exercise.success_criteria}</span>
-              </div>
-              {onExerciseSelect && (
-                <motion.button
-                  onClick={() => onExerciseSelect(exercise.nodeKey)}
-                  className="mt-3 w-full px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Commencer cet exercice
-                </motion.button>
-              )}
-            </motion.div>
-          ))}
+          {result.recommended_exercises && result.recommended_exercises.length > 0 ? (
+            result.recommended_exercises.map((exercise, index) => (
+              <motion.div 
+                key={index}
+                className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
+                whileHover={{ scale: 1.02 }}
+              >
+                <h5 className="font-medium text-gray-900 mb-2">{exercise.title}</h5>
+                <p className="text-sm text-gray-600 mb-3">{exercise.why_this}</p>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-blue-600">⏱️ {exercise.target_minutes} min</span>
+                  <span className="text-green-600">🎯 {exercise.success_criteria}</span>
+                </div>
+                {onExerciseSelect && (
+                  <motion.button
+                    onClick={() => onExerciseSelect(exercise.nodeKey)}
+                    className="mt-3 w-full px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Commencer cet exercice
+                  </motion.button>
+                )}
+              </motion.div>
+            ))
+          ) : (
+            <div className="col-span-2 text-center text-gray-500 italic py-8">
+              Aucun exercice recommandé pour le moment.
+            </div>
+          )}
         </div>
       </div>
 
       {/* Plan de révision (Premium uniquement) */}
-      {isPremiumAccount && (
+      {isPremiumAccount && result.schedule_plan && (
         <motion.div 
           className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200"
           initial={{ opacity: 0, y: 20 }}
@@ -475,16 +493,22 @@ export default function AdvancedLLMResults({
           <div className="mb-4">
             <h5 className="font-medium text-purple-800 mb-2">Prochaines 48h</h5>
             <div className="space-y-2">
-              {result.schedule_plan.next_48h.map((session, index) => (
-                <div key={index} className="flex items-center justify-between p-2 bg-white rounded border">
-                  <span className="text-sm text-purple-700">
-                    {new Date(session.when_local).toLocaleString('fr-FR')}
-                  </span>
-                  <span className="text-sm text-purple-600">
-                    {session.duration_min} min - {session.focus}
-                  </span>
+              {result.schedule_plan.next_48h && result.schedule_plan.next_48h.length > 0 ? (
+                result.schedule_plan.next_48h.map((session, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 bg-white rounded border">
+                    <span className="text-sm text-purple-700">
+                      {new Date(session.when_local).toLocaleString('fr-FR')}
+                    </span>
+                    <span className="text-sm text-purple-600">
+                      {session.duration_min} min - {session.focus}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-purple-500 italic py-2">
+                  Aucune session planifiée pour le moment.
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
@@ -492,16 +516,22 @@ export default function AdvancedLLMResults({
           <div>
             <h5 className="font-medium text-purple-800 mb-2">Révision espacée</h5>
             <div className="space-y-2">
-              {result.schedule_plan.spaced_practice.map((review, index) => (
-                <div key={index} className="flex items-center justify-between p-2 bg-white rounded border">
-                  <span className="text-sm text-purple-700">
-                    {new Date(review.review_on).toLocaleDateString('fr-FR')}
-                  </span>
-                  <span className="text-sm text-purple-600">
-                    {review.nodeKey} - {review.reason}
-                  </span>
+              {result.schedule_plan.spaced_practice && result.schedule_plan.spaced_practice.length > 0 ? (
+                result.schedule_plan.spaced_practice.map((review, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 bg-white rounded border">
+                    <span className="text-sm text-purple-700">
+                      {new Date(review.review_on).toLocaleDateString('fr-FR')}
+                    </span>
+                    <span className="text-sm text-purple-600">
+                      {review.nodeKey} - {review.reason}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-purple-500 italic py-2">
+                  Aucune révision planifiée pour le moment.
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </motion.div>
@@ -526,25 +556,31 @@ export default function AdvancedLLMResults({
           Conseils pour les parents
         </h4>
         <div className="space-y-3">
-          {result.parent_coaching.map((tip, index) => (
-            <motion.div 
-              key={index}
-              className="p-3 bg-yellow-50 rounded-lg border border-yellow-200"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
-            >
-              <div className="flex items-start gap-2">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
-                <span className="text-yellow-800">{tip}</span>
-              </div>
-            </motion.div>
-          ))}
+          {result.parent_coaching && result.parent_coaching.length > 0 ? (
+            result.parent_coaching.map((tip, index) => (
+              <motion.div 
+                key={index}
+                className="p-3 bg-yellow-50 rounded-lg border border-yellow-200"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
+              >
+                <div className="flex items-start gap-2">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-yellow-800">{tip}</span>
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <div className="text-center text-gray-500 italic py-4">
+              Aucun conseil disponible pour le moment.
+            </div>
+          )}
         </div>
       </div>
 
       {/* Notes pour enseignants (Premium uniquement) */}
-      {isPremiumAccount && (
+      {isPremiumAccount && result.teacher_notes && (
         <motion.div 
           className="mb-6 p-4 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg border border-indigo-200"
           initial={{ opacity: 0, y: 20 }}
@@ -568,17 +604,23 @@ export default function AdvancedLLMResults({
             Notes pour enseignants (Premium)
           </h4>
           <div className="space-y-3">
-            {result.teacher_notes.map((note, index) => (
-              <div key={index} className="p-3 bg-white rounded border">
-                <span className="text-indigo-800 text-sm">{note}</span>
+            {result.teacher_notes.length > 0 ? (
+              result.teacher_notes.map((note, index) => (
+                <div key={index} className="p-3 bg-white rounded border">
+                  <span className="text-indigo-800 text-sm">{note}</span>
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-indigo-500 italic py-2">
+                Aucune note disponible pour le moment.
               </div>
-            ))}
+            )}
           </div>
         </motion.div>
       )}
 
       {/* Indicateurs de risque */}
-      {result.risk_flags.length > 0 && (
+      {result.risk_flags && result.risk_flags.length > 0 && (
         <div className="mb-6">
           <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <motion.div
@@ -618,7 +660,7 @@ export default function AdvancedLLMResults({
       )}
 
       {/* Données manquantes */}
-      {result.missing_data.length > 0 && (
+      {result.missing_data && result.missing_data.length > 0 && (
         <motion.div 
           className="p-4 bg-orange-50 rounded-lg border border-orange-200"
           initial={{ opacity: 0, y: 20 }}
