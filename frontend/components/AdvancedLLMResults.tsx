@@ -20,11 +20,10 @@ import {
   GraduationCap,
   Trophy,
   Medal,
-  Fire,
+  Flame,
   Heart,
   Diamond,
   Gem,
-  Lightning,
   Sun,
   Moon,
   Cloud,
@@ -33,7 +32,6 @@ import {
   Tree,
   Mountain,
   Wave,
-  Flame,
   Star2,
   Sparkle,
   Zap2,
@@ -205,7 +203,7 @@ export default function AdvancedLLMResults({
   const getImpactInfo = (impact: string) => {
     switch (impact) {
       case 'high':
-        return { icon: <Fire size={16} />, color: 'text-red-600', bg: 'bg-red-100' }
+        return { icon: <Flame size={16} />, color: 'text-red-600', bg: 'bg-red-100' }
       case 'medium':
         return { icon: <Zap size={16} />, color: 'text-yellow-600', bg: 'bg-yellow-100' }
       case 'low':
@@ -219,7 +217,7 @@ export default function AdvancedLLMResults({
   const getRiskIcon = (risk: string) => {
     switch (risk) {
       case 'burnout_risk':
-        return { icon: <Fire size={16} />, color: 'text-red-600' }
+        return { icon: <Flame size={16} />, color: 'text-red-600' }
       case 'inactivity_risk':
         return { icon: <Clock size={16} />, color: 'text-orange-600' }
       case 'frustration_risk':

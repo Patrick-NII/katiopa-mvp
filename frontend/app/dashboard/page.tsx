@@ -384,6 +384,7 @@ export default function Dashboard() {
                   <option value="coding">Programmation</option>
                   <option value="reading">Lecture</option>
                   <option value="science">Sciences</option>
+                  <option value="ai">IA</option>
                 </select>
                 
                 {/* Bouton LLM animé */}
