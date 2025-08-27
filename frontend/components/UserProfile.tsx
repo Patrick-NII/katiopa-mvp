@@ -78,44 +78,46 @@ export default function UserProfile({ user, level, experience, totalTime }: User
   const progressPercentage = (experience % 100)
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-      <div className="flex items-center space-x-4 mb-6">
+    <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+      <div className="flex items-start space-x-6 mb-8">
         {/* Avatar */}
-        <div className="relative">
+        <div className="relative flex-shrink-0">
           <img 
             src={avatarUrl} 
             alt={`Avatar de ${user.firstName} ${user.lastName}`}
-            className="w-20 h-20 rounded-full border-4 border-blue-100"
+            className="w-24 h-24 rounded-full border-4 border-blue-100 shadow-lg"
           />
           {/* Indicateur de niveau */}
-          <div className="absolute -bottom-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full w-8 h-8 flex items-center justify-center border-2 border-white">
+          <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-bold rounded-full w-10 h-10 flex items-center justify-center border-4 border-white shadow-lg">
             {level}
           </div>
         </div>
 
         {/* Informations utilisateur */}
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold text-gray-900">
+        <div className="flex-1 space-y-3">
+          <h2 className="text-3xl font-bold text-gray-900">
             {user.firstName} {user.lastName}
           </h2>
-          <p className="text-gray-600">{user.email}</p>
-          <p className="text-sm text-gray-500 capitalize">Rôle: {user.role.toLowerCase()}</p>
-          <p className="text-sm text-gray-500">
+          <p className="text-lg text-gray-600">{user.email}</p>
+          <p className="text-sm text-gray-500 capitalize bg-gray-100 px-3 py-1 rounded-full inline-block">
+            Rôle: {user.role.toLowerCase()}
+          </p>
+          <p className="text-sm text-gray-500 bg-blue-50 px-3 py-1 rounded-full inline-block">
             Membre depuis le {formatRegistrationDate(user.createdAt)}
           </p>
         </div>
 
-        {/* Informations de connexion */}
-        <div className="text-right space-y-2">
-          <div>
-            <div className="text-sm text-gray-500">Session actuelle</div>
-            <div className="text-lg font-mono font-bold text-green-600">
+        {/* Informations de connexion détaillées */}
+        <div className="text-right space-y-4 flex-shrink-0">
+          <div className="bg-green-50 p-4 rounded-xl border border-green-200">
+            <div className="text-sm text-green-600 font-medium mb-1">Session actuelle</div>
+            <div className="text-xl font-mono font-bold text-green-700">
               {formatTime(currentSessionTime)}
             </div>
           </div>
-          <div>
-            <div className="text-sm text-gray-500">Temps total</div>
-            <div className="text-lg font-mono font-bold text-blue-600">
+          <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
+            <div className="text-sm text-blue-600 font-medium mb-1">Temps total</div>
+            <div className="text-xl font-mono font-bold text-blue-700">
               {formatTotalTime(totalTime)}
             </div>
           </div>
@@ -123,38 +125,38 @@ export default function UserProfile({ user, level, experience, totalTime }: User
       </div>
 
       {/* Barre de progression du niveau */}
-      <div className="mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-700">
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-3">
+          <span className="text-lg font-semibold text-gray-800">
             Niveau {level} - {experience} XP
           </span>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
             {experienceToNextLevel} XP pour le niveau {level + 1}
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-3">
+        <div className="w-full bg-gray-200 rounded-full h-4 shadow-inner">
           <div 
-            className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-300"
+            className="bg-gradient-to-r from-blue-500 to-purple-600 h-4 rounded-full transition-all duration-500 shadow-sm"
             style={{ width: `${progressPercentage}%` }}
           ></div>
         </div>
       </div>
 
       {/* Statistiques rapides */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="text-center p-3 bg-blue-50 rounded-lg">
-          <div className="text-2xl font-bold text-blue-600">{level}</div>
-          <div className="text-xs text-blue-600">Niveau</div>
+      <div className="grid grid-cols-3 gap-6">
+        <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+          <div className="text-3xl font-bold text-blue-600 mb-2">{level}</div>
+          <div className="text-sm text-blue-700 font-medium">Niveau</div>
         </div>
-        <div className="text-center p-3 bg-green-50 rounded-lg">
-          <div className="text-2xl font-bold text-green-600">{experience}</div>
-          <div className="text-xs text-green-600">XP Total</div>
+        <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200">
+          <div className="text-3xl font-bold text-green-600 mb-2">{experience}</div>
+          <div className="text-sm text-green-700 font-medium">XP Total</div>
         </div>
-        <div className="text-center p-3 bg-purple-50 rounded-lg">
-          <div className="text-2xl font-bold text-purple-600">
+        <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200">
+          <div className="text-3xl font-bold text-purple-600 mb-2">
             {Math.floor(totalTime / 3600000)}h
           </div>
-          <div className="text-xs text-purple-600">Temps Total</div>
+          <div className="text-sm text-purple-700 font-medium">Temps Total</div>
         </div>
       </div>
     </div>
