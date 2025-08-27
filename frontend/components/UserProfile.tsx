@@ -9,14 +9,40 @@ interface UserProfileProps {
     lastName: string
     email: string
     role: string
-    createdAt?: string
+    createdAt: string
+    phone?: string
+    country?: string
+    timezone?: string
+    preferences?: {
+      language: string
+      theme: string
+      notifications: boolean
+    }
   }
   level: number
   experience: number
   totalTime: number
+  subscription?: {
+    plan: string
+    status: string
+    startDate: string
+    endDate: string
+    nextBilling: string
+    amount: number
+    currency: string
+  }
+  billing?: {
+    invoices: Array<{
+      id: string
+      date: string
+      amount: number
+      status: string
+    }>
+    totalSpent: number
+  }
 }
 
-export default function UserProfile({ user, level, experience, totalTime }: UserProfileProps) {
+export default function UserProfile({ user, level, experience, totalTime, subscription, billing }: UserProfileProps) {
   const { currentSessionTime } = useSession()
   const [avatarUrl, setAvatarUrl] = useState('')
 
@@ -66,13 +92,21 @@ export default function UserProfile({ user, level, experience, totalTime }: User
     }
   }
 
-  const formatRegistrationDate = (dateString?: string) => {
-    if (!dateString) return 'Date inconnue'
+  const formatRegistrationDate = (dateString: string) => {
     const date = new Date(dateString)
     const day = date.getDate().toString().padStart(2, '0')
     const month = (date.getMonth() + 1).toString().padStart(2, '0')
     const year = date.getFullYear()
     return `${day}/${month}/${year}`
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('fr-FR', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric' 
+    })
   }
 
   // Calculer le niveau et l'expérience
@@ -81,6 +115,22 @@ export default function UserProfile({ user, level, experience, totalTime }: User
 
   // Calculer le temps total réel (session actuelle + temps cumulé)
   const effectiveTotalTime = totalTime + (currentSessionTime * 1000)
+
+  // Calculer l'ancienneté
+  const memberSince = new Date(user.createdAt)
+  const now = new Date()
+  const yearsDiff = now.getFullYear() - memberSince.getFullYear()
+  const monthsDiff = now.getMonth() - memberSince.getMonth()
+  const daysDiff = now.getDate() - memberSince.getDate()
+  
+  let membershipDuration = ''
+  if (yearsDiff > 0) {
+    membershipDuration = `${yearsDiff} an${yearsDiff > 1 ? 's' : ''}`
+  } else if (monthsDiff > 0) {
+    membershipDuration = `${monthsDiff} mois`
+  } else {
+    membershipDuration = `${daysDiff} jour${daysDiff > 1 ? 's' : ''}`
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
@@ -110,9 +160,32 @@ export default function UserProfile({ user, level, experience, totalTime }: User
               Rôle: {user.role.toLowerCase()}
             </span>
             <span className="text-sm text-gray-500 bg-blue-50 px-3 py-1 rounded-full">
-              Membre depuis le {formatRegistrationDate(user.createdAt)}
+              Membre depuis le {formatRegistrationDate(user.createdAt)} ({membershipDuration})
             </span>
+            {user.phone && (
+              <span className="text-sm text-gray-500 bg-green-50 px-3 py-1 rounded-full">
+                📱 {user.phone}
+              </span>
+            )}
+            {user.country && (
+              <span className="text-sm text-gray-500 bg-purple-50 px-3 py-1 rounded-full">
+                🌍 {user.country}
+              </span>
+            )}
           </div>
+          {user.preferences && (
+            <div className="flex flex-wrap gap-2">
+              <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                Langue: {user.preferences.language}
+              </span>
+              <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                Thème: {user.preferences.theme}
+              </span>
+              <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                Notifications: {user.preferences.notifications ? 'Activées' : 'Désactivées'}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Informations de connexion détaillées */}
@@ -151,7 +224,7 @@ export default function UserProfile({ user, level, experience, totalTime }: User
       </div>
 
       {/* Troisième ligne : Statistiques rapides sur toute la largeur */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-4 mb-8">
         <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
           <div className="text-2xl font-bold text-blue-600 mb-1">{level}</div>
           <div className="text-xs text-blue-700 font-medium">Niveau</div>
@@ -173,6 +246,64 @@ export default function UserProfile({ user, level, experience, totalTime }: User
           <div className="text-xs text-orange-700 font-medium">Min Session</div>
         </div>
       </div>
+
+      {/* Bloc d'abonnements et facturation */}
+      {subscription && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6 mb-6">
+          <h3 className="text-lg font-semibold text-blue-900 mb-4">Abonnement et facturation</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center">
+              <div className="text-sm text-blue-600 font-medium mb-1">Plan actuel</div>
+              <div className="text-lg font-bold text-blue-800">{subscription.plan}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm text-blue-600 font-medium mb-1">Statut</div>
+              <div className={`text-lg font-bold px-2 py-1 rounded-full text-sm ${
+                subscription.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+              }`}>
+                {subscription.status === 'active' ? 'Actif' : 'Inactif'}
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm text-blue-600 font-medium mb-1">Prochaine facturation</div>
+              <div className="text-lg font-bold text-blue-800">{formatDate(subscription.nextBilling)}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm text-blue-600 font-medium mb-1">Montant</div>
+              <div className="text-lg font-bold text-blue-800">{subscription.amount} {subscription.currency}</div>
+            </div>
+          </div>
+          
+          {billing && billing.invoices.length > 0 && (
+            <div className="mt-4">
+              <h4 className="text-base font-medium text-blue-800 mb-3">Dernières factures</h4>
+              <div className="space-y-2">
+                {billing.invoices.slice(0, 3).map((invoice) => (
+                  <div key={invoice.id} className="flex justify-between items-center bg-white p-3 rounded-lg border border-blue-100">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-sm text-blue-600">#{invoice.id}</span>
+                      <span className="text-sm text-gray-600">{formatDate(invoice.date)}</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-sm font-medium text-gray-900">{invoice.amount} {subscription.currency}</span>
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        invoice.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {invoice.status === 'paid' ? 'Payée' : 'En attente'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 text-right">
+                <span className="text-sm text-blue-600">
+                  Total dépensé: {billing.totalSpent} {subscription.currency}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 } 
