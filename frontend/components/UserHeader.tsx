@@ -29,6 +29,27 @@ export default function UserHeader({ user, onLogout }: UserHeaderProps) {
   const [globalTime, setGlobalTime] = useState<Date>(new Date())
   const [sessionDuration, setSessionDuration] = useState<string>('00:00:00')
 
+  // Vérification de sécurité - si pas d'utilisateur, afficher un loader
+  if (!user) {
+    return (
+      <motion.div 
+        className="bg-white border-b border-gray-200 px-6 py-4"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="ml-3 text-gray-600">Chargement des informations utilisateur...</span>
+        </div>
+      </motion.div>
+    )
+  }
+
+  // Vérification de sécurité pour le nom
+  const userName = user.name || 'Utilisateur'
+  const userInitial = userName.charAt(0).toUpperCase()
+
   // Mettre à jour le temps global et la durée de session
   useEffect(() => {
     const timer = setInterval(() => {
@@ -116,22 +137,22 @@ export default function UserHeader({ user, onLogout }: UserHeaderProps) {
               whileHover={{ scale: 1.1, rotate: 5 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
-              {user.name.charAt(0).toUpperCase()}
+              {userInitial}
             </motion.div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">{user.name}</h2>
+              <h2 className="text-xl font-bold text-gray-900">{userName}</h2>
               <div className="flex items-center gap-2">
                 <Mail size={14} className="text-gray-500" />
-                <span className="text-sm text-gray-600">{user.email}</span>
+                <span className="text-sm text-gray-600">{user.email || 'Email non disponible'}</span>
               </div>
             </div>
           </div>
 
           {/* Statut du compte */}
           <div className="flex items-center gap-2">
-            <div className={`px-3 py-1 rounded-full text-white text-sm font-medium flex items-center gap-2 ${getStatusColor(user.subscriptionType)}`}>
-              {getStatusIcon(user.subscriptionType)}
-              {getStatusText(user.subscriptionType)}
+            <div className={`px-3 py-1 rounded-full text-white text-sm font-medium flex items-center gap-2 ${getStatusColor(user.subscriptionType || 'free')}`}>
+              {getStatusIcon(user.subscriptionType || 'free')}
+              {getStatusText(user.subscriptionType || 'free')}
             </div>
           </div>
         </div>
