@@ -288,6 +288,130 @@ async function main() {
 
   console.log('✅ Enregistrements de facturation créés')
 
+  // 8. Créer un compte de test pour patrick@niip.me
+  const patrickAccount = await prisma.account.create({
+    data: {
+      email: 'patrick@niip.me',
+      subscriptionType: SubscriptionType.FREE,
+      maxSessions: 2,
+      createdAt: referenceDate,
+      totalAccountConnectionDurationMs: BigInt(0)
+    }
+  })
+
+  console.log('✅ Compte PATRICK créé:', patrickAccount.email)
+
+  // 9. Créer 2 sessions pour ce compte
+  const patrickSessions = await Promise.all([
+    // Patrick (Parent, 36 ans)
+    prisma.userSession.create({
+      data: {
+        accountId: patrickAccount.id,
+        sessionId: 'PATRICK_007',
+        password: 'patrick123',
+        firstName: 'patrick',
+        lastName: 'isangu',
+        gender: Gender.MALE,
+        userType: UserType.PARENT,
+        age: 36,
+        country: 'France',
+        timezone: 'Europe/Paris',
+        preferences: {
+          learningGoals: 'Suivre la progression de l\'enfant',
+          interests: ['éducation', 'développement personnel']
+        },
+        createdAt: referenceDate,
+        totalConnectionDurationMs: BigInt(0),
+        currentSessionStartTime: null
+      }
+    }),
+
+    // Aylon (Enfant, 6 ans)
+    prisma.userSession.create({
+      data: {
+        accountId: patrickAccount.id,
+        sessionId: 'AYLON_008',
+        password: 'aylon123',
+        firstName: 'Aylon',
+        lastName: 'Isangu',
+        gender: Gender.MALE,
+        userType: UserType.CHILD,
+        age: 6,
+        grade: 'CP',
+        country: 'France',
+        timezone: 'Europe/Paris',
+        preferences: {
+          learningStyle: 'kinesthetic',
+          preferredSubjects: ['maths', 'français', 'sciences'],
+          interests: ['jeux', 'dessin', 'histoires']
+        },
+        createdAt: referenceDate,
+        totalConnectionDurationMs: BigInt(0),
+        currentSessionStartTime: null
+      }
+    })
+  ])
+
+  console.log('✅ 2 sessions PATRICK créées')
+
+  // 10. Créer un profil pour Aylon
+  await prisma.userProfile.create({
+    data: {
+      userSessionId: patrickSessions[1].id, // Aylon
+      learningGoals: [
+        'Apprendre à lire et écrire',
+        'Développer les compétences en mathématiques',
+        'Découvrir le monde qui nous entoure'
+      ],
+      preferredSubjects: ['maths', 'français', 'sciences'],
+      learningStyle: 'kinesthetic',
+      difficulty: 'débutant',
+      sessionPreferences: {
+        sessionDuration: 20,
+        breakFrequency: 5,
+        rewardSystem: true
+      },
+      interests: ['jeux éducatifs', 'histoires', 'dessin'],
+      specialNeeds: [],
+      customNotes: 'Enfant curieux et motivé',
+      parentWishes: 'Encourager l\'autonomie et la confiance en soi'
+    }
+  })
+
+  console.log('✅ Profil utilisateur créé pour Aylon')
+
+  // 11. Créer des activités d'apprentissage pour Aylon
+  await prisma.activity.createMany({
+    data: [
+      {
+        userSessionId: patrickSessions[1].id, // Aylon
+        domain: 'maths',
+        nodeKey: 'compter_jusqua_10',
+        score: 85,
+        attempts: 2,
+        durationMs: 90000 // 1.5 minutes
+      },
+      {
+        userSessionId: patrickSessions[1].id, // Aylon
+        domain: 'français',
+        nodeKey: 'alphabet',
+        score: 92,
+        attempts: 1,
+        durationMs: 120000 // 2 minutes
+      },
+      {
+        userSessionId: patrickSessions[1].id, // Aylon
+        domain: 'sciences',
+        nodeKey: 'animaux_familiers',
+        score: 78,
+        attempts: 3,
+        durationMs: 150000 // 2.5 minutes
+      }
+    ]
+  })
+
+  console.log('✅ Activités d\'apprentissage créées pour Aylon')
+
   console.log('\n🎉 Seeding terminé avec succès !')
   console.log('\n📋 Comptes de test créés :')
   console.log('\n🔐 Compte PRO_PLUS (4 sessions) :')
@@ -303,6 +427,12 @@ async function main() {
   console.log('   Sessions:')
   console.log('     - LEO_005 / leo123 (Enfant, 7 ans)')
   console.log('     - SOPHIE_006 / sophie123 (Parent, 32 ans)')
+
+  console.log('\n🔐 Compte PATRICK (2 sessions) :')
+  console.log('   Email: patrick@niip.me')
+  console.log('   Sessions:')
+  console.log('     - PATRICK_007 / patrick123 (Parent, 36 ans)')
+  console.log('     - AYLON_008 / aylon123 (Enfant, 6 ans, CP)')
   
   console.log('\n💡 Pour tester :')
   console.log('   1. Connectez-vous avec n\'importe quelle session')

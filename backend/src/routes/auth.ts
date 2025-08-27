@@ -374,3 +374,46 @@ router.get("/sessions/:accountId", async (req: any, res) => {
 });
 
 export default router;
+
+// Fonction pour générer un ID de session unique
+function generateUniqueSessionId(firstName: string, lastName: string): string {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 8);
+  const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+  
+  return `${initials}_${timestamp}_${random}`;
+}
+
+// Fonction pour envoyer les notifications d'inscription
+async function sendRegistrationNotifications(
+  accountEmail: string, 
+  sessions: Array<{firstName: string, lastName: string, sessionId: string, password: string, userType: string}>,
+  account: any
+) {
+  try {
+    // Simulation d'envoi d'email
+    console.log(`📧 Email envoyé à ${accountEmail}`);
+    console.log('📧 Contenu de l\'email:');
+    console.log(`   Compte: ${account.id}`);
+    console.log(`   Plan: ${account.subscriptionType}`);
+    console.log(`   Date: ${new Date().toLocaleDateString('fr-FR')}`);
+    console.log('📧 Identifiants de connexion:');
+    
+    for (const session of sessions) {
+      console.log(`   ${session.firstName} ${session.lastName}:`);
+      console.log(`     Session ID: ${session.sessionId}`);
+      console.log(`     Mot de passe: ${session.password}`);
+      console.log(`     Type: ${session.userType}`);
+    }
+    
+    // Simulation d'envoi WhatsApp
+    console.log(`📱 Notification WhatsApp envoyée`);
+    
+    // En production, intégrer avec un service d'email (SendGrid, AWS SES, etc.)
+    // et un service WhatsApp Business API
+    
+  } catch (error) {
+    console.error('Erreur lors de l\'envoi des notifications:', error);
+    // Ne pas faire échouer l'inscription si les notifications échouent
+  }
+}
