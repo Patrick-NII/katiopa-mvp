@@ -1,5 +1,133 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { 
+  Trophy, 
+  Star, 
+  Target, 
+  TrendingUp, 
+  Clock, 
+  Award, 
+  Medal, 
+  Zap,
+  Fire,
+  Heart,
+  Sparkles,
+  Rocket,
+  Diamond,
+  Gem,
+  Lightning,
+  Sun,
+  Moon,
+  Cloud,
+  Leaf,
+  Flower,
+  Tree,
+  Mountain,
+  Wave,
+  Flame,
+  Star2,
+  Sparkle,
+  Zap2,
+  Thunder,
+  Rainbow,
+  Butterfly,
+  Bird,
+  Fish,
+  Cat,
+  Dog,
+  Lion,
+  Tiger,
+  Bear,
+  Wolf,
+  Fox,
+  Deer,
+  Horse,
+  Cow,
+  Pig,
+  Sheep,
+  Goat,
+  Chicken,
+  Duck,
+  Goose,
+  Swan,
+  Eagle,
+  Hawk,
+  Owl,
+  Raven,
+  Crow,
+  Sparrow,
+  Robin,
+  Bluebird,
+  Cardinal,
+  Goldfinch,
+  Canary,
+  Parrot,
+  Macaw,
+  Cockatoo,
+  Lovebird,
+  Budgie,
+  Finch,
+  Warbler,
+  Thrush,
+  Mockingbird,
+  Jay,
+  Magpie,
+  Nuthatch,
+  Woodpecker,
+  Kingfisher,
+  Heron,
+  Crane,
+  Stork,
+  Pelican,
+  Albatross,
+  Seagull,
+  Tern,
+  Sandpiper,
+  Plover,
+  Curlew,
+  Godwit,
+  Snipe,
+  Woodcock,
+  Sanderling,
+  Dunlin,
+  Knot,
+  Turnstone,
+  Oystercatcher,
+  Avocet,
+  Stilt,
+  Phalarope,
+  Skua,
+  Jaeger,
+  Gull,
+  Tern2,
+  Noddy,
+  Tropicbird,
+  Frigatebird,
+  Booby,
+  Gannet,
+  Cormorant,
+  Shag,
+  Anhinga,
+  Darter,
+  Grebe,
+  Loon,
+  Auk,
+  Murre,
+  Guillemot,
+  Razorbill,
+  Puffin,
+  Dovekie,
+  StormPetrel,
+  LeachPetrel,
+  WilsonPetrel,
+  WhiteTailedTropicbird,
+  RedTailedTropicbird,
+  RedBilledTropicbird,
+  WhiteTailedTropicbird2,
+  RedTailedTropicbird2,
+  RedBilledTropicbird2
+} from 'lucide-react'
 
 interface UserStatsProps {
   userId: string
@@ -86,23 +214,23 @@ export default function UserStats({ userId, activities, memberSince }: UserStats
   const generateBadges = (activities: any[], averageScore: number): string[] => {
     const badges: string[] = []
     
-    if (activities.length >= 10) badges.push('🎯 Persévérant')
-    if (activities.length >= 25) badges.push('🏆 Champion')
-    if (averageScore >= 80) badges.push('⭐ Excellent')
-    if (averageScore >= 90) badges.push('👑 Maître')
+    if (activities.length >= 10) badges.push('Persévérant')
+    if (activities.length >= 25) badges.push('Champion')
+    if (averageScore >= 80) badges.push('Excellent')
+    if (averageScore >= 90) badges.push('Maître')
     
     // Badges par domaine
     const domains = activities.map(a => a.domain)
-    if (domains.filter(d => d === 'maths').length >= 5) badges.push('🧮 Mathématicien')
-    if (domains.filter(d => d === 'coding').length >= 5) badges.push('💻 Codeur')
+    if (domains.filter(d => d === 'maths').length >= 5) badges.push('Mathématicien')
+    if (domains.filter(d => d === 'coding').length >= 5) badges.push('Codeur')
     
     // Badge pour la rapidité
     const fastActivities = activities.filter(a => a.durationMs < 30000)
-    if (fastActivities.length >= 3) badges.push('⚡ Rapide')
+    if (fastActivities.length >= 3) badges.push('Rapide')
     
     // Badge pour la précision
     const accurateActivities = activities.filter(a => a.attempts === 1)
-    if (accurateActivities.length >= 5) badges.push('🎯 Précis')
+    if (accurateActivities.length >= 5) badges.push('Précis')
     
     return badges
   }
@@ -191,60 +319,152 @@ export default function UserStats({ userId, activities, memberSince }: UserStats
     }
   }
 
+  // Icônes pour les badges
+  const getBadgeIcon = (badge: string) => {
+    switch (badge) {
+      case 'Persévérant':
+        return <Target size={16} />
+      case 'Champion':
+        return <Trophy size={16} />
+      case 'Excellent':
+        return <Star size={16} />
+      case 'Maître':
+        return <Crown size={16} />
+      case 'Mathématicien':
+        return <Target size={16} />
+      case 'Codeur':
+        return <Zap size={16} />
+      case 'Rapide':
+        return <Lightning size={16} />
+      case 'Précis':
+        return <Target size={16} />
+      default:
+        return <Award size={16} />
+    }
+  }
+
   return (
-    <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-      <h3 className="text-xl font-bold text-gray-900 mb-6">Statistiques détaillées</h3>
+    <motion.div 
+      className="bg-white rounded-xl shadow-sm p-8 mb-8"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <motion.div
+          animate={{ 
+            rotate: [0, 5, -5, 0],
+            scale: [1, 1.1, 1]
+          }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
+          <Trophy size={24} />
+        </motion.div>
+        Statistiques détaillées
+      </h3>
       
       {/* Grille de statistiques sur toute la largeur */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <motion.div 
+          className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200"
+          whileHover={{ scale: 1.05, y: -5 }}
+          transition={{ duration: 0.2 }}
+        >
           <div className="text-2xl font-bold text-blue-600 mb-1">{stats.activitiesCount}</div>
           <div className="text-xs text-blue-700 font-medium">Activités</div>
-        </div>
-        <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-          <div className="text-2xl font-bold text-green-600 mb-1">{stats.averageScore}%</div>
+        </motion.div>
+        <motion.div 
+          className="text-center p-4 bg-green-50 rounded-lg border border-green-200"
+          whileHover={{ scale: 1.05, y: -5 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="text-2xl font-bold text-green-600 mb-1">{stats.averageScore}</div>
           <div className="text-xs text-green-700 font-medium">Moyenne</div>
-        </div>
-        <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
+        </motion.div>
+        <motion.div 
+          className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200"
+          whileHover={{ scale: 1.05, y: -5 }}
+          transition={{ duration: 0.2 }}
+        >
           <div className="text-2xl font-bold text-purple-600 mb-1">{stats.streak}</div>
           <div className="text-xs text-purple-700 font-medium">Jours consécutifs</div>
-        </div>
-        <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+        </motion.div>
+        <motion.div 
+          className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200"
+          whileHover={{ scale: 1.05, y: -5 }}
+          transition={{ duration: 0.2 }}
+        >
           <div className="text-2xl font-bold text-yellow-600 mb-1">{stats.badges.length}</div>
           <div className="text-xs text-yellow-700 font-medium">Badges</div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Informations supplémentaires */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+        <motion.div 
+          className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200"
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.2 }}
+        >
           <div className="text-lg font-bold text-gray-600 mb-1">{stats.domains.length}</div>
           <div className="text-xs text-gray-500">Domaines actifs</div>
-        </div>
-        <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+        </motion.div>
+        <motion.div 
+          className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200"
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.2 }}
+        >
           <div className="text-lg font-bold text-gray-600 mb-1">{formatTime(stats.totalTime)}</div>
           <div className="text-xs text-gray-500">Temps total</div>
-        </div>
-        <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+        </motion.div>
+        <motion.div 
+          className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200"
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.2 }}
+        >
           <div className="text-lg font-bold text-gray-600 mb-1">
             {stats.lastActivity ? formatDate(stats.lastActivity) : 'Aucune'}
           </div>
           <div className="text-xs text-gray-500">Dernière activité</div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Badges obtenus */}
       {stats.badges.length > 0 && (
         <div className="mb-6">
-          <h4 className="text-base font-medium text-gray-800 mb-3">Badges obtenus</h4>
+          <h4 className="text-base font-medium text-gray-800 mb-3 flex items-center gap-2">
+            <motion.div
+              animate={{ 
+                scale: [1, 1.2, 1],
+                rotate: [0, 10, -10, 0]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              <Award size={16} />
+            </motion.div>
+            Badges obtenus
+          </h4>
           <div className="flex flex-wrap gap-2">
             {stats.badges.map((badge, index) => (
-              <span 
+              <motion.span 
                 key={index}
-                className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full"
+                className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full flex items-center gap-2"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+                whileHover={{ scale: 1.1 }}
               >
+                {getBadgeIcon(badge)}
                 {badge}
-              </span>
+              </motion.span>
             ))}
           </div>
         </div>
@@ -252,28 +472,55 @@ export default function UserStats({ userId, activities, memberSince }: UserStats
 
       {/* Progression du niveau sur toute la largeur */}
       <div>
-        <h4 className="text-base font-medium text-gray-800 mb-3">Progression du niveau</h4>
+        <h4 className="text-base font-medium text-gray-800 mb-3 flex items-center gap-2">
+          <motion.div
+            animate={{ 
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, -5, 0]
+            }}
+            transition={{ 
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <TrendingUp size={16} />
+          </motion.div>
+          Progression du niveau
+        </h4>
         <div className="grid grid-cols-3 gap-4">
-          <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+          <motion.div 
+            className="bg-gray-50 p-3 rounded-lg border border-gray-200"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
             <div className="text-center">
               <div className="text-xl font-bold text-blue-600 mb-1">{stats.level}</div>
               <div className="text-xs text-gray-600">Niveau actuel</div>
             </div>
-          </div>
-          <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+          </motion.div>
+          <motion.div 
+            className="bg-gray-50 p-3 rounded-lg border border-gray-200"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
             <div className="text-center">
               <div className="text-xl font-bold text-green-600 mb-1">{stats.experience} XP</div>
               <div className="text-xs text-gray-600">Expérience</div>
             </div>
-          </div>
-          <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+          </motion.div>
+          <motion.div 
+            className="bg-gray-50 p-3 rounded-lg border border-gray-200"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
             <div className="text-center">
               <div className="text-xl font-bold text-purple-600 mb-1">{100 - (stats.experience % 100)} XP</div>
               <div className="text-xs text-gray-600">Prochain niveau</div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 } 
