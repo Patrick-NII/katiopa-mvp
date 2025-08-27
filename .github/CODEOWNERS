@@ -1,0 +1,14 @@
+# Code owners for Katiopa MVP
+# These people will be automatically requested for review when changes are proposed
+
+* @Patrick-NII
+
+# Backend specific
+/backend/ @Patrick-NII
+
+# Frontend specific  
+/frontend/ @Patrick-NII
+
+# Documentation
+/README.md @Patrick-NII
+/LICENSE @Patrick-NII 
