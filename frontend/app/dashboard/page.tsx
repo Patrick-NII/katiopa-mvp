@@ -1,14 +1,14 @@
 'use client'
-import { apiGet, apiPost } from '@/lib/api'
-import { useEffect, useState } from 'react'
-import NavBar from '@/components/NavBar'
-import UserProfile from '@/components/UserProfile'
-import UserStats from '@/components/UserStats'
-import PerformanceCharts from '@/components/PerformanceCharts'
-import FreeAccountLimitations from '@/components/FreeAccountLimitations'
-import AnimatedLLMButton from '@/components/AnimatedLLMButton'
-import AdvancedLLMResults from '@/components/AdvancedLLMResults'
+
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import { apiGet, apiPost } from '@/lib/api'
+
+// Composants d'onglets
+import SidebarNavigation, { NavigationTab } from '@/components/SidebarNavigation'
+import DashboardTab from '@/components/DashboardTab'
+import StatisticsTab from '@/components/StatisticsTab'
 import DetailedUserInfo from '@/components/DetailedUserInfo'
 import HelpChatButton from '@/components/HelpChatButton'
 
@@ -65,19 +65,13 @@ interface LLMResponse {
 
 interface User {
   id: string
-  firstName: string
-  lastName: string
+  name: string
   email: string
-  role: string
-  createdAt: string
-  phone?: string
+  age?: number
+  grade?: string
   country?: string
   timezone?: string
-  preferences?: {
-    language: string
-    theme: string
-    notifications: boolean
-  }
+  createdAt: string
   subscriptionType?: 'free' | 'premium' | 'enterprise'
 }
 
@@ -112,6 +106,7 @@ export default function Dashboard() {
   const [focus, setFocus] = useState('maths')
   const [error, setError] = useState<string | null>(null)
   const [userPreferences, setUserPreferences] = useState<any>(null)
+  const [activeTab, setActiveTab] = useState<NavigationTab>('dashboard')
 
   // Déterminer le type de compte (par défaut gratuit pour les nouveaux utilisateurs)
   const [subscription] = useState<Subscription | null>(null) // null = compte gratuit
@@ -421,175 +416,48 @@ export default function Dashboard() {
     }
   }
 
-  // Gérer la sélection d'un exercice
-  const handleExerciseSelect = (nodeKey: string) => {
-    console.log('Exercice sélectionné:', nodeKey)
-    // Ici vous pouvez rediriger vers l'exercice ou l'ajouter à une liste
+  // Fonction pour changer d'onglet
+  const handleTabChange = (tab: NavigationTab) => {
+    setActiveTab(tab)
   }
 
-  // Affichage du chargement pendant la vérification
+  // Fonction pour gérer la sélection d'exercice
+  const handleExerciseSelect = (nodeKey: string) => {
+    console.log('Exercice sélectionné:', nodeKey)
+    // Ici vous pourriez naviguer vers l'exercice ou l'ouvrir
+  }
+
   if (!ready || !user) {
     return (
-      <>
-        <NavBar />
-        <div className="min-h-screen bg-gray-50">
-          <div className="w-full px-6 py-8">
-            <div className="bg-white rounded-xl shadow-sm p-8">
-              <div className="text-center py-12">
-                <div className="spinner mx-auto mb-6 w-12 h-12"></div>
-                <p className="text-lg text-gray-600">Chargement du profil utilisateur...</p>
-              </div>
-            </div>
-          </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Chargement...</p>
         </div>
-      </>
+      </div>
     )
   }
 
-  const isFreeAccount = user.subscriptionType === 'free'
-
   return (
-    <>
-      <NavBar />
-      <div className="min-h-screen bg-gray-50">
-        <div className="w-full px-6 py-8">
-          {/* Profil utilisateur enrichi */}
-          <UserProfile 
-            user={user}
-            level={Math.floor(activities.length * 10 / 100) + 1}
-            experience={activities.length * 10}
-            totalTime={activities.reduce((total, a) => total + a.durationMs, 0)}
-            subscription={subscription}
-            billing={billing}
-          />
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Navigation latérale */}
+      <SidebarNavigation
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        userSubscriptionType={user.subscriptionType}
+      />
 
-          {/* Statistiques détaillées cohérentes */}
-          <UserStats 
-            userId={user.id}
-            activities={activities}
-            memberSince={user.createdAt}
-          />
-
-          {/* Graphiques de performance - UNIQUEMENT pour les comptes premium */}
-          {!isFreeAccount && (
-            <PerformanceCharts 
-              userId={user.id}
-              memberSince={user.createdAt}
-              activities={activities}
-            />
-          )}
-
-          {/* Limitations du compte gratuit */}
-          {isFreeAccount && (
-            <FreeAccountLimitations 
-              currentFeatures={currentFeatures}
-              premiumFeatures={premiumFeatures}
-            />
-          )}
-
-          {/* Dashboard principal */}
-          <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-8">Tableau de bord</h1>
-            
-            {error && (
-              <div className="mb-8 p-6 bg-red-50 border border-red-200 rounded-lg text-red-700">
-                Erreur: {error}
-              </div>
-            )}
-            
-            {/* Statistiques principales sur toute la largeur */}
-            <div className="grid grid-cols-4 gap-6 mb-8">
-              <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
-                <h3 className="font-medium text-blue-900 text-base mb-2">Activités récentes</h3>
-                <p className="text-3xl font-bold text-blue-600">{activities.length}</p>
-              </div>
-              <div className="bg-green-50 p-6 rounded-lg border border-green-200">
-                <h3 className="font-medium text-green-900 text-base mb-2">Moyenne générale</h3>
-                <p className="text-3xl font-bold text-green-600">
-                  {summary.length > 0 
-                    ? Math.round(summary.reduce((acc, s) => acc + s.avg, 0) / summary.length)
-                    : 'N/A'
-                  }
-                </p>
-              </div>
-              <div className="bg-purple-50 p-6 rounded-lg border border-purple-200">
-                <h3 className="font-medium text-purple-900 text-base mb-2">Domaines actifs</h3>
-                <p className="text-3xl font-bold text-purple-600">{summary.length}</p>
-              </div>
-              <div className="bg-orange-50 p-6 rounded-lg border border-orange-200">
-                <h3 className="font-medium text-orange-900 text-base mb-2">Score moyen</h3>
-                <p className="text-3xl font-bold text-orange-600">
-                  {summary.length > 0 
-                    ? Math.round(summary.reduce((acc, s) => acc + s.avg, 0) / summary.length)
-                    : '0'
-                  }
-                </p>
-              </div>
-            </div>
-
-            {/* Section LLM avec bouton animé */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">Évaluation IA Katiopa</h3>
-              <div className="mb-6">
-                <select 
-                  value={focus} 
-                  onChange={(e) => setFocus(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-[200px] mb-4"
-                >
-                  <option value="maths">Mathématiques</option>
-                  <option value="coding">Programmation</option>
-                  <option value="reading">Lecture</option>
-                  <option value="science">Sciences</option>
-                  <option value="ai">IA</option>
-                </select>
-                
-                {/* Bouton LLM animé */}
-                <AnimatedLLMButton 
-                  onClick={evaluateLLM}
-                  loading={loading}
-                  disabled={loading}
-                  subscriptionType={user.subscriptionType}
-                  focus={focus}
-                  className="max-w-md"
-                />
-              </div>
-
-              {/* Résultats LLM avancés */}
-              {llmResponse && (
-                <AdvancedLLMResults 
-                  result={llmResponse}
-                  subscriptionType={user.subscriptionType}
-                  onExerciseSelect={handleExerciseSelect}
-                />
-              )}
-            </div>
-
-            {/* Résumé par domaine sur toute la largeur */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">Résumé par domaine</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {summary.map((s) => (
-                  <div key={s.domain} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <span className="capitalize font-medium text-gray-700">{s.domain}</span>
-                    <span className="font-bold text-lg text-gray-900">{Math.round(s.avg)}/100</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+      {/* Contenu principal */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-8">
+          <AnimatePresence mode="wait">
+            {renderActiveTab()}
+          </AnimatePresence>
         </div>
-      </div>
-      
-      {/* Informations détaillées de l'utilisateur */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <DetailedUserInfo 
-          user={user!} 
-          onPreferencesUpdate={handlePreferencesUpdate}
-        />
       </div>
 
       {/* Bouton d'aide flottant */}
       <HelpChatButton />
-    </>
+    </div>
   )
 } 
