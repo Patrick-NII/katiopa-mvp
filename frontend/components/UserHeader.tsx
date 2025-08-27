@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Clock, Calendar, Settings, LogOut, Mail, Crown, Gift, Zap } from 'lucide-react'
 import { useTotalConnectionTime } from '../hooks/useTotalConnectionTime'
+import SessionSwitcher from './SessionSwitcher'
 
 interface UserHeaderProps {
   user: {
@@ -26,9 +27,10 @@ interface UserHeaderProps {
     createdAt: string
   }
   onLogout: () => void
+  onSwitchSession: (sessionId: string) => void
 }
 
-export default function UserHeader({ user, account, onLogout }: UserHeaderProps) {
+export default function UserHeader({ user, account, onLogout, onSwitchSession }: UserHeaderProps) {
   const [sessionStartTime, setSessionStartTime] = useState<Date>(new Date())
   const [sessionDuration, setSessionDuration] = useState<string>('00:00:00')
   
@@ -184,10 +186,10 @@ export default function UserHeader({ user, account, onLogout }: UserHeaderProps)
         <div className="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-lg border border-green-200">
           <Calendar size={16} className="text-green-600" />
           <div className="text-center">
-                          <div className="text-xs text-green-600 font-medium">Temps global</div>
-              <div className="text-sm font-mono font-bold text-green-800">
-                {totalConnectionTime.isActive ? totalConnectionTime.totalTimeFormatted : '00:00:00'}
-              </div>
+            <div className="text-xs text-green-600 font-medium">Temps global</div>
+            <div className="text-sm font-mono font-bold text-green-800">
+              {totalConnectionTime.isActive ? totalConnectionTime.totalTimeFormatted : '00:00:00'}
+            </div>
           </div>
         </div>
 
@@ -202,21 +204,20 @@ export default function UserHeader({ user, account, onLogout }: UserHeaderProps)
 
         {/* Boutons d'action */}
         <div className="flex items-center gap-2">
+          {/* Sélecteur de session */}
+          <SessionSwitcher
+            currentSessionId={user.id}
+            accountId={account.id}
+            onSwitchSession={onSwitchSession}
+            onLogout={onLogout}
+          />
+          
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <Settings size={20} />
-          </motion.button>
-          
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={onLogout}
-            className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors"
-          >
-            <LogOut size={20} />
           </motion.button>
         </div>
       </div>
