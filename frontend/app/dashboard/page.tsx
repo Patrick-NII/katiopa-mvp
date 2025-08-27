@@ -36,6 +36,7 @@ interface User {
   lastName: string
   email: string
   role: string
+  createdAt: string
 }
 
 export default function Dashboard() {

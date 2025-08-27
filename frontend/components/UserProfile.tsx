@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useSession } from '../hooks/useSession'
 
 interface UserProfileProps {
   user: {
@@ -8,6 +9,7 @@ interface UserProfileProps {
     lastName: string
     email: string
     role: string
+    createdAt?: string
   }
   level: number
   experience: number
@@ -15,7 +17,7 @@ interface UserProfileProps {
 }
 
 export default function UserProfile({ user, level, experience, totalTime }: UserProfileProps) {
-  const [connectionTime, setConnectionTime] = useState(0)
+  const { currentSessionTime } = useSession()
   const [avatarUrl, setAvatarUrl] = useState('')
 
   // Générer un avatar basé sur les initiales
@@ -36,17 +38,6 @@ export default function UserProfile({ user, level, experience, totalTime }: User
     setAvatarUrl(dataUrl)
   }, [user.firstName, user.lastName])
 
-  // Calculer le temps de connexion en temps réel
-  useEffect(() => {
-    const startTime = Date.now()
-    const interval = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startTime) / 1000)
-      setConnectionTime(elapsed)
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [])
-
   // Formater le temps
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600)
@@ -60,6 +51,26 @@ export default function UserProfile({ user, level, experience, totalTime }: User
     } else {
       return `${secs}s`
     }
+  }
+
+  const formatTotalTime = (milliseconds: number) => {
+    const hours = Math.floor(milliseconds / 3600000)
+    const minutes = Math.floor((milliseconds % 3600000) / 60000)
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`
+    } else {
+      return `${minutes}m`
+    }
+  }
+
+  const formatRegistrationDate = (dateString?: string) => {
+    if (!dateString) return 'Date inconnue'
+    const date = new Date(dateString)
+    const day = date.getDate().toString().padStart(2, '0')
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
+    const year = date.getFullYear()
+    return `${day}/${month}/${year}`
   }
 
   // Calculer le niveau et l'expérience
@@ -89,13 +100,24 @@ export default function UserProfile({ user, level, experience, totalTime }: User
           </h2>
           <p className="text-gray-600">{user.email}</p>
           <p className="text-sm text-gray-500 capitalize">Rôle: {user.role.toLowerCase()}</p>
+          <p className="text-sm text-gray-500">
+            Membre depuis le {formatRegistrationDate(user.createdAt)}
+          </p>
         </div>
 
-        {/* Temps de connexion */}
-        <div className="text-right">
-          <div className="text-sm text-gray-500 mb-1">Temps de connexion</div>
-          <div className="text-lg font-mono font-bold text-blue-600">
-            {formatTime(connectionTime)}
+        {/* Informations de connexion */}
+        <div className="text-right space-y-2">
+          <div>
+            <div className="text-sm text-gray-500">Session actuelle</div>
+            <div className="text-lg font-mono font-bold text-green-600">
+              {formatTime(currentSessionTime)}
+            </div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-500">Temps total</div>
+            <div className="text-lg font-mono font-bold text-blue-600">
+              {formatTotalTime(totalTime)}
+            </div>
           </div>
         </div>
       </div>
