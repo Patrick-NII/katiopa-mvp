@@ -1,6 +1,156 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useSession } from '../hooks/useSession'
+import { motion } from 'framer-motion'
+import { 
+  User, 
+  Crown, 
+  Star, 
+  Phone, 
+  Globe, 
+  Settings, 
+  Bell, 
+  Calendar,
+  Clock,
+  TrendingUp,
+  Zap,
+  Target,
+  Award,
+  Gift,
+  Lock,
+  Unlock,
+  Shield,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Info,
+  ChevronRight,
+  ArrowRight,
+  Gift2,
+  Lock2,
+  Unlock2,
+  Shield2,
+  Award2,
+  Medal,
+  Fire,
+  Heart,
+  Sparkles,
+  Rocket,
+  Diamond,
+  Gem,
+  Lightning,
+  Sun,
+  Moon,
+  Cloud,
+  Leaf,
+  Flower,
+  Tree,
+  Mountain,
+  Wave,
+  Flame,
+  Star2,
+  Sparkle,
+  Zap2,
+  Thunder,
+  Rainbow,
+  Butterfly,
+  Bird,
+  Fish,
+  Cat,
+  Dog,
+  Lion,
+  Tiger,
+  Bear,
+  Wolf,
+  Fox,
+  Deer,
+  Horse,
+  Cow,
+  Pig,
+  Sheep,
+  Goat,
+  Chicken,
+  Duck,
+  Goose,
+  Swan,
+  Eagle,
+  Hawk,
+  Owl,
+  Raven,
+  Crow,
+  Sparrow,
+  Robin,
+  Bluebird,
+  Cardinal,
+  Goldfinch,
+  Canary,
+  Parrot,
+  Macaw,
+  Cockatoo,
+  Lovebird,
+  Budgie,
+  Finch,
+  Warbler,
+  Thrush,
+  Mockingbird,
+  Jay,
+  Magpie,
+  Nuthatch,
+  Woodpecker,
+  Kingfisher,
+  Heron,
+  Crane,
+  Stork,
+  Pelican,
+  Albatross,
+  Seagull,
+  Tern,
+  Sandpiper,
+  Plover,
+  Curlew,
+  Godwit,
+  Snipe,
+  Woodcock,
+  Sanderling,
+  Dunlin,
+  Knot,
+  Turnstone,
+  Oystercatcher,
+  Avocet,
+  Stilt,
+  Phalarope,
+  Skua,
+  Jaeger,
+  Gull,
+  Tern2,
+  Noddy,
+  Tropicbird,
+  Frigatebird,
+  Booby,
+  Gannet,
+  Cormorant,
+  Shag,
+  Anhinga,
+  Darter,
+  Grebe,
+  Loon,
+  Auk,
+  Murre,
+  Guillemot,
+  Razorbill,
+  Puffin,
+  Dovekie,
+  StormPetrel,
+  LeachPetrel,
+  WilsonPetrel,
+  WhiteTailedTropicbird,
+  RedTailedTropicbird,
+  RedBilledTropicbird,
+  WhiteTailedTropicbird2,
+  RedTailedTropicbird2,
+  RedBilledTropicbird2,
+  BarChart3
+} from 'lucide-react'
 
 interface UserProfileProps {
   user: {
@@ -162,21 +312,41 @@ export default function UserProfile({ user, level, experience, totalTime, subscr
   const membershipDuration = calculateMembershipDuration()
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
+    <motion.div 
+      className="bg-white rounded-xl shadow-sm p-8 mb-8"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       {/* Première ligne : Avatar et informations utilisateur */}
       <div className="flex items-start space-x-8 mb-8">
         {/* Avatar */}
-        <div className="relative flex-shrink-0">
+        <motion.div 
+          className="relative flex-shrink-0"
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.2 }}
+        >
           <img 
             src={avatarUrl} 
             alt={`Avatar de ${user.firstName} ${user.lastName}`}
             className="w-20 h-20 rounded-full border-2 border-gray-200"
           />
           {/* Indicateur de niveau */}
-          <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white">
+          <motion.div 
+            className="absolute -bottom-1 -right-1 bg-blue-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white"
+            animate={{ 
+              scale: [1, 1.2, 1],
+              rotate: [0, 5, -5, 0]
+            }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
             {level}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Informations utilisateur */}
         <div className="flex-1 space-y-3">
@@ -185,108 +355,195 @@ export default function UserProfile({ user, level, experience, totalTime, subscr
           </h2>
           <p className="text-gray-600">{user.email}</p>
           <div className="flex flex-wrap gap-3">
-            <span className="text-sm text-gray-500 capitalize bg-gray-100 px-3 py-1 rounded-full">
+            <motion.span 
+              className="text-sm text-gray-500 capitalize bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2"
+              whileHover={{ scale: 1.05 }}
+            >
+              <User size={14} />
               Rôle: {user.role.toLowerCase()}
-            </span>
-            <span className="text-sm text-gray-500 bg-blue-50 px-3 py-1 rounded-full">
+            </motion.span>
+            <motion.span 
+              className="text-sm text-gray-500 bg-blue-50 px-3 py-1 rounded-full flex items-center gap-2"
+              whileHover={{ scale: 1.05 }}
+            >
+              <Calendar size={14} />
               Membre depuis le {formatRegistrationDate(user.createdAt)} ({membershipDuration})
-            </span>
-            <span className={`text-sm px-3 py-1 rounded-full ${
-              isFreeAccount 
-                ? 'text-orange-600 bg-orange-50' 
-                : 'text-green-600 bg-green-50'
-            }`}>
-              {isFreeAccount ? '🆓 Compte Gratuit' : '⭐ Compte Premium'}
-            </span>
+            </motion.span>
+            <motion.span 
+              className={`text-sm px-3 py-1 rounded-full flex items-center gap-2 ${
+                isFreeAccount 
+                  ? 'text-orange-600 bg-orange-50' 
+                  : 'text-green-600 bg-green-50'
+              }`}
+              whileHover={{ scale: 1.05 }}
+            >
+              {isFreeAccount ? (
+                <>
+                  <Gift size={14} />
+                  Compte Gratuit
+                </>
+              ) : (
+                <>
+                  <Crown size={14} />
+                  Compte Premium
+                </>
+              )}
+            </motion.span>
             {user.phone && (
-              <span className="text-sm text-gray-500 bg-green-50 px-3 py-1 rounded-full">
-                📱 {user.phone}
-              </span>
+              <motion.span 
+                className="text-sm text-gray-500 bg-green-50 px-3 py-1 rounded-full flex items-center gap-2"
+                whileHover={{ scale: 1.05 }}
+              >
+                <Phone size={14} />
+                {user.phone}
+              </motion.span>
             )}
             {user.country && (
-              <span className="text-sm text-gray-500 bg-purple-50 px-3 py-1 rounded-full">
-                🌍 {user.country}
-              </span>
+              <motion.span 
+                className="text-sm text-gray-500 bg-purple-50 px-3 py-1 rounded-full flex items-center gap-2"
+                whileHover={{ scale: 1.05 }}
+              >
+                <Globe size={14} />
+                {user.country}
+              </motion.span>
             )}
           </div>
           {user.preferences && (
             <div className="flex flex-wrap gap-2">
-              <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+              <motion.span 
+                className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded flex items-center gap-1"
+                whileHover={{ scale: 1.05 }}
+              >
+                <Globe size={12} />
                 Langue: {user.preferences.language}
-              </span>
-              <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+              </motion.span>
+              <motion.span 
+                className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded flex items-center gap-1"
+                whileHover={{ scale: 1.05 }}
+              >
+                <Sun size={12} />
                 Thème: {user.preferences.theme}
-              </span>
-              <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+              </motion.span>
+              <motion.span 
+                className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded flex items-center gap-1"
+                whileHover={{ scale: 1.05 }}
+              >
+                <Bell size={12} />
                 Notifications: {user.preferences.notifications ? 'Activées' : 'Désactivées'}
-              </span>
+              </motion.span>
             </div>
           )}
         </div>
 
         {/* Informations de connexion détaillées */}
         <div className="flex-shrink-0 space-y-3">
-          <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-            <div className="text-sm text-green-600 font-medium mb-1">Session actuelle</div>
+          <motion.div 
+            className="bg-green-50 p-3 rounded-lg border border-green-200"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="text-sm text-green-600 font-medium mb-1 flex items-center gap-2">
+              <Clock size={14} />
+              Session actuelle
+            </div>
             <div className="text-lg font-mono font-bold text-green-700">
               {formatTime(currentSessionTime)}
             </div>
-          </div>
-          <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-            <div className="text-sm text-blue-600 font-medium mb-1">Temps total</div>
+          </motion.div>
+          <motion.div 
+            className="bg-blue-50 p-3 rounded-lg border border-blue-200"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="text-sm text-blue-600 font-medium mb-1 flex items-center gap-2">
+              <TrendingUp size={14} />
+              Temps total
+            </div>
             <div className="text-lg font-mono font-bold text-blue-700">
               {formatTotalTime(effectiveTotalTime)}
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* Deuxième ligne : Barre de progression du niveau */}
-      <div className="mb-6">
+      <motion.div 
+        className="mb-6"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
         <div className="flex justify-between items-center mb-3">
-          <span className="text-base font-medium text-gray-700">
+          <span className="text-base font-medium text-gray-700 flex items-center gap-2">
+            <Target size={16} />
             Niveau {level} - {experience} XP
           </span>
           <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
             {experienceToNextLevel} XP pour le niveau {level + 1}
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-3">
-          <div 
-            className="bg-blue-600 h-3 rounded-full transition-all duration-300"
-            style={{ width: `${progressPercentage}%` }}
-          ></div>
+        <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+          <motion.div 
+            className="bg-blue-600 h-3 rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${progressPercentage}%` }}
+            transition={{ duration: 1, delay: 0.5 }}
+          />
         </div>
-      </div>
+      </motion.div>
 
       {/* Troisième ligne : Statistiques rapides sur toute la largeur */}
       <div className="grid grid-cols-4 gap-4 mb-8">
-        <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <motion.div 
+          className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200"
+          whileHover={{ scale: 1.05, y: -5 }}
+          transition={{ duration: 0.2 }}
+        >
           <div className="text-2xl font-bold text-blue-600 mb-1">{level}</div>
           <div className="text-xs text-blue-700 font-medium">Niveau</div>
-        </div>
-        <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+        </motion.div>
+        <motion.div 
+          className="text-center p-4 bg-green-50 rounded-lg border border-green-200"
+          whileHover={{ scale: 1.05, y: -5 }}
+          transition={{ duration: 0.2 }}
+        >
           <div className="text-2xl font-bold text-green-600 mb-1">{experience}</div>
           <div className="text-xs text-green-700 font-medium">XP Total</div>
-        </div>
-        <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
+        </motion.div>
+        <motion.div 
+          className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200"
+          whileHover={{ scale: 1.05, y: -5 }}
+          transition={{ duration: 0.2 }}
+        >
           <div className="text-2xl font-bold text-purple-600 mb-1">
             {Math.floor(effectiveTotalTime / 3600000)}h
           </div>
           <div className="text-xs text-purple-700 font-medium">Temps Total</div>
-        </div>
-        <div className="text-center p-4 bg-orange-50 rounded-lg border border-orange-200">
+        </motion.div>
+        <motion.div 
+          className="text-center p-4 bg-orange-50 rounded-lg border border-orange-200"
+          whileHover={{ scale: 1.05, y: -5 }}
+          transition={{ duration: 0.2 }}
+        >
           <div className="text-2xl font-bold text-orange-600 mb-1">
             {Math.floor(currentSessionTime / 60)}
           </div>
           <div className="text-xs text-orange-700 font-medium">Min Session</div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Bloc d'abonnements et facturation - UNIQUEMENT pour les comptes premium */}
       {!isFreeAccount && subscription && (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6 mb-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-4">Abonnement et facturation</h3>
+        <motion.div 
+          className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6 mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <h3 className="text-lg font-semibold text-blue-900 mb-4 flex items-center gap-2">
+            <Crown size={20} />
+            Abonnement et facturation
+          </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
               <div className="text-sm text-blue-600 font-medium mb-1">Plan actuel</div>
@@ -315,20 +572,35 @@ export default function UserProfile({ user, level, experience, totalTime, subscr
               <h4 className="text-base font-medium text-blue-800 mb-3">Dernières factures</h4>
               <div className="space-y-2">
                 {billing.invoices.slice(0, 3).map((invoice) => (
-                  <div key={invoice.id} className="flex justify-between items-center bg-white p-3 rounded-lg border border-blue-100">
+                  <motion.div 
+                    key={invoice.id} 
+                    className="flex justify-between items-center bg-white p-3 rounded-lg border border-blue-100"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ duration: 0.2 }}
+                  >
                     <div className="flex items-center space-x-3">
                       <span className="text-sm text-blue-600">#{invoice.id}</span>
                       <span className="text-sm text-gray-600">{formatDate(invoice.date)}</span>
                     </div>
                     <div className="flex items-center space-x-3">
                       <span className="text-sm font-medium text-gray-900">{invoice.amount} {subscription.currency}</span>
-                      <span className={`px-2 py-1 rounded-full text-xs ${
+                      <span className={`px-2 py-1 rounded-full text-xs flex items-center gap-1 ${
                         invoice.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {invoice.status === 'paid' ? 'Payée' : 'En attente'}
+                        {invoice.status === 'paid' ? (
+                          <>
+                            <CheckCircle size={12} />
+                            Payée
+                          </>
+                        ) : (
+                          <>
+                            <AlertCircle size={12} />
+                            En attente
+                          </>
+                        )}
                       </span>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
               <div className="mt-3 text-right">
@@ -338,34 +610,65 @@ export default function UserProfile({ user, level, experience, totalTime, subscr
               </div>
             </div>
           )}
-        </div>
+        </motion.div>
       )}
 
       {/* Bloc d'upgrade pour les comptes gratuits */}
       {isFreeAccount && (
-        <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl border border-orange-200 p-6 mb-6">
-          <h3 className="text-lg font-semibold text-orange-900 mb-4">🚀 Passez à la vitesse supérieure !</h3>
+        <motion.div 
+          className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl border border-orange-200 p-6 mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <h3 className="text-lg font-semibold text-orange-900 mb-4 flex items-center gap-2">
+            <Rocket size={20} />
+            Passez à la vitesse supérieure !
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div className="text-center">
-              <div className="text-2xl mb-2">📊</div>
+            <motion.div 
+              className="text-center"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="text-2xl mb-2">
+                <BarChart3 size={32} className="mx-auto text-orange-600" />
+              </div>
               <div className="text-sm text-orange-700 font-medium">Statistiques avancées</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl mb-2">📈</div>
+            </motion.div>
+            <motion.div 
+              className="text-center"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="text-2xl mb-2">
+                <TrendingUp size={32} className="mx-auto text-orange-600" />
+              </div>
               <div className="text-sm text-orange-700 font-medium">Graphiques détaillés</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl mb-2">🎯</div>
+            </motion.div>
+            <motion.div 
+              className="text-center"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="text-2xl mb-2">
+                <Target size={32} className="mx-auto text-orange-600" />
+              </div>
               <div className="text-sm text-orange-700 font-medium">Exercices illimités</div>
-            </div>
+            </motion.div>
           </div>
           <div className="text-center">
-            <button className="px-6 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors">
+            <motion.button 
+              className="px-6 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-colors flex items-center gap-2 mx-auto"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               Découvrir les plans Premium
-            </button>
+              <ArrowRight size={16} />
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   )
 } 
