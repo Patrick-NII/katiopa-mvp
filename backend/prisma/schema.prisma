@@ -7,34 +7,126 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  firstName String
-  lastName  String
-  role      Role     @default(USER)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  activities Activity[]
+// Compte principal (une adresse email = un compte)
+model Account {
+  id                String        @id @default(cuid())
+  email             String        @unique
+  subscriptionType  SubscriptionType @default(FREE)
+  maxSessions       Int           @default(2) // 2 pour FREE, 4 pour PRO_PLUS
+  isActive          Boolean       @default(true)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  // Relations
+  userSessions      UserSession[]
+  billingHistory    BillingRecord[]
 }
 
-enum Role {
-  USER
-  ADMIN
-  TEACHER
-  STUDENT
+// Session utilisateur (connexion avec ID/mot de passe)
+model UserSession {
+  id              String      @id @default(cuid())
+  accountId       String      // Référence au compte
+  sessionId       String      @unique // ID de connexion unique
+  password        String      // Mot de passe de cette session
+  firstName       String
+  lastName        String
+  gender          Gender      @default(UNKNOWN)
+  userType        UserType    @default(CHILD)
+  age             Int?
+  grade           String?
+  country         String?
+  timezone        String?
+  preferences     Json?       // Préférences d'apprentissage
+  isActive        Boolean     @default(true)
+  lastLoginAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  // Relations
+  account         Account     @relation(fields: [accountId], references: [id])
+  activities      Activity[]
+  profile         UserProfile?
 }
 
+// Profil détaillé de l'utilisateur
+model UserProfile {
+  id                    String      @id @default(cuid())
+  userSessionId         String      @unique
+  learningGoals         String[]    // Objectifs d'apprentissage
+  preferredSubjects     String[]    // Matières préférées
+  learningStyle         String?     // Style d'apprentissage
+  difficulty            String?     // Niveau de difficulté
+  sessionPreferences    Json?       // Préférences de session
+  interests            String[]     // Centres d'intérêt
+  specialNeeds         String[]     // Besoins spéciaux
+  customNotes          String?      // Notes personnalisées
+  parentWishes         String?      // Souhaits des parents
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  
+  // Relations
+  userSession          UserSession  @relation(fields: [userSessionId], references: [id])
+}
+
+// Activités d'apprentissage
 model Activity {
-  id         String   @id @default(cuid())
-  userId     String
-  domain     String
-  nodeKey    String
-  score      Int
-  attempts   Int      @default(1)
-  durationMs Int
-  createdAt  DateTime @default(now())
-  user       User     @relation(fields: [userId], references: [id])
+  id         String      @id @default(cuid())
+  userSessionId String   // Référence à la session utilisateur
+  domain     String      // Mathématiques, Français, IA, etc.
+  nodeKey    String      // Clé du nœud d'apprentissage
+  score      Int         // Score obtenu
+  attempts   Int         @default(1) // Nombre de tentatives
+  durationMs Int         // Durée en millisecondes
+  createdAt  DateTime    @default(now())
+  
+  // Relations
+  userSession UserSession @relation(fields: [userSessionId], references: [id])
+}
+
+// Historique de facturation
+model BillingRecord {
+  id              String      @id @default(cuid())
+  accountId       String
+  amount          Float
+  currency        String      @default("EUR")
+  description     String
+  status          BillingStatus @default(PENDING)
+  billingDate     DateTime
+  dueDate         DateTime?
+  paidAt          DateTime?
+  createdAt       DateTime    @default(now())
+  
+  // Relations
+  account         Account     @relation(fields: [accountId], references: [id])
+}
+
+// Types d'abonnement
+enum SubscriptionType {
+  FREE        // 2 sessions max
+  PRO         // 2 sessions max + fonctionnalités premium
+  PRO_PLUS    // 4 sessions max + toutes fonctionnalités
+  ENTERPRISE  // Sessions illimitées + support entreprise
+}
+
+// Genre de l'utilisateur
+enum Gender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+// Type d'utilisateur
+enum UserType {
+  CHILD       // Enfant 5-7 ans
+  PARENT      // Parent
+  TEACHER     // Enseignant
+  ADMIN       // Administrateur
+}
+
+// Statut de facturation
+enum BillingStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
 }
