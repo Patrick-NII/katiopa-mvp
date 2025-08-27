@@ -83,7 +83,7 @@ export default function UserProfile({ user, level, experience, totalTime }: User
   const effectiveTotalTime = totalTime + (currentSessionTime * 1000)
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+    <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
       {/* Première ligne : Avatar et informations utilisateur */}
       <div className="flex items-start space-x-8 mb-8">
         {/* Avatar */}
@@ -91,20 +91,20 @@ export default function UserProfile({ user, level, experience, totalTime }: User
           <img 
             src={avatarUrl} 
             alt={`Avatar de ${user.firstName} ${user.lastName}`}
-            className="w-24 h-24 rounded-full border-4 border-blue-100 shadow-lg"
+            className="w-20 h-20 rounded-full border-2 border-gray-200"
           />
           {/* Indicateur de niveau */}
-          <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-bold rounded-full w-10 h-10 flex items-center justify-center border-4 border-white shadow-lg">
+          <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white">
             {level}
           </div>
         </div>
 
         {/* Informations utilisateur */}
         <div className="flex-1 space-y-3">
-          <h2 className="text-3xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900">
             {user.firstName} {user.lastName}
           </h2>
-          <p className="text-lg text-gray-600">{user.email}</p>
+          <p className="text-gray-600">{user.email}</p>
           <div className="flex flex-wrap gap-3">
             <span className="text-sm text-gray-500 capitalize bg-gray-100 px-3 py-1 rounded-full">
               Rôle: {user.role.toLowerCase()}
@@ -116,16 +116,16 @@ export default function UserProfile({ user, level, experience, totalTime }: User
         </div>
 
         {/* Informations de connexion détaillées */}
-        <div className="flex-shrink-0 space-y-4">
-          <div className="bg-green-50 p-4 rounded-xl border border-green-200">
+        <div className="flex-shrink-0 space-y-3">
+          <div className="bg-green-50 p-3 rounded-lg border border-green-200">
             <div className="text-sm text-green-600 font-medium mb-1">Session actuelle</div>
-            <div className="text-xl font-mono font-bold text-green-700">
+            <div className="text-lg font-mono font-bold text-green-700">
               {formatTime(currentSessionTime)}
             </div>
           </div>
-          <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
+          <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
             <div className="text-sm text-blue-600 font-medium mb-1">Temps total</div>
-            <div className="text-xl font-mono font-bold text-blue-700">
+            <div className="text-lg font-mono font-bold text-blue-700">
               {formatTotalTime(effectiveTotalTime)}
             </div>
           </div>
@@ -133,44 +133,44 @@ export default function UserProfile({ user, level, experience, totalTime }: User
       </div>
 
       {/* Deuxième ligne : Barre de progression du niveau */}
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="flex justify-between items-center mb-3">
-          <span className="text-lg font-semibold text-gray-800">
+          <span className="text-base font-medium text-gray-700">
             Niveau {level} - {experience} XP
           </span>
-          <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
             {experienceToNextLevel} XP pour le niveau {level + 1}
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-4 shadow-inner">
+        <div className="w-full bg-gray-200 rounded-full h-3">
           <div 
-            className="bg-gradient-to-r from-blue-500 to-purple-600 h-4 rounded-full transition-all duration-500 shadow-sm"
+            className="bg-blue-600 h-3 rounded-full transition-all duration-300"
             style={{ width: `${progressPercentage}%` }}
           ></div>
         </div>
       </div>
 
       {/* Troisième ligne : Statistiques rapides sur toute la largeur */}
-      <div className="grid grid-cols-4 gap-6">
-        <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
-          <div className="text-3xl font-bold text-blue-600 mb-2">{level}</div>
-          <div className="text-sm text-blue-700 font-medium">Niveau</div>
+      <div className="grid grid-cols-4 gap-4">
+        <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="text-2xl font-bold text-blue-600 mb-1">{level}</div>
+          <div className="text-xs text-blue-700 font-medium">Niveau</div>
         </div>
-        <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200">
-          <div className="text-3xl font-bold text-green-600 mb-2">{experience}</div>
-          <div className="text-sm text-green-700 font-medium">XP Total</div>
+        <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+          <div className="text-2xl font-bold text-green-600 mb-1">{experience}</div>
+          <div className="text-xs text-green-700 font-medium">XP Total</div>
         </div>
-        <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200">
-          <div className="text-3xl font-bold text-purple-600 mb-2">
+        <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
+          <div className="text-2xl font-bold text-purple-600 mb-1">
             {Math.floor(effectiveTotalTime / 3600000)}h
           </div>
-          <div className="text-sm text-purple-700 font-medium">Temps Total</div>
+          <div className="text-xs text-purple-700 font-medium">Temps Total</div>
         </div>
-        <div className="text-center p-6 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200">
-          <div className="text-3xl font-bold text-orange-600 mb-2">
+        <div className="text-center p-4 bg-orange-50 rounded-lg border border-orange-200">
+          <div className="text-2xl font-bold text-orange-600 mb-1">
             {Math.floor(currentSessionTime / 60)}
           </div>
-          <div className="text-sm text-orange-700 font-medium">Min Session</div>
+          <div className="text-xs text-orange-700 font-medium">Min Session</div>
         </div>
       </div>
     </div>
