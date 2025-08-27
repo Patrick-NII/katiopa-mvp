@@ -427,6 +427,275 @@ export default function Dashboard() {
     // Ici vous pourriez naviguer vers l'exercice ou l'ouvrir
   }
 
+  // Fonction pour afficher le contenu de l'onglet actif
+  const renderActiveTab = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return (
+          <DashboardTab
+            user={user}
+            activities={activities}
+            summary={summary}
+            llmResponse={llmResponse}
+            loading={loading}
+            focus={focus}
+            onFocusChange={setFocus}
+            onEvaluateLLM={evaluateLLM}
+            onExerciseSelect={handleExerciseSelect}
+          />
+        )
+      
+      case 'statistiques':
+        return (
+          <StatisticsTab
+            user={user}
+            activities={activities}
+            summary={summary}
+          />
+        )
+      
+      case 'exercices':
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-8"
+          >
+            <div className="bg-gradient-to-r from-orange-600 to-red-600 text-white p-8 rounded-xl">
+              <h1 className="text-3xl font-bold mb-2">📚 Bibliothèque d'exercices</h1>
+              <p className="text-orange-100 text-lg">
+                Découvrez et pratiquez des exercices adaptés à votre niveau
+              </p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Exercices disponibles</h3>
+              <p className="text-gray-600">Cette section sera développée prochainement avec la bibliothèque complète d'exercices.</p>
+            </div>
+          </motion.div>
+        )
+      
+      case 'informations':
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-8"
+          >
+            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-8 rounded-xl">
+              <h1 className="text-3xl font-bold mb-2">👤 Profil & Préférences</h1>
+              <p className="text-purple-100 text-lg">
+                Gérez vos informations personnelles et vos objectifs d'apprentissage
+              </p>
+            </div>
+            
+            <DetailedUserInfo 
+              user={user} 
+              onPreferencesUpdate={handlePreferencesUpdate}
+            />
+          </motion.div>
+        )
+      
+      case 'abonnements':
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-8"
+          >
+            <div className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white p-8 rounded-xl">
+              <h1 className="text-3xl font-bold mb-2">👑 Plans et Abonnements</h1>
+              <p className="text-yellow-100 text-lg">
+                Découvrez nos plans et débloquez toutes les fonctionnalités
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Plan Gratuit */}
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Plan Gratuit</h3>
+                <p className="text-3xl font-bold text-gray-900 mb-2">0€<span className="text-lg text-gray-500">/mois</span></p>
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
+                    Accès aux exercices de base
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
+                    Statistiques simples
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
+                    Support communautaire
+                  </li>
+                </ul>
+                <button className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium">
+                  Plan actuel
+                </button>
+              </div>
+              
+              {/* Plan Premium */}
+              <div className="bg-white p-6 rounded-xl shadow-lg border-2 border-purple-200 relative">
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-purple-600 text-white px-4 py-1 rounded-full text-sm font-medium">
+                  Recommandé
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Plan Premium</h3>
+                <p className="text-3xl font-bold text-purple-600 mb-2">19€<span className="text-lg text-gray-500">/mois</span></p>
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+                    Tout du plan gratuit
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+                    Graphiques avancés
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+                    IA Coach avancée
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+                    Plan personnalisé
+                  </li>
+                </ul>
+                <button className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors">
+                  Choisir Premium
+                </button>
+              </div>
+              
+              {/* Plan Entreprise */}
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Plan Entreprise</h3>
+                <p className="text-3xl font-bold text-gray-900 mb-2">49€<span className="text-lg text-gray-500">/mois</span></p>
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                    Tout du plan Premium
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                    Gestion multi-utilisateurs
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                    Rapports détaillés
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                    Support prioritaire
+                  </li>
+                </ul>
+                <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                  Contacter
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )
+      
+      case 'facturation':
+        if (user?.subscriptionType === 'free') {
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-8"
+            >
+              <div className="bg-gradient-to-r from-red-600 to-pink-600 text-white p-8 rounded-xl">
+                <h1 className="text-3xl font-bold mb-2">💳 Facturation</h1>
+                <p className="text-red-100 text-lg">
+                  Cette fonctionnalité est disponible avec un compte Premium
+                </p>
+              </div>
+              
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 text-center">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Upgrade requis</h3>
+                <p className="text-gray-600 mb-6">
+                  Passez à un compte Premium pour accéder à l'historique de facturation et aux options de paiement.
+                </p>
+                <button className="px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors">
+                  Voir les plans Premium
+                </button>
+              </div>
+            </motion.div>
+          )
+        }
+        
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-8"
+          >
+            <div className="bg-gradient-to-r from-red-600 to-pink-600 text-white p-8 rounded-xl">
+              <h1 className="text-3xl font-bold mb-2">💳 Facturation</h1>
+              <p className="text-red-100 text-lg">
+                Gérez vos paiements et consultez votre historique
+              </p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Historique des paiements</h3>
+              <p className="text-gray-600">Cette section sera développée prochainement avec l'historique complet de facturation.</p>
+            </div>
+          </motion.div>
+        )
+      
+      case 'reglages':
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-8"
+          >
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-8 rounded-xl">
+              <h1 className="text-3xl font-bold mb-2">⚙️ Réglages</h1>
+              <p className="text-indigo-100 text-lg">
+                Configurez votre compte et vos préférences
+              </p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Paramètres du compte</h3>
+              <p className="text-gray-600">Cette section sera développée prochainement avec tous les paramètres de configuration.</p>
+            </div>
+          </motion.div>
+        )
+      
+      case 'aide':
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-8"
+          >
+            <div className="bg-gradient-to-r from-teal-600 to-green-600 text-white p-8 rounded-xl">
+              <h1 className="text-3xl font-bold mb-2">❓ Aide & Support</h1>
+              <p className="text-teal-100 text-lg">
+                Trouvez des réponses à vos questions et obtenez de l'aide
+              </p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Centre d'aide</h3>
+              <p className="text-gray-600">Cette section sera développée prochainement avec la documentation complète et le support.</p>
+            </div>
+          </motion.div>
+        )
+      
+      default:
+        return null
+    }
+  }
+
   if (!ready || !user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
