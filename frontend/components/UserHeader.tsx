@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Clock, Calendar, Settings, LogOut, Mail, Crown, Gift, Zap } from 'lucide-react'
-import { useGlobalTime } from '../hooks/useGlobalTime'
+import { useTotalConnectionTime } from '../hooks/useTotalConnectionTime'
 
 interface UserHeaderProps {
   user: {
@@ -32,8 +32,8 @@ export default function UserHeader({ user, account, onLogout }: UserHeaderProps)
   const [sessionStartTime, setSessionStartTime] = useState<Date>(new Date())
   const [sessionDuration, setSessionDuration] = useState<string>('00:00:00')
   
-  // Utiliser le hook pour le temps global depuis l'inscription
-  const globalTimeInfo = useGlobalTime(account.createdAt)
+  // Utiliser le hook pour le temps total de connexion depuis l'inscription
+  const totalConnectionTime = useTotalConnectionTime(account.createdAt)
 
   // Vérification de sécurité - si pas d'utilisateur, afficher un loader
   if (!user || !account) {
@@ -81,14 +81,13 @@ export default function UserHeader({ user, account, onLogout }: UserHeaderProps)
       day: 'numeric',
       month: 'long',
       year: 'numeric'
-      })
+    })
   }
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('fr-FR', {
       hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
+      minute: '2-digit'
     })
   }
 
@@ -132,106 +131,93 @@ export default function UserHeader({ user, account, onLogout }: UserHeaderProps)
 
   return (
     <motion.div 
-      className="bg-white border-b border-gray-200 px-6 py-4"
+      className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="flex items-center justify-between">
-        {/* Informations utilisateur */}
-        <div className="flex items-center gap-6">
-          {/* Avatar et nom */}
-          <div className="flex items-center gap-3">
-            <motion.div 
-              className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              {userInitial}
-            </motion.div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">{userName}</h2>
-              <div className="flex items-center gap-2">
-                <Mail size={14} className="text-gray-500" />
-                <span className="text-sm text-gray-600">{user.email || 'Email non disponible'}</span>
-              </div>
+      <div className="flex items-center gap-4">
+        {/* Avatar et nom */}
+        <div className="flex items-center gap-3">
+          <motion.div 
+            className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg"
+            whileHover={{ scale: 1.1 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            {userInitial}
+          </motion.div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">{userName}</h2>
+            <div className="flex items-center gap-2">
+              <Mail size={14} className="text-gray-500" />
+              <span className="text-sm text-gray-600">{account.email}</span>
             </div>
-          </div>
-
-          {/* Statut du compte */}
-          <div className="flex items-center gap-2">
-            <div className={`px-3 py-1 rounded-full text-white text-sm font-medium flex items-center gap-2 ${getStatusColor(user.subscriptionType || 'free')}`}>
-              {getStatusIcon(user.subscriptionType || 'free')}
-              {getStatusText(user.subscriptionType || 'free')}
+            {/* Informations d'identification */}
+            <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
+              <span>ID Session: <code className="bg-gray-100 px-1 rounded">{user.id}</code></span>
+              <span>ID Compte: <code className="bg-gray-100 px-1 rounded">{account.id}</code></span>
             </div>
           </div>
         </div>
 
-        {/* Temps et contrôles */}
-        <div className="flex items-center gap-6">
-          {/* Temps de session */}
-          <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
-            <Clock size={16} className="text-blue-600" />
-            <div className="text-center">
-              <div className="text-xs text-blue-600 font-medium">Session</div>
-              <div className="text-sm font-mono font-bold text-blue-800">{sessionDuration}</div>
-            </div>
-          </div>
-
-          {/* Temps global depuis l'inscription */}
-          <div className="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-lg border border-green-200">
-            <Calendar size={16} className="text-green-600" />
-            <div className="text-center">
-              <div className="text-xs text-green-600 font-medium">Temps global</div>
-              <div className="text-sm font-mono font-bold text-green-800">
-                {globalTimeInfo.isActive ? globalTimeInfo.totalTimeSinceRegistration : '00:00:00'}
-              </div>
-            </div>
-          </div>
-
-          {/* Date actuelle */}
-          <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-lg border border-purple-200">
-            <Calendar size={16} className="text-purple-600" />
-            <div className="text-center">
-              <div className="text-xs text-purple-600 font-medium">Date</div>
-              <div className="text-sm font-bold text-purple-800">{formatDate(new Date())}</div>
-            </div>
-          </div>
-
-          {/* Boutons d'action */}
-          <div className="flex items-center gap-2">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <Settings size={20} />
-            </motion.button>
-            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={onLogout}
-              className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors"
-            >
-              <LogOut size={20} />
-            </motion.button>
+        {/* Statut du compte */}
+        <div className="flex items-center gap-2">
+          <div className={`px-3 py-1 rounded-full text-white text-sm font-medium flex items-center gap-2 ${getStatusColor(user.subscriptionType || 'FREE')}`}>
+            {getStatusIcon(user.subscriptionType || 'FREE')}
+            {getStatusText(user.subscriptionType || 'FREE')}
           </div>
         </div>
       </div>
 
-      {/* Barre de progression et informations supplémentaires */}
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <div className="flex items-center justify-between text-sm text-gray-600">
-          <div className="flex items-center gap-4">
-            <span>Début de session: {sessionStartTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
-            <span>Durée totale: {sessionDuration}</span>
+      {/* Temps et contrôles */}
+      <div className="flex items-center gap-6">
+        {/* Temps de session */}
+        <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+          <Clock size={16} className="text-blue-600" />
+          <div className="text-center">
+            <div className="text-xs text-blue-600 font-medium">Session</div>
+            <div className="text-sm font-mono font-bold text-blue-800">{sessionDuration}</div>
           </div>
+        </div>
+
+        {/* Temps global depuis l'inscription */}
+        <div className="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-lg border border-green-200">
+          <Calendar size={16} className="text-green-600" />
+          <div className="text-center">
+                          <div className="text-xs text-green-600 font-medium">Temps global</div>
+              <div className="text-sm font-mono font-bold text-green-800">
+                {totalConnectionTime.isActive ? totalConnectionTime.totalTimeFormatted : '00:00:00'}
+              </div>
+          </div>
+        </div>
+
+        {/* Date actuelle */}
+        <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-lg border border-purple-200">
+          <Calendar size={16} className="text-purple-600" />
+          <div className="text-center">
+            <div className="text-xs text-purple-600 font-medium">Date</div>
+            <div className="text-sm font-bold text-purple-800">{formatDate(new Date())}</div>
+          </div>
+        </div>
+
+        {/* Boutons d'action */}
+        <div className="flex items-center gap-2">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <Settings size={20} />
+          </motion.button>
           
-          <div className="flex items-center gap-4">
-            <span>Membre depuis: {globalTimeInfo.memberSinceFormatted}</span>
-            <span>Durée d'inscription: {globalTimeInfo.daysSinceRegistration} jour{globalTimeInfo.daysSinceRegistration > 1 ? 's' : ''}</span>
-          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onLogout}
+            className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-colors"
+          >
+            <LogOut size={20} />
+          </motion.button>
         </div>
       </div>
     </motion.div>
