@@ -112,7 +112,7 @@ export default function Dashboard() {
       <>
         <NavBar />
         <div className="min-h-screen bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
             <div className="bg-white rounded-2xl shadow-lg p-8">
               <div className="text-center py-12">
                 <div className="spinner mx-auto mb-6 w-12 h-12"></div>
@@ -129,7 +129,7 @@ export default function Dashboard() {
     <>
       <NavBar />
       <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
           {/* Profil utilisateur */}
           <UserProfile 
             user={user}
@@ -146,12 +146,13 @@ export default function Dashboard() {
             <h1 className="text-3xl font-bold text-gray-900 mb-8">Tableau de bord</h1>
             
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
+              <div className="mb-8 p-6 bg-red-50 border border-red-200 rounded-xl text-red-700">
                 Erreur: {error}
               </div>
             )}
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* Statistiques principales sur toute la largeur */}
+            <div className="grid grid-cols-4 gap-6 mb-8">
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200">
                 <h3 className="font-semibold text-blue-900 text-lg mb-2">Activités récentes</h3>
                 <p className="text-4xl font-bold text-blue-600">{activities.length}</p>
@@ -165,15 +166,29 @@ export default function Dashboard() {
                   }
                 </p>
               </div>
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200">
+                <h3 className="font-semibold text-purple-900 text-lg mb-2">Domaines actifs</h3>
+                <p className="text-4xl font-bold text-purple-600">{summary.length}</p>
+              </div>
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl border border-orange-200">
+                <h3 className="font-semibold text-orange-900 text-lg mb-2">Score moyen</h3>
+                <p className="text-4xl font-bold text-orange-600">
+                  {summary.length > 0 
+                    ? Math.round(summary.reduce((acc, s) => acc + s.avg, 0) / summary.length)
+                    : '0'
+                  }
+                </p>
+              </div>
             </div>
 
+            {/* Section LLM */}
             <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Évaluation LLM</h3>
-              <div className="flex gap-4 mb-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Évaluation LLM</h3>
+              <div className="flex items-center gap-6 mb-6">
                 <select 
                   value={focus} 
                   onChange={(e) => setFocus(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-[200px]"
                 >
                   <option value="maths">Mathématiques</option>
                   <option value="coding">Programmation</option>
@@ -181,7 +196,7 @@ export default function Dashboard() {
                 <button 
                   onClick={evaluateLLM} 
                   disabled={loading}
-                  className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50"
+                  className="px-8 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50"
                 >
                   {loading ? 'Évaluation...' : 'Évaluer et proposer'}
                 </button>
@@ -193,7 +208,7 @@ export default function Dashboard() {
                   <p className="text-gray-700 mb-6 text-lg">{llmResponse.assessment}</p>
                   
                   <h4 className="font-semibold text-gray-900 text-lg mb-3">Exercices recommandés</h4>
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {llmResponse.exercises.map((exercise, index) => (
                       <div key={index} className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
                         <h5 className="font-medium text-gray-900 mb-2">{exercise.title}</h5>
@@ -208,9 +223,10 @@ export default function Dashboard() {
               )}
             </div>
 
+            {/* Résumé par domaine sur toute la largeur */}
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Résumé par domaine</h3>
-              <div className="space-y-3">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">Résumé par domaine</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {summary.map((s) => (
                   <div key={s.domain} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-200">
                     <span className="capitalize font-medium text-gray-700">{s.domain}</span>

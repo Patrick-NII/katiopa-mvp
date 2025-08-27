@@ -117,38 +117,38 @@ export default function UserStats({ userId }: UserStatsProps) {
   }, [userId])
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-      <h3 className="text-xl font-bold text-gray-900 mb-4">Statistiques détaillées</h3>
+    <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+      <h3 className="text-2xl font-bold text-gray-900 mb-6">Statistiques détaillées</h3>
       
-      {/* Grille de statistiques */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="text-center p-3 bg-blue-50 rounded-lg">
-          <div className="text-2xl font-bold text-blue-600">{stats.activitiesCount}</div>
-          <div className="text-xs text-blue-600">Activités</div>
+      {/* Grille de statistiques sur toute la largeur */}
+      <div className="grid grid-cols-4 gap-6 mb-8">
+        <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+          <div className="text-3xl font-bold text-blue-600 mb-2">{stats.activitiesCount}</div>
+          <div className="text-sm text-blue-700 font-medium">Activités</div>
         </div>
-        <div className="text-center p-3 bg-green-50 rounded-lg">
-          <div className="text-2xl font-bold text-green-600">{stats.averageScore}%</div>
-          <div className="text-xs text-green-600">Moyenne</div>
+        <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200">
+          <div className="text-3xl font-bold text-green-600 mb-2">{stats.averageScore}%</div>
+          <div className="text-sm text-green-700 font-medium">Moyenne</div>
         </div>
-        <div className="text-center p-3 bg-purple-50 rounded-lg">
-          <div className="text-2xl font-bold text-purple-600">{stats.streak}</div>
-          <div className="text-xs text-purple-600">Jours consécutifs</div>
+        <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200">
+          <div className="text-3xl font-bold text-purple-600 mb-2">{stats.streak}</div>
+          <div className="text-sm text-purple-700 font-medium">Jours consécutifs</div>
         </div>
-        <div className="text-center p-3 bg-yellow-50 rounded-lg">
-          <div className="text-2xl font-bold text-yellow-600">{stats.badges.length}</div>
-          <div className="text-xs text-yellow-600">Badges</div>
+        <div className="text-center p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200">
+          <div className="text-3xl font-bold text-yellow-600 mb-2">{stats.badges.length}</div>
+          <div className="text-sm text-yellow-700 font-medium">Badges</div>
         </div>
       </div>
 
-      {/* Badges */}
+      {/* Badges obtenus */}
       {stats.badges.length > 0 && (
-        <div className="mb-6">
-          <h4 className="text-lg font-semibold text-gray-800 mb-3">Badges obtenus</h4>
-          <div className="flex flex-wrap gap-2">
+        <div className="mb-8">
+          <h4 className="text-lg font-semibold text-gray-800 mb-4">Badges obtenus</h4>
+          <div className="flex flex-wrap gap-3">
             {stats.badges.map((badge, index) => (
               <span 
                 key={index}
-                className="px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium rounded-full"
+                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium rounded-full shadow-sm"
               >
                 {badge}
               </span>
@@ -157,21 +157,27 @@ export default function UserStats({ userId }: UserStatsProps) {
         </div>
       )}
 
-      {/* Progression du niveau */}
+      {/* Progression du niveau sur toute la largeur */}
       <div>
-        <h4 className="text-lg font-semibold text-gray-800 mb-3">Progression du niveau</h4>
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Niveau actuel</span>
-            <span className="font-bold text-blue-600">{stats.level}</span>
+        <h4 className="text-lg font-semibold text-gray-800 mb-4">Progression du niveau</h4>
+        <div className="grid grid-cols-3 gap-6">
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600 mb-1">{stats.level}</div>
+              <div className="text-sm text-gray-600">Niveau actuel</div>
+            </div>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Expérience</span>
-            <span className="font-bold text-green-600">{stats.experience} XP</span>
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600 mb-1">{stats.experience} XP</div>
+              <div className="text-sm text-gray-600">Expérience</div>
+            </div>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Prochain niveau</span>
-            <span className="font-bold text-purple-600">{100 - (stats.experience % 100)} XP</span>
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600 mb-1">{100 - (stats.experience % 100)} XP</div>
+              <div className="text-sm text-gray-600">Prochain niveau</div>
+            </div>
           </div>
         </div>
       </div>
