@@ -11,6 +11,8 @@ import DashboardTab from '@/components/DashboardTab'
 import StatisticsTab from '@/components/StatisticsTab'
 import DetailedUserInfo from '@/components/DetailedUserInfo'
 import HelpChatButton from '@/components/HelpChatButton'
+import UserHeader from '@/components/UserHeader'
+import ExercisesTab from '@/components/ExercisesTab'
 
 interface Activity {
   id: string
@@ -427,6 +429,12 @@ export default function Dashboard() {
     // Ici vous pourriez naviguer vers l'exercice ou l'ouvrir
   }
 
+  // Fonction de déconnexion
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    router.replace('/login')
+  }
+
   // Fonction pour afficher le contenu de l'onglet actif
   const renderActiveTab = () => {
     switch (activeTab) {
@@ -455,26 +463,7 @@ export default function Dashboard() {
         )
       
       case 'exercices':
-        return (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="space-y-8"
-          >
-            <div className="bg-gradient-to-r from-orange-600 to-red-600 text-white p-8 rounded-xl">
-              <h1 className="text-3xl font-bold mb-2">📚 Bibliothèque d'exercices</h1>
-              <p className="text-orange-100 text-lg">
-                Découvrez et pratiquez des exercices adaptés à votre niveau
-              </p>
-            </div>
-            
-            <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">Exercices disponibles</h3>
-              <p className="text-gray-600">Cette section sera développée prochainement avec la bibliothèque complète d'exercices.</p>
-            </div>
-          </motion.div>
-        )
+        return <ExercisesTab />
       
       case 'informations':
         return (
@@ -709,19 +698,30 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Navigation latérale */}
-      <SidebarNavigation
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        userSubscriptionType={user.subscriptionType}
-      />
+      {/* Navigation latérale fixe */}
+      <div className="w-64 flex-shrink-0">
+        <SidebarNavigation
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          userSubscriptionType={user.subscriptionType}
+        />
+      </div>
 
-      {/* Contenu principal */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-8">
-          <AnimatePresence mode="wait">
-            {renderActiveTab()}
-          </AnimatePresence>
+      {/* Contenu principal avec en-tête utilisateur */}
+      <div className="flex-1 flex flex-col">
+        {/* En-tête utilisateur personnalisé */}
+        <UserHeader 
+          user={user}
+          onLogout={handleLogout}
+        />
+
+        {/* Contenu des onglets */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-8">
+            <AnimatePresence mode="wait">
+              {renderActiveTab()}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
 
