@@ -5,3 +5,4 @@ node_modules
 # Fichiers de sécurité
 .env
 .env.*
+env.local

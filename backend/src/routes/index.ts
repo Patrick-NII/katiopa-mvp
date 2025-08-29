@@ -1,33 +1,37 @@
-import { Router } from "express";
-import authRoutes from "./auth";
-import statsRoutes from "./stats";
-import llmRoutes from "./llm";
-import activityRoutes from "./activity";
-import chatRoutes from "./chat";
-import ragRoutes from "./rag";
-import v2Routes from "../api/v2";
+import express from 'express';
+import authRoutes from './auth';
+import chatRoutes from './chat';
+import activityRoutes from './activity';
+import statsRoutes from './stats';
 
-const router = Router();
+const router = express.Router();
 
 // Routes d'authentification
 router.use('/auth', authRoutes);
 
-// Routes des statistiques
-router.use('/stats', statsRoutes);
-
-// Routes LLM
-router.use('/llm', llmRoutes);
-
-// Routes des activités
-router.use('/activity', activityRoutes);
-
-// Routes du chat IA
+// Routes de chat
 router.use('/chat', chatRoutes);
 
-// Routes RAG avancées
-router.use('/rag', ragRoutes);
+// Routes d'activités
+router.use('/activities', activityRoutes);
 
-// Routes API v2 - Comptes parent + sous-comptes enfants
-router.use('/v2', v2Routes);
+// Routes de statistiques
+router.use('/stats', statsRoutes);
+
+// Route de test de l'API
+router.get('/test', (req, res) => {
+  res.json({
+    success: true,
+    message: 'API Katiopa fonctionnelle',
+    timestamp: new Date().toISOString(),
+    version: '2.0.0',
+    endpoints: {
+      auth: '/api/auth',
+      chat: '/api/chat',
+      activities: '/api/activities',
+      stats: '/api/stats'
+    }
+  });
+});
 
 export default router;
