@@ -1,38 +1,57 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { authAPI } from '@/lib/api';
 
 interface AuthGuardProps {
-  children: React.ReactNode
-  fallback?: React.ReactNode
+  children: React.ReactNode;
 }
 
-export default function AuthGuard({ children, fallback = null }: AuthGuardProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
-  const router = useRouter()
+export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    
-    if (!token) {
-      setIsAuthenticated(false)
-      router.replace('/login')
-      return
-    }
+    const checkAuth = async () => {
+      try {
+        // Vérification via l'API (cookie automatiquement envoyé)
+        const response = await authAPI.verify();
+        
+        if (response.success) {
+          setIsAuthenticated(true);
+          setUser(response.user);
+        } else {
+          setIsAuthenticated(false);
+          router.push('/login');
+        }
+      } catch (error) {
+        console.error('❌ Erreur de vérification d\'authentification:', error);
+        setIsAuthenticated(false);
+        router.push('/login');
+      }
+    };
 
-    setIsAuthenticated(true)
-  }, [router])
+    checkAuth();
+  }, [router]);
 
-  // Afficher le fallback pendant la vérification
+  // SUPPRESSION de localStorage.getItem('token')
+
   if (isAuthenticated === null) {
-    return fallback
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Vérification de l'authentification...</p>
+        </div>
+      </div>
+    );
   }
 
-  // Rediriger si non authentifié
   if (!isAuthenticated) {
-    return null
+    return null; // Redirection en cours
   }
 
-  // Afficher le contenu protégé si authentifié
-  return <>{children}</>
-} 
+  return <>{children}</>;
+}; 
