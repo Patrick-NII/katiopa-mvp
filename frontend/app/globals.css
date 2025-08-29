@@ -199,9 +199,31 @@
   /* Effets brillants sur les prix */
   .price-glow {
     text-shadow: 
-      0 0 0px currentColor,
-      0 0 0px currentColor,
-      0 0 0px currentColor;
+      0 0 10px currentColor,
+      0 0 20px currentColor,
+      0 0 30px currentColor;
+    animation: pricePulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes pricePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+  }
+  
+  /* Cartes d'offres avec dégradés et effets brillants */
+  .card-starter {
+    background: linear-gradient(135deg, var(--color-green-mint) 0%, var(--color-blue-sky) 100%);
+    box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+  }
+  
+  .card-pro {
+    background: linear-gradient(135deg, var(--color-violet-soft) 0%, var(--color-rose-raspberry) 100%);
+    box-shadow: 0 20px 40px rgba(139, 92, 246, 0.4);
+  }
+  
+  .card-premium {
+    background: linear-gradient(135deg, var(--color-orange-peach) 0%, var(--color-violet-soft) 100%);
+    box-shadow: 0 20px 40px rgba(245, 158, 11, 0.3);
   }
   
   
