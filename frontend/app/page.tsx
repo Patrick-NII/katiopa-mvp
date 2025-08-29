@@ -1,43 +1,81 @@
 'use client'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, BookOpen, Users, Star, ArrowRight, CheckCircle, Play, Shield, Zap, Globe, Award, MessageCircle, Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, Share2 } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { MulticolorText, CubeAILogo, AnimatedMulticolorText } from '@/components/MulticolorText'
 import ChatBubble from '@/components/ChatBubble'
 
 export default function HomePage() {
+  const plans = [
+    {
+      name: 'Starter',
+      price: '0€',
+      period: '/mois',
+      description: 'Gratuit pendant 3 mois',
+      features: [
+        '1 parent + 1 enfant',
+        'Exercices de base',
+        'Statistiques simples',
+        'Support communautaire'
+      ],
+      popular: false,
+      cta: 'Commencer gratuitement',
+      href: '/register',
+      cardClass: 'card-starter'
+    },
+    {
+      name: 'Pro',
+      price: '29,99€',
+      period: '/mois',
+      description: 'Famille complète',
+      features: [
+        '1 parent + 1 enfant',
+        'Toutes les fonctionnalités',
+        'IA Coach avancée',
+        'Support prioritaire',
+        'Exports et rapports'
+      ],
+      popular: true,
+      cta: 'Choisir Pro',
+      href: '/register',
+      cardClass: 'card-pro'
+    },
+    {
+      name: 'Premium',
+      price: '69,99€',
+      period: '/mois',
+      description: 'Famille étendue',
+      features: [
+        '1 parent + jusqu\'à 4 enfants',
+        'Toutes les fonctionnalités',
+        'IA Coach premium',
+        'Certificats officiels',
+        'Support dédié',
+        'Formation parentale'
+      ],
+      popular: false,
+      cta: 'Choisir Premium',
+      href: '/register',
+      cardClass: 'card-premium'
+    }
+  ]
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Navigation principale */}
+      {/* Navigation */}
       <nav className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo Katiopa */}
-            <motion.div 
-              className="flex items-center space-x-3"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                <Brain className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Katiopa
-              </span>
-            </motion.div>
-
-            {/* Boutons de navigation */}
+            <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <span className="font-title text-white text-2xl">C</span>
+                </div>
+              <CubeAILogo className="text-4xl" />
+            </div>
             <div className="flex items-center space-x-4">
-              <Link 
-                href="/login"
-                className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100"
-              >
+              <Link href="/login" className="font-body text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100">
                 Connexion
               </Link>
-              <Link 
-                href="/register"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
-              >
+              <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
                 Commencer gratuitement
               </Link>
             </div>
@@ -45,140 +83,53 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* Hero Section avec effets 3D et bulles animées */}
+      {/* Section principale */}
       <section className="relative overflow-hidden">
-        {/* Effets de bulles 3D multiples et variés */}
-        <motion.div
-          className="absolute top-10 right-20 w-32 h-32 bg-gradient-to-r from-blue-400/30 to-purple-400/30 rounded-full blur-xl"
-          animate={{ 
-            scale: [1, 1.3, 1], 
-            rotate: [0, 180, 360],
-            x: [0, 20, 0],
-            y: [0, -20, 0]
-          }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-40 left-10 w-24 h-24 bg-gradient-to-r from-pink-400/40 to-red-400/40 rounded-full blur-lg"
-          animate={{ 
-            scale: [1, 1.4, 1], 
-            rotate: [360, 180, 0],
-            x: [0, -15, 0],
-            y: [0, 15, 0]
-          }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-40 right-32 w-20 h-20 bg-gradient-to-r from-green-400/50 to-blue-400/50 rounded-full blur-md"
-          animate={{ 
-            scale: [1, 1.5, 1], 
-            rotate: [0, 90, 180, 270, 360],
-            x: [0, 25, 0],
-            y: [0, -25, 0]
-          }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-60 left-1/4 w-16 h-16 bg-gradient-to-r from-yellow-400/60 to-orange-400/60 rounded-full blur-sm"
-          animate={{ 
-            scale: [1, 1.6, 1], 
-            rotate: [180, 0, 180],
-            x: [0, 30, 0],
-            y: [0, 30, 0]
-          }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-20 left-1/3 w-28 h-28 bg-gradient-to-r from-indigo-400/40 to-purple-400/40 rounded-full blur-xl"
-          animate={{ 
-            scale: [1, 1.2, 1], 
-            rotate: [0, 360],
-            x: [0, -20, 0],
-            y: [0, 20, 0]
-          }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        />
-        {/* Nouvelles bulles supplémentaires */}
-        <motion.div
-          className="absolute top-1/3 right-1/3 w-36 h-36 bg-gradient-to-r from-cyan-400/35 to-blue-400/35 rounded-full blur-2xl"
-          animate={{ 
-            scale: [1, 1.4, 1], 
-            rotate: [0, 120, 240, 360],
-            x: [0, 35, 0],
-            y: [0, -35, 0]
-          }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-gradient-to-r from-violet-400/25 to-purple-400/25 rounded-full blur-3xl"
-          animate={{ 
-            scale: [1, 1.3, 1], 
-            rotate: [360, 240, 120, 0],
-            x: [0, -40, 0],
-            y: [0, 40, 0]
-          }}
-          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 w-20 h-20 bg-gradient-to-r from-emerald-400/45 to-teal-400/45 rounded-full blur-lg"
-          animate={{ 
-            scale: [1, 1.7, 1], 
-            rotate: [0, 180, 360],
-            x: [0, 45, 0],
-            y: [0, 45, 0]
-          }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-        />
+        {/* Éléments décoratifs */}
+        <div className="absolute top-10 right-20 w-32 h-32 bg-gradient-to-r from-blue-400/30 to-purple-400/30 rounded-full blur-xl"></div>
+        <div className="absolute top-40 left-10 w-24 h-24 bg-gradient-to-r from-pink-400/40 to-red-400/40 rounded-full blur-lg"></div>
+        <div className="absolute bottom-40 right-32 w-20 h-20 bg-gradient-to-r from-green-400/50 to-blue-400/50 rounded-full blur-md"></div>
+        <div className="absolute top-60 left-1/4 w-16 h-16 bg-gradient-to-r from-yellow-400/60 to-orange-400/60 rounded-full blur-sm"></div>
+        <div className="absolute bottom-20 left-1/3 w-28 h-28 bg-gradient-to-r from-indigo-400/40 to-purple-400/40 rounded-full blur-xl"></div>
+        <div className="absolute top-1/3 right-1/3 w-36 h-36 bg-gradient-to-r from-cyan-400/35 to-blue-400/35 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-gradient-to-r from-violet-400/25 to-purple-400/25 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 w-20 h-20 bg-gradient-to-r from-emerald-400/45 to-teal-400/45 rounded-full blur-lg"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 relative z-10">
           <div className="text-center">
-            {/* Titre principal avec effet 3D avancé */}
-            <motion.h1 
-              className="text-6xl md:text-8xl font-black text-blue-700 mb-8 leading-tight"
-              initial={{ opacity: 0, y: 50, rotateX: -15 }}
-              animate={{ opacity: 1, y: 0, rotateX: 0 }}
-              transition={{ duration: 1.2, delay: 0.3, ease: "easeOut" }}
-              style={{
-                textShadow: `
-                  0 1px 0 #ccc,
-                  0 2px 0 #c9c9c9,
-                  0 3px 0 #bbb,
-                  0 4px 0 #b9b9b9,
-                  0 5px 0 #aaa,
-                  0 6px 1px rgba(0,0,0,.1),
-                  0 0 5px rgba(0,0,0,.1),
-                  0 1px 3px rgba(0,0,0,.3),
-                  0 3px 5px rgba(0,0,0,.2),
-                  0 5px 10px rgba(0,0,0,.25),
-                  0 10px 10px rgba(0,0,0,.2),
-                  0 20px 20px rgba(0,0,0,.15)
-                `
-              }}
-            >
-              Apprendre 
-              <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-blue-600">
-                Tout en prenant plaisir
-              </span>
-            </motion.h1>
-
-            {/* Description optimisée SEO avec mots-clés stratégiques */}
-            <motion.p 
-              className="text-2xl md:text-3xl text-gray-700 mb-10 max-w-5xl mx-auto leading-relaxed font-medium"
-              initial={{ opacity: 0, y: 40 }}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.6 }}
+              transition={{ duration: 0.8 }}
+              className="mb-8"
             >
-              Découvrez <strong>Katiopa</strong>, la première plateforme d'<strong>apprentissage intelligent</strong> qui révolutionne 
-              l'<strong>éducation des enfants de 5 à 7 ans</strong>. Notre technologie d'<strong>intelligence artificielle adaptative</strong> 
-              crée des <strong>parcours personnalisés</strong> qui s'ajustent en temps réel aux besoins de chaque enfant.
+              <AnimatedMulticolorText 
+                text="Apprendre en s'amusant" 
+                variant="h1" 
+                className="leading-tight"
+                staggerDelay={0.1}
+              />
+            </motion.div>
+            
+            <motion.p 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="font-subtitle-xl text-gray-600 mb-12 max-w-3xl mx-auto"
+            >
+              Découvrez <strong className="text-blue-700">CubeAI</strong>, la première plateforme 
+              d'<strong className="text-blue-700">apprentissage intelligent</strong> qui révolutionne 
+              l'<strong className="text-blue-700">éducation des enfants de 5 à 7 ans</strong>. 
+              Notre technologie d'<strong className="text-blue-700">intelligence artificielle adaptative</strong> 
+              crée des <strong className="text-blue-700">parcours personnalisés</strong> qui s'ajustent 
+              aux besoins de chaque enfant.
             </motion.p>
 
-            {/* Sous-description enrichie avec termes éducatifs spécifiques */}
             <motion.p 
-              className="text-lg md:text-xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed"
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.8 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="font-body-lg text-gray-600 mb-12 max-w-4xl mx-auto"
             >
               <strong>Mathématiques fondamentales, lecture et écriture, sciences naturelles, développement de la créativité</strong> - 
               chaque domaine est abordé avec une approche <strong>ludique et progressive</strong>. Les parents suivent les progrès 
@@ -186,411 +137,99 @@ export default function HomePage() {
               <strong>autonomie d'apprentissage</strong> et leur <strong>curiosité naturelle</strong>.
             </motion.p>
 
-            {/* Boutons d'action améliorés avec animations */}
-            <motion.div
-              className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 1 }}
-            >
-              <Link 
-                href="/register"
-                className="group inline-flex items-center px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xl font-bold rounded-2xl transition-all transform hover:scale-110 shadow-2xl hover:shadow-3xl border-2 border-transparent hover:border-white/20"
-              >
-                Commencer gratuitement
-                <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
-              </Link>
-              
-              <button className="group inline-flex items-center px-10 py-5 border-3 border-gray-300 text-gray-700 text-xl font-bold rounded-2xl hover:border-gray-400 hover:bg-gray-50 transition-all transform hover:scale-105 shadow-lg">
-                <Play className="mr-3 h-6 w-6 group-hover:scale-110 transition-transform" />
-                Voir la démo
-              </button>
-            </motion.div>
-
-            {/* Statistiques enrichies avec données crédibles */}
             <motion.div 
-              className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto"
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 1.2 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
-              <div className="text-center group">
-                <motion.div 
-                  className="text-4xl font-black text-blue-600 mb-3 group-hover:scale-110 transition-transform"
-                  whileHover={{ rotate: 5 }}
-                >
-                  15,000+
-                </motion.div>
-                <div className="text-gray-700 font-semibold">Familles nous font confiance</div>
-                <div className="text-sm text-gray-500 mt-1">Depuis notre lancement</div>
-              </div>
-              <div className="text-center group">
-                <motion.div 
-                  className="text-4xl font-black text-purple-600 mb-3 group-hover:scale-110 transition-transform"
-                  whileHover={{ rotate: -5 }}
-                >
-                  98%
-                </motion.div>
-                <div className="text-gray-700 font-semibold">Amélioration des résultats</div>
-                <div className="text-sm text-gray-500 mt-1">En 3 mois d'utilisation</div>
-              </div>
-              <div className="text-center group">
-                <motion.div 
-                  className="text-4xl font-black text-pink-600 mb-3 group-hover:scale-110 transition-transform"
-                  whileHover={{ rotate: 5 }}
-                >
-                  24/7
-                </motion.div>
-                <div className="text-gray-700 font-semibold">Support personnalisé</div>
-                <div className="text-sm text-gray-500 mt-1">Experts pédagogiques</div>
-              </div>
-              <div className="text-center group">
-                <motion.div 
-                  className="text-4xl font-black text-green-600 mb-3 group-hover:scale-110 transition-transform"
-                  whileHover={{ rotate: -5 }}
-                >
-                  4.9/5
-                </motion.div>
-                <div className="text-gray-700 font-semibold">Note moyenne</div>
-                <div className="text-sm text-gray-500 mt-1">Par les parents</div>
-              </div>
+              <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-medium transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl">
+                Commencer gratuitement
+              </Link>
+              <Link href="/login" className="font-button bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white px-8 py-4 rounded-xl text-lg font-medium transition-all border-2 border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl">
+                Se connecter
+              </Link>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Section Fonctionnalités avec textes optimisés SEO */}
-      <section className="py-24 bg-white relative overflow-hidden">
-        {/* Effets de bulles supplémentaires */}
-        <motion.div
-          className="absolute top-20 right-1/4 w-40 h-40 bg-gradient-to-r from-blue-300/20 to-indigo-300/20 rounded-full blur-2xl"
-          animate={{ 
-            scale: [1, 1.4, 1], 
-            rotate: [0, 90, 180, 270, 360],
-            x: [0, 30, 0],
-            y: [0, -30, 0]
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-20 left-1/4 w-36 h-36 bg-gradient-to-r from-purple-300/25 to-pink-300/25 rounded-full blur-xl"
-          animate={{ 
-            scale: [1, 1.3, 1], 
-            rotate: [360, 180, 0],
-            x: [0, -25, 0],
-            y: [0, 25, 0]
-          }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div 
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-5xl font-black text-gray-900 mb-6 leading-tight">
-              Une révolution dans l'<span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">éducation numérique</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              Katiopa combine les dernières avancées en <strong>intelligence artificielle</strong> avec des 
-              <strong>méthodes pédagogiques éprouvées</strong> pour créer une expérience d'apprentissage 
-              unique et personnalisée, adaptée aux besoins spécifiques de chaque enfant.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {[
-              {
-                icon: "🧠",
-                title: "Intelligence Artificielle Adaptative",
-                description: "Notre algorithme d'IA analyse en temps réel les réponses de votre enfant pour ajuster instantanément la difficulté et le style d'apprentissage. Plus besoin de suivre un programme rigide - l'éducation s'adapte à l'enfant, pas l'inverse.",
-                benefits: ["Adaptation en temps réel", "Personnalisation poussée", "Suivi des progrès"],
-                color: "from-blue-500 to-blue-600"
-              },
-              {
-                icon: "📚",
-                title: "Contenu Éducatif Premium",
-                description: "Développé par des experts en pédagogie et des enseignants expérimentés, notre contenu couvre tous les domaines essentiels : mathématiques fondamentales, lecture et écriture, sciences naturelles, et développement de la créativité.",
-                benefits: ["Experts pédagogiques", "Programme complet", "Méthodes éprouvées"],
-                color: "from-purple-500 to-purple-600"
-              },
-              {
-                icon: "👨‍👩‍👧‍👦",
-                title: "Suivi Parental Avancé",
-                description: "Restez connecté à l'éducation de votre enfant avec des rapports détaillés, des analyses de progression et des recommandations personnalisées. Participez activement à son développement scolaire depuis votre smartphone.",
-                benefits: ["Rapports détaillés", "Recommandations", "Suivi en temps réel"],
-                color: "from-pink-500 to-pink-600"
-              },
-              {
-                icon: "🔒",
-                title: "Sécurité et Confidentialité",
-                description: "La protection des données de votre enfant est notre priorité absolue. Nous utilisons les technologies de cryptage les plus avancées et respectons strictement le RGPD pour garantir un environnement d'apprentissage 100% sécurisé.",
-                benefits: ["Cryptage avancé", "Conformité RGPD", "Protection maximale"],
-                color: "from-green-500 to-green-600"
-              },
-              {
-                icon: "⚡",
-                title: "Résultats Mesurables",
-                description: "Voyez les progrès de votre enfant en temps réel avec des métriques précises et des graphiques interactifs. Notre système de suivi vous montre exactement où votre enfant excelle et où il a besoin de soutien supplémentaire.",
-                benefits: ["Métriques précises", "Graphiques interactifs", "Progrès visibles"],
-                color: "from-yellow-500 to-yellow-600"
-              },
-              {
-                icon: "🌍",
-                title: "Accessibilité Universelle",
-                description: "Katiopa fonctionne sur tous vos appareils : ordinateur, tablette ou smartphone. Votre enfant peut continuer à apprendre partout, que ce soit à la maison, en voyage ou chez les grands-parents.",
-                benefits: ["Multi-plateformes", "Synchronisation", "Apprentissage mobile"],
-                color: "from-indigo-500 to-indigo-600"
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                className="group bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-gray-200"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -10, scale: 1.02 }}
-              >
-                <div className="text-6xl mb-6">{feature.icon}</div>
-                
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors">
-                  {feature.title}
-                </h3>
-                
-                <p className="text-gray-600 leading-relaxed mb-6 text-lg">
-                  {feature.description}
-                </p>
-                
-                <ul className="space-y-3">
-                  {feature.benefits.map((benefit, benefitIndex) => (
-                    <li key={benefitIndex} className="flex items-center text-gray-700">
-                      <div className={`w-2 h-2 bg-gradient-to-r ${feature.color} rounded-full mr-3`} />
-                      {benefit}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section Comment ça marche avec étapes détaillées */}
-      <section className="py-24 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
-        {/* Effets de bulles supplémentaires */}
-        <motion.div
-          className="absolute top-1/2 right-20 w-32 h-32 bg-gradient-to-r from-blue-400/30 to-purple-400/30 rounded-full blur-lg"
-          animate={{ 
-            scale: [1, 1.2, 1], 
-            rotate: [0, 180, 360],
-            x: [0, 15, 0],
-            y: [0, -15, 0]
-          }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div 
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-5xl font-black text-gray-900 mb-6 leading-tight">
-              Votre enfant commence à apprendre en <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">3 étapes simples</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              En moins de 5 minutes, votre enfant aura accès à un parcours d'apprentissage 
-              parfaitement adapté à ses besoins et à son rythme d'apprentissage.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            {[
-              {
-                step: "1",
-                title: "Création du compte familial",
-                description: "Inscrivez-vous en quelques clics avec votre email principal. Choisissez le plan d'abonnement qui correspond à vos besoins et ajoutez tous les membres de votre famille qui utiliseront la plateforme.",
-                details: ["Inscription en 2 minutes", "Plans flexibles", "Gestion familiale"],
-                icon: "👨‍👩‍👧‍👦",
-                color: "from-blue-500 to-blue-600"
-              },
-              {
-                step: "2",
-                title: "Personnalisation des profils",
-                description: "Définissez les objectifs d'apprentissage, les matières préférées et le style d'apprentissage de chaque enfant. Notre système analyse ces informations pour créer un parcours sur mesure.",
-                details: ["Objectifs personnalisés", "Matières ciblées", "Style d'apprentissage"],
-                icon: "🎯",
-                color: "from-purple-500 to-purple-600"
-              },
-              {
-                step: "3",
-                title: "Démarrage de l'apprentissage",
-                description: "L'intelligence artificielle crée instantanément un parcours personnalisé et votre enfant peut commencer à apprendre immédiatement. Les progrès sont suivis en temps réel.",
-                details: ["Parcours instantané", "Progrès en temps réel", "Adaptation continue"],
-                icon: "🚀",
-                color: "from-green-500 to-green-600"
-              }
-            ].map((step, index) => (
-              <motion.div
-                key={index}
-                className="text-center group"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.2 }}
-                viewport={{ once: true }}
-              >
-                <motion.div 
-                  className={`w-24 h-24 bg-gradient-to-r ${step.color} rounded-full flex items-center justify-center mx-auto mb-8 text-white text-3xl font-black shadow-2xl`}
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  {step.step}
-                </motion.div>
-                
-                <div className="text-5xl mb-6">{step.icon}</div>
-                
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors">
-                  {step.title}
-                </h3>
-                
-                <p className="text-gray-600 leading-relaxed mb-6 text-lg">
-                  {step.description}
-                </p>
-                
-                <ul className="space-y-2">
-                  {step.details.map((detail, detailIndex) => (
-                    <li key={detailIndex} className="text-gray-700 font-medium">
-                      ✓ {detail}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section Plans d'abonnement avec textes optimisés */}
-      <section className="py-24 bg-white">
+      {/* Section des plans */}
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-5xl font-black text-gray-900 mb-6 leading-tight">
-              Choisissez le plan qui correspond à vos <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">besoins éducatifs</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="mb-6"
+            >
+              <MulticolorText 
+                text="Choisissez votre plan" 
+                variant="h2" 
+                className="text-gray-900"
+              />
+            </motion.div>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="font-subtitle-lg text-gray-600 max-w-2xl mx-auto"
+            >
               Des options flexibles et transparentes pour tous les budgets et toutes les tailles de famille. 
               Commencez gratuitement et évoluez selon vos besoins.
-            </p>
-          </motion.div>
+            </motion.p>
+          </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                name: "Gratuit",
-                price: "0€",
-                description: "Parfait pour découvrir Katiopa",
-                features: [
-                  "2 sessions utilisateur",
-                  "Accès de base aux exercices",
-                  "Support communautaire",
-                  "Statistiques de base",
-                  "Contenu fondamental"
-                ],
-                color: "from-gray-400 to-gray-600",
-                popular: false
-              },
-              {
-                name: "Pro",
-                price: "9.99€",
-                period: "/mois",
-                description: "Pour les familles engagées",
-                features: [
-                  "3 sessions utilisateur",
-                  "Toutes les fonctionnalités",
-                  "Support prioritaire",
-                  "Statistiques avancées",
-                  "Contenu premium",
-                  "Rapports détaillés"
-                ],
-                color: "from-purple-400 to-purple-600",
-                popular: true
-              },
-              {
-                name: "Pro Plus",
-                price: "19.99€",
-                period: "/mois",
-                description: "Pour les familles nombreuses",
-                features: [
-                  "4 sessions utilisateur",
-                  "Toutes les fonctionnalités",
-                  "Support dédié",
-                  "Analyses détaillées",
-                  "Contenu exclusif",
-                  "Formation parentale",
-                  "Accompagnement personnalisé"
-                ],
-                color: "from-blue-400 to-blue-600",
-                popular: false
-              }
-            ].map((plan, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {plans.map((plan, index) => (
               <motion.div
-                key={index}
-                className={`relative rounded-2xl p-8 border-2 transition-all ${
-                  plan.popular 
-                    ? 'border-purple-500 bg-purple-50 scale-105' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
+                key={plan.name}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                whileHover={{ y: -5 }}
+                className={`relative rounded-2xl p-8 border-2 transition-all ${
+                  plan.popular 
+                    ? 'scale-105' 
+                    : 'hover:scale-105'
+                } ${plan.cardClass}`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-purple-500 text-white px-4 py-2 rounded-full text-sm font-medium">
-                      Plus populaire
-                    </span>
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm text-gray-800 px-6 py-2 rounded-full font-label shadow-lg">
+                    Recommandé
                   </div>
                 )}
-                
+
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                  <div className="flex items-baseline justify-center">
-                    <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                    {plan.period && (
-                      <span className="text-gray-600 ml-1">{plan.period}</span>
-                    )}
+                  <h3 className="font-title-lg text-white mb-4">{plan.name}</h3>
+                  <div className="mb-2">
+                    <span className={`font-title-xl text-white price-glow ${plan.name === 'Starter' ? 'text-green-100' : ''}`}>
+                      {plan.price}
+                    </span>
+                    <span className="font-body text-white/80">{plan.period}</span>
                   </div>
-                  <p className="text-gray-600 mt-2">{plan.description}</p>
+                  <p className="font-body text-white/90">{plan.description}</p>
                 </div>
 
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center">
-                      <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                      <span className="text-gray-700">{feature}</span>
+                    <li key={featureIndex} className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      <span className="font-body text-white/90">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
-                <Link
-                  href="/register"
-                  className={`w-full bg-gradient-to-r ${plan.color} hover:from-blue-600 hover:to-purple-600 text-white py-3 px-4 rounded-xl font-medium text-center block transition-all transform hover:scale-105`}
+                <Link 
+                  href={plan.href}
+                  className="block w-full text-center font-button bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 px-6 py-3 rounded-xl transition-all border border-white/30 hover:border-white/50"
                 >
-                  Commencer maintenant
+                  {plan.cta}
                 </Link>
               </motion.div>
             ))}
@@ -598,64 +237,362 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Section Témoignages avec textes authentiques */}
-      <section className="py-24 bg-gray-50">
+      {/* Section des fonctionnalités */}
+      <section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-5xl font-black text-gray-900 mb-6 leading-tight">
-              Ce que disent les <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">familles satisfaites</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              Découvrez les expériences authentiques de familles qui ont transformé 
-              l'apprentissage de leurs enfants grâce à Katiopa
-            </p>
-          </motion.div>
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="mb-6"
+            >
+              <MulticolorText 
+                text="Une révolution dans l'éducation numérique" 
+                variant="h2" 
+                className="text-gray-900"
+              />
+            </motion.div>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="font-subtitle-xl text-gray-600 mb-12 max-w-3xl mx-auto"
+              >
+              CubeAI combine les dernières avancées en 
+              <strong className="text-green-700"> intelligence artificielle</strong> avec des 
+              <strong className="text-green-700"> méthodes pédagogiques éprouvées</strong> 
+              pour créer une expérience d'apprentissage unique et personnalisée, adaptée aux besoins spécifiques de chaque enfant.
+              </motion.p>
+          </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                name: "Marie Dupont",
-                role: "Mère de Lucas, 6 ans",
-                content: "Katiopa a complètement transformé l'approche de Lucas envers les mathématiques. Il adore maintenant faire ses exercices et demande même à continuer après l'heure prévue !",
-                rating: 5
+                icon: (
+                  <svg className="w-12 h-12 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                ),
+                title: 'Intelligence Artificielle Adaptative',
+                description: 'Notre algorithme d\'IA analyse en temps réel les réponses de votre enfant pour ajuster instantanément la difficulté et le style d\'apprentissage. Plus besoin de suivre un programme rigide - l\'éducation s\'adapte à l\'enfant, pas l\'inverse.',
+                benefits: ['Adaptation en temps réel', 'Personnalisation poussée', 'Suivi des progrès'],
+                bgColor: 'bg-blue-50',
+                borderColor: 'border-blue-200',
+                iconBgColor: 'bg-blue-100',
+                iconColor: 'text-blue-600'
               },
               {
-                name: "Pierre Martin",
-                role: "Père de Emma, 5 ans",
-                content: "L'IA s'adapte parfaitement au rythme d'Emma. Elle progresse à son propre rythme et reste motivée. Les rapports détaillés me permettent de suivre ses progrès facilement.",
-                rating: 5
+                icon: (
+                  <svg className="w-12 h-12 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                ),
+                title: 'Contenu Éducatif Premium',
+                description: 'Développé par des experts en pédagogie et des enseignants expérimentés, notre contenu couvre tous les domaines essentiels : mathématiques fondamentales, lecture et écriture, sciences naturelles, et développement de la créativité.',
+                benefits: ['Experts pédagogiques', 'Programme complet', 'Méthodes éprouvées'],
+                bgColor: 'bg-purple-50',
+                borderColor: 'border-purple-200',
+                iconBgColor: 'bg-purple-100',
+                iconColor: 'text-purple-600'
               },
               {
-                name: "Sophie Bernard",
-                role: "Mère de Thomas, 7 ans",
-                content: "Enfin une plateforme qui comprend vraiment les besoins de mon enfant. Les résultats sont impressionnants et Thomas a développé une vraie confiance en lui.",
-                rating: 5
+                icon: (
+                  <svg className="w-12 h-12 text-pink-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01 1l-4.7 6.28c-.18.24-.29.54-.29.85V20c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2h2v2c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2h2v2z"/>
+                  </svg>
+                ),
+                title: 'Suivi Parental Avancé',
+                description: 'Restez connecté à l\'éducation de votre enfant avec des rapports détaillés, des analyses de progression et des recommandations personnalisées. Participez activement à son développement scolaire depuis votre smartphone.',
+                benefits: ['Rapports détaillés', 'Recommandations', 'Suivi en temps réel'],
+                bgColor: 'bg-pink-50',
+                borderColor: 'border-pink-200',
+                iconBgColor: 'bg-pink-100',
+                iconColor: 'text-pink-600'
+              },
+              {
+                icon: (
+                  <svg className="w-12 h-12 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                  </svg>
+                ),
+                title: 'Sécurité et Confidentialité',
+                description: 'La protection des données de votre enfant est notre priorité absolue. Nous utilisons les technologies de cryptage les plus avancées et respectons strictement le RGPD pour garantir un environnement d\'apprentissage 100% sécurisé.',
+                benefits: ['Cryptage avancé', 'Conformité RGPD', 'Protection maximale'],
+                bgColor: 'bg-green-50',
+                borderColor: 'border-green-200',
+                iconBgColor: 'bg-green-100',
+                iconColor: 'text-green-600'
+              },
+              {
+                icon: (
+                  <svg className="w-12 h-12 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M13 2.05v3.03c3.39.49 6 3.39 6 6.92 0 .9-.18 1.75-.48 2.54l2.6 1.53c.56-1.24.88-2.62.88-4.07 0-5.18-3.95-9.45-9-9.95zM12 19c-3.87 0-7-3.13-7-7 0-3.53 2.61-6.43 6-6.92V2.05c-5.06.5-9 4.76-9 9.95 0 5.52 4.47 10 9.99 10 3.31 0 6.24-1.61 8.06-4.09l-2.6-1.53C16.17 17.98 14.21 19 12 19z"/>
+                  </svg>
+                ),
+                title: 'Résultats Mesurables',
+                description: 'Voyez les progrès de votre enfant en temps réel avec des métriques précises et des graphiques interactifs. Notre système de suivi vous montre exactement où votre enfant excelle et où il a besoin de soutien supplémentaire.',
+                benefits: ['Métriques précises', 'Graphiques interactifs', 'Progrès visibles'],
+                bgColor: 'bg-yellow-50',
+                borderColor: 'border-yellow-200',
+                iconBgColor: 'bg-yellow-100',
+                iconColor: 'text-yellow-600'
+              },
+              {
+                icon: (
+                  <svg className="w-12 h-12 text-indigo-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                  </svg>
+                ),
+                title: 'Accessibilité Universelle',
+                description: 'CubeAI fonctionne sur tous vos appareils : ordinateur, tablette ou smartphone. Votre enfant peut continuer à apprendre partout, que ce soit à la maison, en voyage ou chez les grands-parents.',
+                benefits: ['Multi-plateformes', 'Synchronisation', 'Apprentissage mobile'],
+                bgColor: 'bg-indigo-50',
+                borderColor: 'border-indigo-200',
+                iconBgColor: 'bg-indigo-100',
+                iconColor: 'text-indigo-600'
               }
-            ].map((testimonial, index) => (
+            ].map((feature, index) => (
               <motion.div
                 key={index}
-                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                whileHover={{ y: -5 }}
+                className={`${feature.bgColor} ${feature.borderColor} border-2 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
+              >
+                <div className={`${feature.iconBgColor} w-16 h-16 rounded-xl flex items-center justify-center mb-4`}>
+                  {feature.icon}
+                </div>
+                <h3 className="font-subtitle-lg text-gray-900 mb-3">{feature.title}</h3>
+                <p className="font-body text-gray-600 mb-4">{feature.description}</p>
+                <ul className="space-y-2">
+                  {feature.benefits.map((benefit, benefitIndex) => (
+                    <li key={benefitIndex} className="flex items-center text-gray-700">
+                      <div className={`w-2 h-2 ${feature.iconColor} rounded-full mr-3`} />
+                      <span className="font-body text-sm">{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Section Étapes d'Inscription */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="mb-6"
+            >
+              <MulticolorText 
+                text="Comment ça marche ?" 
+                variant="h2" 
+                className="text-gray-900"
+              />
+            </motion.div>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="font-subtitle-lg text-gray-600 max-w-2xl mx-auto"
+            >
+              En seulement 3 étapes simples, donnez à votre enfant accès à l'éducation du futur
+            </motion.p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                step: '1',
+                title: 'Créez votre compte',
+                description: 'Inscrivez-vous en moins de 2 minutes avec votre email et créez le profil de votre enfant',
+                icon: (
+                  <svg className="w-12 h-12 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                ),
+                bgColor: 'bg-blue-50',
+                borderColor: 'border-blue-200',
+                iconBgColor: 'bg-blue-100'
+              },
+              {
+                step: '2',
+                title: 'Personnalisez le profil',
+                description: 'Définissez l\'âge, le niveau et les préférences d\'apprentissage de votre enfant',
+                icon: (
+                  <svg className="w-12 h-12 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                ),
+                bgColor: 'bg-purple-50',
+                borderColor: 'border-purple-200',
+                iconBgColor: 'bg-purple-100'
+              },
+              {
+                step: '3',
+                title: 'Commencez à apprendre',
+                description: 'Votre enfant peut immédiatement commencer ses exercices personnalisés',
+                icon: (
+                  <svg className="w-12 h-12 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                ),
+                bgColor: 'bg-green-50',
+                borderColor: 'border-green-200',
+                iconBgColor: 'bg-green-100'
+              }
+            ].map((step, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className={`${step.bgColor} ${step.borderColor} border-2 rounded-2xl p-8 text-center relative`}
+              >
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full flex items-center justify-center font-title text-xl font-bold">
+                  {step.step}
+                </div>
+                
+                <div className={`${step.iconBgColor} w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 mt-4`}>
+                  {step.icon}
+                </div>
+                
+                <h3 className="font-subtitle-lg text-gray-900 mb-4">{step.title}</h3>
+                <p className="font-body text-gray-600">{step.description}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-medium transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl">
+              Commencer maintenant
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+      
+      {/* Section Témoignages */}
+      <section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="mb-6"
+            >
+              <MulticolorText 
+                text="Ce que disent les parents" 
+                variant="h2" 
+                className="text-gray-900"
+              />
+            </motion.div>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="font-subtitle-lg text-gray-600 max-w-2xl mx-auto"
+            >
+              Découvrez les retours d'expérience de familles qui utilisent CubeAI
+            </motion.p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                name: 'Marie D.',
+                role: 'Maman de Lucas, 6 ans',
+                content: 'CubeAI a transformé l\'apprentissage de mon fils. Il adore les exercices et je vois ses progrès en temps réel !',
+                rating: 5,
+                avatar: '👩‍👦',
+                bgColor: 'from-blue-100 to-blue-200',
+                borderColor: 'border-blue-300',
+                shadowColor: 'shadow-blue-200'
+              },
+              {
+                name: 'Thomas L.',
+                role: 'Papa de Emma, 5 ans',
+                content: 'L\'IA s\'adapte parfaitement au niveau de ma fille. Elle progresse à son rythme et reste motivée.',
+                rating: 5,
+                avatar: '👨‍👧',
+                bgColor: 'from-purple-100 to-purple-200',
+                borderColor: 'border-purple-300',
+                shadowColor: 'shadow-purple-200'
+              },
+              {
+                name: 'Sophie M.',
+                role: 'Maman de Noah, 7 ans',
+                content: 'Interface intuitive, contenu de qualité et suivi parental excellent. Je recommande vivement !',
+                rating: 5,
+                avatar: '👩‍👦',
+                bgColor: 'from-pink-100 to-pink-200',
+                borderColor: 'border-pink-300',
+                shadowColor: 'shadow-pink-200'
+              }
+            ].map((testimonial, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className={`bg-gradient-to-br ${testimonial.bgColor} ${testimonial.borderColor} border-2 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 ${testimonial.shadowColor}`}
               >
                 <div className="flex items-center mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                  ))}
+                  <div className="text-3xl mr-3">{testimonial.avatar}</div>
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <svg key={i} className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
+                    <p className="font-subtitle text-gray-900 font-semibold">{testimonial.name}</p>
+                    <p className="font-body text-gray-600 text-sm">{testimonial.role}</p>
+                  </div>
                 </div>
-                <p className="text-gray-700 mb-6 italic text-lg leading-relaxed">"{testimonial.content}"</p>
-                <div>
-                  <div className="font-semibold text-gray-900 text-lg">{testimonial.name}</div>
-                  <div className="text-sm text-gray-600">{testimonial.role}</div>
+                <div className="relative">
+                  <svg className="absolute -top-3 -left-3 w-8 h-8 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+                  </svg>
+                  <p className="font-body text-gray-700 mb-4 italic pl-6">"{testimonial.content}"</p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex space-x-2">
+                    <button className="p-2 text-gray-500 hover:text-blue-600 transition-colors">
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                      </svg>
+                    </button>
+                    <button className="p-2 text-gray-500 hover:text-blue-600 transition-colors">
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <button className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors">
+                    Partager
+                  </button>
                 </div>
               </motion.div>
             ))}
@@ -663,158 +600,176 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Section CTA finale avec éléments interactifs */}
-      <section className="py-24 bg-gradient-to-r from-blue-600 to-purple-600 relative overflow-hidden">
-        {/* Effets de bulles supplémentaires */}
-        <motion.div
-          className="absolute top-10 left-1/4 w-28 h-28 bg-white/10 rounded-full blur-lg"
-          animate={{ 
-            scale: [1, 1.3, 1], 
-            rotate: [0, 180, 360],
-            x: [0, 20, 0],
-            y: [0, -20, 0]
-          }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-10 right-1/4 w-32 h-32 bg-white/10 rounded-full blur-xl"
-          animate={{ 
-            scale: [1, 1.2, 1], 
-            rotate: [360, 180, 0],
-            x: [0, -25, 0],
-            y: [0, 25, 0]
-          }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        />
+      {/* Section Rejoindre la Communauté */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="mb-6"
+            >
+              <MulticolorText 
+                text="Rejoignez la communauté CubeAI" 
+                variant="h2" 
+                className="text-gray-900"
+              />
+            </motion.div>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="font-subtitle-lg text-gray-600 max-w-2xl mx-auto"
+            >
+              Connectez-vous avec d'autres parents, partagez vos expériences et restez informés des dernières nouveautés
+            </motion.p>
+          </div>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                platform: 'Facebook',
+                description: 'Groupe privé pour échanger conseils et astuces',
+                icon: (
+                  <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-.8 0-1.54.37-2.01 1l-4.7 6.28c-.18.24-.29.54-.29.85V20c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2h2v2c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2h2v2c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2h2v2z"/>
+                  </svg>
+                ),
+                bgColor: 'bg-blue-50',
+                borderColor: 'border-blue-200',
+                hoverColor: 'hover:bg-blue-100'
+              },
+              {
+                platform: 'Instagram',
+                description: 'Suivez nos activités et partagez vos moments',
+                icon: (
+                  <svg className="w-8 h-8 text-pink-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.297-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.807.875 1.297 2.026 1.297 3.323s-.49 2.448-1.297 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.718-1.297c-.49.49-1.297.807-2.026.807s-1.536-.317-2.026-.807c-.49-.49-.807-1.297-.807-2.026s.317-1.536.807-2.026c.49-.49 1.297-.807 2.026-.807s1.536.317 2.026.807c.49.49.807 1.297.807 2.026s-.317 1.536-.807 2.026z"/>
+                  </svg>
+                ),
+                bgColor: 'bg-pink-50',
+                borderColor: 'border-pink-200',
+                hoverColor: 'hover:bg-pink-100'
+              },
+              {
+                platform: 'LinkedIn',
+                description: 'Réseau professionnel pour les parents',
+                icon: (
+                  <svg className="w-8 h-8 text-blue-700" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                ),
+                bgColor: 'bg-blue-50',
+                borderColor: 'border-blue-200',
+                hoverColor: 'hover:bg-blue-100'
+              },
+              {
+                platform: 'YouTube',
+                description: 'Tutoriels et contenus éducatifs',
+                icon: (
+                  <svg className="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                ),
+                bgColor: 'bg-red-50',
+                borderColor: 'border-red-200',
+                hoverColor: 'hover:bg-red-100'
+              }
+            ].map((social, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className={`${social.bgColor} ${social.borderColor} border-2 rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 ${social.hoverColor}`}
+              >
+                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  {social.icon}
+                </div>
+                <h3 className="font-subtitle text-gray-900 mb-2">{social.platform}</h3>
+                <p className="font-body text-gray-600 text-sm">{social.description}</p>
+                <button className="mt-4 font-button bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg text-sm transition-all hover:from-blue-700 hover:to-purple-700">
+                  Rejoindre
+                </button>
+              </motion.div>
+            ))}
+          </div>
+
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
+            className="text-center mt-12"
           >
-            <h2 className="text-5xl font-black text-white mb-6 leading-tight">
-              Prêt à transformer l'<span className="text-yellow-300">apprentissage</span> ?
-            </h2>
-            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Rejoignez des milliers de familles qui ont déjà découvert 
-              le pouvoir de l'apprentissage adaptatif avec Katiopa. 
-              Commencez gratuitement dès aujourd'hui !
+            <p className="font-body text-gray-600 mb-4">
+              Restez connecté et recevez nos dernières actualités
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
-              <Link
-                href="/register"
-                className="inline-flex items-center px-10 py-5 bg-white text-blue-600 text-xl font-bold rounded-2xl hover:bg-gray-100 transition-all transform hover:scale-105 shadow-2xl"
-              >
-                Commencer gratuitement
-                <ArrowRight className="ml-3 h-6 w-6" />
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex items-center px-10 py-5 border-3 border-white text-white text-xl font-bold rounded-2xl hover:bg-white hover:text-blue-600 transition-all"
-              >
-                Se connecter
-              </Link>
-            </div>
-
-            {/* Éléments interactifs : Chat et réseaux sociaux */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              
-              
-              <div className="flex space-x-4">
-                <a href="#" className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-all transform hover:scale-110">
-                  <Facebook className="h-6 w-6 text-white" />
-                </a>
-                <a href="#" className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-all transform hover:scale-110">
-                  <Twitter className="h-6 w-6 text-white" />
-                </a>
-                <a href="#" className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-all transform hover:scale-110">
-                  <Instagram className="h-6 w-6 text-white" />
-                </a>
-                <a href="#" className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-all transform hover:scale-110">
-                  <Youtube className="h-6 w-6 text-white" />
-                </a>
-                <a href="#" className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-all transform hover:scale-110">
-                  <Share2 className="h-6 w-6 text-white" />
-                </a>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder="Votre email"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-body"
+              />
+              <button className="font-button bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg transition-all hover:from-blue-700 hover:to-purple-700">
+                S'abonner
+              </button>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Footer enrichi avec informations de contact */}
-      <footer className="bg-gray-900 text-white py-20">
+      
+      
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-5 gap-8">
-            <div className="md:col-span-2">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Brain className="h-6 w-6 text-white" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="col-span-1 md:col-span-2">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <span className="font-title text-white text-lg">C</span>
                 </div>
-                <span className="text-2xl font-bold">Katiopa</span>
+                <CubeAILogo className="text-xl" />
               </div>
-              <p className="text-gray-400 text-lg leading-relaxed mb-6">
-                L'apprentissage de l'intelligence artificielle pour tous des le plus jeune âge. Notre mission est de rendre 
+              <p className="font-body text-gray-300 mb-4">
+                L'apprentissage de l'intelligence artificielle pour tous dès le plus jeune âge. Notre mission est de rendre 
                 l'éducation accessible, personnalisée et engageante pour chaque enfant.
               </p>
-              
-              {/* Informations de contact */}
-              <div className="space-y-3">
-                <div className="flex items-center text-gray-400">
-                  <Mail className="h-5 w-5 mr-3 text-blue-400" />
-                  <span>contact@katiopa.com</span>
-                </div>
-                <div className="flex items-center text-gray-400">
-                  <Phone className="h-5 w-5 mr-3 text-blue-400" />
-                  <span>+33 1 23 45 67 89</span>
-                </div>
-                <div className="flex items-center text-gray-400">
-                  <MapPin className="h-5 w-5 mr-3 text-blue-400" />
-                  <span>Paris, France</span>
-                </div>
-              </div>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-6 text-lg">Produit</h3>
-              <ul className="space-y-3 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Fonctionnalités</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Plans d'abonnement</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Sécurité</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Méthodes pédagogiques</a></li>
+              <h4 className="font-subtitle text-white mb-4">Produit</h4>
+              <ul className="space-y-2">
+                <li><Link href="/features" className="font-body text-gray-300 hover:text-white transition-colors">Fonctionnalités</Link></li>
+                <li><Link href="/pricing" className="font-body text-gray-300 hover:text-white transition-colors">Tarifs</Link></li>
+                <li><Link href="/demo" className="font-body text-gray-300 hover:text-white transition-colors">Démo</Link></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-6 text-lg">Support</h3>
-              <ul className="space-y-3 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Centre d'aide</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Tutoriels</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-6 text-lg">Légal</h3>
-              <ul className="space-y-3 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Confidentialité</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Conditions d'utilisation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Cookies</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">RGPD</a></li>
+              <h4 className="font-subtitle text-white mb-4">Support</h4>
+              <ul className="space-y-2">
+                <li><Link href="/help" className="font-body text-gray-300 hover:text-white transition-colors">Centre d'aide</Link></li>
+                <li><Link href="/contact" className="font-body text-gray-300 hover:text-white transition-colors">Contact</Link></li>
+                <li><Link href="/status" className="font-body text-gray-300 hover:text-white transition-colors">Statut</Link></li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 Katiopa. Tous droits réservés. | L'IA pour tous les.</p>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center">
+            <p className="font-body text-gray-400">
+              © 2024 CubeAI. Tous droits réservés. L'IA pour tous les enfants.
+            </p>
           </div>
         </div>
       </footer>
 
-      {/* Chat Bubble flottant */}
+      {/* Bulle de chat flottante */}
       <ChatBubble />
     </div>
   )
