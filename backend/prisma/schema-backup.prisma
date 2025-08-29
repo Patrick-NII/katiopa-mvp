@@ -1,0 +1,351 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Compte principal (une adresse email = un compte)
+model Account {
+  id                String        @id @default(cuid())
+  email             String        @unique
+  subscriptionType  SubscriptionType @default(FREE)
+  plan              SubscriptionPlan @default(FREE)
+  maxSessions       Int           @default(2) // 2 pour FREE, 4 pour PRO_PLUS
+  isActive          Boolean       @default(true)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  totalAccountConnectionDurationMs BigInt @default(0) // Temps total de connexion du compte
+  
+  // Relations
+  userSessions      UserSession[]
+  billingHistory    BillingRecord[]
+  conversations     Conversation[]
+  members           AccountMember[]
+  planSeat          PlanSeat?
+  memberSessionLogs MemberSessionLog[]
+  
+  // Relations v2 - Abonnements et paiements
+  subscription      Subscription?
+  paymentMethods    PaymentMethod[]
+  invoices         Invoice[]
+  sponsorReferrals Referral[] @relation("SponsorReferrals")
+  referredReferrals Referral[] @relation("ReferredReferrals")
+}
+
+// Session utilisateur (connexion avec ID/mot de passe)
+model UserSession {
+  id              String      @id @default(cuid())
+  accountId       String      // Référence au compte
+  sessionId       String      @unique // ID de connexion unique
+  password        String      // Mot de passe de cette session
+  firstName       String
+  lastName        String
+  gender          Gender      @default(UNKNOWN)
+  userType        UserType    @default(CHILD)
+  age             Int?
+  grade           String?
+  country         String?
+  timezone        String?
+  preferences     Json?       // Préférences d'apprentissage
+  isActive        Boolean     @default(true)
+  lastLoginAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  totalConnectionDurationMs BigInt @default(0) // Temps total de connexion de cette session
+  currentSessionStartTime DateTime? // Début de la session actuelle
+  
+  // Relations
+  account         Account     @relation(fields: [accountId], references: [id])
+  activities      Activity[]
+  profile         UserProfile?
+  conversations   Conversation[]
+}
+
+// Profil détaillé de l'utilisateur
+model UserProfile {
+  id                    String      @id @default(cuid())
+  userSessionId         String      @unique
+  learningGoals         String[]    // Objectifs d'apprentissage
+  preferredSubjects     String[]    // Matières préférées
+  learningStyle         String?     // Style d'apprentissage
+  difficulty            String?     // Niveau de difficulté
+  sessionPreferences    Json?       // Préférences de session
+  interests            String[]     // Centres d'intérêt
+  specialNeeds         String[]     // Besoins spéciaux
+  customNotes          String?      // Notes personnalisées
+  parentWishes         String?      // Souhaits des parents
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  
+  // Relations
+  userSession          UserSession  @relation(fields: [userSessionId], references: [id])
+}
+
+// Activités d'apprentissage
+model Activity {
+  id         String      @id @default(cuid())
+  userSessionId String   // Référence à la session utilisateur
+  domain     String      // Mathématiques, Français, IA, etc.
+  nodeKey    String      // Clé du nœud d'apprentissage
+  score      Int         // Score obtenu
+  attempts   Int         @default(1) // Nombre de tentatives
+  durationMs Int         // Durée en millisecondes
+  createdAt  DateTime    @default(now())
+  
+  // Relations
+  userSession UserSession @relation(fields: [userSessionId], references: [id])
+}
+
+// Historique de facturation
+model BillingRecord {
+  id              String      @id @default(cuid())
+  accountId       String
+  amount          Float
+  currency        String      @default("EUR")
+  description     String
+  status          BillingStatus @default(PENDING)
+  billingDate     DateTime
+  dueDate         DateTime?
+  paidAt          DateTime?
+  createdAt       DateTime    @default(now())
+  
+  // Relations
+  account         Account     @relation(fields: [accountId], references: [id])
+}
+
+// Conversations avec l'IA Coach
+model Conversation {
+  id              String      @id @default(cuid())
+  userSessionId   String      // Référence à la session utilisateur
+  accountId       String      // Référence au compte (pour l'historique global)
+  message         String      // Message de l'utilisateur
+  response        String      // Réponse de l'IA
+  focus           String?     // Matière de focus si spécifiée
+  context         Json?       // Contexte de la conversation (type utilisateur, abonnement, etc.)
+  metadata        Json?       // Métadonnées (tokens utilisés, temps de réponse, etc.)
+  createdAt       DateTime    @default(now())
+  
+  // Relations
+  userSession     UserSession @relation(fields: [userSessionId], references: [id])
+  account         Account     @relation(fields: [accountId], references: [id])
+  
+  // Index pour les performances
+  @@index([userSessionId, createdAt])
+  @@index([accountId, createdAt])
+}
+
+// Nouveaux modèles pour v2 (ajout-only, sans casser l'existant)
+model AccountMember {
+  id           String   @id @default(cuid())
+  accountId    String
+  role         AppRole  @default(CHILD_MEMBER)
+  email        String?  @unique
+  username     String
+  passwordHash String
+  status       String   @default("active")
+  displayName  String?
+  ageBracket   String?
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  account      Account  @relation(fields: [accountId], references: [id])
+  sessionLogs  MemberSessionLog[]
+
+  @@unique([accountId, username])
+}
+
+model PlanSeat {
+  accountId   String  @id
+  maxChildren Int
+  account     Account @relation(fields: [accountId], references: [id])
+}
+
+model MemberSessionLog {
+  id           String   @id @default(cuid())
+  accountId    String
+  memberId     String
+  startedAt    DateTime
+  endedAt      DateTime?
+  durationSec  Int      @default(0)
+  activityType String?
+  moduleId     String?
+
+  // Relations
+  account      Account        @relation(fields: [accountId], references: [id])
+  member       AccountMember  @relation(fields: [memberId], references: [id])
+
+  @@index([accountId, memberId, startedAt])
+}
+
+// Types d'abonnement
+enum SubscriptionType {
+  FREE        // 2 sessions max
+  PRO         // 2 sessions max + fonctionnalités premium
+  PRO_PLUS    // 4 sessions max + toutes fonctionnalités
+  ENTERPRISE  // Sessions illimitées + support entreprise
+}
+
+// Nouveaux enums pour v2
+enum AppRole { 
+  PARENT_ADMIN 
+  CHILD_MEMBER 
+}
+
+// @deprecated - Remplacé par le nouveau système d'abonnement v2
+enum SubscriptionPlan { 
+  FREE 
+  PRO 
+  PRO_PLUS 
+  PREMIUM 
+}
+
+// Nouveau système d'abonnement v2
+enum SubscriptionPlanV2 {
+  STARTER         // Gratuit 3 mois, puis 9,99€/mois - 1 parent + 1 enfant
+  PRO             // 29,99€/mois - 1 parent + 1 enfant
+  PREMIUM         // 69,99€/mois - 1 parent + jusqu'à 4 enfants
+  ANTI_CHURN      // 14,99€/mois - Offre de rétention
+}
+
+enum SubscriptionStatus {
+  FREE            // Gratuit pendant 3 mois (Starter)
+  ACTIVE          // Abonnement actif et payant
+  PAST_DUE        // Paiement en retard
+  CANCELED        // Annulé
+  SUSPENDED       // Suspendu (fin de période gratuite sans PM)
+}
+
+// Genre de l'utilisateur
+enum Gender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+// Type d'utilisateur
+enum UserType {
+  CHILD       // Enfant 5-7 ans
+  PARENT      // Parent
+  TEACHER     // Enseignant
+  ADMIN       // Administrateur
+}
+
+// Statut de facturation
+enum BillingStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+// ===== NOUVEAUX MODÈLES D'ABONNEMENT V2 =====
+// Ajout-only, sans casser l'existant
+
+// Abonnement principal du compte
+model Subscription {
+  id                String             @id @default(cuid())
+  accountId         String             @unique // Un seul abonnement par compte
+  plan              SubscriptionPlanV2 @default(STARTER)
+  status            SubscriptionStatus @default(FREE)
+  trialEnd          DateTime?          // Fin de l'essai gratuit (3 mois)
+  currentPeriodStart DateTime?         // Début de la période de facturation actuelle
+  currentPeriodEnd   DateTime?         // Fin de la période de facturation actuelle
+  paymentMethodId   String?            // Référence vers le moyen de paiement
+  autoRenew         Boolean            @default(true) // Renouvellement automatique
+  cancelAtPeriodEnd Boolean            @default(false) // Annulation à la fin de la période
+  
+  // Métadonnées
+  metadata          Json?              // Données additionnelles (coupons, parrainage, etc.)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  
+  // Relations
+  account           Account            @relation(fields: [accountId], references: [id])
+  paymentMethod     PaymentMethod?    @relation(fields: [paymentMethodId], references: [id])
+  invoices          Invoice[]
+  
+  @@index([accountId, status])
+  @@index([trialEnd])
+}
+
+// Moyens de paiement sécurisés (tokens Stripe/PayPal/ApplePay/GooglePay)
+model PaymentMethod {
+  id            String   @id @default(cuid())
+  accountId     String
+  provider      String   // "stripe" | "paypal" | "applepay" | "googlepay"
+  token         String   // Payment method ID/token du provider
+  brand         String?  // Marque de la carte (Visa, Mastercard, etc.)
+  last4         String?  // 4 derniers chiffres
+  expMonth      Int?     // Mois d'expiration
+  expYear       Int?     // Année d'expiration
+  billingEmail String?  // Email de facturation
+  isDefault     Boolean  @default(false) // Moyen de paiement par défaut
+  isActive      Boolean  @default(true)
+  
+  // Métadonnées
+  metadata      Json?    // Données additionnelles du provider
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  account       Account      @relation(fields: [accountId], references: [id])
+  subscriptions Subscription[]
+  
+  @@index([accountId, provider])
+  @@index([token])
+}
+
+// Factures générées
+model Invoice {
+  id            String   @id @default(cuid())
+  accountId     String
+  subscriptionId String
+  amountCents  Int      // Montant en centimes (999 = 9,99€)
+  currency      String   @default("EUR")
+  periodStart   DateTime // Début de la période facturée
+  periodEnd     DateTime // Fin de la période facturée
+  status        String   @default("open") // "open" | "paid" | "void" | "failed"
+  provider      String   // "stripe" | "paypal" | "applepay" | "googlepay"
+  providerInvoiceId String? // ID de la facture chez le provider
+  
+  // Métadonnées
+  metadata      Json?    // Données additionnelles
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  account       Account      @relation(fields: [accountId], references: [id])
+  subscription  Subscription @relation(fields: [subscriptionId], references: [id])
+  
+  @@index([accountId, subscriptionId])
+  @@index([status, createdAt])
+}
+
+// Système de parrainage
+model Referral {
+  id                String   @id @default(cuid())
+  code              String   @unique // Code de parrainage unique
+  sponsorAccountId  String   // Compte qui parraine
+  referredAccountId String?  // Compte parrainé (optionnel, rempli après inscription)
+  rewardStatus      String   @default("pending") // "pending" | "applied" | "expired"
+  rewardType        String   @default("discount") // "discount" | "credit" | "free_month"
+  rewardValue       Int?     // Valeur de la récompense (en centimes ou pourcentage)
+  
+  // Métadonnées
+  metadata          Json?    // Données additionnelles
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  sponsorAccount    Account  @relation("SponsorReferrals", fields: [sponsorAccountId], references: [id])
+  referredAccount   Account? @relation("ReferredReferrals", fields: [referredAccountId], references: [id])
+  
+  @@index([sponsorAccountId])
+  @@index([referredAccountId])
+  @@index([code])
+}

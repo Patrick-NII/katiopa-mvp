@@ -2,6 +2,7 @@ import { Router } from "express";
 import { requireAuth, AuthRequest } from "../middleware/auth";
 import { prisma } from "../prisma";
 import OpenAI from "openai";
+import { apiError } from "../utils/errors";
 
 const router = Router();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -17,11 +18,11 @@ router.post("/evaluate", requireAuth, async (req: AuthRequest, res) => {
   };
 
   try {
-    const userId = req.user!.id;
+    const userSessionId = req.user!.id;
     const focus = (req.body?.focus as string) ?? "maths";
 
     const activities = await prisma.activity.findMany({
-      where: { userId, domain: focus },
+      where: { userSessionId, domain: focus },
       orderBy: { createdAt: "desc" },
       take: 30,
     });
@@ -32,7 +33,7 @@ router.post("/evaluate", requireAuth, async (req: AuthRequest, res) => {
 
     const system = `Tu es un pédagogue pour enfants de 5 à 7 ans.
 Analyse des activités (scores 0-100). Fais un court bilan positif, puis propose 3 exercices adaptés,
-clairs et motivants, sous forme d'objectifs atteignables. Les exercices doivent référencer un nodeKey (maths.* ou coding.*).`;
+clairs et motivants, sous forme d'objectifs atteignables. Les exercices doivent référencer un nodeKey (maths.*, francais.*, sciences.* ou coding.*).`;
 
     const user = `Données récentes:
 ${statsText}
@@ -57,7 +58,8 @@ Contrainte: âge 5-7, langage simple, ton bienveillant. Génère JSON strict.`;
     }
 
     return res.json(out && out.assessment ? out : fallback);
-  } catch (e) {
+  } catch (error) {
+    console.error('❌ Erreur lors de l\'évaluation LLM:', error);
     return res.json(fallback);
   }
 });
