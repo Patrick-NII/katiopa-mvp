@@ -64,8 +64,8 @@ export default function RegisterPage() {
     {
       id: 'STARTER',
       name: "Starter",
-      price: "Gratuit",
-      period: "",
+      price: "0€",
+      period: "/mois",
       maxSessions: 2,
       features: [
         "1 parent + 1 enfant",
@@ -76,13 +76,14 @@ export default function RegisterPage() {
         "3 mois gratuit puis 9,99€/mois"
       ],
       icon: Gift,
-      color: 'from-green-400 to-green-600',
+      cardClass: 'card-starter',
       starter: true
     },
     {
       id: 'PRO',
       name: 'Pro',
-      price: '29,99€/mois',
+      price: '29,99€',
+      period: '/mois',
       maxSessions: 2,
       features: [
         '1 parent + 1 enfant',
@@ -93,13 +94,14 @@ export default function RegisterPage() {
         'Évaluation et coaching IA'
       ],
       icon: Crown,
-      color: 'from-purple-400 to-purple-600',
+      cardClass: 'card-pro',
       popular: true
     },
     {
       id: 'PREMIUM',
       name: 'Premium',
-      price: '69,99€/mois',
+      price: '69,99€',
+      period: '/mois',
       maxSessions: 6,
       features: [
         '1 parent + jusqu\'à 5 enfants',
@@ -111,7 +113,7 @@ export default function RegisterPage() {
         'Parrainage inclus'
       ],
       icon: Crown,
-      color: 'from-blue-400 to-blue-600',
+      cardClass: 'card-premium',
       complete: true
     }
   ]
@@ -351,8 +353,10 @@ export default function RegisterPage() {
           >
             <span className="text-3xl font-bold text-white">K</span>
           </motion.div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Inscription KATIOPA</h1>
-          <p className="text-gray-600">Créez votre compte familial pour l'apprentissage intelligent</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Inscription CubeAI</h1>
+          <p className="text-lg text-gray-600 text-center max-w-2xl">
+            Créez votre compte et donnez à votre enfant accès à l'éducation du futur
+          </p>
         </motion.div>
 
         {/* Étapes */}
@@ -407,66 +411,61 @@ export default function RegisterPage() {
                       key={plan.id}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`relative cursor-pointer rounded-xl p-6 border-2 transition-all ${
+                      className={`relative cursor-pointer rounded-2xl p-8 border-2 transition-all ${
                         accountData.subscriptionType === plan.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
+                          ? 'scale-105'
+                          : 'hover:scale-105'
+                      } ${plan.cardClass}`}
                       onClick={() => handleSubscriptionChange(plan.id as any)}
                     >
                       {accountData.subscriptionType === plan.id && (
-                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                          <Check size={16} className="text-white" />
+                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center">
+                          <Check size={16} className="text-gray-800" />
                         </div>
                       )}
                       
                       {plan.starter && (
-                        <div className="absolute -top-2 -left-2">
-                          <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                            Porte d'entrée
-                          </span>
+                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm text-gray-800 px-6 py-2 rounded-full font-label shadow-lg">
+                          Porte d'entrée
                         </div>
                       )}
                       
                       {plan.popular && (
-                        <div className="absolute -top-2 -left-2">
-                          <span className="bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                            Recommandé
-                          </span>
+                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm text-gray-800 px-6 py-2 rounded-full font-label shadow-lg">
+                          Recommandé
                         </div>
                       )}
                       
                       {plan.complete && (
-                        <div className="absolute -top-2 -left-2">
-                          <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                            Complet
-                          </span>
+                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm text-gray-800 px-6 py-2 rounded-full font-label shadow-lg">
+                          Complet
                         </div>
                       )}
                       
-                      <div className={`w-12 h-12 bg-gradient-to-r ${plan.color} rounded-lg flex items-center justify-center mx-auto mb-4`}>
-                        <Icon size={24} className="text-white" />
+                      <div className="text-center mb-8">
+                        <h3 className="font-title-lg text-white mb-4">{plan.name}</h3>
+                        <div className="mb-2">
+                          <span className={`font-title-xl text-white price-glow ${plan.name === 'Starter' ? 'text-green-100' : ''}`}>
+                            {plan.price}
+                          </span>
+                          <span className="font-body text-white/80">{plan.period}</span>
+                        </div>
+                        <p className="font-body text-white/90">Jusqu'à {plan.maxSessions} session{plan.maxSessions > 1 ? 's' : ''}</p>
                       </div>
                       
-                      <h3 className="text-xl font-bold text-center text-gray-900 mb-2">{plan.name}</h3>
-                      <div className="text-center mb-4">
-                        <span className="text-3xl font-bold text-gray-900">{plan.price}</span>
-                        {plan.period && (
-                          <span className="text-lg text-gray-600 ml-1">{plan.period}</span>
-                        )}
-                      </div>
-                      
-                      <ul className="space-y-2 mb-4">
+                      <ul className="space-y-3 mb-8">
                         {plan.features.map((feature, index) => (
-                          <li key={index} className="flex items-center text-sm text-gray-600">
-                            <Check size={16} className="text-green-500 mr-2 flex-shrink-0" />
-                            {feature}
+                          <li key={index} className="flex items-center space-x-3">
+                            <svg className="w-5 h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                            <span className="font-body text-white/90">{feature}</span>
                           </li>
                         ))}
                       </ul>
                       
                       <div className="text-center">
-                        <span className="text-lg font-semibold text-blue-600">
+                        <span className="text-lg font-semibold text-white/90">
                           {plan.maxSessions} session{plan.maxSessions > 1 ? 's' : ''}
                         </span>
                       </div>
