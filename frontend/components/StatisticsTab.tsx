@@ -15,7 +15,7 @@ import PerformanceCharts from './PerformanceCharts'
 interface StatisticsTabProps {
   user: any
   activities: any[]
-  summary: any[]
+  summary: any
 }
 
 export default function StatisticsTab({
@@ -100,7 +100,7 @@ export default function StatisticsTab({
             <div>
               <h3 className="text-sm font-medium text-gray-600">Temps total</h3>
               <p className="text-2xl font-bold text-gray-900">
-                {Math.round(activities.reduce((acc, a) => acc + a.durationMs, 0) / (1000 * 60))} min
+                {summary?.totalTime || 0} min
               </p>
             </div>
           </div>
@@ -131,6 +131,7 @@ export default function StatisticsTab({
           userId={user?.id}
           memberSince={user?.createdAt}
           activities={activities}
+          summary={summary}
         />
       </motion.div>
 
@@ -149,7 +150,7 @@ export default function StatisticsTab({
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {summary.map((domain, index) => (
+          {summary?.domains?.map((domain, index) => (
             <motion.div 
               key={domain.domain}
               className="p-6 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
@@ -167,14 +168,14 @@ export default function StatisticsTab({
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Score moyen</span>
-                  <span className="font-bold text-lg text-gray-900">{Math.round(domain.avg)}/100</span>
+                  <span className="font-bold text-lg text-gray-900">{domain.averageScore}/100</span>
                 </div>
                 
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <motion.div 
                     className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
                     initial={{ width: 0 }}
-                    animate={{ width: `${domain.avg}%` }}
+                    animate={{ width: `${domain.averageScore}%` }}
                     transition={{ duration: 1, delay: 0.8 + index * 0.1 }}
                   />
                 </div>
@@ -186,7 +187,11 @@ export default function StatisticsTab({
                 </div>
               </div>
             </motion.div>
-          ))}
+          )) || (
+            <div className="col-span-full text-center py-8 text-gray-500">
+              Aucun domaine disponible
+            </div>
+          )}
         </div>
       </motion.div>
 
