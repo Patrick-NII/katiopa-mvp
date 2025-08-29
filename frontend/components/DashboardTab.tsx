@@ -252,31 +252,14 @@ export default function DashboardTab({
                       <h4 className="text-lg font-semibold text-gray-900">Réponse de l'IA Coach</h4>
                     </div>
                     
-                    {/* Badge RAG avancé */}
-                    <div className="flex items-center gap-2">
-                      <div className="px-3 py-1 bg-gradient-to-r from-purple-500 to-blue-600 text-white text-xs font-medium rounded-full flex items-center gap-1">
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                        RAG Avancé
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        IA enrichie
-                      </div>
-                    </div>
+
                   </div>
                   
                   <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                     {chatResponse}
                   </div>
                   
-                  {/* Informations RAG */}
-                  <div className="mt-4 pt-4 border-t border-green-200">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
-                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                      </div>
-                      <span>Cette réponse a été enrichie avec l'historique des conversations et les connaissances de Katiopa</span>
-                    </div>
-                  </div>
+
                 </motion.div>
               )}
 

@@ -172,14 +172,30 @@ app.use((error: any, req: express.Request, res: express.Response, next: express.
   });
 });
 
-// Démarrage du serveur
-app.listen(PORT, () => {
-  console.log(`🚀 Serveur KATIOPA démarré sur le port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔐 API: http://localhost:${PORT}/api`);
-  console.log(`🔒 Sécurité: JWT=${!!process.env.JWT_SECRET}, Cookies=${!!process.env.COOKIE_SECRET}`);
-  console.log(`🌍 Environnement: ${NODE_ENV}`);
-});
+// Démarrage séquentiel: connexion DB puis écoute du port
+async function start() {
+  try {
+    console.log('⏳ Connexion à la base de données...');
+    await prisma.$connect();
+    console.log('✅ Base de données connectée');
+
+    await new Promise<void>((resolve, reject) => {
+      const server = app.listen(PORT, () => resolve());
+      server.on('error', reject);
+    });
+
+    console.log(`🚀 Serveur KATIOPA démarré sur le port ${PORT}`);
+    console.log(`📊 Health check: http://localhost:${PORT}/health`);
+    console.log(`🔐 API: http://localhost:${PORT}/api`);
+    console.log(`🔒 Sécurité: JWT=${!!process.env.JWT_SECRET}, Cookies=${!!process.env.COOKIE_SECRET}`);
+    console.log(`🌍 Environnement: ${NODE_ENV}`);
+  } catch (error) {
+    console.error('❌ Erreur au démarrage du serveur:', error);
+    process.exit(1);
+  }
+}
+
+start();
 
 // Gestion de l'arrêt propre
 process.on('SIGTERM', async () => {
