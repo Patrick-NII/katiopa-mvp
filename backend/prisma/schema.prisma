@@ -12,8 +12,6 @@ model Account {
   id                String        @id @default(cuid())
   email             String        @unique
   subscriptionType  SubscriptionType @default(FREE)
-  // Plan v2 (dérivé de subscriptionType). Optionnel pour compatibilité
-  plan              Plan?
   maxSessions       Int           @default(2)
   isActive          Boolean       @default(true)
   createdAt         DateTime      @default(now())
@@ -22,6 +20,7 @@ model Account {
   
   // Relations
   userSessions      UserSession[]
+  conversations     Conversation[]
   billingHistory    BillingRecord[]
   planSeat          PlanSeat?
 }
@@ -51,6 +50,7 @@ model UserSession {
   // Relations
   account         Account     @relation(fields: [accountId], references: [id])
   activities      Activity[]
+  conversations   Conversation[]
   profile         UserProfile?
 }
 
@@ -68,7 +68,7 @@ model UserProfile {
   customNotes          String?
   parentWishes         String?
   createdAt            DateTime     @default(now())
-  updatedAt            DateTime     @updatedAt
+  updatedAt            DateTime     @default(now())
   
   // Relations
   userSession          UserSession  @relation(fields: [userSessionId], references: [id])
@@ -82,11 +82,28 @@ model Activity {
   nodeKey    String
   score      Int?
   attempts   Int         @default(1)
-  durationMs Int?        // Garde le nom original pour compatibilité
+  durationMs Int?
   createdAt  DateTime    @default(now())
   
   // Relations
   userSession UserSession @relation(fields: [userSessionId], references: [id])
+}
+
+// Conversations avec l'IA
+model Conversation {
+  id              String      @id @default(cuid())
+  userSessionId   String
+  accountId       String
+  message         String
+  response        String
+  focus           String?
+  context         Json?
+  metadata        Json?
+  createdAt       DateTime    @default(now())
+  
+  // Relations
+  userSession     UserSession @relation(fields: [userSessionId], references: [id])
+  account         Account     @relation(fields: [accountId], references: [id])
 }
 
 // Historique de facturation
@@ -106,20 +123,22 @@ model BillingRecord {
   account     Account     @relation(fields: [accountId], references: [id])
 }
 
+// Limites du plan par compte (1-1)
+model PlanSeat {
+  id          String   @id @default(cuid())
+  accountId   String   @unique
+  maxChildren Int
+
+  // Relation vers le compte
+  account     Account  @relation(fields: [accountId], references: [id])
+}
+
 // Enums
 enum SubscriptionType {
   FREE
   PRO
   PRO_PLUS
   ENTERPRISE
-}
-
-// Plan v2 pour compatibilité avec les seeds et contrôleurs V2
-enum Plan {
-  FREE
-  PRO
-  PRO_PLUS
-  PREMIUM
 }
 
 enum Gender {
@@ -141,14 +160,4 @@ enum BillingStatus {
   CANCELLED
   FAILED
   OVERDUE
-}
-
-// Limites du plan par compte (1-1)
-model PlanSeat {
-  id          String   @id @default(cuid())
-  accountId   String   @unique
-  maxChildren Int
-
-  // Relation vers le compte
-  account     Account  @relation(fields: [accountId], references: [id])
 }

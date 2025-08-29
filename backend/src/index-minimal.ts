@@ -213,7 +213,9 @@ app.post('/api/auth/login', globalLimiter, async (req, res) => {
         lastName: userSession.lastName,
         userType: userSession.userType || 'PARENT',
         subscriptionType: userSession.account?.subscriptionType || 'STARTER'
-      }
+      },
+      // Ajout du token pour compatibilité avec les tests utilisant Authorization: Bearer
+      token: accessToken
     });
 
   } catch (error) {
@@ -228,7 +230,12 @@ app.post('/api/auth/login', globalLimiter, async (req, res) => {
 // Vérification du token
 app.get('/api/auth/verify', async (req, res) => {
   try {
-    const accessToken = req.cookies?.katiopa_at;
+    // Supporte cookie HttpOnly ET Authorization: Bearer
+    const authHeader = req.headers.authorization;
+    let accessToken = req.cookies?.katiopa_at as string | undefined;
+    if (authHeader?.startsWith('Bearer ')) {
+      accessToken = authHeader.substring(7);
+    }
     
     if (!accessToken) {
       return res.status(401).json({ 
@@ -267,6 +274,64 @@ app.get('/api/auth/verify', async (req, res) => {
 
   } catch (error) {
     console.error('❌ Erreur de vérification:', error);
+    
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({ 
+        error: 'Token invalide',
+        code: 'TOKEN_INVALID'
+      });
+    }
+    
+    res.status(500).json({ 
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// Route /api/auth/me (compatibilité tests) — identique à /verify
+app.get('/api/auth/me', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    let accessToken = req.cookies?.katiopa_at as string | undefined;
+    if (authHeader?.startsWith('Bearer ')) {
+      accessToken = authHeader.substring(7);
+    }
+
+    if (!accessToken) {
+      return res.status(401).json({ 
+        error: 'Token manquant',
+        code: 'TOKEN_MISSING'
+      });
+    }
+
+    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET!) as any;
+    const userSession = await prisma.userSession.findUnique({
+      where: { id: decoded.userId },
+      include: { account: true }
+    });
+
+    if (!userSession) {
+      return res.status(401).json({ 
+        error: 'Utilisateur non trouvé',
+        code: 'USER_NOT_FOUND'
+      });
+    }
+
+    res.json({
+      success: true,
+      user: {
+        id: userSession.id,
+        sessionId: userSession.sessionId,
+        firstName: userSession.firstName,
+        lastName: userSession.lastName,
+        userType: userSession.userType || 'PARENT',
+        subscriptionType: userSession.account?.subscriptionType || 'STARTER'
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur /auth/me:', error);
     
     if (error instanceof jwt.JsonWebTokenError) {
       return res.status(401).json({ 
@@ -322,14 +387,31 @@ app.use((error: any, req: express.Request, res: express.Response, next: express.
   });
 });
 
-// Démarrage du serveur
-app.listen(PORT, () => {
-  console.log(`🚀 Serveur KATIOPA MINIMAL démarré sur le port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔐 Auth: http://localhost:${PORT}/api/auth/login`);
-  console.log(`🔒 Sécurité: JWT=${!!process.env.JWT_SECRET}, Cookies=${!!process.env.COOKIE_SECRET}`);
-  console.log(`🌍 Environnement: ${NODE_ENV}`);
-});
+// Démarrage séquentiel: connexion DB puis écoute du port
+async function start() {
+  try {
+    console.log('⏳ Connexion à la base de données...');
+    await prisma.$connect();
+    console.log('✅ Base de données connectée');
+
+    await new Promise<void>((resolve, reject) => {
+      const server = app.listen(PORT, () => resolve());
+      server.on('error', reject);
+    });
+
+    console.log(`🚀 Serveur KATIOPA MINIMAL démarré sur le port ${PORT}`);
+    console.log(`📊 Health check: http://localhost:${PORT}/health`);
+    console.log(`🔐 Auth: http://localhost:${PORT}/api/auth/login`);
+    console.log(`🧭 Verify: http://localhost:${PORT}/api/auth/verify`);
+    console.log(`🔒 Sécurité: JWT=${!!process.env.JWT_SECRET}, Cookies=${!!process.env.COOKIE_SECRET}`);
+    console.log(`🌍 Environnement: ${NODE_ENV}`);
+  } catch (error) {
+    console.error('❌ Erreur au démarrage du serveur:', error);
+    process.exit(1);
+  }
+}
+
+start();
 
 // Gestion de l'arrêt propre
 process.on('SIGTERM', async () => {

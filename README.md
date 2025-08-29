@@ -1,206 +1,252 @@
-# 🎯 Katiopa MVP
+# Katiopa MVP - Plateforme d'Apprentissage IA
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-14.2.5-blue.svg)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5.4-blue.svg)](https://www.typescriptlang.org/)
-[![Prisma](https://img.shields.io/badge/Prisma-5.16.1-orange.svg)](https://www.prisma.io/)
+Katiopa est une plateforme d'apprentissage innovante qui combine intelligence artificielle et pédagogie personnalisée pour les enfants et leurs parents.
 
-> **Plateforme d'apprentissage adaptatif IA pour enfants de 5-7 ans** 🧒✨
+## 🚀 Démarrage Rapide
 
-Un MVP complet et fonctionnel intégrant authentification, statistiques en temps réel, et évaluation LLM pour proposer des exercices personnalisés.
+### Prérequis
+- Node.js 18+ 
+- PostgreSQL 15+
+- Docker et Docker Compose (optionnel)
 
-## 🚀 **Fonctionnalités**
+### 1. Configuration de l'environnement
 
-- 🔐 **Authentification complète** : Inscription/Connexion avec JWT sécurisé
-- 📊 **Dashboard interactif** : Vue d'ensemble des activités et statistiques
-- 🤖 **Intégration LLM** : Évaluation OpenAI pour recommandations d'exercices
-- 🎯 **Apprentissage adaptatif** : Propositions basées sur les performances
-- 📱 **Interface moderne** : Design responsive avec Tailwind CSS
-- 🗄️ **Base de données robuste** : PostgreSQL + Prisma ORM
+#### Variables d'environnement Backend
+Créez un fichier `.env` dans le dossier `backend/` :
 
-## 🛠️ **Stack Technique**
-
-### **Backend**
-- **Runtime** : Node.js + Express + TypeScript
-- **Base de données** : PostgreSQL + Prisma ORM
-- **Authentification** : JWT + bcrypt
-- **Validation** : Zod schemas
-- **LLM** : OpenAI GPT-4o-mini API
-
-### **Frontend**
-- **Framework** : Next.js 14 + TypeScript
-- **Styling** : Tailwind CSS
-- **État** : React Hooks
-- **Navigation** : App Router (Next.js 13+)
-
-### **Infrastructure**
-- **Base de données** : Docker + PostgreSQL 16
-- **Développement** : Hot reload + TypeScript watch
-- **Versioning** : Git + GitHub
-
-## 📁 **Architecture du Projet**
-
-```
-katiopa-mvp/
-├── 🐳 docker-compose.yml          # PostgreSQL
-├── 📚 README.md                   # Documentation
-├── 📄 LICENSE                     # Licence MIT
-├── 🔧 .gitignore                  # Fichiers exclus
-├── 🖥️  backend/                   # API Express
-│   ├── 📦 package.json
-│   ├── 🗄️  prisma/               # Schéma DB + migrations
-│   ├── 🔐 src/
-│   │   ├── middleware/            # Auth JWT
-│   │   ├── routes/                # Endpoints API
-│   │   ├── utils/                 # Utilitaires
-│   │   └── index.ts              # Serveur principal
-│   └── 🌱 seed.ts                # Données d'exemple
-└── 🎨 frontend/                   # App Next.js
-    ├── 📦 package.json
-    ├── 🎯 app/                    # Pages (App Router)
-    ├── 🧩 components/             # Composants réutilisables
-    ├── 🔌 lib/                    # Utilitaires frontend
-    └── 🎨 styles/                 # CSS global
-```
-
-## 🚀 **Installation Rapide**
-
-### **Prérequis**
-- Node.js 18+ et npm
-- Docker Desktop
-- Clé API OpenAI
-
-### **1. Cloner le projet**
 ```bash
-git clone https://github.com/Patrick-NII/katiopa-mvp.git
-cd katiopa-mvp
+# Configuration de la base de données
+DATABASE_URL="postgresql://katiopa_user:katiopa_password@localhost:5432/katiopa_db"
+
+# Configuration OpenAI
+OPENAI_API_KEY="your-openai-api-key-here"
+
+# Configuration JWT
+JWT_SECRET="your-super-secret-jwt-key-change-in-production"
+COOKIE_SECRET="your-cookie-secret-key-change-in-production"
+
+# Configuration du serveur
+PORT=4000
+NODE_ENV="development"
+
+# Configuration CORS
+FRONTEND_URL="http://localhost:3000"
 ```
 
-### **2. Base de données**
+### 2. Base de données
+
+#### Option A : Docker (Recommandé)
 ```bash
-docker-compose up -d db
+# Démarrer PostgreSQL
+docker-compose up -d postgres
+
+# Attendre que la base soit prête
+docker-compose logs postgres
 ```
 
-### **3. Backend**
+#### Option B : PostgreSQL local
+```bash
+# Créer la base de données
+createdb katiopa_db
+createdb katiopa_user
+```
+
+### 3. Installation et démarrage
+
+#### Backend
 ```bash
 cd backend
+
+# Installation des dépendances
 npm install
-cp .env.example .env  # Configurez vos variables
-npm run db:push      # Créez la base
-npm run dev          # Lancez l'API (port 4000)
+
+# Génération du client Prisma
+npx prisma generate
+
+# Migration de la base de données
+npx prisma migrate dev
+
+# Seeding de la base (données de test)
+npm run seed
+
+# Démarrage du serveur de développement
+npm run dev
 ```
 
-### **4. Frontend**
+#### Frontend
 ```bash
 cd frontend
+
+# Installation des dépendances
 npm install
-cp .env.local.example .env.local  # Configurez l'URL API
-npm run dev                       # Lancez l'app (port 3000)
+
+# Démarrage du serveur de développement
+npm run dev
 ```
 
-## 🔑 **Configuration des Variables d'Environnement**
+### 4. Accès à l'application
 
-### **Backend (.env)**
-```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/katiopa
-JWT_SECRET=votre-secret-jwt-super-securise
-OPENAI_API_KEY=sk-votre-cle-openai
-PORT=4000
-CORS_ORIGIN=http://localhost:3000
-```
+- **Frontend** : http://localhost:3000
+- **Backend API** : http://localhost:4000
+- **Health Check** : http://localhost:4000/health
+- **Test API** : http://localhost:4000/api/test
 
-### **Frontend (.env.local)**
-```env
-NEXT_PUBLIC_API_BASE=http://localhost:4000
-```
+## 🧪 Comptes de test
 
-## 📊 **Endpoints API**
+Après le seeding, vous pouvez vous connecter avec :
 
-| Méthode | Endpoint | Description | Auth |
-|---------|----------|-------------|------|
-| `POST` | `/auth/register` | Inscription utilisateur | ❌ |
-| `POST` | `/auth/login` | Connexion utilisateur | ❌ |
-| `GET` | `/auth/me` | Profil utilisateur | ✅ |
-| `GET` | `/stats/activities` | Activités récentes | ✅ |
-| `GET` | `/stats/summary` | Résumé par domaine | ✅ |
-| `POST` | `/llm/evaluate` | Évaluation LLM | ✅ |
-| `POST` | `/activity` | Créer une activité | ✅ |
+- **Email** : test@katiopa.com
+- **Mot de passe** : password123
 
-## 🎯 **Utilisation**
+### Sessions disponibles :
+- **Parent** : Session parent avec accès complet
+- **Enfant** : Session enfant avec profil d'apprentissage
 
-1. **Accueil** : http://localhost:3000
-2. **Inscription** : http://localhost:3000/register
-3. **Connexion** : http://localhost:3000/login
-4. **Dashboard** : http://localhost:3000/dashboard (après connexion)
-5. **Test API** : http://localhost:3000/test
+## 🏗️ Architecture
 
-## 🔧 **Scripts Utiles**
+### Backend
+- **Framework** : Express.js avec TypeScript
+- **Base de données** : PostgreSQL avec Prisma ORM
+- **Authentification** : JWT avec cookies sécurisés
+- **IA** : OpenAI GPT-4 avec LangChain
+- **RAG** : Système de récupération et génération avancée
 
+### Frontend
+- **Framework** : Next.js 14 avec React 18
+- **Styling** : Tailwind CSS
+- **Animations** : Framer Motion
+- **État** : Hooks React personnalisés
+
+### Base de données
+- **Comptes** : Gestion des abonnements et limites
+- **Sessions utilisateur** : Profils enfants et parents
+- **Activités** : Suivi des progrès d'apprentissage
+- **Conversations** : Historique des interactions IA
+- **Profils** : Préférences et objectifs d'apprentissage
+
+## 🔧 Commandes utiles
+
+### Backend
 ```bash
-# Backend
-npm run dev          # Développement avec hot reload
-npm run build        # Build de production
-npm run start        # Serveur de production
-npm run seed         # Insérer des données d'exemple
-npm run db:studio    # Interface Prisma Studio
-npm run db:push      # Synchroniser le schéma DB
+# Génération Prisma
+npm run db:generate
 
-# Frontend
-npm run dev          # Développement avec hot reload
-npm run build        # Build de production
-npm run start        # Serveur de production
-```
+# Migration de la base
+npm run db:migrate
 
-## 🧪 **Tests et Développement**
+# Studio Prisma (interface graphique)
+npm run db:studio
 
-### **Page de Test**
-- **URL** : `/test`
-- **Fonctionnalités** : Vérification du token JWT et test des appels API
-- **Utilisation** : Debug et validation de l'authentification
-
-### **Données d'Exemple**
-```bash
-cd backend
+# Seeding
 npm run seed
+
+# Build de production
+npm run build
+npm start
 ```
 
-## 🚀 **Prochaines Étapes**
+### Frontend
+```bash
+# Build de production
+npm run build
+npm start
+```
 
-- [ ] **Cookies httpOnly** pour sécuriser JWT
-- [ ] **Mapping nodeKey → contenu** des exercices
-- [ ] **Graphe de connaissances** pour l'adaptation
-- [ ] **Tests automatisés** (Jest + Testing Library)
-- [ ] **Déploiement Docker** complet
-- [ ] **CI/CD** avec GitHub Actions
-- [ ] **Monitoring** et analytics
+## 📊 Fonctionnalités
 
-## 🤝 **Contribution**
+### Pour les Enfants
+- Apprentissage personnalisé par IA
+- Suivi des progrès en temps réel
+- Domaines : Mathématiques, Programmation, Lecture, Sciences, IA & Logique
+- Interface ludique et adaptée à l'âge
 
-Les contributions sont les bienvenues ! 
+### Pour les Parents
+- Suivi détaillé des progrès
+- Recommandations personnalisées
+- Gestion des sessions enfants
+- Rapports d'activité
 
-1. Fork le projet
-2. Créez une branche feature (`git checkout -b feature/AmazingFeature`)
-3. Committez vos changements (`git commit -m 'Add some AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrez une Pull Request
+### Pour les Enseignants
+- Outils pédagogiques avancés
+- Analyse des performances
+- Recommandations d'adaptation
 
-## 📄 **Licence**
+## 🔒 Sécurité
 
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+- Authentification JWT sécurisée
+- Cookies HttpOnly et sécurisés
+- Rate limiting sur les API
+- Validation des données avec Zod
+- Protection CORS configurée
 
-## 👨‍💻 **Auteur**
+## 🚨 Dépannage
 
-**Patrick NII** - [@Patrick-NII](https://github.com/Patrick-NII)
+### Erreur de connexion à la base
+```bash
+# Vérifier que PostgreSQL est démarré
+docker-compose ps
 
-- 🌐 Portfolio : [niia.fr](https://niia.fr)
-- 💼 LinkedIn : [patrick-ngunga-a2612325b](https://linkedin.com/in/patrick-ngunga-a2612325b)
-- 📧 Email : patrick.nii@aol.com
+# Vérifier les logs
+docker-compose logs postgres
 
----
+# Tester la connexion
+npm run db:studio
+```
 
-## ⭐ **Support**
+### Erreur OpenAI
+- Vérifier que `OPENAI_API_KEY` est configurée
+- Vérifier les quotas et limites de l'API
 
-Si ce projet vous plaît, n'oubliez pas de lui donner une étoile sur GitHub !
+### Erreur de build
+```bash
+# Nettoyer les caches
+rm -rf node_modules package-lock.json
+npm install
 
-**Katiopa** - Apprendre l'IA en s'amusant ! 🎮🧠✨ 
+# Régénérer Prisma
+npx prisma generate
+```
+
+## 📝 Développement
+
+### Structure des dossiers
+```
+backend/
+├── src/
+│   ├── routes/          # Routes API
+│   ├── services/        # Services métier
+│   ├── middleware/      # Middlewares
+│   └── index.ts         # Point d'entrée
+├── prisma/
+│   ├── schema.prisma    # Schéma de base
+│   └── migrations/      # Migrations
+└── package.json
+
+frontend/
+├── app/                 # Pages Next.js
+├── components/          # Composants React
+├── hooks/              # Hooks personnalisés
+└── lib/                # Utilitaires
+```
+
+### Ajout de nouvelles fonctionnalités
+1. Créer le modèle dans `schema.prisma`
+2. Générer la migration : `npx prisma migrate dev`
+3. Créer le service dans `src/services/`
+4. Créer les routes dans `src/routes/`
+5. Tester avec l'API
+
+## 📄 Licence
+
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! Voir le fichier `CONTRIBUTING.md` pour les directives.
+
+## 📞 Support
+
+Pour toute question ou problème :
+- Créer une issue sur GitHub
+- Consulter la documentation technique
+- Contacter l'équipe de développement 

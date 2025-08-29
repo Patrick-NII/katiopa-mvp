@@ -22,6 +22,18 @@ const testAccounts = [
   }
 ];
 
+async function waitForHealth(timeoutMs = 20000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    try {
+      const r = await fetch('http://localhost:4000/health');
+      if (r.ok) return;
+    } catch (_) {}
+    await new Promise((res) => setTimeout(res, 500));
+  }
+  throw new Error('Le backend ne répond pas sur /health');
+}
+
 async function testSubscriptionTypes() {
   console.log('🧪 TEST DES TYPES D\'ABONNEMENT\n');
   
@@ -86,5 +98,14 @@ async function testSubscriptionTypes() {
   console.log('🏁 Tests terminés !');
 }
 
-// Exécuter les tests
-testSubscriptionTypes().catch(console.error);
+// Attendre le backend puis exécuter les tests
+(async () => {
+  try {
+    console.log('⏳ Attente du démarrage du backend...');
+    await waitForHealth();
+    console.log('✅ Backend prêt, lancement des tests...');
+    await testSubscriptionTypes();
+  } catch (e) {
+    console.error('❌ Échec de préparation des tests:', e);
+  }
+})();
