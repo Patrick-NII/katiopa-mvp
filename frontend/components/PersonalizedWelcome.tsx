@@ -98,6 +98,25 @@ export default function PersonalizedWelcome({
     return gradeMessages[grade] || `En ${grade}, continue ton apprentissage !`
   }
 
+  const getLLMAnalysis = () => {
+    switch (userType) {
+      case 'CHILD':
+        return {
+          title: "🤖 Analyse IA de ta progression",
+          content: "Continue comme ça ! Tu progresses bien dans tes exercices. N'oublie pas de faire une pause si tu te sens fatigué.",
+          recommendation: "💡 Recommandation : Essaie de nouveaux domaines pour varier tes apprentissages !"
+        }
+      case 'PARENT':
+        return {
+          title: "🤖 Analyse IA de vos enfants",
+          content: "Vos enfants montrent une excellente progression. Emma (6 ans) excelle en mathématiques, Thomas (7 ans) progresse bien en français.",
+          recommendation: "💡 Recommandation : Encouragez la pratique quotidienne pour maintenir cette dynamique positive."
+        }
+      default:
+        return null
+    }
+  }
+
   const getMembershipMessage = () => {
     if (daysSinceRegistration === 0) {
       return "Bienvenue ! C'est ton premier jour avec Katiopa ! 🎉"
@@ -188,6 +207,26 @@ export default function PersonalizedWelcome({
               Membre depuis le {memberSince}
             </div>
           </motion.div>
+
+          {/* Analyse LLM selon le type d'utilisateur */}
+          {getLLMAnalysis() && (
+            <motion.div
+              className="mt-4 p-4 bg-white bg-opacity-25 rounded-lg border border-white border-opacity-30"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+            >
+              <h3 className="text-lg font-semibold mb-2">
+                {getLLMAnalysis()?.title}
+              </h3>
+              <p className="text-sm opacity-90 mb-3">
+                {getLLMAnalysis()?.content}
+              </p>
+              <div className="text-xs font-medium opacity-80">
+                {getLLMAnalysis()?.recommendation}
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* Décorations animées */}

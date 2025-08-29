@@ -139,7 +139,7 @@ interface AnimatedLLMButtonProps {
   onClick: () => void
   loading: boolean
   disabled?: boolean
-  subscriptionType?: 'free' | 'premium' | 'enterprise'
+  subscriptionType?: 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE'
   focus: string
   className?: string
 }
@@ -148,12 +148,12 @@ export default function AnimatedLLMButton({
   onClick, 
   loading, 
   disabled = false, 
-  subscriptionType = 'free',
+  subscriptionType = 'FREE',
   focus,
   className = ""
 }: AnimatedLLMButtonProps) {
-  const isFreeAccount = subscriptionType === 'free'
-  const isPremiumAccount = subscriptionType === 'premium' || subscriptionType === 'enterprise'
+  const isFreeAccount = subscriptionType === 'FREE'
+  const isPremiumAccount = subscriptionType === 'PRO' || subscriptionType === 'PRO_PLUS' || subscriptionType === 'ENTERPRISE'
 
   // Déterminer le style et l'icône selon le type de compte
   const getButtonStyle = () => {
@@ -161,15 +161,15 @@ export default function AnimatedLLMButton({
       return {
         bg: 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700',
         icon: <Crown size={20} />,
-        text: 'Évaluation Premium',
-        description: 'IA avancée avec mémoire et suivi personnalisé'
+        text: 'Évaluation rapide',
+        description: 'compte rendu sur l\'apprentissage de votre enfant'
       }
     } else {
       return {
         bg: 'bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600',
         icon: <Gift size={20} />,
         text: 'Évaluation Basique',
-        description: 'IA simple pour comptes gratuits'
+        description: 'IA modèle de base'
       }
     }
   }
