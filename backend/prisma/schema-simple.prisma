@@ -12,8 +12,6 @@ model Account {
   id                String        @id @default(cuid())
   email             String        @unique
   subscriptionType  SubscriptionType @default(FREE)
-  // Plan v2 (dérivé de subscriptionType). Optionnel pour compatibilité
-  plan              Plan?
   maxSessions       Int           @default(2)
   isActive          Boolean       @default(true)
   createdAt         DateTime      @default(now())
@@ -23,7 +21,6 @@ model Account {
   // Relations
   userSessions      UserSession[]
   billingHistory    BillingRecord[]
-  planSeat          PlanSeat?
 }
 
 // Session utilisateur (connexion avec ID/mot de passe)
@@ -82,7 +79,7 @@ model Activity {
   nodeKey    String
   score      Int?
   attempts   Int         @default(1)
-  durationMs Int?        // Garde le nom original pour compatibilité
+  duration   Int?        // Durée en millisecondes
   createdAt  DateTime    @default(now())
   
   // Relations
@@ -114,14 +111,6 @@ enum SubscriptionType {
   ENTERPRISE
 }
 
-// Plan v2 pour compatibilité avec les seeds et contrôleurs V2
-enum Plan {
-  FREE
-  PRO
-  PRO_PLUS
-  PREMIUM
-}
-
 enum Gender {
   MALE
   FEMALE
@@ -131,8 +120,6 @@ enum Gender {
 enum UserType {
   PARENT
   CHILD
-  TEACHER
-  ADMIN
 }
 
 enum BillingStatus {
@@ -140,15 +127,4 @@ enum BillingStatus {
   PAID
   CANCELLED
   FAILED
-  OVERDUE
-}
-
-// Limites du plan par compte (1-1)
-model PlanSeat {
-  id          String   @id @default(cuid())
-  accountId   String   @unique
-  maxChildren Int
-
-  // Relation vers le compte
-  account     Account  @relation(fields: [accountId], references: [id])
 }
