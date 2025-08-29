@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { User, Mail, Calendar, Baby, Users, Crown, Gift, Check, AlertCircle, Info, Eye, EyeOff, Lock } from 'lucide-react'
 import Link from 'next/link'
-import { apiPost } from '../../lib/api'
+import { authAPI } from '@/lib/api'
 
 interface FamilyMember {
   id: string
@@ -15,13 +15,15 @@ interface FamilyMember {
   userType: 'CHILD' | 'PARENT'
   dateOfBirth: string
   grade?: string
+  username: string
   password: string
   confirmPassword: string
+  ageBracket?: string
 }
 
 interface AccountData {
   email: string
-  subscriptionType: 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE'
+  subscriptionType: 'STARTER' | 'PRO' | 'PREMIUM'
   maxSessions: number
   familyMembers: FamilyMember[]
 }
@@ -31,11 +33,12 @@ export default function RegisterPage() {
   const [step, setStep] = useState<'account' | 'family' | 'passwords' | 'review' | 'success'>('account')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [createdSessions, setCreatedSessions] = useState<Array<{firstName:string; lastName:string; sessionId:string; userType:string;}>>([])
   
   // Données du compte
   const [accountData, setAccountData] = useState<AccountData>({
     email: '',
-    subscriptionType: 'FREE',
+    subscriptionType: 'STARTER',
     maxSessions: 2,
     familyMembers: []
   })
@@ -48,8 +51,10 @@ export default function RegisterPage() {
     userType: 'CHILD',
     dateOfBirth: '',
     grade: '',
+    username: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    ageBracket: undefined
   })
 
   // État pour afficher/masquer les mots de passe
@@ -57,31 +62,57 @@ export default function RegisterPage() {
 
   const subscriptionPlans = [
     {
-      id: 'FREE',
-      name: 'Gratuit',
-      price: '0€',
+      id: 'STARTER',
+      name: "Starter",
+      price: "Gratuit",
+      period: "",
       maxSessions: 2,
-      features: ['2 sessions utilisateur', 'Accès de base', 'Support communautaire'],
+      features: [
+        "1 parent + 1 enfant",
+        "Accès plateforme",
+        "Programmation, IA, maths et lecture",
+        "Jeux et progression ",
+        "Évaluation et coaching IA",
+        "3 mois gratuit puis 9,99€/mois"
+      ],
       icon: Gift,
-      color: 'from-gray-400 to-gray-600'
+      color: 'from-green-400 to-green-600',
+      starter: true
     },
     {
       id: 'PRO',
       name: 'Pro',
-      price: '9.99€/mois',
-      maxSessions: 3,
-      features: ['3 sessions utilisateur', 'Fonctionnalités avancées', 'Support prioritaire'],
+      price: '29,99€/mois',
+      maxSessions: 2,
+      features: [
+        '1 parent + 1 enfant',
+        'Exercices complets',
+        'Communauté et défis familiaux',
+        'Stats détaillées (session + global)',
+        'Certificats',
+        'Évaluation et coaching IA'
+      ],
       icon: Crown,
-      color: 'from-purple-400 to-purple-600'
+      color: 'from-purple-400 to-purple-600',
+      popular: true
     },
     {
-      id: 'PRO_PLUS',
-      name: 'Pro Plus',
-      price: '19.99€/mois',
-      maxSessions: 4,
-      features: ['4 sessions utilisateur', 'Toutes les fonctionnalités', 'Support dédié'],
+      id: 'PREMIUM',
+      name: 'Premium',
+      price: '69,99€/mois',
+      maxSessions: 6,
+      features: [
+        '1 parent + jusqu\'à 5 enfants',
+        'Tout Pro + IA coach Premium',
+        'Certificats officiels',
+        'Exports PDF/Excel',
+        'Multi-appareils',
+        'Support prioritaire',
+        'Parrainage inclus'
+      ],
       icon: Crown,
-      color: 'from-blue-400 to-blue-600'
+      color: 'from-blue-400 to-blue-600',
+      complete: true
     }
   ]
 
@@ -96,8 +127,18 @@ export default function RegisterPage() {
   }
 
   const handleAddFamilyMember = () => {
-    if (!currentMember.firstName || !currentMember.lastName || !currentMember.dateOfBirth) {
+    if (!currentMember.firstName || !currentMember.lastName || !currentMember.dateOfBirth || !currentMember.username) {
       setError('Veuillez remplir tous les champs obligatoires')
+      return
+    }
+
+    // Vérifier que l'username est unique dans la famille
+    const isUsernameUnique = !accountData.familyMembers.some(member => 
+      member.username.toLowerCase() === currentMember.username?.toLowerCase()
+    )
+    
+    if (!isUsernameUnique) {
+      setError('Cet identifiant de connexion est déjà utilisé par un autre membre de la famille')
       return
     }
 
@@ -109,8 +150,10 @@ export default function RegisterPage() {
       userType: currentMember.userType!,
       dateOfBirth: currentMember.dateOfBirth!,
       grade: currentMember.grade,
+      username: currentMember.username || `${currentMember.firstName?.toLowerCase()}${currentMember.lastName?.toLowerCase()}`,
       password: '',
-      confirmPassword: ''
+      confirmPassword: '',
+      ageBracket: getAgeBracket(calculateAge(currentMember.dateOfBirth!))
     }
 
     setAccountData(prev => ({
@@ -126,8 +169,10 @@ export default function RegisterPage() {
       userType: 'CHILD',
       dateOfBirth: '',
       grade: '',
+      username: '',
       password: '',
-      confirmPassword: ''
+      confirmPassword: '',
+      ageBracket: undefined
     })
 
     setError('')
@@ -140,8 +185,8 @@ export default function RegisterPage() {
     }))
   }
 
-  const handleSubscriptionChange = (subscriptionType: 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE') => {
-    const maxSessions = subscriptionType === 'FREE' ? 2 : subscriptionType === 'PRO' ? 3 : 4
+  const handleSubscriptionChange = (subscriptionType: 'STARTER' | 'PRO' | 'PREMIUM') => {
+    const maxSessions = subscriptionType === 'STARTER' ? 1 : subscriptionType === 'PRO' ? 1 : 4
     setAccountData(prev => ({
       ...prev,
       subscriptionType,
@@ -203,9 +248,36 @@ export default function RegisterPage() {
     setError('')
 
     try {
-      const data = await apiPost('/auth/register', accountData)
+      // Mapping des types d'abonnement frontend -> backend
+      const toBackendSubscriptionType = (t: 'STARTER' | 'PRO' | 'PREMIUM'): 'FREE' | 'PRO' | 'PRO_PLUS' => {
+        if (t === 'STARTER') return 'FREE'
+        if (t === 'PRO') return 'PRO'
+        return 'PRO_PLUS'
+      }
+
+      const payload = {
+        email: accountData.email,
+        subscriptionType: toBackendSubscriptionType(accountData.subscriptionType as any),
+        maxSessions: accountData.maxSessions,
+        familyMembers: accountData.familyMembers.map(m => ({
+          firstName: m.firstName,
+          lastName: m.lastName,
+          gender: m.gender,
+          userType: m.userType,
+          dateOfBirth: m.dateOfBirth,
+          grade: m.grade,
+          username: m.username,
+          password: m.password,
+          confirmPassword: m.confirmPassword,
+        }))
+      }
+
+      const data = await authAPI.register(payload) as any
       
       if (data.success) {
+        if (Array.isArray(data.sessions)) {
+          setCreatedSessions(data.sessions)
+        }
         setStep('success')
         // Stocker les informations de connexion
         localStorage.setItem('registrationData', JSON.stringify(data))
@@ -246,6 +318,13 @@ export default function RegisterPage() {
       case 'PARENT': return 'Parent'
       default: return 'Utilisateur'
     }
+  }
+
+  const getAgeBracket = (age: number): string => {
+    if (age >= 5 && age <= 7) return '5-7'
+    if (age >= 8 && age <= 11) return '8-11'
+    if (age >= 12 && age <= 15) return '12-15'
+    return '5-7' // Valeur par défaut
   }
 
   const togglePasswordVisibility = (memberId: string) => {
@@ -341,12 +420,41 @@ export default function RegisterPage() {
                         </div>
                       )}
                       
+                      {plan.starter && (
+                        <div className="absolute -top-2 -left-2">
+                          <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                            Porte d'entrée
+                          </span>
+                        </div>
+                      )}
+                      
+                      {plan.popular && (
+                        <div className="absolute -top-2 -left-2">
+                          <span className="bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                            Recommandé
+                          </span>
+                        </div>
+                      )}
+                      
+                      {plan.complete && (
+                        <div className="absolute -top-2 -left-2">
+                          <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                            Complet
+                          </span>
+                        </div>
+                      )}
+                      
                       <div className={`w-12 h-12 bg-gradient-to-r ${plan.color} rounded-lg flex items-center justify-center mx-auto mb-4`}>
                         <Icon size={24} className="text-white" />
                       </div>
                       
                       <h3 className="text-xl font-bold text-center text-gray-900 mb-2">{plan.name}</h3>
-                      <p className="text-3xl font-bold text-center text-gray-900 mb-4">{plan.price}</p>
+                      <div className="text-center mb-4">
+                        <span className="text-3xl font-bold text-gray-900">{plan.price}</span>
+                        {plan.period && (
+                          <span className="text-lg text-gray-600 ml-1">{plan.period}</span>
+                        )}
+                      </div>
                       
                       <ul className="space-y-2 mb-4">
                         {plan.features.map((feature, index) => (
@@ -462,6 +570,36 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Identifiant de connexion unique
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={currentMember.username}
+                      onChange={(e) => setCurrentMember(prev => ({ ...prev, username: e.target.value }))}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Identifiant unique (ex: lucas2024, emma_pro)"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const suggestedUsername = `${currentMember.firstName?.toLowerCase()}${currentMember.lastName?.toLowerCase()}${Math.floor(Math.random() * 100)}`
+                        setCurrentMember(prev => ({ ...prev, username: suggestedUsername }))
+                      }}
+                      className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      title="Générer un identifiant suggéré"
+                    >
+                      🎲
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Cet identifiant sera utilisé pour se connecter à la session de {currentMember.firstName || 'cet enfant'}
+                  </p>
+                </div>
+
                 <div className="grid md:grid-cols-3 gap-4 mb-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Genre</label>
@@ -554,6 +692,7 @@ export default function RegisterPage() {
                           <div>Type: {getUserTypeLabel(member.userType)}</div>
                           <div>Âge: {calculateAge(member.dateOfBirth)} ans</div>
                           {member.grade && <div>Niveau: {member.grade}</div>}
+                          <div className="font-medium text-blue-600">ID: {member.username}</div>
                         </div>
                       </motion.div>
                     ))}
@@ -780,6 +919,7 @@ export default function RegisterPage() {
                           <div>Type: {getUserTypeLabel(member.userType)}</div>
                           <div>Âge: {calculateAge(member.dateOfBirth)} ans</div>
                           {member.grade && <div>Niveau: {member.grade}</div>}
+                          <div className="font-medium text-blue-600">ID de connexion: {member.username}</div>
                           <div className="text-xs text-gray-600">Mot de passe défini ✓</div>
                         </div>
                       </div>
@@ -870,13 +1010,31 @@ export default function RegisterPage() {
                 <h3 className="text-lg font-semibold text-green-900 mb-4">
                   Vos identifiants de connexion :
                 </h3>
-                <div className="space-y-3">
-                  {/* Ici seront affichés les IDs de session et mots de passe générés */}
-                  <p className="text-sm text-green-700">
-                    Les identifiants de connexion ont été envoyés par email à {accountData.email}
-                  </p>
-            </div>
-        </div>
+                <div className="space-y-4">
+                  {(createdSessions.length > 0 ? createdSessions : accountData.familyMembers).map((m: any) => (
+                    <div key={(m.id || m.sessionId)} className="bg-white rounded-lg p-4 border border-green-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        {(m.userType === 'CHILD') ? <Baby size={16} /> : <Users size={16} />}
+                        <span className="font-medium text-green-900">
+                          {m.firstName} {m.lastName}
+                        </span>
+                      </div>
+                      <div className="text-sm text-green-700 space-y-1">
+                        <div><strong>Identifiant:</strong> <code className="bg-gray-100 px-2 py-1 rounded">{m.sessionId || m.username}</code></div>
+                        <div><strong>Mot de passe:</strong> <code className="bg-gray-100 px-2 py-1 rounded">••••••••</code></div>
+                        <div className="text-xs text-gray-600">
+                          {(m.userType === 'CHILD') ? 'Utilisez ces identifiants pour connecter votre enfant' : 'Utilisez ces identifiants pour vous connecter'}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <p className="text-sm text-blue-700">
+                      <strong>Important:</strong> Notez bien ces identifiants ! Ils ont également été envoyés par email à {accountData.email}
+                    </p>
+                  </div>
+                </div>
+              </div>
               
               <motion.button
                 onClick={() => router.push('/login')}

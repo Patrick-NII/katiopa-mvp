@@ -2,23 +2,300 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: light; }
-body { @apply bg-gray-50 text-gray-900; }
-.card { @apply bg-white rounded-2xl shadow p-6; }
-.btn { @apply inline-flex items-center justify-center rounded-lg border px-4 py-2 font-medium hover:opacity-90; }
-.btn-primary { @apply bg-blue-600 text-white; }
-.input { @apply w-full rounded-lg border px-3 py-2; }
-.label { @apply block text-sm font-medium mb-1; }
-.spinner {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3b82f6;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
+/* Variables CSS pour la charte typographique CubeAI */
+:root {
+  --font-sniglet: 'Sniglet', cursive;
+  --font-fredoka: 'Fredoka', sans-serif;
+  --font-bubblegum: 'Roboto', sans-serif;
+  
+  /* Palette de couleurs multicolores conseillée */
+  --color-blue-sky: #3B82F6;      /* énergie, fraîcheur */
+  --color-violet-soft: #8B5CF6;   /* créativité, magie */
+  --color-rose-raspberry: #EC4899; /* fun, affectif */
+  --color-green-mint: #10B981;    /* nature, équilibre */
+  --color-orange-peach: #F59E0B;  /* dynamisme, chaleur */
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* Classes utilitaires typographiques */
+@layer components {
+  /* Gros titres - Sniglet ExtraBold 800 */
+  .font-title {
+    font-family: var(--font-sniglet);
+    font-weight: 800;
+    font-size: 2.5rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  
+  .font-title-lg {
+    font-family: var(--font-sniglet);
+    font-weight: 800;
+    font-size: 3rem;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+  
+  .font-title-xl {
+    font-family: var(--font-sniglet);
+    font-weight: 800;
+    font-size: 4rem;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+  
+  .font-title-2xl {
+    font-family: var(--font-sniglet);
+    font-weight: 800;
+    font-size: 5rem;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+  }
+  
+  /* Sous-titres - Fredoka 500 */
+  .font-subtitle {
+    font-family: var(--font-fredoka);
+    font-weight: 500;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+  
+  .font-subtitle-lg {
+    font-family: var(--font-fredoka);
+    font-weight: 500;
+    font-size: 1.5rem;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+  }
+  
+  .font-subtitle-xl {
+    font-family: var(--font-fredoka);
+    font-weight: 500;
+    font-size: 1.75rem;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+  
+  /* Texte courant - Roboto 400 */
+  .font-body {
+    font-family: var(--font-bubblegum);
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+  
+  .font-body-lg {
+    font-family: var(--font-bubblegum);
+    font-weight: 400;
+    font-size: 1.125rem;
+    line-height: 1.5;
+    letter-spacing: 0.015em;
+  }
+  
+  .font-body-sm {
+    font-family: var(--font-bubblegum);
+    font-weight: 400;
+    font-size: 0.875rem;
+    line-height: 1.7;
+    letter-spacing: 0.02em;
+  }
+  
+  /* Classes spéciales pour les éléments d'interface */
+  .font-button {
+    font-family: var(--font-fredoka);
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+  }
+  
+  .font-label {
+    font-family: var(--font-fredoka);
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+  }
+  
+  .font-input {
+    font-family: var(--font-bubblegum);
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+  }
+  
+  /* Classes multicolores pour les titres */
+  .h1-multicolor span {
+    display: inline-block;
+    font-family: var(--font-sniglet);
+    font-weight: 800;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.05;
+    transition: all 0.3s ease;
+  }
+  
+  .h1-multicolor span:hover {
+    transform: scale(1.1) rotate(2deg);
+    filter: brightness(1.2);
+  }
+  
+  /* Alternance automatique des couleurs */
+  .h1-multicolor span:nth-child(5n+1) { color: var(--color-blue-sky); }
+  .h1-multicolor span:nth-child(5n+2) { color: var(--color-violet-soft); }
+  .h1-multicolor span:nth-child(5n+3) { color: var(--color-rose-raspberry); }
+  .h1-multicolor span:nth-child(5n+4) { color: var(--color-green-mint); }
+  .h1-multicolor span:nth-child(5n+5) { color: var(--color-orange-peach); }
+  
+  /* Classes pour les titres de taille moyenne */
+  .h2-multicolor span {
+    display: inline-block;
+    font-family: var(--font-sniglet);
+    font-weight: 800;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
+    transition: all 0.3s ease;
+  }
+  
+  .h2-multicolor span:nth-child(5n+1) { color: var(--color-blue-sky); }
+  .h2-multicolor span:nth-child(5n+2) { color: var(--color-violet-soft); }
+  .h2-multicolor span:nth-child(5n+3) { color: var(--color-rose-raspberry); }
+  .h2-multicolor span:nth-child(5n+4) { color: var(--color-green-mint); }
+  .h2-multicolor span:nth-child(5n+5) { color: var(--color-orange-peach); }
+  
+  /* Classes pour les logos et éléments de marque */
+  .logo-multicolor span {
+    display: inline-block;
+    font-family: var(--font-sniglet);
+    font-weight: 800;
+    transition: all 0.3s ease;
+  }
+  
+  .logo-multicolor span:nth-child(1) { color: var(--color-blue-sky); }
+  .logo-multicolor span:nth-child(2) { color: var(--color-violet-soft); }
+  .logo-multicolor span:nth-child(3) { color: var(--color-rose-raspberry); }
+  .logo-multicolor span:nth-child(4) { color: var(--color-green-mint); }
+  .logo-multicolor span:nth-child(5) { color: var(--color-orange-peach); }
+  .logo-multicolor span:nth-child(6) { color: var(--color-blue-sky); }
+  .logo-multicolor span:nth-child(7) { color: var(--color-violet-soft); }
+  
+  /* Cartes d'offres avec dégradés et effets brillants */
+  .card-starter {
+    background: linear-gradient(135deg, var(--color-green-mint) 0%, var(--color-blue-sky) 100%);
+    box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+  }
+  
+  .card-pro {
+    background: linear-gradient(135deg, var(--color-violet-soft) 0%, var(--color-rose-raspberry) 100%);
+    box-shadow: 0 20px 40px rgba(139, 92, 246, 0.4);
+  }
+  
+  .card-premium {
+    background: linear-gradient(135deg, var(--color-orange-peach) 0%, var(--color-violet-soft) 100%);
+    box-shadow: 0 20px 40px rgba(245, 158, 11, 0.3);
+  }
+  
+  /* Effets brillants sur les prix */
+  .price-glow {
+    text-shadow: 
+      0 0 0px currentColor,
+      0 0 0px currentColor,
+      0 0 0px currentColor;
+  }
+  
+  
+}
+
+/* Styles de base pour améliorer la lisibilité */
+body {
+  font-family: var(--font-bubblegum);
+  font-weight: 400;
+  line-height: 1.6;
+  color: #374151;
+  background-color: #f9fafb;
+}
+
+/* Amélioration de la lisibilité pour les titres */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sniglet);
+  font-weight: 800;
+  line-height: 1.2;
+  color: #111827;
+}
+
+/* Amélioration de la lisibilité pour les sous-titres */
+.subtitle, .subtitle-lg, .subtitle-xl {
+  font-family: var(--font-fredoka);
+  font-weight: 500;
+  line-height: 1.4;
+  color: #4b5563;
+}
+
+/* Amélioration de la lisibilité pour le texte courant */
+p, span, div, li {
+  font-family: var(--font-bubblegum);
+  font-weight: 400;
+  line-height: 1.6;
+  color: #374151;
+}
+
+/* Styles pour les boutons et éléments interactifs */
+button, .btn {
+  font-family: var(--font-fredoka);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Styles pour les labels et champs de formulaire */
+label, input, textarea, select {
+  font-family: var(--font-bubblegum);
+  font-weight: 400;
+}
+
+/* Amélioration de l'espacement des lettres pour la lisibilité */
+.font-title, .font-title-lg, .font-title-xl, .font-title-2xl {
+  letter-spacing: -0.02em;
+}
+
+.font-subtitle, .font-subtitle-lg, .font-subtitle-xl {
+  letter-spacing: -0.01em;
+}
+
+.font-body, .font-body-lg, .font-body-sm {
+  letter-spacing: 0.01em;
+}
+
+/* Animations pour les éléments multicolores */
+@keyframes colorShift {
+  0%, 100% { filter: hue-rotate(0deg); }
+  25% { filter: hue-rotate(90deg); }
+  50% { filter: hue-rotate(180deg); }
+  75% { filter: hue-rotate(270deg); }
+}
+
+.multicolor-animate {
+  animation: colorShift 8s ease-in-out infinite;
+}
+
+/* Effets de survol pour les titres multicolores */
+.h1-multicolor span:hover,
+.h2-multicolor span:hover,
+.logo-multicolor span:hover {
+  animation: bounce 0.6s ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0,0,0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
 }
