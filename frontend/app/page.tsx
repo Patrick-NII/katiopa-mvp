@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { MulticolorText, CubeAILogo, AnimatedMulticolorText } from '@/components/MulticolorText'
 import ChatBubble from '@/components/ChatBubble'
+import AnimatedIcon from '@/components/AnimatedIcons'
 
 export default function HomePage() {
   const plans = [
@@ -10,14 +11,18 @@ export default function HomePage() {
       name: 'Starter',
       price: '0€',
       period: '/mois',
-      description: 'Gratuit pendant 3 mois',
+      description: 'Parfait pour commencer l\'aventure',
       features: [
+        '2 sessions simultanées',
         '1 parent + 1 enfant',
-        'Exercices de base',
-        'Statistiques simples',
-        'Support communautaire'
+        'Accès complet à la plateforme',
+        'Programmation, IA, maths et lecture',
+        'Jeux éducatifs et progression',
+        'Évaluation et coaching IA basique',
+        '3 mois gratuit puis 9,99€/mois'
       ],
       popular: false,
+      starter: true,
       cta: 'Commencer gratuitement',
       href: '/register',
       cardClass: 'card-starter'
@@ -26,13 +31,16 @@ export default function HomePage() {
       name: 'Pro',
       price: '29,99€',
       period: '/mois',
-      description: 'Famille complète',
+      description: 'L\'expérience complète recommandée',
       features: [
+        '2 sessions simultanées',
         '1 parent + 1 enfant',
-        'Toutes les fonctionnalités',
-        'IA Coach avancée',
-        'Support prioritaire',
-        'Exports et rapports'
+        'Tous les exercices et contenus',
+        'Communauté et défis familiaux',
+        'Stats détaillées et rapports',
+        'Certificats de progression',
+        'IA coach personnalisé',
+        'Support par email'
       ],
       popular: true,
       cta: 'Choisir Pro',
@@ -43,16 +51,20 @@ export default function HomePage() {
       name: 'Premium',
       price: '69,99€',
       period: '/mois',
-      description: 'Famille étendue',
+      description: 'La solution complète pour les familles',
       features: [
-        '1 parent + jusqu\'à 4 enfants',
-        'Toutes les fonctionnalités',
-        'IA Coach premium',
-        'Certificats officiels',
-        'Support dédié',
-        'Formation parentale'
+        '6 sessions simultanées',
+        '1 parent + jusqu\'à 5 enfants',
+        'IA coach Premium avancé',
+        'Certificats officiels reconnus',
+        'Exports PDF/Excel détaillés',
+        'Multi-appareils synchronisés',
+        'Support prioritaire 24/7',
+        'Programme de parrainage',
+        'Contenus exclusifs'
       ],
       popular: false,
+      complete: true,
       cta: 'Choisir Premium',
       href: '/register',
       cardClass: 'card-premium'
@@ -62,7 +74,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200 sticky top-0 z-50">
+      <nav className="bg-white/90 border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
@@ -85,15 +97,7 @@ export default function HomePage() {
 
       {/* Section principale */}
       <section className="relative overflow-hidden">
-        {/* Éléments décoratifs */}
-        <div className="absolute top-10 right-20 w-32 h-32 bg-gradient-to-r from-blue-400/30 to-purple-400/30 rounded-full blur-xl"></div>
-        <div className="absolute top-40 left-10 w-24 h-24 bg-gradient-to-r from-pink-400/40 to-red-400/40 rounded-full blur-lg"></div>
-        <div className="absolute bottom-40 right-32 w-20 h-20 bg-gradient-to-r from-green-400/50 to-blue-400/50 rounded-full blur-md"></div>
-        <div className="absolute top-60 left-1/4 w-16 h-16 bg-gradient-to-r from-yellow-400/60 to-orange-400/60 rounded-full blur-sm"></div>
-        <div className="absolute bottom-20 left-1/3 w-28 h-28 bg-gradient-to-r from-indigo-400/40 to-purple-400/40 rounded-full blur-xl"></div>
-        <div className="absolute top-1/3 right-1/3 w-36 h-36 bg-gradient-to-r from-cyan-400/35 to-blue-400/35 rounded-full blur-2xl"></div>
-        <div className="absolute bottom-1/3 left-1/4 w-44 h-44 bg-gradient-to-r from-violet-400/25 to-purple-400/25 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 w-20 h-20 bg-gradient-to-r from-emerald-400/45 to-teal-400/45 rounded-full blur-lg"></div>
+        {/* Éléments décoratifs supprimés - effets de brillance retirés */}
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 relative z-10">
           <div className="text-center">
@@ -114,7 +118,7 @@ export default function HomePage() {
             <motion.p 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              transition={{ duration: 0.8 }}
               className="font-subtitle-xl text-gray-600 mb-12 max-w-3xl mx-auto"
             >
               Découvrez <strong className="text-blue-700">CubeAI</strong>, la première plateforme 
@@ -128,7 +132,7 @@ export default function HomePage() {
             <motion.p 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
+              transition={{ duration: 0.8 }}
               className="font-body-lg text-gray-600 mb-12 max-w-4xl mx-auto"
             >
               <strong>Mathématiques fondamentales, lecture et écriture, sciences naturelles, développement de la créativité</strong> - 
@@ -143,10 +147,10 @@ export default function HomePage() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
-              <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-medium transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl">
+              <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-medium transition-all transform hover:scale-105">
                 Commencer gratuitement
               </Link>
-              <Link href="/login" className="font-button bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white px-8 py-4 rounded-xl text-lg font-medium transition-all border-2 border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl">
+              <Link href="/login" className="font-button bg-white/90 text-gray-700 hover:bg-white px-8 py-4 rounded-xl text-lg font-medium transition-all border-2 border-gray-200 hover:border-gray-300">
                 Se connecter
               </Link>
             </motion.div>
@@ -159,22 +163,20 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 0 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
               className="mb-6"
             >
-              <MulticolorText 
-                text="Choisissez votre plan" 
-                variant="h2" 
-                className="text-gray-900"
-              />
+              <h2 className="text-xl font-subtitle text-center text-gray-800 mb-6">
+                Choisissez votre plan d'abonnement
+              </h2>
             </motion.div>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.8 }}
               viewport={{ once: true }}
               className="font-subtitle-lg text-gray-600 max-w-2xl mx-auto"
             >
@@ -183,51 +185,60 @@ export default function HomePage() {
             </motion.p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
             {plans.map((plan, index) => (
               <motion.div
                 key={plan.name}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
-                className={`relative rounded-2xl p-8 border-2 transition-all ${
-                  plan.popular 
-                    ? 'scale-105' 
-                    : 'hover:scale-105'
-                } ${plan.cardClass}`}
+                className={`relative rounded-2xl p-6 border-2 flex flex-col h-full ${plan.cardClass}`}
               >
+                {plan.starter && (
+                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
+                    <AnimatedIcon type="gift" />
+                  </div>
+                )}
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm text-gray-800 px-6 py-2 rounded-full font-label shadow-lg">
-                    Recommandé
+                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
+                    <AnimatedIcon type="star" />
+                  </div>
+                )}
+                {plan.complete && (
+                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
+                    <AnimatedIcon type="crown" />
                   </div>
                 )}
 
-                <div className="text-center mb-8">
-                  <h3 className="font-title-lg text-white mb-4">{plan.name}</h3>
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-subtitle text-white mb-3">{plan.name}</h3>
                   <div className="mb-2">
-                    <span className={`font-title-xl text-white price-glow ${plan.name === 'Starter' ? 'text-green-100' : ''}`}>
+                    <span className={`text-lg font-subtitle text-white ${plan.name === 'Starter' ? 'text-green-100' : ''}`}>
                       {plan.price}
                     </span>
                     <span className="font-body text-white/80">{plan.period}</span>
                   </div>
-                  <p className="font-body text-white/90">{plan.description}</p>
+                  <p className="font-body text-white/90 mb-2">{plan.description}</p>
+                  <p className="font-body text-white/80 text-sm italic">
+                    {plan.name === 'Premium' ? '6 sessions' : '2 sessions'} • {plan.name === 'Premium' ? '1 parent + 5 enfants' : '1 parent + 1 enfant'}
+                  </p>
                 </div>
 
-                <ul className="space-y-3 mb-8">
+                <ul className="space-y-3 mb-6 flex-grow">
                   {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center space-x-3">
-                      <svg className="w-5 h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <li key={featureIndex} className="flex items-start space-x-3">
+                      <svg className="w-5 h-5 text-white flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
-                      <span className="font-body text-white/90">{feature}</span>
+                      <span className="font-body text-white/90 text-sm">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
                 <Link 
                   href={plan.href}
-                  className="block w-full text-center font-button bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 px-6 py-3 rounded-xl transition-all border border-white/30 hover:border-white/50"
+                  className="block w-full text-center font-button bg-white/20 text-white hover:bg-white/30 px-6 py-3 rounded-xl transition-all border border-white/30 hover:border-white/50 mt-auto"
                 >
                   {plan.cta}
                 </Link>
@@ -268,7 +279,7 @@ export default function HomePage() {
               </motion.p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
             {[
               {
                 icon: (
@@ -359,15 +370,15 @@ export default function HomePage() {
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
-                className={`${feature.bgColor} ${feature.borderColor} border-2 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
+                className={`${feature.bgColor} ${feature.borderColor} border-2 rounded-2xl p-6 flex flex-col h-full`}
               >
                 <div className={`${feature.iconBgColor} w-16 h-16 rounded-xl flex items-center justify-center mb-4`}>
                   {feature.icon}
                 </div>
                 <h3 className="font-subtitle-lg text-gray-900 mb-3">{feature.title}</h3>
-                <p className="font-body text-gray-600 mb-4">{feature.description}</p>
+                <p className="font-body text-gray-600 mb-4 flex-grow">{feature.description}</p>
                 <ul className="space-y-2">
                   {feature.benefits.map((benefit, benefitIndex) => (
                     <li key={benefitIndex} className="flex items-center text-gray-700">
@@ -402,7 +413,7 @@ export default function HomePage() {
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.8 }}
               viewport={{ once: true }}
               className="font-subtitle-lg text-gray-600 max-w-2xl mx-auto"
             >
@@ -456,7 +467,7 @@ export default function HomePage() {
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
                 className={`${step.bgColor} ${step.borderColor} border-2 rounded-2xl p-8 text-center relative`}
               >
@@ -477,11 +488,11 @@ export default function HomePage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="text-center mt-12"
           >
-            <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-medium transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl">
+            <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-medium">
               Commencer maintenant
             </Link>
           </motion.div>
@@ -508,7 +519,7 @@ export default function HomePage() {
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.8 }}
               viewport={{ once: true }}
               className="font-subtitle-lg text-gray-600 max-w-2xl mx-auto"
             >
@@ -516,7 +527,7 @@ export default function HomePage() {
             </motion.p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
             {[
               {
                 name: 'Marie D.',
@@ -553,9 +564,9 @@ export default function HomePage() {
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
-                className={`bg-gradient-to-br ${testimonial.bgColor} ${testimonial.borderColor} border-2 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 ${testimonial.shadowColor}`}
+                className={`bg-gradient-to-br ${testimonial.bgColor} ${testimonial.borderColor} border-2 rounded-2xl p-6 flex flex-col h-full`}
               >
                 <div className="flex items-center mb-4">
                   <div className="text-3xl mr-3">{testimonial.avatar}</div>
@@ -575,9 +586,9 @@ export default function HomePage() {
                   <svg className="absolute -top-3 -left-3 w-8 h-8 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
                   </svg>
-                  <p className="font-body text-gray-700 mb-4 italic pl-6">"{testimonial.content}"</p>
+                  <p className="font-body text-gray-700 mb-4 italic pl-6 flex-grow">"{testimonial.content}"</p>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center mt-auto">
                   <div className="flex space-x-2">
                     <button className="p-2 text-gray-500 hover:text-blue-600 transition-colors">
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -620,7 +631,7 @@ export default function HomePage() {
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.8 }}
               viewport={{ once: true }}
               className="font-subtitle-lg text-gray-600 max-w-2xl mx-auto"
             >
@@ -683,9 +694,9 @@ export default function HomePage() {
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
-                className={`${social.bgColor} ${social.borderColor} border-2 rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 ${social.hoverColor}`}
+                className={`${social.bgColor} ${social.borderColor} border-2 rounded-2xl p-6 text-center`}
               >
                 <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                   {social.icon}
@@ -702,7 +713,7 @@ export default function HomePage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.8 }}
             viewport={{ once: true }}
             className="text-center mt-12"
           >
