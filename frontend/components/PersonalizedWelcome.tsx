@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Heart, Star, BookOpen, Target, Trophy, Sparkles } from 'lucide-react'
+import { Heart, Star, BookOpen, Target, Trophy } from 'lucide-react'
 
 interface PersonalizedWelcomeProps {
   firstName: string
@@ -37,7 +37,7 @@ export default function PersonalizedWelcome({
         return {
           title: "Voici ton tableau de bord personnalisé !",
           subtitle: "Suis ta progression et découvre de nouveaux exercices amusants",
-          icon: <Sparkles className="text-yellow-500" />,
+          icon: <Star className="text-yellow-500" />,
           color: "from-yellow-400 to-orange-500"
         }
       case 'PARENT':
