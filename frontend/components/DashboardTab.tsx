@@ -69,7 +69,24 @@ export default function DashboardTab({
       try {
         setSessionsLoading(true);
         const sessions = await sessionsAPI.getActiveSessions();
-        setActiveSessions(sessions);
+        
+        // Si aucune session active n'est trouvée, on peut considérer la session actuelle comme active
+        if (sessions.length === 0 && user?.userType === 'PARENT') {
+          // Créer une session virtuelle pour l'utilisateur connecté
+          const currentSession = {
+            id: user.id,
+            sessionId: user.sessionId,
+            name: `${user.firstName} ${user.lastName}`,
+            userType: user.userType,
+            totalTime: 0, // Sera mis à jour par le backend
+            lastActivity: new Date(),
+            isCurrentlyActive: true,
+            createdAt: new Date()
+          };
+          setActiveSessions([currentSession]);
+        } else {
+          setActiveSessions(sessions);
+        }
       } catch (error) {
         console.error('Erreur lors du chargement des sessions actives:', error);
         setActiveSessions([]);
@@ -81,7 +98,7 @@ export default function DashboardTab({
     if (user?.userType === 'PARENT') {
       loadActiveSessions();
     }
-  }, [user?.userType]);
+  }, [user?.userType, user?.id, user?.sessionId, user?.firstName, user?.lastName]);
 
   // Calcul du nombre de sessions actives selon le type de compte
   const getActiveSessionsCount = () => {
