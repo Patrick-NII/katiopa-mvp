@@ -8,6 +8,7 @@ import StatisticsTab from '@/components/StatisticsTab';
 import { ProfileTab } from '@/components/ProfileTab';
 import { SubscriptionTab } from '@/components/SubscriptionTab';
 import { BillingTab } from '@/components/BillingTab';
+import FamilyMembersTab from '@/components/FamilyMembersTab';
 import { authAPI, statsAPI } from '@/lib/api';
 
 interface User {
@@ -56,7 +57,13 @@ export default function DashboardPage() {
         setSummary(summaryData);
       } catch (error) {
         console.warn('⚠️ Impossible de charger les statistiques:', error);
-        setSummary(null);
+        // Utiliser des données par défaut au lieu de null
+        setSummary({
+          totalTime: 0,
+          averageScore: 0,
+          totalActivities: 0,
+          domains: []
+        });
       }
 
       setReady(true);
@@ -169,6 +176,8 @@ export default function DashboardPage() {
         return <SubscriptionTab user={user} />;
       case 'billing':
         return <BillingTab user={user} />;
+      case 'family-members':
+        return <FamilyMembersTab />;
       default:
         return (
           <DashboardTab
@@ -192,7 +201,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Navigation latérale */}
       <SidebarNavigation
         activeTab={activeTab as any}
@@ -202,7 +211,7 @@ export default function DashboardPage() {
       />
 
       {/* Contenu principal */}
-      <main className="flex-1 ml-64 p-6">
+      <main className="flex-1 ml-64 p-6 min-h-screen">
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, x: 20 }}
@@ -210,7 +219,9 @@ export default function DashboardPage() {
           transition={{ duration: 0.3 }}
           className="h-full"
         >
-          {renderTabContent()}
+          <div className="max-w-7xl mx-auto">
+            {renderTabContent()}
+          </div>
         </motion.div>
       </main>
     </div>

@@ -130,8 +130,38 @@ export const authAPI = {
 export const statsAPI = {
   // Récupération du résumé des statistiques (remplace /activities)
   getSummary: async (): Promise<StatsSummary> => {
-    const response = await apiFetch('/api/stats/summary');
-    return response.json();
+    try {
+      const response = await apiFetch('/api/stats/summary');
+      return response.json();
+    } catch (error) {
+      console.warn('⚠️ Impossible de charger les statistiques depuis l\'API, utilisation des données de fallback:', error);
+      // Données de fallback pour éviter les erreurs 404
+      return {
+        totalTime: 0,
+        averageScore: 0,
+        totalActivities: 0,
+        domains: [
+          {
+            name: 'Mathématiques',
+            count: 0,
+            averageScore: 0,
+            activities: []
+          },
+          {
+            name: 'Français',
+            count: 0,
+            averageScore: 0,
+            activities: []
+          },
+          {
+            name: 'Sciences',
+            count: 0,
+            averageScore: 0,
+            activities: []
+          }
+        ]
+      };
+    }
   },
 };
 
