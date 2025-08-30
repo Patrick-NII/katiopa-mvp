@@ -1,0 +1,49 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .crown { animation: shine 3s ease-in-out infinite; }
+    .gem { animation: sparkle 2s ease-in-out infinite; }
+    @keyframes shine {
+      0%, 100% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+      50% { transform: scale(1.05) rotate(1deg); filter: brightness(1.2); }
+    }
+    @keyframes sparkle {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+  </style>
+  
+  <!-- Couronne principale -->
+  <g class="crown">
+    <!-- Base de la couronne -->
+    <rect x="6" y="32" width="36" height="8" rx="4" fill="#F59E0B" stroke="#D97706" stroke-width="2"/>
+    
+    <!-- Pointes de la couronne -->
+    <path d="M8 32 L12 20 L16 32" fill="#F59E0B" stroke="#D97706" stroke-width="2"/>
+    <path d="M16 32 L20 16 L24 32" fill="#F59E0B" stroke="#D97706" stroke-width="2"/>
+    <path d="M24 32 L28 16 L32 32" fill="#F59E0B" stroke="#D97706" stroke-width="2"/>
+    <path d="M32 32 L36 20 L40 32" fill="#F59E0B" stroke="#D97706" stroke-width="2"/>
+    
+    <!-- Détails de la couronne -->
+    <rect x="10" y="28" width="4" height="4" rx="2" fill="#8B5CF6"/>
+    <rect x="22" y="26" width="4" height="6" rx="2" fill="#EC4899"/>
+    <rect x="34" y="28" width="4" height="4" rx="2" fill="#10B981"/>
+  </g>
+  
+  <!-- Gemmes -->
+  <g class="gem">
+    <!-- Gemme centrale -->
+    <polygon points="24,12 28,20 24,28 20,20" fill="#8B5CF6" stroke="#7C3AED" stroke-width="2"/>
+    <polygon points="24,14 26,20 24,26 22,20" fill="#EC4899"/>
+    
+    <!-- Gemmes latérales -->
+    <polygon points="12,16 16,24 12,32 8,24" fill="#F59E0B" stroke="#D97706" stroke-width="1"/>
+    <polygon points="36,16 40,24 36,32 32,24" fill="#3B82F6" stroke="#2563EB" stroke-width="1"/>
+  </g>
+  
+  <!-- Rayons de lumière -->
+  <g opacity="0.4">
+    <line x1="24" y1="8" x2="24" y2="12" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+    <line x1="12" y1="12" x2="16" y2="16" stroke="#8B5CF6" stroke-width="1" stroke-linecap="round"/>
+    <line x1="36" y1="12" x2="32" y2="16" stroke="#EC4899" stroke-width="1" stroke-linecap="round"/>
+  </g>
+</svg>
