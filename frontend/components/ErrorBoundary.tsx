@@ -1,6 +1,7 @@
 'use client'
 import React, { Component, ErrorInfo, ReactNode } from 'react'
 import { AlertTriangle, RefreshCw, Home, ArrowLeft } from 'lucide-react'
+import AnimatedIcon from './AnimatedIcons'
 
 interface Props {
   children: ReactNode
@@ -119,7 +120,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 onClick={this.handleGoHome}
                 className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
               >
-                <Home className="w-4 h-4" />
+                <AnimatedIcon type="home" className="w-4 h-4" />
                 Accueil
               </button>
             </div>
