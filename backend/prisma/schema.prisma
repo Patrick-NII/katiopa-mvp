@@ -23,6 +23,10 @@ model Account {
   conversations     Conversation[]
   billingHistory    BillingRecord[]
   planSeat          PlanSeat?
+  userInteractions  UserInteraction[]
+  userPrompts       UserPrompt[]
+  navigationSessions NavigationSession[]
+  performanceMetrics PerformanceMetric[]
 }
 
 // Session utilisateur (connexion avec ID/mot de passe)
@@ -52,6 +56,10 @@ model UserSession {
   activities      Activity[]
   conversations   Conversation[]
   profile         UserProfile?
+  userInteractions UserInteraction[]
+  userPrompts     UserPrompt[]
+  navigationSessions NavigationSession[]
+  performanceMetrics PerformanceMetric[]
 }
 
 // Profil détaillé de l'utilisateur
@@ -133,7 +141,155 @@ model PlanSeat {
   account     Account  @relation(fields: [accountId], references: [id])
 }
 
-// Enums
+// Interactions utilisateur (clicks, inputs, navigation)
+model UserInteraction {
+  id              String      @id @default(cuid())
+  userSessionId   String
+  accountId       String
+  interactionType InteractionType
+  elementType     ElementType
+  elementId       String?
+  elementName     String?
+  elementValue    String?
+  pageUrl         String?
+  pageTitle       String?
+  timestamp       DateTime    @default(now())
+  metadata        Json?
+  sessionDuration Int?        // Durée de session en ms au moment de l'interaction
+  
+  // Relations
+  userSession     UserSession @relation(fields: [userSessionId], references: [id])
+  account         Account     @relation(fields: [accountId], references: [id])
+}
+
+// Prompts et inputs utilisateur
+model UserPrompt {
+  id              String      @id @default(cuid())
+  userSessionId   String
+  accountId       String
+  promptType      PromptType
+  content         String
+  context         Json?
+  response        String?
+  responseTime    Int?        // Temps de réponse en ms
+  tokensUsed      Int?
+  modelUsed       String?
+  success         Boolean     @default(true)
+  errorMessage    String?
+  timestamp       DateTime    @default(now())
+  
+  // Relations
+  userSession     UserSession @relation(fields: [userSessionId], references: [id])
+  account         Account     @relation(fields: [accountId], references: [id])
+}
+
+// Sessions de navigation
+model NavigationSession {
+  id              String      @id @default(cuid())
+  userSessionId   String
+  accountId       String
+  startTime       DateTime    @default(now())
+  endTime         DateTime?
+  duration        Int?        // Durée en ms
+  pagesVisited    String[]    // URLs visitées
+  actionsPerformed Int        @default(0)
+  sessionData     Json?
+  
+  // Relations
+  userSession     UserSession @relation(fields: [userSessionId], references: [id])
+  account         Account     @relation(fields: [accountId], references: [id])
+}
+
+// Métriques de performance
+model PerformanceMetric {
+  id              String      @id @default(cuid())
+  userSessionId   String
+  accountId       String
+  metricType      MetricType
+  value           Float
+  unit            String?
+  context         Json?
+  timestamp       DateTime    @default(now())
+  
+  // Relations
+  userSession     UserSession @relation(fields: [userSessionId], references: [id])
+  account         Account     @relation(fields: [accountId], references: [id])
+}
+
+// Enums pour les nouveaux modèles
+enum InteractionType {
+  CLICK
+  INPUT
+  SUBMIT
+  NAVIGATION
+  SCROLL
+  HOVER
+  FOCUS
+  BLUR
+  KEYPRESS
+  MOUSE_MOVE
+  TOUCH
+  GESTURE
+  VOICE
+  OTHER
+}
+
+enum ElementType {
+  BUTTON
+  INPUT
+  TEXTAREA
+  SELECT
+  CHECKBOX
+  RADIO
+  LINK
+  TAB
+  CARD
+  MODAL
+  SIDEBAR
+  HEADER
+  FOOTER
+  NAVIGATION
+  FORM
+  CHAT_INPUT
+  AI_RESPONSE
+  EXERCISE
+  GAME
+  VIDEO
+  AUDIO
+  IMAGE
+  OTHER
+}
+
+enum PromptType {
+  CHAT_MESSAGE
+  EXERCISE_QUESTION
+  AI_ASSISTANCE
+  SEARCH
+  FILTER
+  SORT
+  EXPORT
+  IMPORT
+  SETTINGS
+  FEEDBACK
+  SUPPORT
+  OTHER
+}
+
+enum MetricType {
+  LOAD_TIME
+  RESPONSE_TIME
+  CLICK_RATE
+  CONVERSION_RATE
+  ENGAGEMENT_TIME
+  ERROR_RATE
+  SUCCESS_RATE
+  SATISFACTION_SCORE
+  USAGE_FREQUENCY
+  FEATURE_USAGE
+  OTHER
+}
+
+// Enums existants
 enum SubscriptionType {
   FREE
   PRO
