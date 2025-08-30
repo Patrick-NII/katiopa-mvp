@@ -1,0 +1,38 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .star { animation: twinkle 2s ease-in-out infinite; }
+    .sparkle { animation: sparkle 1.5s ease-in-out infinite; }
+    @keyframes twinkle {
+      0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+      50% { transform: scale(1.1) rotate(5deg); opacity: 0.8; }
+    }
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+  </style>
+  
+  <!-- Étoile principale -->
+  <g class="star">
+    <path d="M24 4 L29.5 18.5 L44 18.5 L32.5 28.5 L38 43 L24 34.5 L10 43 L15.5 28.5 L4 18.5 L18.5 18.5 Z" 
+          fill="#8B5CF6" stroke="#7C3AED" stroke-width="2"/>
+    <path d="M24 8 L27.5 18 L36 18 L28.5 25.5 L32 35 L24 29 L16 35 L19.5 25.5 L12 18 L20.5 18 Z" 
+          fill="#EC4899" stroke="#DB2777" stroke-width="1"/>
+  </g>
+  
+  <!-- Étincelles -->
+  <g class="sparkle">
+    <circle cx="12" cy="12" r="2" fill="#F59E0B"/>
+    <circle cx="36" cy="12" r="2" fill="#10B981"/>
+    <circle cx="12" cy="36" r="2" fill="#3B82F6"/>
+    <circle cx="36" cy="36" r="2" fill="#EC4899"/>
+  </g>
+  
+  <!-- Rayons lumineux -->
+  <g opacity="0.6">
+    <line x1="24" y1="0" x2="24" y2="8" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"/>
+    <line x1="40" y1="24" x2="32" y2="24" stroke="#EC4899" stroke-width="2" stroke-linecap="round"/>
+    <line x1="24" y1="40" x2="24" y2="48" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+    <line x1="8" y1="24" x2="16" y2="24" stroke="#10B981" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>
