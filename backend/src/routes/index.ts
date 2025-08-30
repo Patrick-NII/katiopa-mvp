@@ -3,6 +3,8 @@ import authRoutes from './auth';
 import chatRoutes from './chat';
 import activityRoutes from './activity';
 import statsRoutes from './stats';
+import sessionsRoutes from './sessions';
+import trackingRoutes from './tracking';
 
 const router = express.Router();
 
@@ -18,6 +20,12 @@ router.use('/activities', activityRoutes);
 // Routes de statistiques
 router.use('/stats', statsRoutes);
 
+// Routes de sessions
+router.use('/sessions', sessionsRoutes);
+
+// Routes de tracking
+router.use('/tracking', trackingRoutes);
+
 // Route de test de l'API
 router.get('/test', (req, res) => {
   res.json({
@@ -29,7 +37,9 @@ router.get('/test', (req, res) => {
       auth: '/api/auth',
       chat: '/api/chat',
       activities: '/api/activities',
-      stats: '/api/stats'
+      stats: '/api/stats',
+      sessions: '/api/sessions',
+      tracking: '/api/tracking'
     }
   });
 });
