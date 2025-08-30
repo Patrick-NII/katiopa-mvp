@@ -128,7 +128,7 @@ export interface GlobalTimeInfo {
 export type NavigationTab = 
   | 'dashboard'
   | 'statistiques'
-  | 'cubeai-experiences'
+  | 'experiences'
   | 'informations'
   | 'abonnements'
   | 'facturation'
