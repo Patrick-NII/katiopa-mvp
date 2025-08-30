@@ -150,6 +150,9 @@ export const sessionsAPI = {
     }
   },
 };
+
+// API des statistiques
+export const statsAPI = {
   // Récupération du résumé des statistiques (remplace /activities)
   getSummary: async (): Promise<StatsSummary> => {
     try {
