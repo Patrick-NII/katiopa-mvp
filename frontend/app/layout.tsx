@@ -4,6 +4,7 @@ import './globals.css'
 
 // Import des polices Google Fonts pour la charte typographique CubeAI
 import { Sniglet, Fredoka, Roboto } from 'next/font/google'
+import ClientRouteWrapper from '@/components/ClientRouteWrapper'
 
 // Configuration de Sniglet ExtraBold 800 pour les gros titres
 const sniglet = Sniglet({
@@ -13,10 +14,10 @@ const sniglet = Sniglet({
   display: 'swap',
 })
 
-// Configuration de Fredoka 500 pour les sous-titres
+// Configuration de Fredoka pour les usages principaux (poids variés)
 const fredoka = Fredoka({
   subsets: ['latin'],
-  weight: '500',
+  weight: ['400', '500', '600', '700'],
   variable: '--font-fredoka',
   display: 'swap',
 })
@@ -44,7 +45,9 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${inter.className} ${sniglet.variable} ${fredoka.variable} ${roboto.variable}`}>
-        {children}
+        <ClientRouteWrapper>
+          {children}
+        </ClientRouteWrapper>
       </body>
     </html>
   )
