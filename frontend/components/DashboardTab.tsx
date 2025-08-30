@@ -18,7 +18,7 @@ import {
 import AnimatedLLMButton from './AnimatedLLMButton'
 import AdvancedLLMResults from './AdvancedLLMResults'
 import UserStats from './UserStats'
-import { sessionsAPI } from '@/lib/api'
+import { sessionsAPI, statsAPI } from '@/lib/api'
 
 
 interface DashboardTabProps {
@@ -62,6 +62,26 @@ export default function DashboardTab({
   const [chatMessage, setChatMessage] = useState('');
   const [activeSessions, setActiveSessions] = useState<any[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
+  const [realSummary, setRealSummary] = useState<any>(null);
+  const [summaryLoading, setSummaryLoading] = useState(true);
+
+  // Récupération des vraies données depuis l'API
+  useEffect(() => {
+    const loadRealData = async () => {
+      try {
+        setSummaryLoading(true);
+        const summaryData = await statsAPI.getSummary();
+        setRealSummary(summaryData);
+      } catch (error) {
+        console.error('Erreur lors du chargement des données réelles:', error);
+        setRealSummary(summary);
+      } finally {
+        setSummaryLoading(false);
+      }
+    };
+
+    loadRealData();
+  }, [summary]);
 
   // Récupération des sessions actives
   useEffect(() => {
@@ -122,6 +142,9 @@ export default function DashboardTab({
     const names = activeSessions.slice(0, 3).map(session => session.name || session.id).join(' & ');
     return activeSessions.length > 3 ? `${names} & +${activeSessions.length - 3}` : names;
   };
+
+  // Utiliser les vraies données ou les données de fallback
+  const displaySummary = realSummary || summary;
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -131,114 +154,70 @@ export default function DashboardTab({
     >
       
 
-      {/* Statistiques principales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        <motion.div 
-          className="bg-white p-5 rounded-xl shadow-sm"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <div className="flex items-center gap-4 mb-3">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-              <Activity size={24} className="text-white" />
+      {/* Statistiques principales - Affichage compact */}
+      <div className="bg-white rounded-xl p-6 shadow-sm mb-8">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Vue d'ensemble</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Activity size={20} className="text-blue-600" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-600">Activités totales</h3>
-              <p className="text-3xl font-bold text-gray-900">{activities?.length || 0}</p>
-            </div>
-          </div>
-          <div className="inline-flex items-center gap-1 text-sm text-emerald-800 bg-emerald-100 px-2 py-1 rounded-full">
-            <TrendingUp size={14} />
-            <span className="font-medium">+15% ce mois</span>
-          </div>
-        </motion.div>
-
-        <motion.div 
-          className="bg-white p-5 rounded-xl shadow-sm"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <div className="flex items-center gap-4 mb-3">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-              <Target size={24} className="text-white" />
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-gray-600">Score moyen</h3>
-              <p className="text-3xl font-bold text-gray-900">
-                {summary?.averageScore ? summary.averageScore.toFixed(1) : 'N/A'}
+              <p className="text-sm text-gray-600">Activités totales</p>
+              <p className="text-xl font-bold text-gray-900">
+                {summaryLoading ? '...' : (displaySummary?.totalActivities || 0)}
               </p>
             </div>
           </div>
-          <div className="inline-flex items-center gap-1 text-sm text-emerald-800 bg-emerald-100 px-2 py-1 rounded-full">
-            <TrendingUp size={14} />
-            <span className="font-medium">+8% cette semaine</span>
-          </div>
-        </motion.div>
 
-        <motion.div 
-          className="bg-white p-5 rounded-xl shadow-sm"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <div className="flex items-center gap-4 mb-3">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <Target size={20} className="text-green-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Score moyen</p>
+              <p className="text-xl font-bold text-gray-900">
+                {summaryLoading ? '...' : (displaySummary?.averageScore || 0)}%
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
               {user?.userType === 'PARENT' ? (
-                <Users size={24} className="text-white" />
+                <Users size={20} className="text-purple-600" />
               ) : (
-                <BarChart3 size={24} className="text-white" />
+                <BarChart3 size={20} className="text-purple-600" />
               )}
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-600">
+              <p className="text-sm text-gray-600">
                 {user?.userType === 'PARENT' ? 'Sessions actives' : 'Domaines actifs'}
-              </h3>
-              <p className="text-3xl font-bold text-gray-900">
+              </p>
+              <p className="text-xl font-bold text-gray-900">
                 {user?.userType === 'PARENT' 
                   ? (sessionsLoading ? '...' : getActiveSessionsCount())
-                  : (summary?.domains?.length || 0)
+                  : (displaySummary?.domains?.length || 0)
                 }
               </p>
             </div>
           </div>
-          <div className="inline-flex items-center gap-1 text-sm text-indigo-800 bg-indigo-100 px-2 py-1 rounded-full">
-            <Zap size={14} />
-            <span className="font-medium">
-              {user?.userType === 'PARENT' 
-                ? (sessionsLoading ? 'Chargement...' : getSessionsNames())
-                : `${summary?.domains?.length || 0} matières`
-              }
-            </span>
-          </div>
-        </motion.div>
 
-        <motion.div 
-          className="bg-white p-5 rounded-xl shadow-sm"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <div className="flex items-center gap-4 mb-3">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-              <Clock size={24} className="text-white" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+              <Clock size={20} className="text-orange-600" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-600">Temps total</h3>
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-sm text-gray-600">Temps total</p>
+              <p className="text-xl font-bold text-gray-900">
                 {user?.userType === 'PARENT' 
                   ? `${getTotalSessionsTime()} min`
-                  : `${summary?.totalTime || 0} min`
+                  : `${displaySummary?.totalTime || 0} min`
                 }
               </p>
             </div>
           </div>
-          <div className="inline-flex items-center gap-1 text-sm text-amber-800 bg-amber-100 px-2 py-1 rounded-full">
-            <Award size={14} />
-            <span className="font-medium">Niveau 3</span>
-          </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Section détaillée des sessions actives pour les parents */}
@@ -552,3 +531,4 @@ export default function DashboardTab({
     </motion.div>
   )
 } 
+

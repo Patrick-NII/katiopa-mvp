@@ -159,7 +159,13 @@ export const statsAPI = {
   getSummary: async (): Promise<StatsSummary> => {
     try {
       const response = await apiFetch('/api/stats/summary');
-      return response.json();
+      const data = await response.json();
+      return data.success ? data.data : {
+        totalTime: 0,
+        averageScore: 0,
+        totalActivities: 0,
+        domains: []
+      };
     } catch (error) {
       console.warn('⚠️ Impossible de charger les statistiques depuis l\'API, utilisation des données de fallback:', error);
       // Données de fallback pour éviter les erreurs 404
@@ -167,27 +173,20 @@ export const statsAPI = {
         totalTime: 0,
         averageScore: 0,
         totalActivities: 0,
-        domains: [
-          {
-            name: 'Mathématiques',
-            count: 0,
-            averageScore: 0,
-            activities: []
-          },
-          {
-            name: 'Français',
-            count: 0,
-            averageScore: 0,
-            activities: []
-          },
-          {
-            name: 'Sciences',
-            count: 0,
-            averageScore: 0,
-            activities: []
-          }
-        ]
+        domains: []
       };
+    }
+  },
+
+  // Récupération des activités
+  getActivities: async (): Promise<any[]> => {
+    try {
+      const response = await apiFetch('/api/stats/activities');
+      const data = await response.json();
+      return data.success ? data.data : [];
+    } catch (error) {
+      console.warn('⚠️ Impossible de charger les activités depuis l\'API:', error);
+      return [];
     }
   },
 };
