@@ -2,6 +2,8 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../prisma';
+import { sendWelcomeEmail } from '../utils/sendWelcomeEmail';
+import { randomUUID } from 'crypto';
 import { requireAuth } from '../middleware/requireAuth';
 
 const router = express.Router();
@@ -209,10 +211,14 @@ router.post('/register', async (req, res) => {
       console.log('✅ Token JWT généré pour le parent');
     }
 
+    // Générer un identifiant d'inscription unique (non stocké)
+    const registrationId = `REG-${randomUUID()}`;
+
     const responseData = {
       success: true,
       message: 'Compte créé avec succès',
       data: {
+        registrationId,
         account: {
           id: account.id,
           email: account.email,
@@ -231,6 +237,24 @@ router.post('/register', async (req, res) => {
       sessions: createdSessions.map(s => `${s.firstName} ${s.lastName} (${s.userType})`)
     });
 
+    // Envoi de l'email de bienvenue avec les identifiants
+    try {
+      const parentReq = familyMembers.find((m: any) => (m.userType || 'CHILD') === 'PARENT') || familyMembers[0]
+      const toName = parentReq ? `${parentReq.firstName || ''} ${parentReq.lastName || ''}`.trim() : account.email
+
+      await sendWelcomeEmail({
+        toEmail: account.email,
+        toName: toName || account.email,
+        subscriptionType: account.subscriptionType,
+        familyMembers: familyMembers || [],
+        createdSessions: createdSessions as any,
+        registrationId,
+      })
+      console.log('📧 Email de bienvenue déclenché pour', account.email)
+    } catch (e) {
+      console.warn('⚠️ Envoi de l\'email de bienvenue échoué (non bloquant):', (e as any)?.message)
+    }
+
     res.status(201).json(responseData);
 
   } catch (error) {
@@ -246,40 +270,90 @@ router.post('/register', async (req, res) => {
 // Connexion
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, sessionId, password } = req.body;
 
     // Validation des données
-    if (!email || !password) {
+    if (!password) {
       return res.status(400).json({
-        error: 'Email et mot de passe requis',
+        error: 'Mot de passe requis',
+        code: 'MISSING_PASSWORD'
+      });
+    }
+
+    if (!email && !sessionId) {
+      return res.status(400).json({
+        error: 'Email ou ID de session requis',
         code: 'MISSING_CREDENTIALS'
       });
     }
 
-    // Recherche du compte
-    const account = await prisma.account.findUnique({
-      where: { email },
-      include: {
-        userSessions: {
-          where: { isActive: true },
-          include: {
-            profile: true
+    let account;
+    let userSession;
+
+    if (email) {
+      // Connexion par email
+      account = await prisma.account.findUnique({
+        where: { email },
+        include: {
+          userSessions: {
+            where: { isActive: true },
+            include: {
+              profile: true
+            }
           }
         }
-      }
-    });
-
-    if (!account) {
-      return res.status(401).json({
-        error: 'Email ou mot de passe incorrect',
-        code: 'INVALID_CREDENTIALS'
       });
-    }
 
-    // Recherche de la session utilisateur avec le mot de passe
-    const userSession = account.userSessions.find(session => 
-      bcrypt.compareSync(password, session.password)
-    );
+      if (!account) {
+        return res.status(401).json({
+          error: 'Email ou mot de passe incorrect',
+          code: 'INVALID_CREDENTIALS'
+        });
+      }
+
+      // Recherche de la session utilisateur avec le mot de passe
+      userSession = account.userSessions.find(session => 
+        bcrypt.compareSync(password, session.password)
+      );
+    } else {
+      // Connexion par sessionId
+      userSession = await prisma.userSession.findFirst({
+        where: { 
+          sessionId,
+          isActive: true 
+        },
+        include: {
+          account: {
+            include: {
+              userSessions: {
+                where: { isActive: true },
+                include: {
+                  profile: true
+                }
+              }
+            }
+          },
+          profile: true
+        }
+      });
+
+      if (!userSession) {
+        return res.status(401).json({
+          error: 'ID de session ou mot de passe incorrect',
+          code: 'INVALID_CREDENTIALS'
+        });
+      }
+
+      // Vérification du mot de passe
+      if (!bcrypt.compareSync(password, userSession.password)) {
+        return res.status(401).json({
+          error: 'ID de session ou mot de passe incorrect',
+          code: 'INVALID_CREDENTIALS'
+        });
+      }
+
+      account = userSession.account;
+    }
 
     if (!userSession) {
       return res.status(401).json({
@@ -398,55 +472,6 @@ router.get('/me', requireAuth, async (req, res) => {
     res.status(500).json({
       error: 'Erreur lors de la vérification',
       code: 'VERIFICATION_ERROR'
-    });
-  }
-});
-
-// Route pour récupérer les comptes de test
-router.get('/test-accounts', async (req, res) => {
-  try {
-    // Récupérer tous les comptes avec leurs sessions utilisateur
-    const accounts = await prisma.account.findMany({
-      include: {
-        userSessions: {
-          where: { isActive: true },
-          select: {
-            id: true,
-            sessionId: true,
-            firstName: true,
-            lastName: true,
-            userType: true,
-            password: true
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
-
-    // Formater les comptes de test
-    const testAccounts = accounts.flatMap(account => 
-      account.userSessions.map(session => ({
-        name: `${session.firstName} ${session.lastName} (${account.subscriptionType})`,
-        sessionId: session.sessionId,
-        password: session.password, // En production, ne pas exposer les mots de passe
-        type: session.userType,
-        subscriptionType: account.subscriptionType,
-        email: account.email
-      }))
-    );
-
-    res.json({
-      success: true,
-      data: testAccounts
-    });
-
-  } catch (error) {
-    console.error('❌ Erreur lors de la récupération des comptes de test:', error);
-    res.status(500).json({
-      error: 'Erreur interne du serveur',
-      code: 'INTERNAL_ERROR'
     });
   }
 });

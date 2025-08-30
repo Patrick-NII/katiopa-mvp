@@ -124,18 +124,6 @@ export const authAPI = {
     });
     return response.json();
   },
-
-  // Récupération des comptes de test
-  getTestAccounts: async (): Promise<any[]> => {
-    try {
-      const response = await apiFetch('/api/auth/test-accounts');
-      const data = await response.json();
-      return data.success ? data.data : [];
-    } catch (error) {
-      console.warn('⚠️ Impossible de récupérer les comptes de test:', error);
-      return [];
-    }
-  },
 };
 
 // API des sessions
