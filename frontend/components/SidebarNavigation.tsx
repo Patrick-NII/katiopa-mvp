@@ -19,6 +19,11 @@ import {
 } from 'lucide-react'
 import AnimatedIcon from './AnimatedIcons'
 
+// Composant icône cube personnalisé
+const CubeIcon = ({ size = 18, className = '' }: { size?: number; className?: string }) => (
+  <AnimatedIcon type="cube" className={className} />
+)
+
 export type NavigationTab = 
   | 'dashboard'
   | 'reglages'
@@ -26,7 +31,7 @@ export type NavigationTab =
   | 'abonnements'
   | 'informations'
   | 'statistiques'
-  | 'exercices'
+  | 'cubeai-experiences'
   | 'aide'
   | 'communautes'
   | 'photo'
@@ -86,11 +91,11 @@ export default function SidebarNavigation({
       available: !isChild && !isFree // Parents + comptes Pro et supérieurs
     },
     {
-      id: 'exercices',
-      label: 'Exercices',
-      icon: BookOpen,
-      description: 'Bibliothèque et progression',
-      available: true // Tous les utilisateurs ont accès aux exercices
+      id: 'cubeai-experiences',
+      label: 'CubeAI Experiences',
+      icon: CubeIcon,
+      description: 'Toutes les fonctionnalités CubeAI',
+      available: true // Tous les utilisateurs ont accès aux expériences CubeAI
     },
     {
       id: 'informations',
@@ -184,8 +189,8 @@ export default function SidebarNavigation({
             <AnimatedIcon type="home" className="w-5 h-5 text-white" />
           </motion.div>
                       <div>
-              <h1 className="text-lg font-bold text-gray-900">CubeAI</h1>
-              <p className="text-xs text-gray-700">Apprentissage intelligent</p>
+              <h1 className="text-lg font-bold text-gray-700">CubeAI</h1>
+              <p className="text-m text-gray-700">Espace personnel</p>
             </div>
         </div>
         
