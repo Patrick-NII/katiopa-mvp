@@ -75,7 +75,7 @@ export default function StatisticsTab({
             <div>
               <h3 className="text-sm font-medium text-gray-600">Score moyen</h3>
               <p className="text-2xl font-bold text-gray-900">
-                {summary.length > 0 
+                {summary && summary.length > 0 
                   ? Math.round(summary.reduce((acc, s) => acc + s.avg, 0) / summary.length)
                   : 'N/A'
                 }/100
@@ -83,7 +83,7 @@ export default function StatisticsTab({
             </div>
           </div>
           <div className="text-sm text-gray-500">
-            Sur {summary.length} domaine(s)
+            Sur {summary ? summary.length : 0} domaine(s)
           </div>
         </motion.div>
 
