@@ -5,11 +5,11 @@ import { motion } from 'framer-motion';
 import SidebarNavigation from '@/components/SidebarNavigation';
 import DashboardTab from '@/components/DashboardTab';
 import StatisticsTab from '@/components/StatisticsTab';
-import CubeAIExperiencesTab from '@/components/CubeAIExperiencesTab'
 import { ProfileTab } from '@/components/ProfileTab';
 import { SubscriptionTab } from '@/components/SubscriptionTab';
 import { BillingTab } from '@/components/BillingTab';
 import FamilyMembersTab from '@/components/FamilyMembersTab';
+import CubeAIExperiencesTab from '@/components/CubeAIExperiencesTab';
 import { authAPI, statsAPI } from '@/lib/api';
 
 interface User {
@@ -142,12 +142,10 @@ export default function DashboardPage() {
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'statistiques', label: 'Statistiques', icon: '📈' },
-    { id: 'cubeai-experiences', label: 'CubeAI Experiences', icon: '🚀' },
-    { id: 'informations', label: 'Profil & Préférences', icon: '👤' },
-    { id: 'abonnements', label: 'Abonnements', icon: '💳' },
-    { id: 'facturation', label: 'Facturation', icon: '🧾' },
-    { id: 'family-members', label: 'Membres de famille', icon: '👥' },
+    { id: 'statistics', label: 'Statistiques', icon: '📈' },
+    { id: 'profile', label: 'Profil', icon: '👤' },
+    { id: 'subscription', label: 'Abonnements', icon: '💳' },
+    { id: 'billing', label: 'Facturation', icon: '🧾' },
   ];
 
   const renderTabContent = () => {
@@ -171,18 +169,18 @@ export default function DashboardPage() {
             onLoadChatHistory={loadChatHistory}
           />
         );
-      case 'statistiques':
+      case 'statistics':
         return <StatisticsTab user={user} activities={[]} summary={summary} />;
-      case 'cubeai-experiences':
-        return <CubeAIExperiencesTab />;
-      case 'informations':
+      case 'profile':
         return <ProfileTab user={user} />;
-      case 'abonnements':
+      case 'subscription':
         return <SubscriptionTab user={user} />;
-      case 'facturation':
+      case 'billing':
         return <BillingTab user={user} />;
       case 'family-members':
         return <FamilyMembersTab />;
+      case 'experiences':
+        return <CubeAIExperiencesTab />;
       default:
         return (
           <DashboardTab
