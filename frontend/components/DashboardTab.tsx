@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { 
   Activity, 
@@ -18,6 +18,7 @@ import {
 import AnimatedLLMButton from './AnimatedLLMButton'
 import AdvancedLLMResults from './AdvancedLLMResults'
 import UserStats from './UserStats'
+import { sessionsAPI } from '@/lib/api'
 
 
 interface DashboardTabProps {
@@ -59,6 +60,51 @@ export default function DashboardTab({
   onLoadChatHistory
 }: DashboardTabProps) {
   const [chatMessage, setChatMessage] = useState('');
+  const [activeSessions, setActiveSessions] = useState<any[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(true);
+
+  // Récupération des sessions actives
+  useEffect(() => {
+    const loadActiveSessions = async () => {
+      try {
+        setSessionsLoading(true);
+        const sessions = await sessionsAPI.getActiveSessions();
+        setActiveSessions(sessions);
+      } catch (error) {
+        console.error('Erreur lors du chargement des sessions actives:', error);
+        setActiveSessions([]);
+      } finally {
+        setSessionsLoading(false);
+      }
+    };
+
+    if (user?.userType === 'PARENT') {
+      loadActiveSessions();
+    }
+  }, [user?.userType]);
+
+  // Calcul du nombre de sessions actives selon le type de compte
+  const getActiveSessionsCount = () => {
+    if (user?.userType !== 'PARENT') return 0;
+    
+    const maxSessions = user?.subscriptionType === 'PRO' ? 2 : 
+                       user?.subscriptionType === 'PREMIUM' ? 4 : 1;
+    
+    return Math.min(activeSessions.length, maxSessions);
+  };
+
+  // Formatage du temps total des sessions
+  const getTotalSessionsTime = () => {
+    if (!activeSessions.length) return 0;
+    return activeSessions.reduce((total, session) => total + (session.totalTime || 0), 0);
+  };
+
+  // Formatage des noms des sessions
+  const getSessionsNames = () => {
+    if (!activeSessions.length) return 'Aucune session';
+    const names = activeSessions.slice(0, 3).map(session => session.name || session.id).join(' & ');
+    return activeSessions.length > 3 ? `${names} & +${activeSessions.length - 3}` : names;
+  };
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -130,16 +176,24 @@ export default function DashboardTab({
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-600">
-                {user?.userType === 'PARENT' ? 'Enfants actifs' : 'Domaines actifs'}
+                {user?.userType === 'PARENT' ? 'Sessions actives' : 'Domaines actifs'}
               </h3>
               <p className="text-3xl font-bold text-gray-900">
-                {user?.userType === 'PARENT' ? '2' : (summary?.domains?.length || 0)}
+                {user?.userType === 'PARENT' 
+                  ? (sessionsLoading ? '...' : getActiveSessionsCount())
+                  : (summary?.domains?.length || 0)
+                }
               </p>
             </div>
           </div>
           <div className="inline-flex items-center gap-1 text-sm text-indigo-800 bg-indigo-100 px-2 py-1 rounded-full">
             <Zap size={14} />
-            <span className="font-medium">{user?.userType === 'PARENT' ? 'Emma & Thomas' : '3 matières'}</span>
+            <span className="font-medium">
+              {user?.userType === 'PARENT' 
+                ? (sessionsLoading ? 'Chargement...' : getSessionsNames())
+                : `${summary?.domains?.length || 0} matières`
+              }
+            </span>
           </div>
         </motion.div>
 
@@ -156,7 +210,10 @@ export default function DashboardTab({
             <div>
               <h3 className="text-sm font-medium text-gray-600">Temps total</h3>
               <p className="text-3xl font-bold text-gray-900">
-                {summary?.totalTime || 0} min
+                {user?.userType === 'PARENT' 
+                  ? `${getTotalSessionsTime()} min`
+                  : `${summary?.totalTime || 0} min`
+                }
               </p>
             </div>
           </div>
@@ -166,6 +223,49 @@ export default function DashboardTab({
           </div>
         </motion.div>
       </div>
+
+      {/* Section détaillée des sessions actives pour les parents */}
+      {user?.userType === 'PARENT' && activeSessions.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          className="bg-white rounded-2xl p-6 shadow-sm"
+        >
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Détails des sessions actives</h3>
+          <div className="space-y-3">
+            {activeSessions.map((session, index) => (
+              <div key={session.id || index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-semibold text-blue-600">{index + 1}</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {session.name || `Session ${session.id}`}
+                    </p>
+                    <p className="text-xs text-gray-500">ID: {session.id}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-gray-900">
+                    {session.totalTime || 0} min
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {session.lastActivity ? new Date(session.lastActivity).toLocaleDateString('fr-FR') : 'N/A'}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+            <p className="text-sm text-blue-700">
+              <strong>Limite du compte :</strong> {user?.subscriptionType === 'PRO' ? '2 sessions max' : 
+                                                   user?.subscriptionType === 'PREMIUM' ? '4 sessions max' : '1 session max'}
+            </p>
+          </div>
+        </motion.div>
+      )}
 
       {/* Section LLM avec bouton animé */}
       <motion.div 

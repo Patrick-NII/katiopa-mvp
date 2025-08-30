@@ -126,8 +126,30 @@ export const authAPI = {
   },
 };
 
-// API des statistiques
-export const statsAPI = {
+// API des sessions
+export const sessionsAPI = {
+  // Récupération des sessions actives
+  getActiveSessions: async (): Promise<any[]> => {
+    try {
+      const response = await apiFetch('/api/sessions/active');
+      return response.json();
+    } catch (error) {
+      console.warn('⚠️ Impossible de charger les sessions actives depuis l\'API:', error);
+      return [];
+    }
+  },
+
+  // Récupération des sessions d'un utilisateur
+  getUserSessions: async (): Promise<any[]> => {
+    try {
+      const response = await apiFetch('/api/sessions/user');
+      return response.json();
+    } catch (error) {
+      console.warn('⚠️ Impossible de charger les sessions utilisateur depuis l\'API:', error);
+      return [];
+    }
+  },
+};
   // Récupération du résumé des statistiques (remplace /activities)
   getSummary: async (): Promise<StatsSummary> => {
     try {
