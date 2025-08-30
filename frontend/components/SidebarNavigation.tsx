@@ -19,11 +19,6 @@ import {
 } from 'lucide-react'
 import AnimatedIcon from './AnimatedIcons'
 
-// Composant icône cube personnalisé
-const CubeIcon = ({ size = 18, className = '' }: { size?: number; className?: string }) => (
-  <AnimatedIcon type="cube" className={className} />
-)
-
 export type NavigationTab = 
   | 'dashboard'
   | 'reglages'
@@ -31,7 +26,7 @@ export type NavigationTab =
   | 'abonnements'
   | 'informations'
   | 'statistiques'
-  | 'cubeai-experiences'
+  | 'experiences'
   | 'aide'
   | 'communautes'
   | 'photo'
@@ -53,6 +48,19 @@ interface TabItem {
   available: boolean
   badge?: string
 }
+
+// Composant personnalisé pour l'icône cube
+const CubeIcon = ({ size = 18, className = "" }) => {
+  return (
+    <div className={className}>
+      <img 
+        src="/icons/cube-icon.svg" 
+        alt="Cube icon"
+        style={{ width: size, height: size }}
+      />
+    </div>
+  );
+};
 
 export default function SidebarNavigation({ 
   activeTab, 
@@ -91,11 +99,11 @@ export default function SidebarNavigation({
       available: !isChild && !isFree // Parents + comptes Pro et supérieurs
     },
     {
-      id: 'cubeai-experiences',
-      label: 'CubeAI Experiences',
+      id: 'experiences',
+      label: 'Expériences',
       icon: CubeIcon,
       description: 'Toutes les fonctionnalités CubeAI',
-      available: true // Tous les utilisateurs ont accès aux expériences CubeAI
+      available: true // Tous les utilisateurs ont accès aux expériences
     },
     {
       id: 'informations',
@@ -189,7 +197,7 @@ export default function SidebarNavigation({
             <AnimatedIcon type="home" className="w-5 h-5 text-white" />
           </motion.div>
                       <div>
-              <h1 className="text-lg font-bold text-gray-700">CubeAI</h1>
+              <h1 className="text-lg font-bold text-gray-900">CubeAI</h1>
               <p className="text-m text-gray-700">Espace personnel</p>
             </div>
         </div>
@@ -213,7 +221,7 @@ export default function SidebarNavigation({
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
                 className={`
-                  w-full flex items-center gap-3 px-3 py-4 rounded-lg text-base font-semibold
+                  w-full flex items-center gap-3 px-3 py-4 rounded-lg text-sm font-semibold
                   ${activeTab === tab.id
                     ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-105'
                     : 'text-gray-700'
@@ -228,7 +236,7 @@ export default function SidebarNavigation({
                     : 'text-black'
                   }
                 `}>
-                  <tab.icon size={18} />
+                  <tab.icon size={16} />
                 </div>
                 <span className="flex-1 text-left font-semibold">{tab.label}</span>
                 {tab.badge && (

@@ -487,7 +487,7 @@ export default function RegisterPage() {
       </nav>
 
       <div className="p-4">
-        <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -807,15 +807,15 @@ export default function RegisterPage() {
                     </p>
                   </div>
                 ) : (
-                  <motion.button
-                    type="button"
-                    onClick={handleAddFamilyMember}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                <motion.button
+                  type="button"
+                  onClick={handleAddFamilyMember}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                     className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-all"
-                  >
-                    Ajouter ce membre
-                  </motion.button>
+                >
+                  Ajouter ce membre
+                </motion.button>
                 )}
               </div>
 
