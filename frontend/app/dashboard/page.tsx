@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import SidebarNavigation from '@/components/SidebarNavigation';
 import DashboardTab from '@/components/DashboardTab';
 import StatisticsTab from '@/components/StatisticsTab';
+import CubeAIExperiencesTab from '@/components/CubeAIExperiencesTab'
 import { ProfileTab } from '@/components/ProfileTab';
 import { SubscriptionTab } from '@/components/SubscriptionTab';
 import { BillingTab } from '@/components/BillingTab';
@@ -168,8 +169,10 @@ export default function DashboardPage() {
             onLoadChatHistory={loadChatHistory}
           />
         );
-      case 'statistics':
+      case 'statistiques':
         return <StatisticsTab user={user} activities={[]} summary={summary} />;
+      case 'cubeai-experiences':
+        return <CubeAIExperiencesTab />;
       case 'profile':
         return <ProfileTab user={user} />;
       case 'subscription':

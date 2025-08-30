@@ -652,7 +652,7 @@ export default function UserProfile({ user, level, experience, totalTime, subscr
               <div className="text-2xl mb-2">
                 <Target size={32} className="mx-auto text-orange-600" />
               </div>
-              <div className="text-sm text-orange-700 font-medium">Exercices illimités</div>
+                              <div className="text-sm text-orange-700 font-medium">Expériences CubeAI illimitées</div>
             </motion.div>
           </div>
           <div className="text-center">

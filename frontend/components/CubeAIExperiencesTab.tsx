@@ -39,7 +39,7 @@ interface WeeklySchedule {
   }>
 }
 
-export default function ExercisesTab() {
+export default function CubeAIExperiencesTab() {
   const [currentTime] = useState(new Date())
   
   // Données simulées pour les exercices
@@ -186,11 +186,11 @@ export default function ExercisesTab() {
       transition={{ duration: 0.5 }}
       className="space-y-8"
     >
-      {/* En-tête des exercices */}
-      <div className="bg-gradient-to-r from-orange-600 to-red-600 text-white p-8 rounded-xl">
-        <h1 className="text-3xl font-bold mb-2">📚 Bibliothèque d'exercices</h1>
-        <p className="text-orange-100 text-lg">
-          Découvrez et pratiquez des exercices adaptés à votre niveau
+      {/* En-tête des expériences CubeAI */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-xl">
+        <h1 className="text-3xl font-bold mb-2">🚀 CubeAI Experiences</h1>
+        <p className="text-blue-100 text-lg">
+          Découvrez toutes les fonctionnalités CubeAI et commencez votre apprentissage intelligent
         </p>
         <div className="mt-4 flex items-center gap-4">
           <div className="flex items-center gap-2">

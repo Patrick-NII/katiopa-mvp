@@ -56,7 +56,7 @@ export const SubscriptionTab: React.FC<SubscriptionTabProps> = ({ user }) => {
           <ul className="space-y-2 mb-6">
             <li className="flex items-center gap-2 text-sm text-gray-600">
               <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
-              Accès aux exercices de base
+                              Accès aux expériences CubeAI de base
             </li>
             <li className="flex items-center gap-2 text-sm text-gray-600">
               <span className="w-2 h-2 bg-gray-400 rounded-full"></span>

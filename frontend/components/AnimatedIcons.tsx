@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface AnimatedIconProps {
-  type: 'gift' | 'star' | 'crown' | 'home';
+  type: 'gift' | 'star' | 'crown' | 'home' | 'cube';
   className?: string;
 }
 
@@ -16,6 +16,8 @@ export const AnimatedIcon: React.FC<AnimatedIconProps> = ({ type, className = ''
         return '/icons/crown-icon.svg';
       case 'home':
         return '/icons/home-icon.svg';
+      case 'cube':
+        return '/icons/cube-icon.svg';
       default:
         return '/icons/gift-icon.svg';
     }
