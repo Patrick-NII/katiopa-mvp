@@ -33,7 +33,6 @@ import {
   Mountain,
   Wave,
   Star2,
-  Sparkle,
   Zap2,
   Thunder,
   Rainbow,

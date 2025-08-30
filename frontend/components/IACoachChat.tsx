@@ -6,7 +6,6 @@ import {
   Send, 
   Bot, 
   User, 
-  Sparkles, 
   Lock, 
   Crown,
   MessageCircle,
