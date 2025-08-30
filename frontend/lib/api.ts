@@ -132,7 +132,8 @@ export const sessionsAPI = {
   getActiveSessions: async (): Promise<any[]> => {
     try {
       const response = await apiFetch('/api/sessions/active');
-      return response.json();
+      const data = await response.json();
+      return data.success ? data.data : [];
     } catch (error) {
       console.warn('⚠️ Impossible de charger les sessions actives depuis l\'API:', error);
       return [];
@@ -143,7 +144,8 @@ export const sessionsAPI = {
   getUserSessions: async (): Promise<any[]> => {
     try {
       const response = await apiFetch('/api/sessions/user');
-      return response.json();
+      const data = await response.json();
+      return data.success ? data.data : [];
     } catch (error) {
       console.warn('⚠️ Impossible de charger les sessions utilisateur depuis l\'API:', error);
       return [];
