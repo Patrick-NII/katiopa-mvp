@@ -1,22 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { User, Lock, Eye, EyeOff, ArrowRight, Info, User as UserIcon } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, ArrowRight, User as UserIcon } from 'lucide-react';
 import { authAPI } from '@/lib/api';
 import { CubeAILogo } from '@/components/MulticolorText';
 import AnimatedIcon from '@/components/AnimatedIcons';
 import Link from 'next/link';
-
-interface TestAccount {
-  name: string;
-  sessionId: string;
-  password: string;
-  type: string;
-  subscriptionType: string;
-  email: string;
-}
 
 export default function LoginPage() {
   const [sessionId, setSessionId] = useState('');
@@ -24,33 +15,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showTestAccounts, setShowTestAccounts] = useState(false);
-  const [testAccounts, setTestAccounts] = useState<TestAccount[]>([]);
-  const [loadingAccounts, setLoadingAccounts] = useState(false);
   const router = useRouter();
-
-  // Récupérer les comptes de test depuis la base de données
-  useEffect(() => {
-    const loadTestAccounts = async () => {
-      setLoadingAccounts(true);
-      try {
-        const accounts = await authAPI.getTestAccounts();
-        setTestAccounts(accounts);
-        
-        // Pré-remplir avec le premier compte si disponible
-        if (accounts.length > 0) {
-          setSessionId(accounts[0].sessionId);
-          setPassword(accounts[0].password);
-        }
-      } catch (error) {
-        console.error('Erreur lors du chargement des comptes de test:', error);
-      } finally {
-        setLoadingAccounts(false);
-      }
-    };
-
-    loadTestAccounts();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -208,70 +173,6 @@ export default function LoginPage() {
 
           {/* Informations supplémentaires */}
           <div className="mt-6 space-y-4">
-            {/* Comptes de test */}
-            <button
-              onClick={() => setShowTestAccounts(!showTestAccounts)}
-              className="font-body w-full flex items-center justify-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
-            >
-              <Info className="h-4 w-4" />
-              <span className="text-sm">
-                {loadingAccounts ? 'Chargement des comptes...' : 'Voir les comptes de test'}
-              </span>
-            </button>
-
-            {showTestAccounts && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="bg-gray-50 rounded-lg p-4 space-y-2"
-              >
-                {loadingAccounts ? (
-                  <div className="text-center py-4">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="font-body text-xs text-gray-600 mt-2">Chargement des comptes...</p>
-                  </div>
-                ) : testAccounts.length > 0 ? (
-                  <>
-                    <p className="font-body text-xs text-gray-600 mb-2">Comptes de test disponibles :</p>
-                    {testAccounts.map((account, index) => (
-                      <div key={index} className="font-body text-xs text-gray-700 p-2 bg-white rounded border">
-                        <div className="flex justify-between items-start mb-1">
-                          <strong className="text-blue-600">{account.name}</strong>
-                          <span className={`px-2 py-1 rounded text-xs ${
-                            account.subscriptionType === 'PRO' ? 'bg-purple-100 text-purple-700' :
-                            account.subscriptionType === 'PREMIUM' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-green-100 text-green-700'
-                          }`}>
-                            {account.subscriptionType}
-                          </span>
-                        </div>
-                        <div className="text-gray-600">
-                          <div><strong>ID:</strong> {account.sessionId}</div>
-                          <div><strong>Mot de passe:</strong> {account.password}</div>
-                          <div><strong>Type:</strong> {account.type}</div>
-                          <div><strong>Email:</strong> {account.email}</div>
-                        </div>
-                        <button
-                          onClick={() => {
-                            setSessionId(account.sessionId);
-                            setPassword(account.password);
-                          }}
-                          className="mt-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-colors"
-                        >
-                          Utiliser ce compte
-                        </button>
-                      </div>
-                    ))}
-                  </>
-                ) : (
-                  <p className="font-body text-xs text-gray-500 text-center py-4">
-                    Aucun compte de test disponible
-                  </p>
-                )}
-              </motion.div>
-            )}
-
             {/* Liens d'inscription */}
             <div className="text-center space-y-2">
               <p className="font-body text-sm text-gray-600">
