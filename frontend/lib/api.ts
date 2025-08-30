@@ -223,9 +223,144 @@ export const activityAPI = {
   },
 };
 
+// API de tracking des interactions utilisateur
+export const trackingAPI = {
+  // Enregistrer une interaction utilisateur
+  trackInteraction: async (data: {
+    interactionType: string;
+    elementType: string;
+    elementId?: string;
+    elementName?: string;
+    elementValue?: string;
+    pageUrl?: string;
+    pageTitle?: string;
+    metadata?: any;
+    sessionDuration?: number;
+  }): Promise<boolean> => {
+    try {
+      const response = await apiFetch('/api/tracking/interaction', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      return result.success;
+    } catch (error) {
+      console.warn('⚠️ Impossible d\'enregistrer l\'interaction:', error);
+      return false;
+    }
+  },
+
+  // Enregistrer un prompt utilisateur
+  trackPrompt: async (data: {
+    promptType: string;
+    content: string;
+    context?: any;
+    response?: string;
+    responseTime?: number;
+    tokensUsed?: number;
+    modelUsed?: string;
+    success?: boolean;
+    errorMessage?: string;
+  }): Promise<boolean> => {
+    try {
+      const response = await apiFetch('/api/tracking/prompt', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      return result.success;
+    } catch (error) {
+      console.warn('⚠️ Impossible d\'enregistrer le prompt:', error);
+      return false;
+    }
+  },
+
+  // Démarrer une session de navigation
+  startNavigationSession: async (data: {
+    initialPage?: string;
+    sessionData?: any;
+  }): Promise<any> => {
+    try {
+      const response = await apiFetch('/api/tracking/navigation/start', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      return result.success ? result.data : null;
+    } catch (error) {
+      console.warn('⚠️ Impossible de démarrer la session de navigation:', error);
+      return null;
+    }
+  },
+
+  // Mettre à jour une session de navigation
+  updateNavigationSession: async (sessionId: string, data: {
+    pageUrl?: string;
+    actionPerformed?: boolean;
+    sessionData?: any;
+  }): Promise<boolean> => {
+    try {
+      const response = await apiFetch(`/api/tracking/navigation/${sessionId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      return result.success;
+    } catch (error) {
+      console.warn('⚠️ Impossible de mettre à jour la session de navigation:', error);
+      return false;
+    }
+  },
+
+  // Terminer une session de navigation
+  endNavigationSession: async (sessionId: string): Promise<boolean> => {
+    try {
+      const response = await apiFetch(`/api/tracking/navigation/${sessionId}/end`, {
+        method: 'PUT'
+      });
+      const result = await response.json();
+      return result.success;
+    } catch (error) {
+      console.warn('⚠️ Impossible de terminer la session de navigation:', error);
+      return false;
+    }
+  },
+
+  // Enregistrer une métrique de performance
+  trackMetric: async (data: {
+    metricType: string;
+    value: number;
+    unit?: string;
+    context?: any;
+  }): Promise<boolean> => {
+    try {
+      const response = await apiFetch('/api/tracking/metric', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      return result.success;
+    } catch (error) {
+      console.warn('⚠️ Impossible d\'enregistrer la métrique:', error);
+      return false;
+    }
+  },
+
+  // Récupérer les statistiques de tracking
+  getTrackingStats: async (): Promise<any> => {
+    try {
+      const response = await apiFetch('/api/tracking/stats');
+      const result = await response.json();
+      return result.success ? result.data : null;
+    } catch (error) {
+      console.warn('⚠️ Impossible de récupérer les statistiques de tracking:', error);
+      return null;
+    }
+  }
+};
+
 // API générale
 export const api = {
-  // Configuration avec credentials
   fetch: (url: string, options: RequestInit = {}) => {
     return apiFetch(url, options);
   },

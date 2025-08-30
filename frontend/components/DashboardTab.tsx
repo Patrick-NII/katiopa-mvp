@@ -19,6 +19,7 @@ import AnimatedLLMButton from './AnimatedLLMButton'
 import AdvancedLLMResults from './AdvancedLLMResults'
 import UserStats from './UserStats'
 import { sessionsAPI, statsAPI } from '@/lib/api'
+import { useTracking } from '@/hooks/useTracking'
 
 
 interface DashboardTabProps {
@@ -64,6 +65,15 @@ export default function DashboardTab({
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [realSummary, setRealSummary] = useState<any>(null);
   const [summaryLoading, setSummaryLoading] = useState(true);
+
+  // Initialisation du tracking
+  const { trackPrompt, trackMetric } = useTracking({
+    trackClicks: true,
+    trackInputs: true,
+    trackNavigation: true,
+    trackPerformance: true,
+    trackPrompts: true
+  });
 
   // Récupération des vraies données depuis l'API
   useEffect(() => {
@@ -333,7 +343,90 @@ export default function DashboardTab({
               {/* Bouton d'envoi placé en dessous de l'input */}
               <div className="flex justify-center">
                 <button 
-                  onClick={() => onSendChatMessage(chatMessage)}
+                  onClick={async () => {
+                    if (!chatMessage.trim()) return;
+
+                    const startTime = Date.now();
+                    const messageContent = chatMessage.trim();
+                    
+                    // Tracker le prompt utilisateur
+                    trackPrompt({
+                      promptType: 'CHAT_MESSAGE',
+                      content: messageContent,
+                      context: {
+                        userType: user?.userType,
+                        page: 'dashboard',
+                        timestamp: new Date().toISOString()
+                      }
+                    });
+
+                    try {
+                      // Tracker le début de la requête
+                      trackMetric({
+                        metricType: 'RESPONSE_TIME',
+                        value: 0,
+                        unit: 'ms',
+                        context: { action: 'chat_message_start' }
+                      });
+
+                      await onSendChatMessage(messageContent);
+                      setChatMessage('');
+
+                      const endTime = Date.now();
+                      const responseTime = endTime - startTime;
+
+                      // Tracker la réponse réussie
+                      trackPrompt({
+                        promptType: 'CHAT_MESSAGE',
+                        content: messageContent,
+                        response: 'Message envoyé avec succès',
+                        responseTime,
+                        success: true,
+                        context: {
+                          userType: user?.userType,
+                          page: 'dashboard',
+                          responseTime
+                        }
+                      });
+
+                      // Tracker le temps de réponse
+                      trackMetric({
+                        metricType: 'RESPONSE_TIME',
+                        value: responseTime,
+                        unit: 'ms',
+                        context: { action: 'chat_message_complete' }
+                      });
+
+                    } catch (error) {
+                      const endTime = Date.now();
+                      const responseTime = endTime - startTime;
+
+                      // Tracker l'erreur
+                      trackPrompt({
+                        promptType: 'CHAT_MESSAGE',
+                        content: messageContent,
+                        response: 'Erreur lors de l\'envoi',
+                        responseTime,
+                        success: false,
+                        errorMessage: error instanceof Error ? error.message : 'Erreur inconnue',
+                        context: {
+                          userType: user?.userType,
+                          page: 'dashboard',
+                          error: true
+                        }
+                      });
+
+                      // Tracker l'erreur de performance
+                      trackMetric({
+                        metricType: 'ERROR_RATE',
+                        value: 1,
+                        unit: 'count',
+                        context: { action: 'chat_message_error' }
+                      });
+
+                      console.error('Erreur lors de l\'envoi du message:', error);
+                    }
+                  }}
                   disabled={chatLoading || !chatMessage.trim()}
                   className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-xl transition-colors shadow-sm flex items-center gap-3 text-base disabled:cursor-not-allowed font-semibold"
                 >
