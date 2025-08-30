@@ -12,7 +12,6 @@ import {
   Zap,
   Flame,
   Heart,
-  Sparkles,
   Rocket,
   Diamond,
   Gem,
@@ -25,7 +24,6 @@ import {
   Mountain,
   Wave,
   Star2,
-  Sparkle,
   Zap2,
   Thunder,
   Rainbow,
@@ -368,32 +366,28 @@ export default function UserStats({ userId, activities, memberSince }: UserStats
       {/* Grille de statistiques sur toute la largeur */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         <motion.div 
-          className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200"
-          whileHover={{ scale: 1.05, y: -5 }}
+          className="text-center p-4 bg-blue-50 rounded-lg"
           transition={{ duration: 0.2 }}
         >
           <div className="text-2xl font-bold text-blue-600 mb-1">{stats.activitiesCount}</div>
           <div className="text-xs text-blue-700 font-medium">Activités</div>
         </motion.div>
         <motion.div 
-          className="text-center p-4 bg-green-50 rounded-lg border border-green-200"
-          whileHover={{ scale: 1.05, y: -5 }}
+          className="text-center p-4 bg-green-50 rounded-lg"
           transition={{ duration: 0.2 }}
         >
           <div className="text-2xl font-bold text-green-600 mb-1">{stats.averageScore}</div>
           <div className="text-xs text-green-700 font-medium">Moyenne</div>
         </motion.div>
         <motion.div 
-          className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200"
-          whileHover={{ scale: 1.05, y: -5 }}
+          className="text-center p-4 bg-purple-50 rounded-lg"
           transition={{ duration: 0.2 }}
         >
           <div className="text-2xl font-bold text-purple-600 mb-1">{stats.streak}</div>
           <div className="text-xs text-purple-700 font-medium">Jours consécutifs</div>
         </motion.div>
         <motion.div 
-          className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200"
-          whileHover={{ scale: 1.05, y: -5 }}
+          className="text-center p-4 bg-yellow-50 rounded-lg"
           transition={{ duration: 0.2 }}
         >
           <div className="text-2xl font-bold text-yellow-600 mb-1">{stats.badges.length}</div>
@@ -404,30 +398,27 @@ export default function UserStats({ userId, activities, memberSince }: UserStats
       {/* Informations supplémentaires */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <motion.div 
-          className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200"
-          whileHover={{ scale: 1.05 }}
+          className="text-center p-3 bg-gray-50 rounded-lg"
           transition={{ duration: 0.2 }}
         >
-          <div className="text-lg font-bold text-gray-600 mb-1">{stats.domains.length}</div>
-          <div className="text-xs text-gray-500">Domaines actifs</div>
+          <div className="text-lg font-bold text-gray-700 mb-1">{stats.domains.length}</div>
+          <div className="text-xs text-gray-600">Domaines actifs</div>
         </motion.div>
         <motion.div 
-          className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200"
-          whileHover={{ scale: 1.05 }}
+          className="text-center p-3 bg-gray-50 rounded-lg"
           transition={{ duration: 0.2 }}
         >
-          <div className="text-lg font-bold text-gray-600 mb-1">{formatTime(stats.totalTime)}</div>
-          <div className="text-xs text-gray-500">Temps total</div>
+          <div className="text-lg font-bold text-gray-700 mb-1">{formatTime(stats.totalTime)}</div>
+          <div className="text-xs text-gray-600">Temps total</div>
         </motion.div>
         <motion.div 
-          className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200"
-          whileHover={{ scale: 1.05 }}
+          className="text-center p-3 bg-gray-50 rounded-lg"
           transition={{ duration: 0.2 }}
         >
-          <div className="text-lg font-bold text-gray-600 mb-1">
+          <div className="text-lg font-bold text-gray-700 mb-1">
             {stats.lastActivity ? formatDate(stats.lastActivity) : 'Aucune'}
           </div>
-          <div className="text-xs text-gray-500">Dernière activité</div>
+          <div className="text-xs text-gray-600">Dernière activité</div>
         </motion.div>
       </div>
 
@@ -488,8 +479,7 @@ export default function UserStats({ userId, activities, memberSince }: UserStats
         </h4>
         <div className="grid grid-cols-3 gap-4">
           <motion.div 
-            className="bg-gray-50 p-3 rounded-lg border border-gray-200"
-            whileHover={{ scale: 1.05 }}
+            className="bg-gray-50 p-3 rounded-lg"
             transition={{ duration: 0.2 }}
           >
             <div className="text-center">
@@ -498,8 +488,7 @@ export default function UserStats({ userId, activities, memberSince }: UserStats
             </div>
           </motion.div>
           <motion.div 
-            className="bg-gray-50 p-3 rounded-lg border border-gray-200"
-            whileHover={{ scale: 1.05 }}
+            className="bg-gray-50 p-3 rounded-lg"
             transition={{ duration: 0.2 }}
           >
             <div className="text-center">
@@ -508,8 +497,7 @@ export default function UserStats({ userId, activities, memberSince }: UserStats
             </div>
           </motion.div>
           <motion.div 
-            className="bg-gray-50 p-3 rounded-lg border border-gray-200"
-            whileHover={{ scale: 1.05 }}
+            className="bg-gray-50 p-3 rounded-lg"
             transition={{ duration: 0.2 }}
           >
             <div className="text-center">

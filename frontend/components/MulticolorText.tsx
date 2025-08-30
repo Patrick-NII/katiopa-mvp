@@ -85,15 +85,12 @@ export function MulticolorText({
           variants={animate ? letterVariants : {}}
           style={{ 
             color: colors[i % colors.length],
-            display: char === ' ' ? 'inline' : 'inline-block',
-            // Valeur initiale pour éviter brightness(NaN)
-            filter: 'brightness(1)'
+            display: char === ' ' ? 'inline' : 'inline-block'
           }}
           whileHover={animate ? {
-            scale: 1.2,
-            rotate: 5,
-            filter: "brightness(1.3)",
-            transition: { type: "spring", stiffness: 400 }
+            scale: 1.1,
+            rotate: 2,
+            transition: { type: "spring", stiffness: 300, damping: 15 }
           } : {}}
           className={char === ' ' ? 'mx-1' : ''}
         >
