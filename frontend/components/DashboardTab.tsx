@@ -23,7 +23,12 @@ import UserStats from './UserStats'
 interface DashboardTabProps {
   user: any
   activities: any[]
-  summary: any[]
+  summary: {
+    totalTime: number
+    averageScore: number
+    totalActivities: number
+    domains: any[]
+  } | null
   llmResponse: any
   loading: boolean
   focus: string
@@ -39,8 +44,8 @@ interface DashboardTabProps {
 
 export default function DashboardTab({
   user,
-  activities,
-  summary,
+  activities = [],
+  summary = null,
   llmResponse,
   loading,
   focus,
@@ -50,7 +55,7 @@ export default function DashboardTab({
   onSendChatMessage,
   chatResponse,
   chatLoading,
-  chatHistory,
+  chatHistory = [],
   onLoadChatHistory
 }: DashboardTabProps) {
   const [chatMessage, setChatMessage] = useState('');
@@ -59,111 +64,105 @@ export default function DashboardTab({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="space-y-8"
+      className="space-y-12"
     >
       
 
       {/* Statistiques principales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <motion.div 
-          className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"
+          className="bg-white p-5 rounded-xl shadow-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          whileHover={{ y: -5, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
         >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Activity size={24} className="text-blue-600" />
+          <div className="flex items-center gap-4 mb-3">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+              <Activity size={24} className="text-white" />
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-600">Activités totales</h3>
-              <p className="text-2xl font-bold text-gray-900">{activities.length}</p>
+              <p className="text-3xl font-bold text-gray-900">{activities?.length || 0}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-green-600">
-            <TrendingUp size={16} />
-            <span>+15% ce mois</span>
+          <div className="inline-flex items-center gap-1 text-sm text-emerald-800 bg-emerald-100 px-2 py-1 rounded-full">
+            <TrendingUp size={14} />
+            <span className="font-medium">+15% ce mois</span>
           </div>
         </motion.div>
 
         <motion.div 
-          className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"
+          className="bg-white p-5 rounded-xl shadow-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          whileHover={{ y: -5, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
         >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <Target size={24} className="text-green-600" />
+          <div className="flex items-center gap-4 mb-3">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+              <Target size={24} className="text-white" />
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-600">Score moyen</h3>
-              <p className="text-2xl font-bold text-gray-900">
-                {summary?.averageScore || 'N/A'}
+              <p className="text-3xl font-bold text-gray-900">
+                {summary?.averageScore ? summary.averageScore.toFixed(1) : 'N/A'}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-green-600">
-            <TrendingUp size={16} />
-            <span>+8% cette semaine</span>
+          <div className="inline-flex items-center gap-1 text-sm text-emerald-800 bg-emerald-100 px-2 py-1 rounded-full">
+            <TrendingUp size={14} />
+            <span className="font-medium">+8% cette semaine</span>
           </div>
         </motion.div>
 
         <motion.div 
-          className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"
+          className="bg-white p-5 rounded-xl shadow-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          whileHover={{ y: -5, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
         >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+          <div className="flex items-center gap-4 mb-3">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
               {user?.userType === 'PARENT' ? (
-                <Users size={24} className="text-purple-600" />
+                <Users size={24} className="text-white" />
               ) : (
-                <BarChart3 size={24} className="text-purple-600" />
+                <BarChart3 size={24} className="text-white" />
               )}
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-600">
                 {user?.userType === 'PARENT' ? 'Enfants actifs' : 'Domaines actifs'}
               </h3>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-3xl font-bold text-gray-900">
                 {user?.userType === 'PARENT' ? '2' : (summary?.domains?.length || 0)}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-purple-600">
-            <Zap size={16} />
-            <span>
-              {user?.userType === 'PARENT' ? 'Emma & Thomas' : '3 matières'}
-            </span>
+          <div className="inline-flex items-center gap-1 text-sm text-indigo-800 bg-indigo-100 px-2 py-1 rounded-full">
+            <Zap size={14} />
+            <span className="font-medium">{user?.userType === 'PARENT' ? 'Emma & Thomas' : '3 matières'}</span>
           </div>
         </motion.div>
 
         <motion.div 
-          className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"
+          className="bg-white p-5 rounded-xl shadow-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          whileHover={{ y: -5, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
         >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-              <Clock size={24} className="text-orange-600" />
+          <div className="flex items-center gap-4 mb-3">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+              <Clock size={24} className="text-white" />
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-600">Temps total</h3>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-3xl font-bold text-gray-900">
                 {summary?.totalTime || 0} min
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-orange-600">
-            <Award size={16} />
-            <span>Niveau 3</span>
+          <div className="inline-flex items-center gap-1 text-sm text-amber-800 bg-amber-100 px-2 py-1 rounded-full">
+            <Award size={14} />
+            <span className="font-medium">Niveau 3</span>
           </div>
         </motion.div>
       </div>
@@ -176,20 +175,20 @@ export default function DashboardTab({
       >
         
     
-        {/* Interface unifiée : Grand input avec évaluation intégrée - AGRANDIE */}
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-10 mb-8 shadow-xl">
+        {/* Interface unifiée : Grand input avec évaluation intégrée - MODERNE */}
+        <div className="bg-white rounded-2xl p-8 mb-8 shadow-sm">
           {/* En-tête intégré avec salutation */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-10">
           
             <h1 className="text-4xl font-bold text-gray-900 mb-3">
               {user?.userType === 'PARENT' 
-                ? `Bonjour ${user?.firstName} ! ` 
+                ? `Bonjour ${user?.firstName} !` 
                 : `Bonjour ${user?.firstName} ! 👋`
               }
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-gray-700 max-w-3xl mx-auto">
               {user?.userType === 'PARENT' 
-                ? "Suivez la progression de vos enfants et leurs performances en temps réel avec votre Assistant IA Katiopa"
+                ? "Suivez la progression de vos enfants et leurs performances en temps réel avec votre Assistant IA CubeAI"
                 : "Découvre ton potentiel avec l'intelligence artificielle ! Ton Assistant IA Personnel est là pour t'accompagner"
               }
             </p>
@@ -198,10 +197,10 @@ export default function DashboardTab({
           
           
                       {/* Sélection de matière et bouton d'évaluation en haut */}
-            <div className="bg-white rounded-xl p-8 border border-blue-100 shadow-lg">
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
               
               
-              {/* Grand input unifié - AGRANDI */}
+              {/* Grand input unifié - ÉPURÉ */}
               <div className="mb-6">
                 <textarea
                   value={chatMessage}
@@ -212,7 +211,7 @@ export default function DashboardTab({
                       : "Posez votre question, demandez une analyse ou lancez une évaluation... (Ex: Comment se sent mon enfant aujourd'hui ? Analyse ses progrès en mathématiques)"
                   }
                   rows={6}
-                  className="w-full px-6 py-6 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-300 transition-all duration-200 resize-none text-lg"
+                  className="w-full px-6 py-6 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200 resize-none text-base bg-white placeholder-gray-500"
                 />
               </div>
               
@@ -221,7 +220,7 @@ export default function DashboardTab({
                 <button 
                   onClick={() => onSendChatMessage(chatMessage)}
                   disabled={chatLoading || !chatMessage.trim()}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-12 py-4 rounded-lg transition-all duration-300 hover:scale-105 disabled:scale-100 shadow-md flex items-center gap-3 text-lg disabled:cursor-not-allowed"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-xl transition-colors shadow-sm flex items-center gap-3 text-base disabled:cursor-not-allowed font-semibold"
                 >
                   {chatLoading ? (
                     <>
@@ -230,7 +229,7 @@ export default function DashboardTab({
                     </>
                   ) : (
                     <>
-                      <Send size={20} />
+                      <Send size={18} />
                       <span className="font-medium">Envoyer</span>
                     </>
                   )}
@@ -242,24 +241,18 @@ export default function DashboardTab({
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 p-6 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg shadow-sm"
+                  className="mt-8 p-8 bg-white rounded-2xl shadow-sm"
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center">
-                        <MessageCircle size={16} className="text-white" />
-                      </div>
-                      <h4 className="text-lg font-semibold text-gray-900">Réponse de l'IA Coach</h4>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                      <MessageCircle size={20} className="text-white" />
                     </div>
-                    
-
+                    <h4 className="text-lg font-semibold text-gray-900">Réponse de l'IA Coach</h4>
                   </div>
                   
-                  <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  <div className="text-gray-800 leading-relaxed whitespace-pre-wrap text-base">
                     {chatResponse}
                   </div>
-                  
-
                 </motion.div>
               )}
 
@@ -268,18 +261,18 @@ export default function DashboardTab({
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 p-6 bg-gradient-to-r from-gray-50 to-blue-50 border border-gray-200 rounded-lg shadow-sm"
+                  className="mt-8 p-8 bg-white rounded-2xl shadow-sm"
                 >
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                        <MessageCircle size={16} className="text-white" />
+                      <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                        <MessageCircle size={20} className="text-white" />
                       </div>
                       <h4 className="text-lg font-semibold text-gray-900">Historique des Conversations</h4>
                     </div>
                     <button 
                       onClick={onLoadChatHistory}
-                      className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                      className="text-sm text-blue-600 hover:text-blue-800 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
                     >
                       Actualiser
                     </button>
@@ -287,7 +280,7 @@ export default function DashboardTab({
                   
                   <div className="space-y-4 max-h-96 overflow-y-auto">
                     {chatHistory.slice(0, 5).map((conv, index) => (
-                      <div key={conv.id} className="border-l-4 border-blue-200 pl-4 py-2">
+                      <div key={conv.id} className="border-l-2 border-blue-300 pl-4 py-2">
                         <div className="text-sm text-gray-500 mb-1">
                           {new Date(conv.createdAt).toLocaleDateString('fr-FR', {
                             day: '2-digit',
@@ -304,7 +297,7 @@ export default function DashboardTab({
                         <div className="text-sm font-medium text-gray-700 mb-1">
                           <span className="text-blue-600">Vous :</span> {conv.message}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-700">
                           <span className="text-green-600">IA :</span> {conv.response.substring(0, 100)}...
                         </div>
                       </div>
@@ -322,7 +315,7 @@ export default function DashboardTab({
               )}
             
             {/* Aide contextuelle et raccourcis - AGRANDIS */}
-            <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+            <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl">
               <div className="flex items-center gap-3 text-base text-blue-700 mb-4">
                 {user?.userType === 'CHILD' ? (
                   <>
@@ -356,35 +349,64 @@ export default function DashboardTab({
           </div>
         </div>
 
-        {/* Ligne supérieure : Matière de focus + Bouton d'évaluation */}
-        <div className="flex items-center justify-between gap-6 mb-6">
-                <div className="flex items-center gap-6">
-                  <label className="text-base font-medium text-gray-700 whitespace-nowrap">
-                    Matière de focus :
-                  </label>
-                  <select 
-                    value={focus} 
-                    onChange={(e) => onFocusChange(e.target.value)}
-                    className="px-6 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-300 text-base bg-gray-50"
-                  >
-                    <option value="maths">Mathématiques</option>
-                    <option value="coding">Programmation</option>
-                    <option value="reading">Lecture</option>
-                    <option value="science">Sciences</option>
-                    <option value="ai">IA</option>
-                  </select>
-                </div>
-                
-                {/* Bouton d'évaluation IA placé à droite */}
-                <AnimatedLLMButton 
-                  onClick={onEvaluateLLM}
-                  loading={loading}
-                  disabled={loading}
-                  subscriptionType={user.subscriptionType}
-                  focus={focus}
-                  className=""
-                />
-              </div>
+        {/* Barre d'actions: Matière de focus + Bouton d'évaluation */}
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-4 bg-white rounded-xl px-5 py-3 shadow-sm">
+            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
+              Matière de focus
+            </label>
+            <select 
+              value={focus} 
+              onChange={(e) => onFocusChange(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 text-sm bg-white"
+            >
+              <option value="maths">Mathématiques</option>
+              <option value="coding">Programmation</option>
+              <option value="reading">Lecture</option>
+              <option value="science">Sciences</option>
+              <option value="ai">IA</option>
+            </select>
+          </div>
+          <AnimatedLLMButton 
+            onClick={onEvaluateLLM}
+            loading={loading}
+            disabled={loading}
+            subscriptionType={user.subscriptionType}
+            focus={focus}
+            className="lg:min-w-[280px]"
+          />
+        </div>
+
+        {/* Actions rapides */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+          <button className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-3 text-left">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white flex items-center justify-center">
+              <Send size={18} />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-gray-900">Nouvel exercice</div>
+              <div className="text-xs text-gray-600">Générez un exercice adapté</div>
+            </div>
+          </button>
+          <button className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-3 text-left">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white flex items-center justify-center">
+              <TrendingUp size={18} />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-gray-900">Analyser les progrès</div>
+              <div className="text-xs text-gray-600">Aperçu des performances récentes</div>
+            </div>
+          </button>
+          <button className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-3 text-left">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white flex items-center justify-center">
+              <Users size={18} />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-gray-900">Inviter un membre</div>
+              <div className="text-xs text-gray-600">Ajouter un parent ou un enfant</div>
+            </div>
+          </button>
+        </div>
 
         {/* Résultats LLM avancés */}
         {llmResponse && (
