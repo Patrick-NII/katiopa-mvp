@@ -3,46 +3,33 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../prisma';
 import { requireAuth } from '../middleware/requireAuth';
+import authCompleteRoutes from './auth-complete';
 
 const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const JWT_EXPIRES_IN = '24h';
 
-// Inscription d'un nouveau compte complet
+// Utiliser la route d'inscription complète
+router.use('/', authCompleteRoutes);
+
+const router = express.Router();
+const prisma = new PrismaClient();
+
+// Configuration JWT
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_EXPIRES_IN = '24h';
+
+// Inscription d'un nouveau compte
 router.post('/register', async (req, res) => {
   try {
-    const { 
-      email, 
-      subscriptionType = 'FREE',
-      maxSessions,
-      familyMembers = [],
-      parentPrompts = {},
-      paymentInfo = {}
-    } = req.body;
+    const { email, password, firstName, lastName, subscriptionType = 'FREE' } = req.body;
 
-    console.log('📝 Données d\'inscription reçues:', {
-      email,
-      subscriptionType,
-      maxSessions,
-      familyMembersCount: familyMembers.length,
-      hasParentPrompts: !!parentPrompts,
-      hasPaymentInfo: !!paymentInfo
-    });
-
-    // Validation des données de base
-    if (!email) {
+    // Validation des données
+    if (!email || !password || !firstName || !lastName) {
       return res.status(400).json({
-        error: 'Email requis',
-        code: 'MISSING_EMAIL'
-      });
-    }
-
-    // Validation des membres de la famille
-    if (!familyMembers || familyMembers.length === 0) {
-      return res.status(400).json({
-        error: 'Au moins un membre de la famille est requis',
-        code: 'MISSING_FAMILY_MEMBERS'
+        error: 'Tous les champs sont requis',
+        code: 'MISSING_FIELDS'
       });
     }
 
@@ -58,158 +45,74 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Création du compte avec toutes les informations
+    // Hashage du mot de passe
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Création du compte
     const account = await prisma.account.create({
       data: {
         email,
         subscriptionType,
-        maxSessions: maxSessions || (subscriptionType === 'FREE' ? 1 : 
+        maxSessions: subscriptionType === 'FREE' ? 1 : 
                      subscriptionType === 'PRO' ? 2 : 
-                     subscriptionType === 'PRO_PLUS' ? 4 : 10),
-        createdAt: new Date(),
-        updatedAt: new Date()
+                     subscriptionType === 'PRO_PLUS' ? 4 : 10
       }
     });
 
-    console.log('✅ Compte créé:', account.id);
-
-    // Création des sessions utilisateur pour tous les membres de la famille
-    const createdSessions = [];
-    
-    for (const member of familyMembers) {
-      const {
+    // Création de la session utilisateur principale (parent)
+    const userSession = await prisma.userSession.create({
+      data: {
+        accountId: account.id,
+        sessionId: `${firstName.toLowerCase()}_${Date.now()}`,
+        password: hashedPassword,
         firstName,
         lastName,
-        gender = 'UNKNOWN',
-        userType = 'CHILD',
-        dateOfBirth,
-        grade,
-        username,
-        password
-      } = member;
-
-      // Validation des données du membre
-      if (!firstName || !lastName || !password) {
-        console.warn('⚠️ Membre invalide ignoré:', { firstName, lastName, hasPassword: !!password });
-        continue; // Ignorer les membres invalides
+        userType: 'PARENT',
+        isActive: true
       }
+    });
 
-      // Hashage du mot de passe
-      const hashedPassword = await bcrypt.hash(password, 12);
-
-      // Création de la session utilisateur
-      const userSession = await prisma.userSession.create({
-        data: {
-          accountId: account.id,
-          sessionId: username || `${firstName.toLowerCase()}_${Date.now()}`,
-          password: hashedPassword,
-          firstName,
-          lastName,
-          gender,
-          userType,
-          age: dateOfBirth ? calculateAge(dateOfBirth) : null,
-          grade,
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      });
-
-      console.log(`✅ Session créée pour ${firstName} ${lastName}:`, userSession.sessionId);
-
-      // Création du profil utilisateur avec les prompts parent
-      if (userType === 'PARENT' && parentPrompts) {
-        await prisma.userProfile.create({
-          data: {
-            userSessionId: userSession.id,
-            learningGoals: parentPrompts.objectives ? [parentPrompts.objectives] : [],
-            preferredSubjects: [],
-            learningStyle: parentPrompts.preferences || null,
-            difficulty: null,
-            sessionPreferences: parentPrompts,
-            interests: [],
-            specialNeeds: parentPrompts.concerns ? [parentPrompts.concerns] : [],
-            customNotes: parentPrompts.additionalInfo || null,
-            parentWishes: parentPrompts.needs || null,
-            createdAt: new Date(),
-            updatedAt: new Date()
-          }
-        });
-        console.log(`✅ Profil parent créé pour ${firstName} ${lastName}`);
-      } else {
-        // Profil basique pour les enfants
-        await prisma.userProfile.create({
-          data: {
-            userSessionId: userSession.id,
-            learningGoals: [],
-            preferredSubjects: [],
-            interests: [],
-            specialNeeds: [],
-            createdAt: new Date(),
-            updatedAt: new Date()
-          }
-        });
-        console.log(`✅ Profil enfant créé pour ${firstName} ${lastName}`);
+    // Création du profil utilisateur
+    await prisma.userProfile.create({
+      data: {
+        userSessionId: userSession.id,
+        learningGoals: [],
+        preferredSubjects: [],
+        interests: [],
+        specialNeeds: []
       }
-
-      createdSessions.push({
-        id: userSession.id,
-        firstName: userSession.firstName,
-        lastName: userSession.lastName,
-        sessionId: userSession.sessionId,
-        userType: userSession.userType,
-        createdAt: userSession.createdAt
-      });
-    }
+    });
 
     // Création du plan de sièges
     await prisma.planSeat.create({
       data: {
         accountId: account.id,
-        maxChildren: maxSessions || (subscriptionType === 'FREE' ? 1 : 
+        maxChildren: subscriptionType === 'FREE' ? 1 : 
                     subscriptionType === 'PRO' ? 2 : 
-                    subscriptionType === 'PRO_PLUS' ? 4 : 10)
+                    subscriptionType === 'PRO_PLUS' ? 4 : 10
       }
     });
 
-    console.log('✅ Plan de sièges créé');
-
-    // Enregistrement des informations de paiement (optionnel)
-    if (paymentInfo && Object.keys(paymentInfo).length > 0) {
-      console.log('💳 Informations de paiement reçues:', {
+    // Génération du token JWT
+    const token = jwt.sign(
+      { 
+        userId: userSession.id, 
         accountId: account.id,
-        cardHolderName: paymentInfo.cardHolderName,
-        billingAddress: paymentInfo.billingAddress,
-        acceptTerms: paymentInfo.acceptTerms,
-        acceptMarketing: paymentInfo.acceptMarketing
-      });
-    }
+        userType: userSession.userType 
+      },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
 
-    // Génération du token JWT pour le premier parent
-    const parentSession = createdSessions.find(s => s.userType === 'PARENT');
-    if (parentSession) {
-      const token = jwt.sign(
-        { 
-          userId: parentSession.id, 
-          accountId: account.id,
-          userType: parentSession.userType 
-        },
-        JWT_SECRET,
-        { expiresIn: JWT_EXPIRES_IN }
-      );
+    // Réponse avec cookie sécurisé
+    res.cookie('authToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24 heures
+    });
 
-      // Réponse avec cookie sécurisé
-      res.cookie('authToken', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 24 * 60 * 60 * 1000 // 24 heures
-      });
-
-      console.log('✅ Token JWT généré pour le parent');
-    }
-
-    const responseData = {
+    res.status(201).json({
       success: true,
       message: 'Compte créé avec succès',
       data: {
@@ -217,28 +120,22 @@ router.post('/register', async (req, res) => {
           id: account.id,
           email: account.email,
           subscriptionType: account.subscriptionType,
-          maxSessions: account.maxSessions,
-          createdAt: account.createdAt
+          maxSessions: account.maxSessions
         },
-        sessions: createdSessions,
-        totalMembers: createdSessions.length
+        userSession: {
+          id: userSession.id,
+          firstName: userSession.firstName,
+          lastName: userSession.lastName,
+          userType: userSession.userType
+        }
       }
-    };
-
-    console.log('🎉 Inscription terminée avec succès:', {
-      accountId: account.id,
-      totalMembers: createdSessions.length,
-      sessions: createdSessions.map(s => `${s.firstName} ${s.lastName} (${s.userType})`)
     });
-
-    res.status(201).json(responseData);
 
   } catch (error) {
     console.error('❌ Erreur lors de l\'inscription:', error);
     res.status(500).json({
       error: 'Erreur lors de la création du compte',
-      code: 'REGISTRATION_ERROR',
-      details: error.message
+      code: 'REGISTRATION_ERROR'
     });
   }
 });
@@ -394,10 +291,134 @@ router.get('/me', requireAuth, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Erreur lors de la vérification:', error);
+    console.error('❌ Erreur lors de la vérification de l\'authentification:', error);
     res.status(500).json({
-      error: 'Erreur lors de la vérification',
-      code: 'VERIFICATION_ERROR'
+      error: 'Erreur lors de la vérification de l\'authentification',
+      code: 'AUTH_VERIFICATION_ERROR'
+    });
+  }
+});
+
+// Création d'une session enfant
+router.post('/child-session', requireAuth, async (req, res) => {
+  try {
+    const { accountId } = req.user;
+    const { firstName, lastName, age, grade, gender = 'UNKNOWN' } = req.body;
+
+    // Validation des données
+    if (!firstName || !lastName || !age || !grade) {
+      return res.status(400).json({
+        error: 'Tous les champs sont requis',
+        code: 'MISSING_FIELDS'
+      });
+    }
+
+    // Vérification des limites du plan
+    const account = await prisma.account.findUnique({
+      where: { id: accountId },
+      include: {
+        userSessions: true,
+        planSeat: true
+      }
+    });
+
+    if (!account) {
+      return res.status(404).json({
+        error: 'Compte non trouvé',
+        code: 'ACCOUNT_NOT_FOUND'
+      });
+    }
+
+    const currentChildSessions = account.userSessions.filter(
+      session => session.userType === 'CHILD'
+    ).length;
+
+    if (currentChildSessions >= account.planSeat!.maxChildren) {
+      return res.status(403).json({
+        error: 'Limite du plan atteinte',
+        code: 'PLAN_LIMIT_REACHED'
+      });
+    }
+
+    // Génération d'un mot de passe temporaire
+    const tempPassword = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(tempPassword, 12);
+
+    // Création de la session enfant
+    const childSession = await prisma.userSession.create({
+      data: {
+        accountId,
+        sessionId: `${firstName.toLowerCase()}_${Date.now()}`,
+        password: hashedPassword,
+        firstName,
+        lastName,
+        age,
+        grade,
+        gender,
+        userType: 'CHILD',
+        isActive: true
+      }
+    });
+
+    // Création du profil enfant
+    await prisma.userProfile.create({
+      data: {
+        userSessionId: childSession.id,
+        learningGoals: [],
+        preferredSubjects: [],
+        interests: [],
+        specialNeeds: []
+      }
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Session enfant créée avec succès',
+      data: {
+        childSession: {
+          id: childSession.id,
+          firstName: childSession.firstName,
+          lastName: childSession.lastName,
+          age: childSession.age,
+          grade: childSession.grade,
+          gender: childSession.gender,
+          tempPassword
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur lors de la création de la session enfant:', error);
+    res.status(500).json({
+      error: 'Erreur lors de la création de la session enfant',
+      code: 'CHILD_SESSION_CREATION_ERROR'
+    });
+  }
+});
+
+// Récupération des sessions utilisateur d'un compte
+router.get('/sessions', requireAuth, async (req, res) => {
+  try {
+    const { accountId } = req.user;
+
+    const userSessions = await prisma.userSession.findMany({
+      where: { accountId },
+      include: {
+        profile: true
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json({
+      success: true,
+      data: userSessions
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur lors de la récupération des sessions:', error);
+    res.status(500).json({
+      error: 'Erreur lors de la récupération des sessions',
+      code: 'SESSIONS_RETRIEVAL_ERROR'
     });
   }
 });
@@ -451,18 +472,3 @@ router.get('/test-accounts', async (req, res) => {
   }
 });
 
-// Fonction utilitaire pour calculer l'âge
-function calculateAge(dateOfBirth: string): number {
-  const today = new Date();
-  const birthDate = new Date(dateOfBirth);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-  
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
-  }
-  
-  return age;
-}
-
-export default router;
