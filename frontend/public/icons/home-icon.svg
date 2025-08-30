@@ -1,0 +1,67 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @keyframes shine {
+      0% { opacity: 0; transform: translateX(-100%); }
+      50% { opacity: 1; transform: translateX(0%); }
+      100% { opacity: 0; transform: translateX(100%); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    @keyframes glow {
+      0%, 100% { filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.3)); }
+      50% { filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.6)); }
+    }
+    
+    .home-icon {
+      animation: pulse 2s ease-in-out infinite, glow 3s ease-in-out infinite;
+    }
+    
+    .shine-effect {
+      animation: shine 2s ease-in-out infinite;
+    }
+  </style>
+  
+  <!-- Effet de brillance -->
+  <rect x="0" y="0" width="24" height="24" fill="url(#shine)" class="shine-effect" opacity="0.3"/>
+  
+  <!-- Icône de maison -->
+  <g class="home-icon">
+    <!-- Toit -->
+    <path d="M12 2L2 9V22H22V9L12 2Z" fill="#3B82F6" stroke="#1E40AF" stroke-width="1"/>
+    
+    <!-- Porte -->
+    <rect x="9" y="14" width="6" height="8" fill="#1E40AF" rx="1"/>
+    
+    <!-- Poignée de porte -->
+    <circle cx="13" cy="18" r="0.5" fill="#FBBF24"/>
+    
+    <!-- Fenêtres -->
+    <rect x="4" y="10" width="3" height="3" fill="#60A5FA" rx="0.5"/>
+    <rect x="17" y="10" width="3" height="3" fill="#60A5FA" rx="0.5"/>
+    
+    <!-- Cheminée -->
+    <rect x="16" y="4" width="2" height="4" fill="#EF4444" rx="0.5"/>
+    
+    <!-- Fumée -->
+    <circle cx="17" cy="3" r="0.5" fill="#9CA3AF" opacity="0.7">
+      <animate attributeName="cy" values="3;2;3" dur="1s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7;0.3;0.7" dur="1s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Détails du toit -->
+    <path d="M12 2L2 9H22L12 2Z" fill="none" stroke="#1E40AF" stroke-width="0.5" opacity="0.5"/>
+  </g>
+  
+  <!-- Gradient pour l'effet de brillance -->
+  <defs>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0);stop-opacity:0" />
+      <stop offset="50%" style="stop-color:rgba(255,255,255,0.8);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0);stop-opacity:0" />
+    </linearGradient>
+  </defs>
+</svg>
