@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { User, Lock, Eye, EyeOff, ArrowRight, Info, User as UserIcon } from 'lucide-react';
@@ -9,14 +9,48 @@ import { CubeAILogo } from '@/components/MulticolorText';
 import AnimatedIcon from '@/components/AnimatedIcons';
 import Link from 'next/link';
 
+interface TestAccount {
+  name: string;
+  sessionId: string;
+  password: string;
+  type: string;
+  subscriptionType: string;
+  email: string;
+}
+
 export default function LoginPage() {
-  const [sessionId, setSessionId] = useState('PATRICK_MARTIN');
-  const [password, setPassword] = useState('password123');
+  const [sessionId, setSessionId] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showTestAccounts, setShowTestAccounts] = useState(false);
+  const [testAccounts, setTestAccounts] = useState<TestAccount[]>([]);
+  const [loadingAccounts, setLoadingAccounts] = useState(false);
   const router = useRouter();
+
+  // Récupérer les comptes de test depuis la base de données
+  useEffect(() => {
+    const loadTestAccounts = async () => {
+      setLoadingAccounts(true);
+      try {
+        const accounts = await authAPI.getTestAccounts();
+        setTestAccounts(accounts);
+        
+        // Pré-remplir avec le premier compte si disponible
+        if (accounts.length > 0) {
+          setSessionId(accounts[0].sessionId);
+          setPassword(accounts[0].password);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des comptes de test:', error);
+      } finally {
+        setLoadingAccounts(false);
+      }
+    };
+
+    loadTestAccounts();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,12 +83,6 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
-
-  const testAccounts = [
-    { name: 'Compte Parent (Pro)', sessionId: 'PATRICK_MARTIN', password: 'password123', type: 'PRO' },
-    { name: 'Compte Parent (Gratuit)', sessionId: 'MARIE_DUPONT', password: 'password123', type: 'FREE' },
-    { name: 'Compte Enfant', sessionId: 'ALEX_008', password: 'password123', type: 'CHILD' }
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -90,8 +118,8 @@ export default function LoginPage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8"
         >
-          <CubeAILogo className="text-4xl mb-2" />
-          <p className="font-subtitle text-gray-600">Apprentissage pour enfants</p>
+          
+          <p className="font-subtitle text-gray-600">Hello ! 😊</p>
         </motion.div>
 
         {/* Formulaire de connexion */}
@@ -186,7 +214,9 @@ export default function LoginPage() {
               className="font-body w-full flex items-center justify-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
             >
               <Info className="h-4 w-4" />
-              <span className="text-sm">Voir les comptes de test</span>
+              <span className="text-sm">
+                {loadingAccounts ? 'Chargement des comptes...' : 'Voir les comptes de test'}
+              </span>
             </button>
 
             {showTestAccounts && (
@@ -196,12 +226,49 @@ export default function LoginPage() {
                 exit={{ opacity: 0, height: 0 }}
                 className="bg-gray-50 rounded-lg p-4 space-y-2"
               >
-                <p className="font-body text-xs text-gray-600 mb-2">Comptes de test disponibles :</p>
-                {testAccounts.map((account, index) => (
-                  <div key={index} className="font-body text-xs text-gray-700">
-                    <strong>{account.name}:</strong> {account.sessionId} / {account.password}
+                {loadingAccounts ? (
+                  <div className="text-center py-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="font-body text-xs text-gray-600 mt-2">Chargement des comptes...</p>
                   </div>
-                ))}
+                ) : testAccounts.length > 0 ? (
+                  <>
+                    <p className="font-body text-xs text-gray-600 mb-2">Comptes de test disponibles :</p>
+                    {testAccounts.map((account, index) => (
+                      <div key={index} className="font-body text-xs text-gray-700 p-2 bg-white rounded border">
+                        <div className="flex justify-between items-start mb-1">
+                          <strong className="text-blue-600">{account.name}</strong>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            account.subscriptionType === 'PRO' ? 'bg-purple-100 text-purple-700' :
+                            account.subscriptionType === 'PREMIUM' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-green-100 text-green-700'
+                          }`}>
+                            {account.subscriptionType}
+                          </span>
+                        </div>
+                        <div className="text-gray-600">
+                          <div><strong>ID:</strong> {account.sessionId}</div>
+                          <div><strong>Mot de passe:</strong> {account.password}</div>
+                          <div><strong>Type:</strong> {account.type}</div>
+                          <div><strong>Email:</strong> {account.email}</div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setSessionId(account.sessionId);
+                            setPassword(account.password);
+                          }}
+                          className="mt-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-colors"
+                        >
+                          Utiliser ce compte
+                        </button>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <p className="font-body text-xs text-gray-500 text-center py-4">
+                    Aucun compte de test disponible
+                  </p>
+                )}
               </motion.div>
             )}
 
