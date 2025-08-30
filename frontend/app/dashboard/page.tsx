@@ -142,10 +142,12 @@ export default function DashboardPage() {
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'statistics', label: 'Statistiques', icon: '📈' },
-    { id: 'profile', label: 'Profil', icon: '👤' },
-    { id: 'subscription', label: 'Abonnements', icon: '💳' },
-    { id: 'billing', label: 'Facturation', icon: '🧾' },
+    { id: 'statistiques', label: 'Statistiques', icon: '📈' },
+    { id: 'cubeai-experiences', label: 'CubeAI Experiences', icon: '🚀' },
+    { id: 'informations', label: 'Profil & Préférences', icon: '👤' },
+    { id: 'abonnements', label: 'Abonnements', icon: '💳' },
+    { id: 'facturation', label: 'Facturation', icon: '🧾' },
+    { id: 'family-members', label: 'Membres de famille', icon: '👥' },
   ];
 
   const renderTabContent = () => {
@@ -173,11 +175,11 @@ export default function DashboardPage() {
         return <StatisticsTab user={user} activities={[]} summary={summary} />;
       case 'cubeai-experiences':
         return <CubeAIExperiencesTab />;
-      case 'profile':
+      case 'informations':
         return <ProfileTab user={user} />;
-      case 'subscription':
+      case 'abonnements':
         return <SubscriptionTab user={user} />;
-      case 'billing':
+      case 'facturation':
         return <BillingTab user={user} />;
       case 'family-members':
         return <FamilyMembersTab />;
