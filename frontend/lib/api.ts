@@ -151,6 +151,20 @@ export const sessionsAPI = {
       return [];
     }
   },
+
+  // Mise à jour du temps de connexion
+  updateConnectionTime: async (): Promise<boolean> => {
+    try {
+      const response = await apiFetch('/api/sessions/update-time', {
+        method: 'POST'
+      });
+      const data = await response.json();
+      return data.success;
+    } catch (error) {
+      console.warn('⚠️ Impossible de mettre à jour le temps de connexion:', error);
+      return false;
+    }
+  }
 };
 
 // API des statistiques

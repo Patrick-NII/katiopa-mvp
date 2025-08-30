@@ -120,6 +120,25 @@ export default function DashboardTab({
     }
   }, [user?.userType, user?.id, user?.sessionId, user?.firstName, user?.lastName]);
 
+  // Mise à jour périodique du temps de connexion
+  useEffect(() => {
+    if (user?.userType === 'PARENT') {
+      // Mettre à jour le temps toutes les 5 minutes
+      const updateInterval = setInterval(async () => {
+        try {
+          await sessionsAPI.updateConnectionTime();
+          // Recharger les sessions pour avoir les données mises à jour
+          const sessions = await sessionsAPI.getActiveSessions();
+          setActiveSessions(sessions);
+        } catch (error) {
+          console.error('Erreur lors de la mise à jour du temps de connexion:', error);
+        }
+      }, 5 * 60 * 1000); // 5 minutes
+
+      return () => clearInterval(updateInterval);
+    }
+  }, [user?.userType]);
+
   // Calcul du nombre de sessions actives selon le type de compte
   const getActiveSessionsCount = () => {
     if (user?.userType !== 'PARENT') return 0;
