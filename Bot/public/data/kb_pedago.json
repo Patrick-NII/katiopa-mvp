@@ -1,0 +1,987 @@
+[
+  {
+    "id": "pedago_methode",
+    "q": "Méthode / progression",
+    "a_kid": "On avance par petites missions. Tu vois tes progrès et tu gagnes des badges.",
+    "a_pro": "Parcours en quêtes, objectifs clairs, feedback immédiat, certificat final.",
+    "tags": [
+      "methode",
+      "pedago",
+      "progression",
+      "apprentissage",
+      "evaluation",
+      "certificat",
+      "parents",
+      "defi"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_parents",
+    "q": "Rôle des parents",
+    "a_kid": "On avance par petites missions. Tu vois tes progrès et tu gagnes des badges.",
+    "a_pro": "Définition d’objectifs, validation de défis, rapports réguliers.",
+    "tags": [
+      "parents",
+      "pedago",
+      "progression",
+      "apprentissage",
+      "evaluation",
+      "certificat",
+      "parents",
+      "defi"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_evaluation",
+    "q": "Évaluation continue",
+    "a_kid": "On avance par petites missions. Tu vois tes progrès et tu gagnes des badges.",
+    "a_pro": "Courtes évaluations, graphiques, adaptation de la difficulté.",
+    "tags": [
+      "evaluation",
+      "pedago",
+      "progression",
+      "apprentissage",
+      "evaluation",
+      "certificat",
+      "parents",
+      "defi"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_motivation",
+    "q": "Motivation",
+    "a_kid": "On avance par petites missions. Tu vois tes progrès et tu gagnes des badges.",
+    "a_pro": "Défis, badges, progression visible, récompenses parentales optionnelles.",
+    "tags": [
+      "motivation",
+      "pedago",
+      "progression",
+      "apprentissage",
+      "evaluation",
+      "certificat",
+      "parents",
+      "defi"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_graphe",
+    "q": "Graphe des connaissances",
+    "a_kid": "On avance par petites missions. Tu vois tes progrès et tu gagnes des badges.",
+    "a_pro": "Visualisation des notions apprises comme un réseau de compétences.",
+    "tags": [
+      "graphe",
+      "pedago",
+      "progression",
+      "apprentissage",
+      "evaluation",
+      "certificat",
+      "parents",
+      "defi"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_1",
+    "q": "Principe pédagogique 1",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_2",
+    "q": "Principe pédagogique 2",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_3",
+    "q": "Principe pédagogique 3",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_4",
+    "q": "Principe pédagogique 4",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_5",
+    "q": "Principe pédagogique 5",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_6",
+    "q": "Principe pédagogique 6",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_7",
+    "q": "Principe pédagogique 7",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_8",
+    "q": "Principe pédagogique 8",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_9",
+    "q": "Principe pédagogique 9",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_10",
+    "q": "Principe pédagogique 10",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_11",
+    "q": "Principe pédagogique 11",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_12",
+    "q": "Principe pédagogique 12",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_13",
+    "q": "Principe pédagogique 13",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_14",
+    "q": "Principe pédagogique 14",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_15",
+    "q": "Principe pédagogique 15",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_16",
+    "q": "Principe pédagogique 16",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_17",
+    "q": "Principe pédagogique 17",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_18",
+    "q": "Principe pédagogique 18",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_19",
+    "q": "Principe pédagogique 19",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_20",
+    "q": "Principe pédagogique 20",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_21",
+    "q": "Principe pédagogique 21",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_22",
+    "q": "Principe pédagogique 22",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_23",
+    "q": "Principe pédagogique 23",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_24",
+    "q": "Principe pédagogique 24",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_25",
+    "q": "Principe pédagogique 25",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_26",
+    "q": "Principe pédagogique 26",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_27",
+    "q": "Principe pédagogique 27",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_28",
+    "q": "Principe pédagogique 28",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_29",
+    "q": "Principe pédagogique 29",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_30",
+    "q": "Principe pédagogique 30",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_31",
+    "q": "Principe pédagogique 31",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_32",
+    "q": "Principe pédagogique 32",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_33",
+    "q": "Principe pédagogique 33",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_34",
+    "q": "Principe pédagogique 34",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_35",
+    "q": "Principe pédagogique 35",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_36",
+    "q": "Principe pédagogique 36",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_37",
+    "q": "Principe pédagogique 37",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_38",
+    "q": "Principe pédagogique 38",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_39",
+    "q": "Principe pédagogique 39",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_40",
+    "q": "Principe pédagogique 40",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_41",
+    "q": "Principe pédagogique 41",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_42",
+    "q": "Principe pédagogique 42",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_43",
+    "q": "Principe pédagogique 43",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_44",
+    "q": "Principe pédagogique 44",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_45",
+    "q": "Principe pédagogique 45",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_46",
+    "q": "Principe pédagogique 46",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_47",
+    "q": "Principe pédagogique 47",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_48",
+    "q": "Principe pédagogique 48",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_49",
+    "q": "Principe pédagogique 49",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_50",
+    "q": "Principe pédagogique 50",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_51",
+    "q": "Principe pédagogique 51",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_52",
+    "q": "Principe pédagogique 52",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_53",
+    "q": "Principe pédagogique 53",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_54",
+    "q": "Principe pédagogique 54",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_55",
+    "q": "Principe pédagogique 55",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_56",
+    "q": "Principe pédagogique 56",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_57",
+    "q": "Principe pédagogique 57",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_58",
+    "q": "Principe pédagogique 58",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_59",
+    "q": "Principe pédagogique 59",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  },
+  {
+    "id": "pedago_detail_60",
+    "q": "Principe pédagogique 60",
+    "a_pro": "Alignement sur les objectifs, pratique espacée, feedback ciblé, différenciation selon le niveau.",
+    "a_kid": "On t’explique, tu essaies, et on t’aide à t’améliorer pas à pas.",
+    "tags": [
+      "pedago",
+      "principe",
+      "feedback",
+      "objectifs",
+      "differenciation",
+      "pratique"
+    ],
+    "kind": "pedago"
+  }
+]

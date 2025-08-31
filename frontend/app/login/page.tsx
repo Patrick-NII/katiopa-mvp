@@ -167,6 +167,8 @@ export default function LoginPage() {
                 </>
               )}
             </motion.button>
+
+            
           </form>
 
           {/* Informations supplémentaires */}
@@ -180,13 +182,13 @@ export default function LoginPage() {
                 </a>
               </p>
               
-              <p className="font-body text-sm text-gray-600">
-                Votre enfant a déjà un compte ?{' '}
-                <a href="/login-child" className="text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center space-x-2">
+             
+                <a href="/forgot-password" className="flex items-center justify-center space-x-2 text-sm text-blue-600 hover:text-blue-800 font-medium">
                   <UserIcon className="h-4 w-4" />
-                  <span>Connexion Enfant</span>
+                  <span className="!text-blue-600 hover:!text-blue-800">Mot de passe oublié ?</span>
                 </a>
-              </p>
+                
+              
             </div>
           </div>
 

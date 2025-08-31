@@ -10,6 +10,7 @@ import { SubscriptionTab } from '@/components/SubscriptionTab';
 import { BillingTab } from '@/components/BillingTab';
 import FamilyMembersTab from '@/components/FamilyMembersTab';
 import CubeAIExperiencesTab from '@/components/CubeAIExperiencesTab';
+import ChatbotWrapper from '@/components/chatbot/ChatbotWrapper';
 import { authAPI, statsAPI } from '@/lib/api';
 
 interface User {
@@ -227,6 +228,9 @@ export default function DashboardPage() {
           </div>
         </motion.div>
       </main>
+
+      {/* Chatbot */}
+      <ChatbotWrapper />
     </div>
   );
 } 
