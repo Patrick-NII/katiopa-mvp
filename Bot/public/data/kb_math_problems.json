@@ -1,0 +1,2802 @@
+[
+  {
+    "id": "math_add_1",
+    "q": "Problème addition 1",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 8 = ? Réponse: 14.",
+    "a_pro": "Addition simple: 6 + 8 = 14.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_2",
+    "q": "Problème addition 2",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 3 = ? Réponse: 12.",
+    "a_pro": "Addition simple: 9 + 3 = 12.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_3",
+    "q": "Problème addition 3",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 6 = ? Réponse: 15.",
+    "a_pro": "Addition simple: 9 + 6 = 15.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_4",
+    "q": "Problème addition 4",
+    "topic": "math",
+    "a_kid": "Calcule: 2 + 3 = ? Réponse: 5.",
+    "a_pro": "Addition simple: 2 + 3 = 5.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_5",
+    "q": "Problème addition 5",
+    "topic": "math",
+    "a_kid": "Calcule: 5 + 4 = ? Réponse: 9.",
+    "a_pro": "Addition simple: 5 + 4 = 9.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_6",
+    "q": "Problème addition 6",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 8 = ? Réponse: 14.",
+    "a_pro": "Addition simple: 6 + 8 = 14.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_7",
+    "q": "Problème addition 7",
+    "topic": "math",
+    "a_kid": "Calcule: 5 + 5 = ? Réponse: 10.",
+    "a_pro": "Addition simple: 5 + 5 = 10.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_8",
+    "q": "Problème addition 8",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 8 = ? Réponse: 14.",
+    "a_pro": "Addition simple: 6 + 8 = 14.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_9",
+    "q": "Problème addition 9",
+    "topic": "math",
+    "a_kid": "Calcule: 4 + 7 = ? Réponse: 11.",
+    "a_pro": "Addition simple: 4 + 7 = 11.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_10",
+    "q": "Problème addition 10",
+    "topic": "math",
+    "a_kid": "Calcule: 3 + 3 = ? Réponse: 6.",
+    "a_pro": "Addition simple: 3 + 3 = 6.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_11",
+    "q": "Problème addition 11",
+    "topic": "math",
+    "a_kid": "Calcule: 2 + 6 = ? Réponse: 8.",
+    "a_pro": "Addition simple: 2 + 6 = 8.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_12",
+    "q": "Problème addition 12",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 2 = ? Réponse: 8.",
+    "a_pro": "Addition simple: 6 + 2 = 8.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_13",
+    "q": "Problème addition 13",
+    "topic": "math",
+    "a_kid": "Calcule: 4 + 9 = ? Réponse: 13.",
+    "a_pro": "Addition simple: 4 + 9 = 13.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_14",
+    "q": "Problème addition 14",
+    "topic": "math",
+    "a_kid": "Calcule: 3 + 4 = ? Réponse: 7.",
+    "a_pro": "Addition simple: 3 + 4 = 7.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_15",
+    "q": "Problème addition 15",
+    "topic": "math",
+    "a_kid": "Calcule: 7 + 9 = ? Réponse: 16.",
+    "a_pro": "Addition simple: 7 + 9 = 16.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_16",
+    "q": "Problème addition 16",
+    "topic": "math",
+    "a_kid": "Calcule: 7 + 4 = ? Réponse: 11.",
+    "a_pro": "Addition simple: 7 + 4 = 11.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_17",
+    "q": "Problème addition 17",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 5 = ? Réponse: 11.",
+    "a_pro": "Addition simple: 6 + 5 = 11.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_18",
+    "q": "Problème addition 18",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 4 = ? Réponse: 13.",
+    "a_pro": "Addition simple: 9 + 4 = 13.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_19",
+    "q": "Problème addition 19",
+    "topic": "math",
+    "a_kid": "Calcule: 4 + 8 = ? Réponse: 12.",
+    "a_pro": "Addition simple: 4 + 8 = 12.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_20",
+    "q": "Problème addition 20",
+    "topic": "math",
+    "a_kid": "Calcule: 8 + 9 = ? Réponse: 17.",
+    "a_pro": "Addition simple: 8 + 9 = 17.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_21",
+    "q": "Problème addition 21",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 5 = ? Réponse: 14.",
+    "a_pro": "Addition simple: 9 + 5 = 14.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_22",
+    "q": "Problème addition 22",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 4 = ? Réponse: 13.",
+    "a_pro": "Addition simple: 9 + 4 = 13.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_23",
+    "q": "Problème addition 23",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 4 = ? Réponse: 13.",
+    "a_pro": "Addition simple: 9 + 4 = 13.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_24",
+    "q": "Problème addition 24",
+    "topic": "math",
+    "a_kid": "Calcule: 8 + 2 = ? Réponse: 10.",
+    "a_pro": "Addition simple: 8 + 2 = 10.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_25",
+    "q": "Problème addition 25",
+    "topic": "math",
+    "a_kid": "Calcule: 2 + 5 = ? Réponse: 7.",
+    "a_pro": "Addition simple: 2 + 5 = 7.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_26",
+    "q": "Problème addition 26",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 7 = ? Réponse: 13.",
+    "a_pro": "Addition simple: 6 + 7 = 13.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_27",
+    "q": "Problème addition 27",
+    "topic": "math",
+    "a_kid": "Calcule: 3 + 7 = ? Réponse: 10.",
+    "a_pro": "Addition simple: 3 + 7 = 10.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_28",
+    "q": "Problème addition 28",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 7 = ? Réponse: 16.",
+    "a_pro": "Addition simple: 9 + 7 = 16.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_29",
+    "q": "Problème addition 29",
+    "topic": "math",
+    "a_kid": "Calcule: 5 + 3 = ? Réponse: 8.",
+    "a_pro": "Addition simple: 5 + 3 = 8.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_30",
+    "q": "Problème addition 30",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 8 = ? Réponse: 14.",
+    "a_pro": "Addition simple: 6 + 8 = 14.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_31",
+    "q": "Problème addition 31",
+    "topic": "math",
+    "a_kid": "Calcule: 3 + 2 = ? Réponse: 5.",
+    "a_pro": "Addition simple: 3 + 2 = 5.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_32",
+    "q": "Problème addition 32",
+    "topic": "math",
+    "a_kid": "Calcule: 3 + 2 = ? Réponse: 5.",
+    "a_pro": "Addition simple: 3 + 2 = 5.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_33",
+    "q": "Problème addition 33",
+    "topic": "math",
+    "a_kid": "Calcule: 2 + 2 = ? Réponse: 4.",
+    "a_pro": "Addition simple: 2 + 2 = 4.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_34",
+    "q": "Problème addition 34",
+    "topic": "math",
+    "a_kid": "Calcule: 3 + 5 = ? Réponse: 8.",
+    "a_pro": "Addition simple: 3 + 5 = 8.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_35",
+    "q": "Problème addition 35",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 3 = ? Réponse: 9.",
+    "a_pro": "Addition simple: 6 + 3 = 9.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_36",
+    "q": "Problème addition 36",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 3 = ? Réponse: 12.",
+    "a_pro": "Addition simple: 9 + 3 = 12.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_37",
+    "q": "Problème addition 37",
+    "topic": "math",
+    "a_kid": "Calcule: 8 + 4 = ? Réponse: 12.",
+    "a_pro": "Addition simple: 8 + 4 = 12.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_38",
+    "q": "Problème addition 38",
+    "topic": "math",
+    "a_kid": "Calcule: 3 + 7 = ? Réponse: 10.",
+    "a_pro": "Addition simple: 3 + 7 = 10.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_39",
+    "q": "Problème addition 39",
+    "topic": "math",
+    "a_kid": "Calcule: 5 + 6 = ? Réponse: 11.",
+    "a_pro": "Addition simple: 5 + 6 = 11.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_40",
+    "q": "Problème addition 40",
+    "topic": "math",
+    "a_kid": "Calcule: 8 + 9 = ? Réponse: 17.",
+    "a_pro": "Addition simple: 8 + 9 = 17.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_41",
+    "q": "Problème addition 41",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 4 = ? Réponse: 13.",
+    "a_pro": "Addition simple: 9 + 4 = 13.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_42",
+    "q": "Problème addition 42",
+    "topic": "math",
+    "a_kid": "Calcule: 7 + 6 = ? Réponse: 13.",
+    "a_pro": "Addition simple: 7 + 6 = 13.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_43",
+    "q": "Problème addition 43",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 4 = ? Réponse: 10.",
+    "a_pro": "Addition simple: 6 + 4 = 10.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_44",
+    "q": "Problème addition 44",
+    "topic": "math",
+    "a_kid": "Calcule: 7 + 5 = ? Réponse: 12.",
+    "a_pro": "Addition simple: 7 + 5 = 12.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_45",
+    "q": "Problème addition 45",
+    "topic": "math",
+    "a_kid": "Calcule: 2 + 8 = ? Réponse: 10.",
+    "a_pro": "Addition simple: 2 + 8 = 10.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_46",
+    "q": "Problème addition 46",
+    "topic": "math",
+    "a_kid": "Calcule: 7 + 5 = ? Réponse: 12.",
+    "a_pro": "Addition simple: 7 + 5 = 12.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_47",
+    "q": "Problème addition 47",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 6 = ? Réponse: 12.",
+    "a_pro": "Addition simple: 6 + 6 = 12.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_48",
+    "q": "Problème addition 48",
+    "topic": "math",
+    "a_kid": "Calcule: 7 + 3 = ? Réponse: 10.",
+    "a_pro": "Addition simple: 7 + 3 = 10.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_49",
+    "q": "Problème addition 49",
+    "topic": "math",
+    "a_kid": "Calcule: 4 + 7 = ? Réponse: 11.",
+    "a_pro": "Addition simple: 4 + 7 = 11.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_50",
+    "q": "Problème addition 50",
+    "topic": "math",
+    "a_kid": "Calcule: 5 + 5 = ? Réponse: 10.",
+    "a_pro": "Addition simple: 5 + 5 = 10.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_51",
+    "q": "Problème addition 51",
+    "topic": "math",
+    "a_kid": "Calcule: 5 + 7 = ? Réponse: 12.",
+    "a_pro": "Addition simple: 5 + 7 = 12.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_52",
+    "q": "Problème addition 52",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 7 = ? Réponse: 16.",
+    "a_pro": "Addition simple: 9 + 7 = 16.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_53",
+    "q": "Problème addition 53",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 7 = ? Réponse: 16.",
+    "a_pro": "Addition simple: 9 + 7 = 16.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_54",
+    "q": "Problème addition 54",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 8 = ? Réponse: 17.",
+    "a_pro": "Addition simple: 9 + 8 = 17.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_55",
+    "q": "Problème addition 55",
+    "topic": "math",
+    "a_kid": "Calcule: 2 + 9 = ? Réponse: 11.",
+    "a_pro": "Addition simple: 2 + 9 = 11.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_56",
+    "q": "Problème addition 56",
+    "topic": "math",
+    "a_kid": "Calcule: 4 + 7 = ? Réponse: 11.",
+    "a_pro": "Addition simple: 4 + 7 = 11.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_57",
+    "q": "Problème addition 57",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 6 = ? Réponse: 15.",
+    "a_pro": "Addition simple: 9 + 6 = 15.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_58",
+    "q": "Problème addition 58",
+    "topic": "math",
+    "a_kid": "Calcule: 8 + 5 = ? Réponse: 13.",
+    "a_pro": "Addition simple: 8 + 5 = 13.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_59",
+    "q": "Problème addition 59",
+    "topic": "math",
+    "a_kid": "Calcule: 5 + 3 = ? Réponse: 8.",
+    "a_pro": "Addition simple: 5 + 3 = 8.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_60",
+    "q": "Problème addition 60",
+    "topic": "math",
+    "a_kid": "Calcule: 2 + 7 = ? Réponse: 9.",
+    "a_pro": "Addition simple: 2 + 7 = 9.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_61",
+    "q": "Problème addition 61",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 6 = ? Réponse: 12.",
+    "a_pro": "Addition simple: 6 + 6 = 12.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_62",
+    "q": "Problème addition 62",
+    "topic": "math",
+    "a_kid": "Calcule: 5 + 8 = ? Réponse: 13.",
+    "a_pro": "Addition simple: 5 + 8 = 13.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_63",
+    "q": "Problème addition 63",
+    "topic": "math",
+    "a_kid": "Calcule: 3 + 8 = ? Réponse: 11.",
+    "a_pro": "Addition simple: 3 + 8 = 11.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_64",
+    "q": "Problème addition 64",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 3 = ? Réponse: 9.",
+    "a_pro": "Addition simple: 6 + 3 = 9.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_65",
+    "q": "Problème addition 65",
+    "topic": "math",
+    "a_kid": "Calcule: 8 + 9 = ? Réponse: 17.",
+    "a_pro": "Addition simple: 8 + 9 = 17.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_66",
+    "q": "Problème addition 66",
+    "topic": "math",
+    "a_kid": "Calcule: 7 + 8 = ? Réponse: 15.",
+    "a_pro": "Addition simple: 7 + 8 = 15.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_67",
+    "q": "Problème addition 67",
+    "topic": "math",
+    "a_kid": "Calcule: 8 + 7 = ? Réponse: 15.",
+    "a_pro": "Addition simple: 8 + 7 = 15.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_68",
+    "q": "Problème addition 68",
+    "topic": "math",
+    "a_kid": "Calcule: 7 + 6 = ? Réponse: 13.",
+    "a_pro": "Addition simple: 7 + 6 = 13.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_69",
+    "q": "Problème addition 69",
+    "topic": "math",
+    "a_kid": "Calcule: 7 + 8 = ? Réponse: 15.",
+    "a_pro": "Addition simple: 7 + 8 = 15.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_70",
+    "q": "Problème addition 70",
+    "topic": "math",
+    "a_kid": "Calcule: 7 + 2 = ? Réponse: 9.",
+    "a_pro": "Addition simple: 7 + 2 = 9.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_71",
+    "q": "Problème addition 71",
+    "topic": "math",
+    "a_kid": "Calcule: 7 + 3 = ? Réponse: 10.",
+    "a_pro": "Addition simple: 7 + 3 = 10.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_72",
+    "q": "Problème addition 72",
+    "topic": "math",
+    "a_kid": "Calcule: 4 + 2 = ? Réponse: 6.",
+    "a_pro": "Addition simple: 4 + 2 = 6.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_73",
+    "q": "Problème addition 73",
+    "topic": "math",
+    "a_kid": "Calcule: 3 + 8 = ? Réponse: 11.",
+    "a_pro": "Addition simple: 3 + 8 = 11.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_74",
+    "q": "Problème addition 74",
+    "topic": "math",
+    "a_kid": "Calcule: 2 + 2 = ? Réponse: 4.",
+    "a_pro": "Addition simple: 2 + 2 = 4.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_75",
+    "q": "Problème addition 75",
+    "topic": "math",
+    "a_kid": "Calcule: 8 + 4 = ? Réponse: 12.",
+    "a_pro": "Addition simple: 8 + 4 = 12.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_76",
+    "q": "Problème addition 76",
+    "topic": "math",
+    "a_kid": "Calcule: 3 + 8 = ? Réponse: 11.",
+    "a_pro": "Addition simple: 3 + 8 = 11.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_77",
+    "q": "Problème addition 77",
+    "topic": "math",
+    "a_kid": "Calcule: 4 + 2 = ? Réponse: 6.",
+    "a_pro": "Addition simple: 4 + 2 = 6.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_78",
+    "q": "Problème addition 78",
+    "topic": "math",
+    "a_kid": "Calcule: 3 + 4 = ? Réponse: 7.",
+    "a_pro": "Addition simple: 3 + 4 = 7.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_79",
+    "q": "Problème addition 79",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 2 = ? Réponse: 8.",
+    "a_pro": "Addition simple: 6 + 2 = 8.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_80",
+    "q": "Problème addition 80",
+    "topic": "math",
+    "a_kid": "Calcule: 5 + 4 = ? Réponse: 9.",
+    "a_pro": "Addition simple: 5 + 4 = 9.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_81",
+    "q": "Problème addition 81",
+    "topic": "math",
+    "a_kid": "Calcule: 4 + 7 = ? Réponse: 11.",
+    "a_pro": "Addition simple: 4 + 7 = 11.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_82",
+    "q": "Problème addition 82",
+    "topic": "math",
+    "a_kid": "Calcule: 2 + 5 = ? Réponse: 7.",
+    "a_pro": "Addition simple: 2 + 5 = 7.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_83",
+    "q": "Problème addition 83",
+    "topic": "math",
+    "a_kid": "Calcule: 8 + 3 = ? Réponse: 11.",
+    "a_pro": "Addition simple: 8 + 3 = 11.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_84",
+    "q": "Problème addition 84",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 4 = ? Réponse: 10.",
+    "a_pro": "Addition simple: 6 + 4 = 10.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_85",
+    "q": "Problème addition 85",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 2 = ? Réponse: 11.",
+    "a_pro": "Addition simple: 9 + 2 = 11.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_86",
+    "q": "Problème addition 86",
+    "topic": "math",
+    "a_kid": "Calcule: 3 + 3 = ? Réponse: 6.",
+    "a_pro": "Addition simple: 3 + 3 = 6.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_87",
+    "q": "Problème addition 87",
+    "topic": "math",
+    "a_kid": "Calcule: 7 + 2 = ? Réponse: 9.",
+    "a_pro": "Addition simple: 7 + 2 = 9.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_88",
+    "q": "Problème addition 88",
+    "topic": "math",
+    "a_kid": "Calcule: 2 + 5 = ? Réponse: 7.",
+    "a_pro": "Addition simple: 2 + 5 = 7.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_89",
+    "q": "Problème addition 89",
+    "topic": "math",
+    "a_kid": "Calcule: 5 + 4 = ? Réponse: 9.",
+    "a_pro": "Addition simple: 5 + 4 = 9.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_90",
+    "q": "Problème addition 90",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 9 = ? Réponse: 15.",
+    "a_pro": "Addition simple: 6 + 9 = 15.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_91",
+    "q": "Problème addition 91",
+    "topic": "math",
+    "a_kid": "Calcule: 2 + 8 = ? Réponse: 10.",
+    "a_pro": "Addition simple: 2 + 8 = 10.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_92",
+    "q": "Problème addition 92",
+    "topic": "math",
+    "a_kid": "Calcule: 5 + 4 = ? Réponse: 9.",
+    "a_pro": "Addition simple: 5 + 4 = 9.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_93",
+    "q": "Problème addition 93",
+    "topic": "math",
+    "a_kid": "Calcule: 3 + 6 = ? Réponse: 9.",
+    "a_pro": "Addition simple: 3 + 6 = 9.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_94",
+    "q": "Problème addition 94",
+    "topic": "math",
+    "a_kid": "Calcule: 8 + 2 = ? Réponse: 10.",
+    "a_pro": "Addition simple: 8 + 2 = 10.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_95",
+    "q": "Problème addition 95",
+    "topic": "math",
+    "a_kid": "Calcule: 9 + 3 = ? Réponse: 12.",
+    "a_pro": "Addition simple: 9 + 3 = 12.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_96",
+    "q": "Problème addition 96",
+    "topic": "math",
+    "a_kid": "Calcule: 4 + 5 = ? Réponse: 9.",
+    "a_pro": "Addition simple: 4 + 5 = 9.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_97",
+    "q": "Problème addition 97",
+    "topic": "math",
+    "a_kid": "Calcule: 6 + 2 = ? Réponse: 8.",
+    "a_pro": "Addition simple: 6 + 2 = 8.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_98",
+    "q": "Problème addition 98",
+    "topic": "math",
+    "a_kid": "Calcule: 7 + 2 = ? Réponse: 9.",
+    "a_pro": "Addition simple: 7 + 2 = 9.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_99",
+    "q": "Problème addition 99",
+    "topic": "math",
+    "a_kid": "Calcule: 4 + 4 = ? Réponse: 8.",
+    "a_pro": "Addition simple: 4 + 4 = 8.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_add_100",
+    "q": "Problème addition 100",
+    "topic": "math",
+    "a_kid": "Calcule: 3 + 4 = ? Réponse: 7.",
+    "a_pro": "Addition simple: 3 + 4 = 7.",
+    "tags": [
+      "math",
+      "addition",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_1",
+    "q": "Problème soustraction 1",
+    "topic": "math",
+    "a_kid": "Calcule: 18 − 2 = ? Réponse: 16.",
+    "a_pro": "Soustraction simple: 18 − 2 = 16.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_2",
+    "q": "Problème soustraction 2",
+    "topic": "math",
+    "a_kid": "Calcule: 11 − 4 = ? Réponse: 7.",
+    "a_pro": "Soustraction simple: 11 − 4 = 7.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_3",
+    "q": "Problème soustraction 3",
+    "topic": "math",
+    "a_kid": "Calcule: 19 − 6 = ? Réponse: 13.",
+    "a_pro": "Soustraction simple: 19 − 6 = 13.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_4",
+    "q": "Problème soustraction 4",
+    "topic": "math",
+    "a_kid": "Calcule: 13 − 4 = ? Réponse: 9.",
+    "a_pro": "Soustraction simple: 13 − 4 = 9.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_5",
+    "q": "Problème soustraction 5",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 9 = ? Réponse: 5.",
+    "a_pro": "Soustraction simple: 14 − 9 = 5.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_6",
+    "q": "Problème soustraction 6",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 2 = ? Réponse: 12.",
+    "a_pro": "Soustraction simple: 14 − 2 = 12.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_7",
+    "q": "Problème soustraction 7",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 2 = ? Réponse: 12.",
+    "a_pro": "Soustraction simple: 14 − 2 = 12.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_8",
+    "q": "Problème soustraction 8",
+    "topic": "math",
+    "a_kid": "Calcule: 13 − 5 = ? Réponse: 8.",
+    "a_pro": "Soustraction simple: 13 − 5 = 8.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_9",
+    "q": "Problème soustraction 9",
+    "topic": "math",
+    "a_kid": "Calcule: 11 − 7 = ? Réponse: 4.",
+    "a_pro": "Soustraction simple: 11 − 7 = 4.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_10",
+    "q": "Problème soustraction 10",
+    "topic": "math",
+    "a_kid": "Calcule: 12 − 7 = ? Réponse: 5.",
+    "a_pro": "Soustraction simple: 12 − 7 = 5.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_11",
+    "q": "Problème soustraction 11",
+    "topic": "math",
+    "a_kid": "Calcule: 17 − 8 = ? Réponse: 9.",
+    "a_pro": "Soustraction simple: 17 − 8 = 9.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_12",
+    "q": "Problème soustraction 12",
+    "topic": "math",
+    "a_kid": "Calcule: 15 − 2 = ? Réponse: 13.",
+    "a_pro": "Soustraction simple: 15 − 2 = 13.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_13",
+    "q": "Problème soustraction 13",
+    "topic": "math",
+    "a_kid": "Calcule: 18 − 8 = ? Réponse: 10.",
+    "a_pro": "Soustraction simple: 18 − 8 = 10.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_14",
+    "q": "Problème soustraction 14",
+    "topic": "math",
+    "a_kid": "Calcule: 19 − 4 = ? Réponse: 15.",
+    "a_pro": "Soustraction simple: 19 − 4 = 15.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_15",
+    "q": "Problème soustraction 15",
+    "topic": "math",
+    "a_kid": "Calcule: 12 − 9 = ? Réponse: 3.",
+    "a_pro": "Soustraction simple: 12 − 9 = 3.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_16",
+    "q": "Problème soustraction 16",
+    "topic": "math",
+    "a_kid": "Calcule: 15 − 7 = ? Réponse: 8.",
+    "a_pro": "Soustraction simple: 15 − 7 = 8.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_17",
+    "q": "Problème soustraction 17",
+    "topic": "math",
+    "a_kid": "Calcule: 16 − 2 = ? Réponse: 14.",
+    "a_pro": "Soustraction simple: 16 − 2 = 14.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_18",
+    "q": "Problème soustraction 18",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 4 = ? Réponse: 10.",
+    "a_pro": "Soustraction simple: 14 − 4 = 10.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_19",
+    "q": "Problème soustraction 19",
+    "topic": "math",
+    "a_kid": "Calcule: 17 − 9 = ? Réponse: 8.",
+    "a_pro": "Soustraction simple: 17 − 9 = 8.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_20",
+    "q": "Problème soustraction 20",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 2 = ? Réponse: 12.",
+    "a_pro": "Soustraction simple: 14 − 2 = 12.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_21",
+    "q": "Problème soustraction 21",
+    "topic": "math",
+    "a_kid": "Calcule: 11 − 6 = ? Réponse: 5.",
+    "a_pro": "Soustraction simple: 11 − 6 = 5.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_22",
+    "q": "Problème soustraction 22",
+    "topic": "math",
+    "a_kid": "Calcule: 15 − 2 = ? Réponse: 13.",
+    "a_pro": "Soustraction simple: 15 − 2 = 13.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_23",
+    "q": "Problème soustraction 23",
+    "topic": "math",
+    "a_kid": "Calcule: 15 − 8 = ? Réponse: 7.",
+    "a_pro": "Soustraction simple: 15 − 8 = 7.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_24",
+    "q": "Problème soustraction 24",
+    "topic": "math",
+    "a_kid": "Calcule: 16 − 8 = ? Réponse: 8.",
+    "a_pro": "Soustraction simple: 16 − 8 = 8.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_25",
+    "q": "Problème soustraction 25",
+    "topic": "math",
+    "a_kid": "Calcule: 11 − 6 = ? Réponse: 5.",
+    "a_pro": "Soustraction simple: 11 − 6 = 5.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_26",
+    "q": "Problème soustraction 26",
+    "topic": "math",
+    "a_kid": "Calcule: 15 − 7 = ? Réponse: 8.",
+    "a_pro": "Soustraction simple: 15 − 7 = 8.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_27",
+    "q": "Problème soustraction 27",
+    "topic": "math",
+    "a_kid": "Calcule: 11 − 5 = ? Réponse: 6.",
+    "a_pro": "Soustraction simple: 11 − 5 = 6.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_28",
+    "q": "Problème soustraction 28",
+    "topic": "math",
+    "a_kid": "Calcule: 16 − 4 = ? Réponse: 12.",
+    "a_pro": "Soustraction simple: 16 − 4 = 12.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_29",
+    "q": "Problème soustraction 29",
+    "topic": "math",
+    "a_kid": "Calcule: 12 − 4 = ? Réponse: 8.",
+    "a_pro": "Soustraction simple: 12 − 4 = 8.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_30",
+    "q": "Problème soustraction 30",
+    "topic": "math",
+    "a_kid": "Calcule: 18 − 4 = ? Réponse: 14.",
+    "a_pro": "Soustraction simple: 18 − 4 = 14.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_31",
+    "q": "Problème soustraction 31",
+    "topic": "math",
+    "a_kid": "Calcule: 18 − 3 = ? Réponse: 15.",
+    "a_pro": "Soustraction simple: 18 − 3 = 15.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_32",
+    "q": "Problème soustraction 32",
+    "topic": "math",
+    "a_kid": "Calcule: 16 − 7 = ? Réponse: 9.",
+    "a_pro": "Soustraction simple: 16 − 7 = 9.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_33",
+    "q": "Problème soustraction 33",
+    "topic": "math",
+    "a_kid": "Calcule: 18 − 4 = ? Réponse: 14.",
+    "a_pro": "Soustraction simple: 18 − 4 = 14.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_34",
+    "q": "Problème soustraction 34",
+    "topic": "math",
+    "a_kid": "Calcule: 13 − 8 = ? Réponse: 5.",
+    "a_pro": "Soustraction simple: 13 − 8 = 5.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_35",
+    "q": "Problème soustraction 35",
+    "topic": "math",
+    "a_kid": "Calcule: 12 − 7 = ? Réponse: 5.",
+    "a_pro": "Soustraction simple: 12 − 7 = 5.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_36",
+    "q": "Problème soustraction 36",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 9 = ? Réponse: 5.",
+    "a_pro": "Soustraction simple: 14 − 9 = 5.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_37",
+    "q": "Problème soustraction 37",
+    "topic": "math",
+    "a_kid": "Calcule: 13 − 9 = ? Réponse: 4.",
+    "a_pro": "Soustraction simple: 13 − 9 = 4.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_38",
+    "q": "Problème soustraction 38",
+    "topic": "math",
+    "a_kid": "Calcule: 16 − 2 = ? Réponse: 14.",
+    "a_pro": "Soustraction simple: 16 − 2 = 14.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_39",
+    "q": "Problème soustraction 39",
+    "topic": "math",
+    "a_kid": "Calcule: 16 − 8 = ? Réponse: 8.",
+    "a_pro": "Soustraction simple: 16 − 8 = 8.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_40",
+    "q": "Problème soustraction 40",
+    "topic": "math",
+    "a_kid": "Calcule: 18 − 6 = ? Réponse: 12.",
+    "a_pro": "Soustraction simple: 18 − 6 = 12.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_41",
+    "q": "Problème soustraction 41",
+    "topic": "math",
+    "a_kid": "Calcule: 19 − 2 = ? Réponse: 17.",
+    "a_pro": "Soustraction simple: 19 − 2 = 17.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_42",
+    "q": "Problème soustraction 42",
+    "topic": "math",
+    "a_kid": "Calcule: 11 − 9 = ? Réponse: 2.",
+    "a_pro": "Soustraction simple: 11 − 9 = 2.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_43",
+    "q": "Problème soustraction 43",
+    "topic": "math",
+    "a_kid": "Calcule: 13 − 9 = ? Réponse: 4.",
+    "a_pro": "Soustraction simple: 13 − 9 = 4.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_44",
+    "q": "Problème soustraction 44",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 9 = ? Réponse: 5.",
+    "a_pro": "Soustraction simple: 14 − 9 = 5.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_45",
+    "q": "Problème soustraction 45",
+    "topic": "math",
+    "a_kid": "Calcule: 16 − 8 = ? Réponse: 8.",
+    "a_pro": "Soustraction simple: 16 − 8 = 8.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_46",
+    "q": "Problème soustraction 46",
+    "topic": "math",
+    "a_kid": "Calcule: 18 − 5 = ? Réponse: 13.",
+    "a_pro": "Soustraction simple: 18 − 5 = 13.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_47",
+    "q": "Problème soustraction 47",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 2 = ? Réponse: 12.",
+    "a_pro": "Soustraction simple: 14 − 2 = 12.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_48",
+    "q": "Problème soustraction 48",
+    "topic": "math",
+    "a_kid": "Calcule: 18 − 9 = ? Réponse: 9.",
+    "a_pro": "Soustraction simple: 18 − 9 = 9.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_49",
+    "q": "Problème soustraction 49",
+    "topic": "math",
+    "a_kid": "Calcule: 13 − 3 = ? Réponse: 10.",
+    "a_pro": "Soustraction simple: 13 − 3 = 10.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_50",
+    "q": "Problème soustraction 50",
+    "topic": "math",
+    "a_kid": "Calcule: 15 − 2 = ? Réponse: 13.",
+    "a_pro": "Soustraction simple: 15 − 2 = 13.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_51",
+    "q": "Problème soustraction 51",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 8 = ? Réponse: 6.",
+    "a_pro": "Soustraction simple: 14 − 8 = 6.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_52",
+    "q": "Problème soustraction 52",
+    "topic": "math",
+    "a_kid": "Calcule: 15 − 8 = ? Réponse: 7.",
+    "a_pro": "Soustraction simple: 15 − 8 = 7.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_53",
+    "q": "Problème soustraction 53",
+    "topic": "math",
+    "a_kid": "Calcule: 12 − 5 = ? Réponse: 7.",
+    "a_pro": "Soustraction simple: 12 − 5 = 7.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_54",
+    "q": "Problème soustraction 54",
+    "topic": "math",
+    "a_kid": "Calcule: 11 − 6 = ? Réponse: 5.",
+    "a_pro": "Soustraction simple: 11 − 6 = 5.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_55",
+    "q": "Problème soustraction 55",
+    "topic": "math",
+    "a_kid": "Calcule: 13 − 4 = ? Réponse: 9.",
+    "a_pro": "Soustraction simple: 13 − 4 = 9.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_56",
+    "q": "Problème soustraction 56",
+    "topic": "math",
+    "a_kid": "Calcule: 19 − 7 = ? Réponse: 12.",
+    "a_pro": "Soustraction simple: 19 − 7 = 12.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_57",
+    "q": "Problème soustraction 57",
+    "topic": "math",
+    "a_kid": "Calcule: 17 − 4 = ? Réponse: 13.",
+    "a_pro": "Soustraction simple: 17 − 4 = 13.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_58",
+    "q": "Problème soustraction 58",
+    "topic": "math",
+    "a_kid": "Calcule: 17 − 9 = ? Réponse: 8.",
+    "a_pro": "Soustraction simple: 17 − 9 = 8.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_59",
+    "q": "Problème soustraction 59",
+    "topic": "math",
+    "a_kid": "Calcule: 18 − 8 = ? Réponse: 10.",
+    "a_pro": "Soustraction simple: 18 − 8 = 10.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_60",
+    "q": "Problème soustraction 60",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 2 = ? Réponse: 12.",
+    "a_pro": "Soustraction simple: 14 − 2 = 12.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_61",
+    "q": "Problème soustraction 61",
+    "topic": "math",
+    "a_kid": "Calcule: 18 − 2 = ? Réponse: 16.",
+    "a_pro": "Soustraction simple: 18 − 2 = 16.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_62",
+    "q": "Problème soustraction 62",
+    "topic": "math",
+    "a_kid": "Calcule: 11 − 4 = ? Réponse: 7.",
+    "a_pro": "Soustraction simple: 11 − 4 = 7.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_63",
+    "q": "Problème soustraction 63",
+    "topic": "math",
+    "a_kid": "Calcule: 17 − 2 = ? Réponse: 15.",
+    "a_pro": "Soustraction simple: 17 − 2 = 15.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_64",
+    "q": "Problème soustraction 64",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 2 = ? Réponse: 12.",
+    "a_pro": "Soustraction simple: 14 − 2 = 12.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_65",
+    "q": "Problème soustraction 65",
+    "topic": "math",
+    "a_kid": "Calcule: 18 − 3 = ? Réponse: 15.",
+    "a_pro": "Soustraction simple: 18 − 3 = 15.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_66",
+    "q": "Problème soustraction 66",
+    "topic": "math",
+    "a_kid": "Calcule: 11 − 2 = ? Réponse: 9.",
+    "a_pro": "Soustraction simple: 11 − 2 = 9.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_67",
+    "q": "Problème soustraction 67",
+    "topic": "math",
+    "a_kid": "Calcule: 12 − 7 = ? Réponse: 5.",
+    "a_pro": "Soustraction simple: 12 − 7 = 5.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_68",
+    "q": "Problème soustraction 68",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 7 = ? Réponse: 7.",
+    "a_pro": "Soustraction simple: 14 − 7 = 7.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_69",
+    "q": "Problème soustraction 69",
+    "topic": "math",
+    "a_kid": "Calcule: 16 − 4 = ? Réponse: 12.",
+    "a_pro": "Soustraction simple: 16 − 4 = 12.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_70",
+    "q": "Problème soustraction 70",
+    "topic": "math",
+    "a_kid": "Calcule: 15 − 2 = ? Réponse: 13.",
+    "a_pro": "Soustraction simple: 15 − 2 = 13.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_71",
+    "q": "Problème soustraction 71",
+    "topic": "math",
+    "a_kid": "Calcule: 18 − 4 = ? Réponse: 14.",
+    "a_pro": "Soustraction simple: 18 − 4 = 14.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_72",
+    "q": "Problème soustraction 72",
+    "topic": "math",
+    "a_kid": "Calcule: 17 − 8 = ? Réponse: 9.",
+    "a_pro": "Soustraction simple: 17 − 8 = 9.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_73",
+    "q": "Problème soustraction 73",
+    "topic": "math",
+    "a_kid": "Calcule: 11 − 7 = ? Réponse: 4.",
+    "a_pro": "Soustraction simple: 11 − 7 = 4.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_74",
+    "q": "Problème soustraction 74",
+    "topic": "math",
+    "a_kid": "Calcule: 11 − 4 = ? Réponse: 7.",
+    "a_pro": "Soustraction simple: 11 − 4 = 7.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_75",
+    "q": "Problème soustraction 75",
+    "topic": "math",
+    "a_kid": "Calcule: 15 − 9 = ? Réponse: 6.",
+    "a_pro": "Soustraction simple: 15 − 9 = 6.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_76",
+    "q": "Problème soustraction 76",
+    "topic": "math",
+    "a_kid": "Calcule: 12 − 4 = ? Réponse: 8.",
+    "a_pro": "Soustraction simple: 12 − 4 = 8.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_77",
+    "q": "Problème soustraction 77",
+    "topic": "math",
+    "a_kid": "Calcule: 11 − 8 = ? Réponse: 3.",
+    "a_pro": "Soustraction simple: 11 − 8 = 3.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_78",
+    "q": "Problème soustraction 78",
+    "topic": "math",
+    "a_kid": "Calcule: 16 − 2 = ? Réponse: 14.",
+    "a_pro": "Soustraction simple: 16 − 2 = 14.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_79",
+    "q": "Problème soustraction 79",
+    "topic": "math",
+    "a_kid": "Calcule: 15 − 2 = ? Réponse: 13.",
+    "a_pro": "Soustraction simple: 15 − 2 = 13.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_80",
+    "q": "Problème soustraction 80",
+    "topic": "math",
+    "a_kid": "Calcule: 13 − 7 = ? Réponse: 6.",
+    "a_pro": "Soustraction simple: 13 − 7 = 6.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_81",
+    "q": "Problème soustraction 81",
+    "topic": "math",
+    "a_kid": "Calcule: 11 − 5 = ? Réponse: 6.",
+    "a_pro": "Soustraction simple: 11 − 5 = 6.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_82",
+    "q": "Problème soustraction 82",
+    "topic": "math",
+    "a_kid": "Calcule: 13 − 5 = ? Réponse: 8.",
+    "a_pro": "Soustraction simple: 13 − 5 = 8.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_83",
+    "q": "Problème soustraction 83",
+    "topic": "math",
+    "a_kid": "Calcule: 13 − 4 = ? Réponse: 9.",
+    "a_pro": "Soustraction simple: 13 − 4 = 9.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_84",
+    "q": "Problème soustraction 84",
+    "topic": "math",
+    "a_kid": "Calcule: 13 − 3 = ? Réponse: 10.",
+    "a_pro": "Soustraction simple: 13 − 3 = 10.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_85",
+    "q": "Problème soustraction 85",
+    "topic": "math",
+    "a_kid": "Calcule: 15 − 9 = ? Réponse: 6.",
+    "a_pro": "Soustraction simple: 15 − 9 = 6.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_86",
+    "q": "Problème soustraction 86",
+    "topic": "math",
+    "a_kid": "Calcule: 15 − 6 = ? Réponse: 9.",
+    "a_pro": "Soustraction simple: 15 − 6 = 9.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_87",
+    "q": "Problème soustraction 87",
+    "topic": "math",
+    "a_kid": "Calcule: 12 − 6 = ? Réponse: 6.",
+    "a_pro": "Soustraction simple: 12 − 6 = 6.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_88",
+    "q": "Problème soustraction 88",
+    "topic": "math",
+    "a_kid": "Calcule: 17 − 8 = ? Réponse: 9.",
+    "a_pro": "Soustraction simple: 17 − 8 = 9.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_89",
+    "q": "Problème soustraction 89",
+    "topic": "math",
+    "a_kid": "Calcule: 13 − 8 = ? Réponse: 5.",
+    "a_pro": "Soustraction simple: 13 − 8 = 5.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_90",
+    "q": "Problème soustraction 90",
+    "topic": "math",
+    "a_kid": "Calcule: 15 − 5 = ? Réponse: 10.",
+    "a_pro": "Soustraction simple: 15 − 5 = 10.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_91",
+    "q": "Problème soustraction 91",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 4 = ? Réponse: 10.",
+    "a_pro": "Soustraction simple: 14 − 4 = 10.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_92",
+    "q": "Problème soustraction 92",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 8 = ? Réponse: 6.",
+    "a_pro": "Soustraction simple: 14 − 8 = 6.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_93",
+    "q": "Problème soustraction 93",
+    "topic": "math",
+    "a_kid": "Calcule: 16 − 3 = ? Réponse: 13.",
+    "a_pro": "Soustraction simple: 16 − 3 = 13.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_94",
+    "q": "Problème soustraction 94",
+    "topic": "math",
+    "a_kid": "Calcule: 12 − 8 = ? Réponse: 4.",
+    "a_pro": "Soustraction simple: 12 − 8 = 4.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_95",
+    "q": "Problème soustraction 95",
+    "topic": "math",
+    "a_kid": "Calcule: 12 − 7 = ? Réponse: 5.",
+    "a_pro": "Soustraction simple: 12 − 7 = 5.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_96",
+    "q": "Problème soustraction 96",
+    "topic": "math",
+    "a_kid": "Calcule: 18 − 4 = ? Réponse: 14.",
+    "a_pro": "Soustraction simple: 18 − 4 = 14.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_97",
+    "q": "Problème soustraction 97",
+    "topic": "math",
+    "a_kid": "Calcule: 12 − 6 = ? Réponse: 6.",
+    "a_pro": "Soustraction simple: 12 − 6 = 6.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_98",
+    "q": "Problème soustraction 98",
+    "topic": "math",
+    "a_kid": "Calcule: 14 − 5 = ? Réponse: 9.",
+    "a_pro": "Soustraction simple: 14 − 5 = 9.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_99",
+    "q": "Problème soustraction 99",
+    "topic": "math",
+    "a_kid": "Calcule: 17 − 4 = ? Réponse: 13.",
+    "a_pro": "Soustraction simple: 17 − 4 = 13.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  },
+  {
+    "id": "math_sub_100",
+    "q": "Problème soustraction 100",
+    "topic": "math",
+    "a_kid": "Calcule: 19 − 4 = ? Réponse: 15.",
+    "a_pro": "Soustraction simple: 19 − 4 = 15.",
+    "tags": [
+      "math",
+      "soustraction",
+      "calcul",
+      "probleme"
+    ],
+    "kind": "problem"
+  }
+]

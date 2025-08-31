@@ -1,0 +1,754 @@
+[
+  {
+    "id": "signup_flow",
+    "q": "Inscription / création de compte",
+    "a_kid": "Pour commencer, clique sur « Commencer gratuitement ». Tu peux ensuite ajouter ton profil et partir à l’aventure.",
+    "a_pro": "Cliquez sur « Commencer gratuitement » pour créer un compte, ajouter votre enfant et configurer son parcours.",
+    "tags": [
+      "inscription",
+      "compte",
+      "commencer",
+      "signup",
+      "enregistrer",
+      "creation"
+    ],
+    "actions": [
+      {
+        "label": "Créer un compte",
+        "href": "/signup"
+      },
+      {
+        "label": "Se connecter",
+        "href": "/login"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "pricing_basics",
+    "q": "Tarifs",
+    "a_kid": "Tu peux essayer gratuitement. Après, il y a des formules famille pour débloquer plus d’activités et de rapports.",
+    "a_pro": "Essai gratuit puis offres famille. Les plans payants débloquent plus de contenus et des rapports parentaux détaillés.",
+    "tags": [
+      "prix",
+      "tarifs",
+      "abonnement",
+      "offres",
+      "payer",
+      "plan"
+    ],
+    "actions": [
+      {
+        "label": "Voir les tarifs",
+        "href": "/pricing"
+      },
+      {
+        "label": "Souscrire",
+        "href": "/subscribe"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "ages_coverage",
+    "q": "Âges couverts",
+    "a_kid": "Aujourd’hui, nous guidons surtout les 5 à 7 ans, avec des jeux et des missions adaptés.",
+    "a_pro": "Le prototype actuel cible 5–7 ans avec une progression calibrée. D’autres tranches suivront.",
+    "tags": [
+      "age",
+      "âge",
+      "5",
+      "6",
+      "7",
+      "enfant",
+      "parcours"
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "subjects_pillars",
+    "q": "Matières / piliers",
+    "a_kid": "Il y a MathCube, CodeCube et PlayCube. MathCube pour compter et résoudre, CodeCube pour créer et apprendre l’informatique, PlayCube pour jouer et se détendre.",
+    "a_pro": "Trois piliers : MathCube (maths), CodeCube (programmation & IA), PlayCube (détente, échecs, créations communautaires).",
+    "tags": [
+      "math",
+      "maths",
+      "programmer",
+      "programmation",
+      "ia",
+      "jeux",
+      "matiere",
+      "matières",
+      "contenu"
+    ],
+    "actions": [
+      {
+        "label": "MathCube",
+        "href": "/products/mathcube"
+      },
+      {
+        "label": "CodeCube",
+        "href": "/products/codecube"
+      },
+      {
+        "label": "PlayCube",
+        "href": "/products/playcube"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "security_rgpd",
+    "q": "Sécurité / RGPD",
+    "a_kid": "Tes informations sont protégées. Tes parents décident ce qui est partagé.",
+    "a_pro": "Conformité RGPD, minimisation des données, chiffrement des informations sensibles. Contrôle parental, export et suppression.",
+    "tags": [
+      "securite",
+      "sécurité",
+      "rgpd",
+      "donnees",
+      "données",
+      "confidentialite",
+      "confidentialité"
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "vision_intent",
+    "q": "Vision du projet",
+    "a_kid": "Notre but, c’est d’aider chaque enfant à découvrir ses forces en apprenant en s’amusant.",
+    "a_pro": "Intention : révéler le potentiel de chaque enfant par une aventure d’apprentissage ludique, assistée par l’IA, avec les parents comme co-pilotes.",
+    "tags": [
+      "vision",
+      "idee",
+      "idée",
+      "volonte",
+      "volonté",
+      "pourquoi",
+      "objectif"
+    ],
+    "actions": [
+      {
+        "label": "En savoir plus",
+        "href": "/docs"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "subscribe_flow",
+    "q": "Souscription",
+    "a_kid": "La souscription ouvre plus d’activités et des surprises pour progresser.",
+    "a_pro": "La souscription active immédiatement les contenus premium et les outils parentaux avancés.",
+    "tags": [
+      "souscription",
+      "payer",
+      "abonner",
+      "abonnement"
+    ],
+    "actions": [
+      {
+        "label": "Souscrire",
+        "href": "/subscribe"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "contact_support",
+    "q": "Support / contact",
+    "a_kid": "Si tu as besoin d’aide, on peut te répondre ici ou sur la page contact.",
+    "a_pro": "Expliquez votre besoin ici ou utilisez la page contact. Réponse rapide.",
+    "tags": [
+      "contact",
+      "support",
+      "aide",
+      "email",
+      "telephone",
+      "téléphone"
+    ],
+    "actions": [
+      {
+        "label": "Contacter le support",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_1",
+    "q": "FAQ site 1",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_2",
+    "q": "FAQ site 2",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_3",
+    "q": "FAQ site 3",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_4",
+    "q": "FAQ site 4",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_5",
+    "q": "FAQ site 5",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_6",
+    "q": "FAQ site 6",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_7",
+    "q": "FAQ site 7",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_8",
+    "q": "FAQ site 8",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_9",
+    "q": "FAQ site 9",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_10",
+    "q": "FAQ site 10",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_11",
+    "q": "FAQ site 11",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_12",
+    "q": "FAQ site 12",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_13",
+    "q": "FAQ site 13",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_14",
+    "q": "FAQ site 14",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_15",
+    "q": "FAQ site 15",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_16",
+    "q": "FAQ site 16",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_17",
+    "q": "FAQ site 17",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_18",
+    "q": "FAQ site 18",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_19",
+    "q": "FAQ site 19",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_20",
+    "q": "FAQ site 20",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_21",
+    "q": "FAQ site 21",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_22",
+    "q": "FAQ site 22",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_23",
+    "q": "FAQ site 23",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  },
+  {
+    "id": "faq_24",
+    "q": "FAQ site 24",
+    "a_pro": "Voir documentation produit et page d’aide.",
+    "a_kid": "Tu peux demander de l’aide et on t’explique tout simplement.",
+    "tags": [
+      "faq",
+      "aide",
+      "site",
+      "infos",
+      "support"
+    ],
+    "actions": [
+      {
+        "label": "Documentation",
+        "href": "/docs"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "kind": "site"
+  }
+]

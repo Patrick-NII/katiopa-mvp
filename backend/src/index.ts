@@ -64,7 +64,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Rate limiting global
 const globalLimiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
+  max: NODE_ENV === 'development' ? 1000 : parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
   message: 'Trop de requêtes, réessayez plus tard',
   standardHeaders: true,
   legacyHeaders: false,

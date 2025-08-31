@@ -1,0 +1,5462 @@
+[
+  {
+    "id": "fact_science_1",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_2",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_3",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_4",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_5",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_6",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_7",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_8",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_9",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_10",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_11",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_12",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_13",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_14",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_15",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_16",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_17",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_18",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_19",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_20",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_21",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_22",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_23",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_24",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_25",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_26",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_27",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_28",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_29",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_30",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_31",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_32",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_33",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_34",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_35",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_36",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_37",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_38",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_39",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_40",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_41",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_42",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_43",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_44",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_45",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_46",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_47",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_48",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_49",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_50",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_51",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_52",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_53",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_54",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_55",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_56",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_57",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_58",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_59",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_60",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_61",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_62",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_63",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_64",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_65",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_66",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_67",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_68",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_69",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_70",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_71",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_72",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_73",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_74",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_75",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_76",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_77",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_78",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_79",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_80",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_81",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_82",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_83",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_84",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_85",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_86",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_87",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_88",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_89",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_90",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_91",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_92",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_93",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_94",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_95",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_96",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_97",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_98",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_99",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_100",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_101",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_102",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_103",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_104",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_105",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_106",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_107",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_108",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_109",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_110",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_111",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_112",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_113",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_114",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_115",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_116",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_117",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_118",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_119",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_120",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_121",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_122",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_123",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_124",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_125",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_126",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_127",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_128",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_129",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_130",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_131",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_132",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_133",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_134",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_135",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_136",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_137",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_138",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_139",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_140",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_141",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_142",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_143",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_144",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_145",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_146",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_147",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_148",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_149",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_150",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_151",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_152",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_153",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_154",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_155",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_156",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_157",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_158",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_159",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_160",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_161",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_162",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_163",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_164",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_165",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_166",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_167",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_168",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_169",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_170",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_171",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_172",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_173",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_174",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_175",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_176",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_177",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_178",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_179",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_180",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_181",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_182",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_183",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_184",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_185",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_186",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_187",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_188",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_189",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_190",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_191",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_192",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_193",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_194",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_195",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_196",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_197",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_198",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_199",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_200",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_201",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_202",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_203",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_204",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_205",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_206",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_207",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_208",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_209",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_210",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_211",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_212",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_213",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_214",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_215",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_216",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_217",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_218",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_219",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_220",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_221",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_222",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_223",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_224",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_225",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_226",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_227",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_228",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_229",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_230",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_231",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_232",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_233",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_234",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_235",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_236",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_237",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_238",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_239",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_240",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_241",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_242",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_243",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_244",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_245",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_246",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_247",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_248",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_249",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_250",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_251",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_252",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_253",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_254",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_255",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_256",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_257",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_258",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_259",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_260",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_261",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_262",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_263",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_264",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_265",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_266",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_267",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_268",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_269",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_270",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_271",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_272",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_273",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_274",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_275",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_276",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_277",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_278",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_279",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_280",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_281",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_282",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_283",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_284",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_285",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_286",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_287",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_288",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_289",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_290",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_291",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_292",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_293",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_294",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_295",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_296",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_297",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_298",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_299",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_300",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_301",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_302",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_303",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_304",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_305",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_306",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_307",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_308",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_309",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_310",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_311",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_312",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_313",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_314",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_315",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_316",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_317",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_318",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_319",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_320",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_321",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_322",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_323",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_324",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_325",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_326",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_327",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_328",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_329",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_330",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_331",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_332",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_333",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_334",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_335",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_336",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_337",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_338",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_339",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_340",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_341",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_342",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_343",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_344",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_345",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_346",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_347",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_348",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_349",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_350",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_351",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_352",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_353",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_354",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_355",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_356",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_357",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_358",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_359",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_360",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_361",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_362",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_363",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_364",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_365",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_366",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_367",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_368",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_369",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_370",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_371",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_372",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_373",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_374",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_375",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_376",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_377",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_378",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_379",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_380",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_381",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_382",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_383",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_384",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_385",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_386",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_387",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_388",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_389",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_390",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_391",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_392",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_393",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_394",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_395",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_396",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_397",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_398",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_399",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_400",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_401",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_402",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_403",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_404",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_405",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_406",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_407",
+    "q": "Fait: Animaux",
+    "topic": "science",
+    "a_kid": "La baleine bleue est un des plus grands animaux du monde.",
+    "a_pro": "Megafaune, adaptation marine.",
+    "tags": [
+      "science",
+      "animaux",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_408",
+    "q": "Fait: Forces",
+    "topic": "science",
+    "a_kid": "Un aimant attire certains objets en métal.",
+    "a_pro": "Magnétisme et matériaux ferromagnétiques.",
+    "tags": [
+      "science",
+      "forces",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_409",
+    "q": "Fait: Plantes",
+    "topic": "science",
+    "a_kid": "Les plantes ont besoin d’eau et de lumière pour grandir.",
+    "a_pro": "Photosynthèse: lumière, eau, CO2, nutriments.",
+    "tags": [
+      "science",
+      "plantes",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_410",
+    "q": "Fait: Energie",
+    "topic": "science",
+    "a_kid": "La lumière donne de l’énergie.",
+    "a_pro": "Énergie: formes, conversions, conservation.",
+    "tags": [
+      "science",
+      "energie",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_411",
+    "q": "Fait: Terre",
+    "topic": "science",
+    "a_kid": "Fait simple sur Terre.",
+    "a_pro": "Fait détaillé sur Terre. Concept Terre.",
+    "tags": [
+      "science",
+      "terre",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_412",
+    "q": "Fait: Soleil",
+    "topic": "science",
+    "a_kid": "Fait simple sur Soleil.",
+    "a_pro": "Fait détaillé sur Soleil. Concept Soleil.",
+    "tags": [
+      "science",
+      "soleil",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_413",
+    "q": "Fait: Lune",
+    "topic": "science",
+    "a_kid": "Fait simple sur Lune.",
+    "a_pro": "Fait détaillé sur Lune. Concept Lune.",
+    "tags": [
+      "science",
+      "lune",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_414",
+    "q": "Fait: Air",
+    "topic": "science",
+    "a_kid": "Fait simple sur Air.",
+    "a_pro": "Fait détaillé sur Air. Concept Air.",
+    "tags": [
+      "science",
+      "air",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_415",
+    "q": "Fait: Eau",
+    "topic": "science",
+    "a_kid": "Fait simple sur Eau.",
+    "a_pro": "Fait détaillé sur Eau. Concept Eau.",
+    "tags": [
+      "science",
+      "eau",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_416",
+    "q": "Fait: Roches",
+    "topic": "science",
+    "a_kid": "Fait simple sur Roches.",
+    "a_pro": "Fait détaillé sur Roches. Concept Roches.",
+    "tags": [
+      "science",
+      "roches",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_417",
+    "q": "Fait: Volcans",
+    "topic": "science",
+    "a_kid": "Fait simple sur Volcans.",
+    "a_pro": "Fait détaillé sur Volcans. Concept Volcans.",
+    "tags": [
+      "science",
+      "volcans",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_418",
+    "q": "Fait: Météo",
+    "topic": "science",
+    "a_kid": "Fait simple sur Météo.",
+    "a_pro": "Fait détaillé sur Météo. Concept Météo.",
+    "tags": [
+      "science",
+      "météo",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_419",
+    "q": "Fait: Saisons",
+    "topic": "science",
+    "a_kid": "Fait simple sur Saisons.",
+    "a_pro": "Fait détaillé sur Saisons. Concept Saisons.",
+    "tags": [
+      "science",
+      "saisons",
+      "fait"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "fact_science_420",
+    "q": "Fait: Ecosystèmes",
+    "topic": "science",
+    "a_kid": "Fait simple sur Ecosystèmes.",
+    "a_pro": "Fait détaillé sur Ecosystèmes. Concept Ecosystèmes.",
+    "tags": [
+      "science",
+      "ecosystèmes",
+      "fait"
+    ],
+    "kind": "lesson"
+  }
+]

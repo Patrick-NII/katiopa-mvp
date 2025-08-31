@@ -27,6 +27,7 @@ model Account {
   userPrompts       UserPrompt[]
   navigationSessions NavigationSession[]
   performanceMetrics PerformanceMetric[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 // Session utilisateur (connexion avec ID/mot de passe)
@@ -60,6 +61,7 @@ model UserSession {
   userPrompts     UserPrompt[]
   navigationSessions NavigationSession[]
   performanceMetrics PerformanceMetric[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 // Profil détaillé de l'utilisateur
@@ -112,6 +114,21 @@ model Conversation {
   // Relations
   userSession     UserSession @relation(fields: [userSessionId], references: [id])
   account         Account     @relation(fields: [accountId], references: [id])
+}
+
+// Réinitialisation de mot de passe
+model PasswordResetToken {
+  id            String   @id @default(cuid())
+  accountId     String
+  userSessionId String
+  token         String   @unique
+  expiresAt     DateTime
+  usedAt        DateTime?
+  createdAt     DateTime @default(now())
+
+  // Relations
+  account       Account     @relation(fields: [accountId], references: [id])
+  userSession   UserSession @relation(fields: [userSessionId], references: [id])
 }
 
 // Historique de facturation

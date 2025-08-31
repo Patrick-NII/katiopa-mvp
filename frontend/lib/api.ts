@@ -63,7 +63,11 @@ const apiFetch = async (url: string, options: RequestInit = {}) => {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    const err = new Error(errorData.error || `HTTP error! status: ${response.status}`) as any;
+    err.status = response.status;
+    err.code = errorData.code;
+    err.details = errorData.details;
+    throw err;
   }
 
   return response;
@@ -184,6 +188,32 @@ export const authAPI = {
       body: JSON.stringify(data),
     });
     return response.json();
+  },
+  // Vérifier la disponibilité d'un email
+  checkEmail: async (email: string): Promise<{ success: boolean; available: boolean; exists: boolean }> => {
+    const response = await apiFetch(`/api/auth/check-email?email=${encodeURIComponent(email)}`);
+    return response.json();
+  },
+  // Vérifier la disponibilité d'un identifiant (sessionId)
+  checkSession: async (sessionId: string): Promise<{ success: boolean; available: boolean; exists: boolean }> => {
+    const response = await apiFetch(`/api/auth/check-session?sessionId=${encodeURIComponent(sessionId)}`);
+    return response.json();
+  },
+  // Mot de passe oublié
+  forgotPassword: async (payload: { email?: string; sessionId?: string }): Promise<{ success: boolean }> => {
+    const res = await apiFetch('/api/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return res.json();
+  },
+  // Réinitialiser le mot de passe
+  resetPassword: async (payload: { token: string; newPassword: string }): Promise<{ success: boolean }> => {
+    const res = await apiFetch('/api/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return res.json();
   },
 };
 

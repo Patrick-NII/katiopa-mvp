@@ -7,7 +7,7 @@ const router = express.Router();
 // Route pour récupérer les statistiques des activités
 router.get("/activities", requireAuth, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       return res.status(401).json({
         error: 'Utilisateur non authentifié',
@@ -74,7 +74,7 @@ router.get("/activities", requireAuth, async (req, res) => {
 // Route pour récupérer un résumé des statistiques
 router.get("/summary", requireAuth, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       return res.status(401).json({
         error: 'Utilisateur non authentifié',
