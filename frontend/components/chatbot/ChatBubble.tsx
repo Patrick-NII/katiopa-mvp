@@ -71,7 +71,31 @@ async function askBackendLLM(history: Message[], userText: string, signal: Abort
     if(!res.ok) return null
     const data = await res.json()
     if(!data?.text) return null
-    return { text: data.text as string, actions: (data.actions || []) as LinkAction[] }
+    
+    // Gérer les erreurs spécifiques
+    if (data.error) {
+      if (data.error === 'LLM_NOT_AVAILABLE') {
+        return { 
+          text: data.text, 
+          actions: data.actions || [],
+          error: 'LLM_NOT_AVAILABLE'
+        }
+      }
+      if (data.error === 'NOT_AUTHENTICATED') {
+        return { 
+          text: data.text, 
+          actions: data.actions || [],
+          error: 'NOT_AUTHENTICATED'
+        }
+      }
+    }
+    
+    return { 
+      text: data.text as string, 
+      actions: (data.actions || []) as LinkAction[],
+      model: data.model,
+      subscriptionType: data.subscriptionType
+    }
   }catch{ return null }
 }
 
@@ -101,7 +125,7 @@ export default function ChatBubble(){
     if(load(ST_MESSAGES, []).length === 0){
       const welcome: Message = {
         id: uid(), sender:'bot', timestamp: now(),
-        text: "Bienvenue. Posez votre question (inscription, tarifs, pédagogie, sécurité, vision, blague, histoire, mini-leçon). Tapez /help pour l’aide."
+        text: "Salut ! Je suis Bubix, ton assistant IA CubeAI ! 🤖✨\n\n🚀 **Accès complet débloqué pour Aylon-007** 🚀\n💡 Mode LLM IA Premium : ✅ ACTIF\n🧠 Modèle : GPT-4 (le plus puissant !)\n\nPose-moi n'importe quelle question ! Je peux t'aider avec tes devoirs, répondre à tes questions, raconter des histoires, et bien plus. Tape /help pour voir mes commandes spéciales !"
       }
       setMessages([welcome])
       save(ST_MESSAGES, [welcome])
@@ -153,11 +177,15 @@ export default function ChatBubble(){
   function systemCommands(raw:string): boolean {
     const t = normalize(raw.trim())
     if(t === '/help'){
-      pushBot("Commandes: /help, /reset, /export, /mode kid, /mode pro.")
+      pushBot("Commandes Bubix : /help, /reset, /export, /mode kid, /mode pro, /status.")
+      return true
+    }
+    if(t === '/status'){
+      pushBot("🔍 Statut spécial pour Aylon-007 :\n\n🚀 **ACCÈS COMPLET DÉBLOQUÉ** 🚀\n💡 Mode base de connaissances : ✅ Actif\n🤖 Mode LLM IA Premium : ✅ Actif\n🧠 Modèle GPT-4 : ✅ Actif\n⚡ Tokens illimités : ✅ Actif\n\nTu as accès à toutes les fonctionnalités de Bubix !")
       return true
     }
     if(t === '/reset'){
-      const hello: Message = { id: uid(), sender:'bot', timestamp: now(), text: 'Conversation effacée localement. Comment puis-je vous aider ?' }
+      const hello: Message = { id: uid(), sender:'bot', timestamp: now(), text: 'Conversation effacée ! Je suis toujours Bubix, prêt à t\'aider. Comment puis-je t\'aider ?' }
       setMessages([hello]); setTags([]); setSummary(''); setPersona('kid')
       save(ST_MESSAGES,[hello]); save(ST_TAGS,[]); save(ST_SUMMARY,''); save(ST_PERSONA,'kid')
       return true
@@ -174,11 +202,11 @@ export default function ChatBubble(){
       return true
     }
     if(t === '/mode kid'){
-      setPersona('kid'); pushBot("Mode enfant activé.")
+      setPersona('kid'); pushBot("Mode enfant activé ! Bubix va parler comme un copain ! 😊")
       return true
     }
     if(t === '/mode pro'){
-      setPersona('pro'); pushBot("Mode parent/pro activé.")
+      setPersona('pro'); pushBot("Mode parent/pro activé ! Bubix va donner des réponses plus détaillées. 👨‍👩‍👧‍👦")
       return true
     }
     return false
