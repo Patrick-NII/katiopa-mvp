@@ -182,7 +182,7 @@ export default function ChatBubble(){
     setSummary(prev => bullets.length > 2000 ? bullets.slice(-2000) : bullets)
   }
 
-  function systemCommands(raw:string): boolean {
+  async function systemCommands(raw:string): Promise<boolean> {
     const t = normalize(raw.trim())
     if(t === '/help'){
       pushBot("Commandes Bubix : /help, /reset, /export, /mode kid, /mode pro, /status, /profile.")
@@ -312,7 +312,7 @@ export default function ChatBubble(){
     pushUser(raw)
     updateTags(raw)
 
-    if(systemCommands(raw)) return
+    if(await systemCommands(raw)) return
 
     // 1) Intent
     const intent = detectIntent(raw)
