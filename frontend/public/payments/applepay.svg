@@ -1,0 +1,13 @@
+<svg width="120" height="60" viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="120" height="60" rx="8" fill="#000000"/>
+  <rect x="2" y="2" width="116" height="56" rx="6" fill="black" stroke="#333333" stroke-width="1"/>
+  
+  <!-- Apple logo -->
+  <g transform="translate(20, 15)">
+    <path d="M12 2C12.5 1.5 13 0.8 13.5 0.5C12.8 -0.2 11.8 -0.5 10.8 -0.5C9.8 -0.5 8.8 -0.2 8.1 0.5C7.4 1.2 7 2.2 7 3.2C7 4.2 7.4 5.2 8.1 5.9C8.8 6.6 9.8 6.9 10.8 6.9C11.8 6.9 12.8 6.6 13.5 5.9C14.2 5.2 14.6 4.2 14.6 3.2C14.6 2.2 14.2 1.2 13.5 0.5C13 0.8 12.5 1.5 12 2Z" fill="white"/>
+  </g>
+  
+  <!-- Pay text -->
+  <text x="60" y="36" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">Pay</text>
+</svg>

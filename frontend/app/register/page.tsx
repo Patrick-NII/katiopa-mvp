@@ -10,6 +10,7 @@ import {
 import Link from 'next/link'
 import { authAPI } from '@/lib/api'
 import { CubeAILogo } from '@/components/MulticolorText'
+import Image from 'next/image'
 
 /* ----------------------------- Types & helpers ---------------------------- */
 
@@ -37,6 +38,20 @@ interface RegistrationData {
   promoCode?: string
   selectedPaymentMethod?: 'card' | 'applepay' | 'paypal' | 'sepa'
   paymentMethodId?: string        // id tokenisé PSP (Stripe/PayPal/SEPA)
+  payCard?: {
+    name: string
+    number: string
+    expMonth: string
+    expYear: string
+    cvc: string
+  }
+  paySEPA?: {
+    name: string
+    iban: string
+  }
+  payPaypal?: {
+    email: string
+  }
   parentPrompts?: {
     objectives?: string
     preferences?: string
@@ -490,10 +505,10 @@ const SummarySidebar = () => {
                       className={[
                         'w-7 h-7 rounded-full grid place-items-center text-[11px] font-bold border',
                         isDone
-                          ? 'bg-emerald-500 text-emerald-800 border-emerald-300'
+                          ? 'bg-emerald-500 text-emerald-100 border-emerald-600'
                           : isCurrent
-                          ? 'bg-blue-500 text-blue-800 border-blue-300'
-                          : 'bg-gray-800 text-gray-100 border-gray-300',
+                          ? 'bg-blue-500 text-blue-100 border-blue-600'
+                          : 'bg-white-800 text-white-100 border-white-600',
                       ].join(' ')}
                     >
                       {isDone ? '✓' : idx + 1}
@@ -762,7 +777,7 @@ const SummarySidebar = () => {
                           type="email"
                           value={formData.email}
                           onChange={(e) => handleInputChange('email', e.target.value)}
-                          className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          className="w-full pl-12 pr-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                           placeholder="votre@email.com"
                         />
                       </div>
@@ -824,7 +839,7 @@ const SummarySidebar = () => {
                                   type="text"
                                   value={formData.firstName}
                                   onChange={(e) => handleInputChange('firstName', e.target.value)}
-                                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                  className="w-full pl-12 pr-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                                   placeholder="Votre prénom"
                                 />
                               </div>
@@ -838,7 +853,7 @@ const SummarySidebar = () => {
                                   type="text"
                                   value={formData.lastName}
                                   onChange={(e) => handleInputChange('lastName', e.target.value)}
-                                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                  className="w-full pl-12 pr-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                                   placeholder="Votre nom"
                                 />
                               </div>
@@ -856,7 +871,7 @@ const SummarySidebar = () => {
                               type="text"
                               value={formData.familyMembers[0].dateOfBirth}
                               onChange={(e) => handleDateInput(0, e.target.value)}
-                              className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                              className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                               placeholder="jj/mm/aaaa"
                               maxLength={10}
                             />
@@ -867,7 +882,7 @@ const SummarySidebar = () => {
                             <select
                               value={formData.familyMembers[0].gender}
                               onChange={(e) => handleFamilyMemberChange(0, 'gender', e.target.value)}
-                              className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                              className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                             >
                               <option value="UNKNOWN">Non spécifié</option>
                               <option value="MALE">M.</option>
@@ -897,7 +912,7 @@ const SummarySidebar = () => {
                                   return { ...prev, familyMembers: fm }
                                 })
                               }
-                              className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                              className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                               placeholder="ex: Patrick-007"
                             />
                             <button
@@ -927,7 +942,7 @@ const SummarySidebar = () => {
                                   type={showPassword ? 'text' : 'password'}
                                   value={formData.password}
                                   onChange={(e) => handleInputChange('password', e.target.value)}
-                                  className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                  className="w-full pl-12 pr-12 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                                   placeholder="••••••••"
                                 />
                                 <button
@@ -948,7 +963,7 @@ const SummarySidebar = () => {
                                   type={showConfirmPassword ? 'text' : 'password'}
                                   value={formData.confirmPassword}
                                   onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                                  className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                  className="w-full pl-12 pr-12 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                                   placeholder="••••••••"
                                 />
                                 <button
@@ -978,7 +993,7 @@ const SummarySidebar = () => {
                             value={formData.parentPrompts?.objectives || ''}
                             onChange={(e) => handleInputChange('parentPrompts', { ...formData.parentPrompts, objectives: e.target.value })}
                             placeholder="Objectifs (ex. découvrir la programmation, renforcer les maths)"
-                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-32 resize-none"
+                            className="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent h-32 resize-none"
                           />
                         </div>
                       </div>
@@ -1078,7 +1093,7 @@ const SummarySidebar = () => {
                                     type="text"
                                     value={member.firstName}
                                     onChange={(e) => handleFamilyMemberChange(index, 'firstName', e.target.value)}
-                                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                    className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
                                     placeholder="Prénom"
                                   />
                                 </div>
@@ -1089,7 +1104,7 @@ const SummarySidebar = () => {
                                     type="text"
                                     value={member.lastName}
                                     onChange={(e) => handleFamilyMemberChange(index, 'lastName', e.target.value)}
-                                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                    className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
                                     placeholder="Nom"
                                   />
                                 </div>
@@ -1102,7 +1117,7 @@ const SummarySidebar = () => {
                                     type="text"
                                     value={member.dateOfBirth}
                                     onChange={(e) => handleDateInput(index, e.target.value)}
-                                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                    className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
                                     placeholder="jj/mm/aaaa"
                                     maxLength={10}
                                   />
@@ -1113,7 +1128,7 @@ const SummarySidebar = () => {
                                   <select
                                     value={member.gender}
                                     onChange={(e) => handleFamilyMemberChange(index, 'gender', e.target.value)}
-                                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                    className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
                                   >
                                     <option value="UNKNOWN">Non spécifié</option>
                                     <option value="MALE">Garçon</option>
@@ -1128,7 +1143,7 @@ const SummarySidebar = () => {
                                       type="text"
                                       value={member.username || ''}
                                       onChange={(e) => handleFamilyMemberChange(index, 'username', e.target.value)}
-                                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                      className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
                                       placeholder="ex: lea3, samuel21..."
                                     />
                                     <button
@@ -1152,7 +1167,7 @@ const SummarySidebar = () => {
                                       type="text"
                                       value={member.sessionPassword || ''}
                                       onChange={(e) => handleFamilyMemberChange(index, 'sessionPassword', e.target.value)}
-                                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                      className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
                                       placeholder="Fort & facile à retenir"
                                     />
                                     <button
@@ -1227,94 +1242,118 @@ const SummarySidebar = () => {
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-stretch">
                   {/* Col gauche (2/3) */}
                   <div className="xl:col-span-2">
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white/80 backdrop-blur rounded-3xl shadow-xl p-8 lg:p-10 min-h-[700px] flex flex-col h-full">
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-white/80 backdrop-blur rounded-3xl shadow-xl p-8 lg:p-10 min-h-[700px] flex flex-col h-full"
+                    >
                       <div className="text-center mb-8">
                         <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Paiement & vérification</h1>
-                        <p className="text-lg text-gray-600">Entrez vos informations de paiement sécurisées. Une empreinte sera créée pour Starter.</p>
+                        <p className="text-lg text-gray-600">
+                          Entrez vos informations de paiement sécurisées. Une empreinte sera créée pour Starter.
+                        </p>
                       </div>
 
                       <div className="space-y-6 flex-grow">
-                        <div className="rounded-2xl border-2 border-gray-200 bg-white p-6">
-                          <div className="flex items-center mb-4">
+                        {/* Carte “Informations de paiement” — style épuré */}
+                        <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+                          <div className="flex items-center mb-5">
                             <CreditCard className="w-5 h-5 mr-2 text-blue-600" />
                             <span className="font-semibold text-gray-900">Informations de paiement</span>
                           </div>
 
-                          {/* Sélecteur de méthode */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                            {(['card', 'applepay', 'sepa', 'paypal'] as const).map(m => (
-                              <button
-                                key={m}
-                                onClick={() => handleInputChange('selectedPaymentMethod', m)}
-                                className={`px-4 py-3 rounded-xl border text-sm !font-medium transition text-left ${
-                                  formData.selectedPaymentMethod === m ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'
-                                }`}
-                              >
-                                <span className="!font-semibold">
-                                  {m === 'card' && 'Carte bancaire (3D Secure)'}
-                                  {m === 'applepay' && 'Apple Pay'}
-                                  {m === 'sepa' && 'SEPA (IBAN)'}
-                                  {m === 'paypal' && 'PayPal'}
-                                </span>
-                              </button>
-                            ))}
+                          {/* Sélecteur de méthode — logos alignés sur une ligne */}
+                          <div className="flex gap-8 mb-6">
+                            {([
+                              { id: 'card', label: '', logo: '/payments/visa-mastercard.png' },
+                              { id: 'applepay', label: ' ', logo: '/payments/applepay.png' },
+                              { id: 'sepa', label: '', logo: '/payments/sepa.png' },
+                              { id: 'paypal', label: '', logo: '/payments/paypal.png' }
+                            ] as const).map(m => {
+                              const active = formData.selectedPaymentMethod === m.id
+                              return (
+                                <button
+                                  key={m.id}
+                                  onClick={() => handleInputChange('selectedPaymentMethod', m.id)}
+                                  className={`flex items-center justify-center gap-2 py-4 px-6 rounded-xl transition
+                                    ${active ? 'bg-blue-50 border-2 border-blue-500 shadow-md' : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'}`}
+                                  aria-pressed={active}
+                                >
+                                  <Image src={m.logo} alt="" width={80} height={80} className="h-15 w-auto" />
+                                </button>
+                              )
+                            })}
                           </div>
 
-                          {/* Champs conditionnels */}
+                          {/* Champs conditionnels — layout optimisé */}
                           {formData.selectedPaymentMethod === 'card' && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div className="md:col-span-2">
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Titulaire *</label>
-                                <input
-                                  type="text"
-                                  value={formData.payCard?.name || ''}
-                                  onChange={(e) => handleInputChange('payCard', { ...(formData.payCard||{}), name: e.target.value })}
-                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                  placeholder="Nom sur la carte"
-                                />
+                            <div className="space-y-4">
+                              {/* Titulaire et Numéro sur la même ligne */}
+                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
+                                  <input
+                                    type="text"
+                                    value={formData.payCard?.name || ''}
+                                    onChange={(e) => handleInputChange('payCard', { ...(formData.payCard || {}), name: e.target.value })}
+                                    className="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
+                                    placeholder="Titulaire *"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
+                                  <input
+                                    inputMode="numeric"
+                                    placeholder="Numéro de carte *"
+                                    value={formData.payCard?.number || ''}
+                                    onChange={(e) =>
+                                      handleInputChange('payCard', {
+                                        ...(formData.payCard || {}),
+                                        number: e.target.value.replace(/[^\d]/g, '')
+                                      })
+                                    }
+                                    className="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
+                                  />
+                                </div>
                               </div>
-                              <div className="md:col-span-2">
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Numéro de carte *</label>
-                                <input
-                                  inputMode="numeric"
-                                  placeholder="1234 5678 9012 3456"
-                                  value={formData.payCard?.number || ''}
-                                  onChange={(e) => handleInputChange('payCard', { ...(formData.payCard||{}), number: e.target.value.replace(/[^\d]/g, '') })}
-                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Exp. (MM) *</label>
-                                <input
-                                  inputMode="numeric"
-                                  maxLength={2}
-                                  value={formData.payCard?.expMonth || ''}
-                                  onChange={(e) => handleInputChange('payCard', { ...(formData.payCard||{}), expMonth: e.target.value.replace(/[^\d]/g, '') })}
-                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                  placeholder="MM"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Exp. (AA) *</label>
-                                <input
-                                  inputMode="numeric"
-                                  maxLength={2}
-                                  value={formData.payCard?.expYear || ''}
-                                  onChange={(e) => handleInputChange('payCard', { ...(formData.payCard||{}), expYear: e.target.value.replace(/[^\d]/g, '') })}
-                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                  placeholder="AA"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">CVC *</label>
-                                <input
-                                  inputMode="numeric"
-                                  maxLength={4}
-                                  value={formData.payCard?.cvc || ''}
-                                  onChange={(e) => handleInputChange('payCard', { ...(formData.payCard||{}), cvc: e.target.value.replace(/[^\d]/g, '') })}
-                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                  placeholder="CVC"
-                                />
+                              
+                              {/* Date d'expiration et CVC sur la même ligne */}
+                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
+                                  <input
+                                    inputMode="numeric"
+                                    maxLength={5}
+                                    placeholder="Date d'expiration *"
+                                    value={formData.payCard?.expMonth && formData.payCard?.expYear ? `${formData.payCard.expMonth}/${formData.payCard.expYear}` : ''}
+                                    onChange={(e) => {
+                                      const value = e.target.value.replace(/[^\d]/g, '');
+                                      if (value.length <= 4) {
+                                        const month = value.substring(0, 2);
+                                        const year = value.substring(2, 4);
+                                        handleInputChange('payCard', { 
+                                          ...(formData.payCard || {}), 
+                                          expMonth: month,
+                                          expYear: year
+                                        });
+                                      }
+                                    }}
+                                    className="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
+                                  <input
+                                    inputMode="numeric"
+                                    maxLength={4}
+                                    value={formData.payCard?.cvc || ''}
+                                    onChange={(e) =>
+                                      handleInputChange('payCard', { ...(formData.payCard || {}), cvc: e.target.value.replace(/[^\d]/g, '') })
+                                    }
+                                    className="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
+                                    placeholder="CVC *"
+                                  />
+                                </div>
                               </div>
                             </div>
                           )}
@@ -1326,8 +1365,8 @@ const SummarySidebar = () => {
                                 <input
                                   type="text"
                                   value={formData.paySEPA?.name || ''}
-                                  onChange={(e) => handleInputChange('paySEPA', { ...(formData.paySEPA||{}), name: e.target.value })}
-                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  onChange={(e) => handleInputChange('paySEPA', { ...(formData.paySEPA || {}), name: e.target.value })}
+                                  className="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                                   placeholder="Nom du titulaire"
                                 />
                               </div>
@@ -1336,8 +1375,8 @@ const SummarySidebar = () => {
                                 <input
                                   type="text"
                                   value={formData.paySEPA?.iban || ''}
-                                  onChange={(e) => handleInputChange('paySEPA', { ...(formData.paySEPA||{}), iban: e.target.value })}
-                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  onChange={(e) => handleInputChange('paySEPA', { ...(formData.paySEPA || {}), iban: e.target.value.toUpperCase() })}
+                                  className="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                                   placeholder="FR76 3000 6000 0112 3456 7890 189"
                                 />
                               </div>
@@ -1351,8 +1390,8 @@ const SummarySidebar = () => {
                                 <input
                                   type="email"
                                   value={formData.payPaypal?.email || ''}
-                                  onChange={(e) => handleInputChange('payPaypal', { ...(formData.payPaypal||{}), email: e.target.value })}
-                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  onChange={(e) => handleInputChange('payPaypal', { ...(formData.payPaypal || {}), email: e.target.value })}
+                                  className="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                                   placeholder="votre-email@paypal.com"
                                 />
                               </div>
@@ -1367,7 +1406,7 @@ const SummarySidebar = () => {
                         </div>
 
                         {/* Vérification */}
-                        <div className="rounded-2xl border-2 border-gray-200 bg-white p-6">
+                        <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
                           <div className="flex items-center mb-4">
                             <CircleCheck className="w-5 h-5 mr-2 text-emerald-600" />
                             <span className="font-semibold text-gray-900">Vérification des informations</span>
@@ -1381,8 +1420,12 @@ const SummarySidebar = () => {
                           </ul>
 
                           <div className="flex gap-3 mt-4">
-                            <button onClick={() => setStep('account')} className="px-4 py-2 rounded-xl border-2 border-gray-200 hover:bg-gray-50 text-sm !font-semibold">Modifier compte</button>
-                            <button onClick={() => setStep('family')} className="px-4 py-2 rounded-xl border-2 border-gray-200 hover:bg-gray-50 text-sm !font-semibold">Modifier membres</button>
+                            <button onClick={() => setStep('account')} className="px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 text-sm !font-semibold">
+                              Modifier compte
+                            </button>
+                            <button onClick={() => setStep('family')} className="px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 text-sm !font-semibold">
+                              Modifier membres
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -1394,7 +1437,10 @@ const SummarySidebar = () => {
                       )}
 
                       <div className="mt-8 flex justify-between items-center">
-                        <button onClick={handleBack} className="flex items-center space-x-3 text-gray-600 hover:text-gray-900 px-6 py-3 rounded-xl !font-semibold transition-all hover:bg-gray-100">
+                        <button
+                          onClick={handleBack}
+                          className="flex items-center space-x-3 text-gray-600 hover:text-gray-900 px-6 py-3 rounded-xl !font-semibold transition-all hover:bg-gray-100"
+                        >
                           <ArrowLeft className="w-5 h-5" />
                           <span>Retour</span>
                         </button>
@@ -1406,7 +1452,9 @@ const SummarySidebar = () => {
                           disabled={loading}
                           className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-12 py-4 rounded-xl !font-semibold transition-all shadow-lg hover:shadow-xl"
                         >
-                          <span className="!text-white !font-semibold">{loading ? 'Validation…' : 'Valider et activer mon plan'}</span>
+                          <span className="!text-white !font-semibold">
+                            {loading ? 'Validation…' : 'Valider et activer mon plan'}
+                          </span>
                         </motion.button>
                       </div>
                     </motion.div>

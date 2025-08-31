@@ -1,0 +1,21 @@
+<svg width="120" height="60" viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="120" height="60" rx="8" fill="#F8F9FA"/>
+  <rect x="2" y="2" width="116" height="56" rx="6" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+  
+  <!-- European flag colors -->
+  <g transform="translate(15, 15)">
+    <rect width="6" height="30" fill="#003399"/>
+    <rect x="6" width="6" height="30" fill="#FFCC00"/>
+    <rect x="12" width="6" height="30" fill="#FF6600"/>
+    <rect x="18" width="6" height="30" fill="#CC0000"/>
+    <rect x="24" width="6" height="30" fill="#006600"/>
+    <rect x="30" width="6" height="30" fill="#9933CC"/>
+  </g>
+  
+  <!-- SEPA text -->
+  <text x="80" y="32" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2C3E50" text-anchor="middle">SEPA</text>
+  
+  <!-- Euro symbol -->
+  <text x="100" y="32" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#2C3E50" text-anchor="middle">€</text>
+</svg>
