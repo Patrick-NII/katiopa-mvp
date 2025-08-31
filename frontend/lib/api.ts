@@ -1,5 +1,9 @@
 // Configuration de l'API Katiopa
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+// Supporte NEXT_PUBLIC_API_URL (prioritaire) puis NEXT_PUBLIC_API_BASE (fallback)
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_API_BASE ||
+  'http://localhost:4000';
 
 // Types pour l'API
 export interface LoginRequest {
@@ -99,13 +103,70 @@ export const authAPI = {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
-    return response.json();
+    const json = await response.json();
+    // Unifie la forme de réponse (minimal: {success,user} | routes: {success,data:{userSession,...}})
+    if (json?.user) {
+      return json as LoginResponse;
+    }
+    if (json?.data?.userSession) {
+      const u = json.data.userSession;
+      return {
+        success: true,
+        user: {
+          id: u.id,
+          sessionId: u.sessionId,
+          firstName: u.firstName,
+          lastName: u.lastName,
+          userType: u.userType,
+          subscriptionType: json.data.account?.subscriptionType || 'STARTER',
+        },
+      } as LoginResponse;
+    }
+    return json;
   },
 
-  // Vérification du token (remplace /me)
+  // Vérification du token (supporte /verify et fallback sur /me)
   verify: async (): Promise<{ success: boolean; user: User }> => {
-    const response = await apiFetch('/api/auth/verify');
-    return response.json();
+    try {
+      const res = await apiFetch('/api/auth/verify');
+      const json = await res.json();
+      if (json?.user) return json;
+      // Si la forme ne correspond pas, on tente la normalisation
+      if (json?.data?.userSession) {
+        const u = json.data.userSession;
+        return {
+          success: true,
+          user: {
+            id: u.id,
+            sessionId: u.sessionId,
+            firstName: u.firstName,
+            lastName: u.lastName,
+            userType: u.userType,
+            subscriptionType: json.data.account?.subscriptionType || 'STARTER',
+          },
+        };
+      }
+      return json;
+    } catch (e) {
+      // Fallback si /verify n'existe pas (backend routes)
+      const res = await apiFetch('/api/auth/me');
+      const json = await res.json();
+      if (json?.data?.userSession) {
+        const u = json.data.userSession;
+        return {
+          success: true,
+          user: {
+            id: u.id,
+            sessionId: u.sessionId,
+            firstName: u.firstName,
+            lastName: u.lastName,
+            userType: u.userType,
+            subscriptionType: json.data.account?.subscriptionType || 'STARTER',
+          },
+        };
+      }
+      return json;
+    }
   },
 
   // Déconnexion

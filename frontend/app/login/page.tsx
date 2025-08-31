@@ -163,8 +163,7 @@ export default function LoginPage() {
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               ) : (
                 <>
-                  <span>Se connecter</span>
-                  <ArrowRight className="h-5 w-5" />
+                  <span className="!text-white">Se connecter</span>
                 </>
               )}
             </motion.button>
