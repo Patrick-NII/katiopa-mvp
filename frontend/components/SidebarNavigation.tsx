@@ -232,7 +232,7 @@ export default function SidebarNavigation({
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
                 className={`
-                  w-full flex items-center gap-3 ${collapsed ? 'px-2 py-3 justify-center' : 'px-3 py-4'} rounded-lg text-sm font-semibold
+                  group relative w-full flex items-center gap-3 ${collapsed ? 'px-2 py-3 justify-center' : 'px-3 py-4'} rounded-lg text-sm font-semibold
                   ${activeTab === tab.id
                     ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-105'
                     : 'text-gray-700'
@@ -241,12 +241,22 @@ export default function SidebarNavigation({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 title={tab.label}
+                aria-label={tab.label}
               >
                 <div className={`${activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700'} w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0`}>
                   <tab.icon size={20} />
                 </div>
                 {!collapsed && (
                   <span className="flex-1 text-left font-semibold">{tab.label}</span>
+                )}
+                {collapsed && (
+                  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 pointer-events-none opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-150 delay-150">
+                    <div className="relative px-2 py-1 rounded-md bg-gray-900 text-white text-xs shadow-lg whitespace-nowrap">
+                      {/* Caret */}
+                      <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45 shadow-md"></div>
+                      {tab.label}
+                    </div>
+                  </div>
                 )}
                 {tab.badge && (
                   <span className={`${

@@ -133,7 +133,7 @@ export default function ChatBubble(){
     if(load(ST_MESSAGES, []).length === 0){
       const welcome: Message = {
         id: uid(), sender:'bot', timestamp: now(),
-        text: "Salut ! Je suis Bubix, ton assistant IA CubeAI ! 🤖✨\n\n🚀 **Accès complet débloqué pour Aylon-007** 🚀\n💡 Mode LLM IA Premium : ✅ ACTIF\n🧠 Modèle : GPT-4 (le plus puissant !)\n\nPose-moi n'importe quelle question ! Je peux t'aider avec tes devoirs, répondre à tes questions, raconter des histoires, et bien plus. Tape /help pour voir mes commandes spéciales !"
+        text: "Salut ! Je suis Bubix, ton assistant IA CubeAI ! 🤖✨\n\n💡 **Mode actuel :** Base de connaissances locale\n🔒 **LLM IA :** Disponible selon votre abonnement\n\nPose-moi n'importe quelle question ! Je peux t'aider avec tes devoirs, répondre à tes questions, raconter des histoires, et bien plus. Tape /help pour voir mes commandes spéciales !"
       }
       setMessages([welcome])
       save(ST_MESSAGES, [welcome])
@@ -189,7 +189,13 @@ export default function ChatBubble(){
       return true
     }
     if(t === '/status'){
-      pushBot("🔍 Statut spécial pour Aylon-007 :\n\n🚀 **ACCÈS COMPLET DÉBLOQUÉ** 🚀\n💡 Mode base de connaissances : ✅ Actif\n🤖 Mode LLM IA Premium : ✅ Actif\n🧠 Modèle GPT-4 : ✅ Actif\n⚡ Tokens illimités : ✅ Actif\n\nTu as accès à toutes les fonctionnalités de Bubix !")
+      // Utiliser l'API pour récupérer le statut réel
+      const statusResponse = await askBackendLLM([], "montre-moi mon statut d'abonnement et mes capacités LLM", new AbortController().signal)
+      if (statusResponse && statusResponse.text) {
+        pushBot(statusResponse.text)
+      } else {
+        pushBot("🔍 **Statut de votre compte :**\n\n💡 Mode base de connaissances : ✅ Actif\n🔒 Mode LLM IA : Vérifiez votre abonnement\n\nConnectez-vous pour voir votre statut complet !")
+      }
       return true
     }
           if(t === '/profile'){
