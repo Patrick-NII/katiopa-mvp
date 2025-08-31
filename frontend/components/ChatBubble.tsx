@@ -160,7 +160,7 @@ export default function ChatBubble() {
                     <Bot size={20} />
                   </div>
                   <div>
-                    <h3 className="font-bold">Assistant Katiopa</h3>
+                    <h2 className="font-bold">Assistant Katiopa</h2>
                     <p className="text-sm text-blue-100">En ligne • Réponse instantanée</p>
                   </div>
                 </div>

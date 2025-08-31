@@ -16,20 +16,31 @@ router.post('/register', async (req, res) => {
   try {
     const { 
       email, 
+      firstName,
+      lastName,
+      password,
+      confirmPassword,
       subscriptionType = 'FREE',
-      maxSessions,
       familyMembers = [],
       parentPrompts = {},
-      paymentInfo = {}
+      selectedPaymentMethod,
+      payCard,
+      paySEPA,
+      payPaypal,
+      promoCode,
+      acceptTerms = false
     } = req.body;
 
     console.log('📝 Données d\'inscription reçues:', {
       email,
+      firstName,
+      lastName,
       subscriptionType,
-      maxSessions,
       familyMembersCount: familyMembers.length,
       hasParentPrompts: !!parentPrompts,
-      hasPaymentInfo: !!paymentInfo
+      selectedPaymentMethod,
+      hasPromoCode: !!promoCode,
+      acceptTerms
     });
 
     // Validation des données de base
@@ -40,7 +51,36 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    if (!firstName || !lastName) {
+      return res.status(400).json({
+        error: 'Prénom et nom requis',
+        code: 'MISSING_NAME'
+      });
+    }
+
+    if (!password || !confirmPassword) {
+      return res.status(400).json({
+        error: 'Mot de passe et confirmation requis',
+        code: 'MISSING_PASSWORD'
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        error: 'Les mots de passe ne correspondent pas',
+        code: 'PASSWORD_MISMATCH'
+      });
+    }
+
+    if (!acceptTerms) {
+      return res.status(400).json({
+        error: 'Vous devez accepter les conditions',
+        code: 'TERMS_NOT_ACCEPTED'
+      });
+    }
+
     // Validation des membres de la famille
+    console.log('👥 Membres de la famille reçus:', familyMembers?.length || 0);
     if (!familyMembers || familyMembers.length === 0) {
       return res.status(400).json({
         error: 'Au moins un membre de la famille est requis',
@@ -60,14 +100,17 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    // Calcul du nombre maximum de sessions selon le plan
+    const maxSessions = subscriptionType === 'FREE' ? 1 : 
+                       subscriptionType === 'PRO' ? 2 : 
+                       subscriptionType === 'PRO_PLUS' ? 4 : 10;
+
     // Création du compte avec toutes les informations
     const account = await prisma.account.create({
       data: {
         email,
         subscriptionType,
-        maxSessions: maxSessions || (subscriptionType === 'FREE' ? 1 : 
-                     subscriptionType === 'PRO' ? 2 : 
-                     subscriptionType === 'PRO_PLUS' ? 4 : 10),
+        maxSessions,
         createdAt: new Date(),
         updatedAt: new Date()
       }
@@ -78,7 +121,8 @@ router.post('/register', async (req, res) => {
     // Création des sessions utilisateur pour tous les membres de la famille
     const createdSessions = [];
     
-    for (const member of familyMembers) {
+    for (let index = 0; index < familyMembers.length; index++) {
+      const member = familyMembers[index];
       const {
         firstName,
         lastName,
@@ -87,17 +131,18 @@ router.post('/register', async (req, res) => {
         dateOfBirth,
         grade,
         username,
-        password
+        sessionPassword
       } = member;
 
       // Validation des données du membre
-      if (!firstName || !lastName || !password) {
-        console.warn('⚠️ Membre invalide ignoré:', { firstName, lastName, hasPassword: !!password });
+      console.log(`🔍 Validation du membre ${index + 1}:`, { firstName, lastName, hasPassword: !!sessionPassword, userType });
+      if (!firstName || !lastName || !sessionPassword) {
+        console.warn('⚠️ Membre invalide ignoré:', { firstName, lastName, hasPassword: !!sessionPassword });
         continue; // Ignorer les membres invalides
       }
 
       // Hashage du mot de passe
-      const hashedPassword = await bcrypt.hash(password, 12);
+      const hashedPassword = await bcrypt.hash(sessionPassword, 12);
 
       // Création de la session utilisateur
       const userSession = await prisma.userSession.create({
@@ -168,22 +213,21 @@ router.post('/register', async (req, res) => {
     await prisma.planSeat.create({
       data: {
         accountId: account.id,
-        maxChildren: maxSessions || (subscriptionType === 'FREE' ? 1 : 
-                    subscriptionType === 'PRO' ? 2 : 
-                    subscriptionType === 'PRO_PLUS' ? 4 : 10)
+        maxChildren: maxSessions
       }
     });
 
     console.log('✅ Plan de sièges créé');
 
     // Enregistrement des informations de paiement (optionnel)
-    if (paymentInfo && Object.keys(paymentInfo).length > 0) {
+    if (selectedPaymentMethod) {
       console.log('💳 Informations de paiement reçues:', {
         accountId: account.id,
-        cardHolderName: paymentInfo.cardHolderName,
-        billingAddress: paymentInfo.billingAddress,
-        acceptTerms: paymentInfo.acceptTerms,
-        acceptMarketing: paymentInfo.acceptMarketing
+        selectedPaymentMethod,
+        hasCardInfo: !!payCard,
+        hasSEPAInfo: !!paySEPA,
+        hasPayPalInfo: !!payPaypal,
+        promoCode
       });
     }
 
@@ -262,7 +306,7 @@ router.post('/register', async (req, res) => {
     res.status(500).json({
       error: 'Erreur lors de la création du compte',
       code: 'REGISTRATION_ERROR',
-      details: error.message
+      details: error instanceof Error ? error.message : 'Erreur inconnue'
     });
   }
 });
@@ -431,6 +475,13 @@ router.post('/logout', (req, res) => {
 // Vérification de l'authentification
 router.get('/me', requireAuth, async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Utilisateur non authentifié',
+        code: 'USER_NOT_AUTHENTICATED'
+      });
+    }
+
     const { userId, accountId } = req.user;
 
     const userSession = await prisma.userSession.findUnique({

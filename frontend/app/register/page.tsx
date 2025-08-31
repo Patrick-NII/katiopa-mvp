@@ -428,33 +428,35 @@ export default function RegisterPage() {
     try {
       const payload = {
         email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
         subscriptionType:
           formData.subscriptionType === 'STARTER' ? 'FREE' :
           formData.subscriptionType === 'PRO' ? 'PRO' : 'PRO_PLUS',
-        maxSessions:
-          formData.subscriptionType === 'PREMIUM' ? 6 :
-          formData.subscriptionType === 'PRO' ? 2 : 1,
         familyMembers: formData.familyMembers.map((member, index) => ({
-          ...member,
-          username:
-            index === 0
-              ? (member.username && member.username.length > 0 ? member.username : `${member.firstName.toLowerCase()}_${Date.now()}`)
-              : member.username,
-          password: index === 0 ? formData.password : member.sessionPassword
+          firstName: member.firstName,
+          lastName: member.lastName,
+          gender: member.gender,
+          userType: member.userType,
+          // Convertit jj/mm/aaaa -> yyyy-mm-dd pour compatibilité backend
+          dateOfBirth: formatFrenchToISO(member.dateOfBirth),
+          grade: member.grade,
+          username: member.username || `${member.firstName.toLowerCase()}_${Date.now()}`,
+          sessionPassword: index === 0 ? formData.password : member.sessionPassword
         })),
         parentPrompts: {
           objectives: formData.parentPrompts?.objectives || '',
           preferences: formData.parentPrompts?.preferences || '',
           concerns: formData.parentPrompts?.concerns || ''
         },
-        billing: {
-          method: formData.selectedPaymentMethod,
-          paymentMethodId: generatePaymentMethodId(),
-          promoCode: formData.promoCode || null,
-          unitPrice: basePrice,
-          discountedPrice
-        },
-        paymentInfo: {}
+        selectedPaymentMethod: formData.selectedPaymentMethod,
+        payCard: formData.payCard,
+        paySEPA: formData.paySEPA,
+        payPaypal: formData.payPaypal,
+        promoCode: formData.promoCode,
+        acceptTerms: true
       }
 
       const response = await authAPI.register(payload)
@@ -710,26 +712,26 @@ const SummarySidebar = () => {
                             <IconComponent className="w-7 h-7 lg:w-8 lg:h-8 text-white" />
                           </div>
 
-                          <h3 className={`text-xl lg:text-2xl font-bold mb-2 ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                          <h3 className={`text-xl lg:text-2xl font-bold mb-2 ${isSelected ? 'text-white' : 'text-gray-100'}`}>
                             {plan.name}
                           </h3>
 
                           <div className="mb-2">
-                            <span className={`text-3xl lg:text-4xl font-bold ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                            <span className={`text-3xl lg:text-4xl font-bold ${isSelected ? 'text-white' : 'text-gray-100'}`}>
                               {plan.price}
                             </span>
-                            <span className={`text-base lg:text-lg ml-2 ${isSelected ? 'text-white/80' : 'text-gray-600'}`}>
+                            <span className={`text-base lg:text-lg ml-2 ${isSelected ? 'text-white/80' : 'text-gray-100'}`}>
                               {plan.period}
                             </span>
                           </div>
 
-                          <p className={`${isSelected ? 'text-white/90' : 'text-gray-600'} mb-3 lg:mb-4 text-base lg:text-lg`}>
+                          <p className={`${isSelected ? 'text-white/90' : 'text-gray-100'} mb-3 lg:mb-4 text-base lg:text-lg`}>
                             {plan.description}
                           </p>
 
                           {/* pill sessions — transparent si non sélectionné */}
                           <div className={`${isSelected ? 'bg-white/15 ring-1 ring-white/20' : 'bg-transparent'} rounded-xl p-2.5 lg:p-3`}>
-                            <p className={`font-semibold text-sm lg:text-base ${isSelected ? 'text-white drop-shadow-sm' : 'text-gray-800'}`}>
+                            <p className={`font-semibold text-sm lg:text-base ${isSelected ? 'text-white drop-shadow-sm' : 'text-gray-100'}`}>
                               {plan.maxMembers === 2 ? '2 sessions' : plan.maxMembers === 6 ? '6 sessions' : '1 session'} • {plan.maxMembers === 2 ? '1 parent + 1 enfant' : plan.maxMembers === 6 ? '1 parent + 5 enfants' : '1 parent'}
                             </p>
                           </div>
@@ -741,7 +743,7 @@ const SummarySidebar = () => {
                               <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${isSelected ? 'bg-white/20' : 'bg-green-100'}`}>
                                 <Check className={`w-3 h-3 ${isSelected ? 'text-white' : 'text-green-600'}`} />
                               </div>
-                              <span className={`${isSelected ? 'text-white' : 'text-gray-700'} text-sm lg:text-base`}>
+                              <span className={`${isSelected ? 'text-white' : 'text-gray-100'} text-sm lg:text-base`}>
                                 {feature}
                               </span>
                             </li>
@@ -768,17 +770,17 @@ const SummarySidebar = () => {
                   <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 max-w-4xl mx-auto">
                     {/* Champ Email à gauche */}
                     <div className="lg:w-1/2">
-                      <label className="block text-sm font-semibold text-gray-700 mb-3 text-left">
-                        Email de connexion *
+                      <label className="block text-sm font-semibold text-gray-100 mb-3 text-left">
+                        
                       </label>
                       <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-100 w-5 h-5" />
                         <input
                           type="email"
                           value={formData.email}
                           onChange={(e) => handleInputChange('email', e.target.value)}
                           className="w-full pl-12 pr-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
-                          placeholder="votre@email.com"
+                          placeholder="Email de contact  *"
                         />
                       </div>
                     </div>
@@ -792,7 +794,6 @@ const SummarySidebar = () => {
                         className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-12 lg:px-16 py-3.5 lg:py-4 rounded-2xl text-lg lg:text-xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl"
                       >
                         Continuer
-                        <ArrowRight className="w-5 h-5 lg:w-6 lg:h-6 ml-2 lg:ml-3 inline" />
                       </motion.button>
                     </div>
                   </div>
@@ -832,7 +833,7 @@ const SummarySidebar = () => {
                           </h3>
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div>
-                              <label className="block text-sm font-semibold text-gray-700 mb-2">Prénom *</label>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
                               <div className="relative">
                                 <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                                 <input
@@ -840,13 +841,13 @@ const SummarySidebar = () => {
                                   value={formData.firstName}
                                   onChange={(e) => handleInputChange('firstName', e.target.value)}
                                   className="w-full pl-12 pr-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
-                                  placeholder="Votre prénom"
+                                  placeholder="Prénom *"
                                 />
                               </div>
                             </div>
 
                             <div>
-                              <label className="block text-sm font-semibold text-gray-700 mb-2">Nom *</label>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
                               <div className="relative">
                                 <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                                 <input
@@ -854,7 +855,7 @@ const SummarySidebar = () => {
                                   value={formData.lastName}
                                   onChange={(e) => handleInputChange('lastName', e.target.value)}
                                   className="w-full pl-12 pr-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
-                                  placeholder="Votre nom"
+                                  placeholder="Nom *"
                                 />
                               </div>
                             </div>
@@ -865,26 +866,26 @@ const SummarySidebar = () => {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                           <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              Date de naissance * <span className="text-gray-400">(jj/mm/aaaa)</span>
+                              <span className="text-gray-400"></span>
                             </label>
                             <input
                               type="text"
                               value={formData.familyMembers[0].dateOfBirth}
                               onChange={(e) => handleDateInput(0, e.target.value)}
                               className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
-                              placeholder="jj/mm/aaaa"
+                              placeholder="Date de naissance jj/mm/aaaa *"
                               maxLength={10}
                             />
                           </div>
 
                           <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">Type</label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
                             <select
                               value={formData.familyMembers[0].gender}
                               onChange={(e) => handleFamilyMemberChange(0, 'gender', e.target.value)}
                               className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                             >
-                              <option value="UNKNOWN">Non spécifié</option>
+                              
                               <option value="MALE">M.</option>
                               <option value="FEMALE">Mme</option>
                             </select>
@@ -900,7 +901,7 @@ const SummarySidebar = () => {
 
                           {/* Identifiant parent */}
                         <div className="mb-8">
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">Identifiant de connexion (parent) *</label>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
                           <div className="flex gap-2">
                             <input
                               type="text"
@@ -913,7 +914,7 @@ const SummarySidebar = () => {
                                 })
                               }
                               className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
-                              placeholder="ex: Patrick-007"
+                              placeholder="Identifiant de connexion ex: Patrick-007 *"
                             />
                             <button
                               type="button"
@@ -935,7 +936,7 @@ const SummarySidebar = () => {
 
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div>
-                              <label className="block text-sm font-semibold text-gray-700 mb-2">Mot de passe *</label>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
                               <div className="relative">
                                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                                 <input
@@ -943,7 +944,7 @@ const SummarySidebar = () => {
                                   value={formData.password}
                                   onChange={(e) => handleInputChange('password', e.target.value)}
                                   className="w-full pl-12 pr-12 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
-                                  placeholder="••••••••"
+                                  placeholder="Mot de passe *"
                                 />
                                 <button
                                   type="button"
@@ -956,7 +957,7 @@ const SummarySidebar = () => {
                             </div>
 
                             <div>
-                              <label className="block text-sm font-semibold text-gray-700 mb-2">Confirmer le mot de passe *</label>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
                               <div className="relative">
                                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                                 <input
@@ -964,7 +965,7 @@ const SummarySidebar = () => {
                                   value={formData.confirmPassword}
                                   onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                                   className="w-full pl-12 pr-12 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
-                                  placeholder="••••••••"
+                                  placeholder="Confirmer le mot de passe *"
                                 />
                                 <button
                                   type="button"
@@ -1088,63 +1089,62 @@ const SummarySidebar = () => {
 
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                  <label className="block text-sm font-semibold text-gray-700 mb-3">Prénom *</label>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-3"></label>
                                   <input
                                     type="text"
                                     value={member.firstName}
                                     onChange={(e) => handleFamilyMemberChange(index, 'firstName', e.target.value)}
                                     className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
-                                    placeholder="Prénom"
+                                    placeholder="Prénom *"
                                   />
                                 </div>
 
                                 <div>
-                                  <label className="block text-sm font-semibold text-gray-700 mb-3">Nom *</label>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-3"></label>
                                   <input
                                     type="text"
                                     value={member.lastName}
                                     onChange={(e) => handleFamilyMemberChange(index, 'lastName', e.target.value)}
                                     className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
-                                    placeholder="Nom"
+                                    placeholder="Nom *"
                                   />
                                 </div>
 
                                 <div>
                                   <label className="block text-sm font-semibold text-gray-700 mb-3">
-                                    Date de naissance * <span className="text-gray-400">(jj/mm/aaaa)</span>
+                                    <span className="text-gray-400"></span>
                                   </label>
                                   <input
                                     type="text"
                                     value={member.dateOfBirth}
                                     onChange={(e) => handleDateInput(index, e.target.value)}
                                     className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
-                                    placeholder="jj/mm/aaaa"
+                                    placeholder="Date de naissance jj/mm/aaaa *"
                                     maxLength={10}
                                   />
                                 </div>
 
                                 <div>
-                                  <label className="block text-sm font-semibold text-gray-700 mb-3">Genre</label>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-3"></label>
                                   <select
                                     value={member.gender}
                                     onChange={(e) => handleFamilyMemberChange(index, 'gender', e.target.value)}
                                     className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
                                   >
-                                    <option value="UNKNOWN">Non spécifié</option>
                                     <option value="MALE">Garçon</option>
                                     <option value="FEMALE">Fille</option>
                                   </select>
                                 </div>
 
                                 <div>
-                                  <label className="block text-sm font-semibold text-gray-700 mb-3">Identifiant de session *</label>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-3"></label>
                                   <div className="flex gap-2">
                                     <input
                                       type="text"
                                       value={member.username || ''}
                                       onChange={(e) => handleFamilyMemberChange(index, 'username', e.target.value)}
                                       className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
-                                      placeholder="ex: lea3, samuel21..."
+                                      placeholder="ID de session ex: lea3 *"
                                     />
                                     <button
                                       type="button"
@@ -1161,14 +1161,14 @@ const SummarySidebar = () => {
                                 </div>
 
                                 <div>
-                                  <label className="block text-sm font-semibold text-gray-700 mb-3">Mot de passe de session *</label>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-3"></label>
                                   <div className="flex gap-2">
                                     <input
                                       type="text"
                                       value={member.sessionPassword || ''}
                                       onChange={(e) => handleFamilyMemberChange(index, 'sessionPassword', e.target.value)}
                                       className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
-                                      placeholder="Fort & facile à retenir"
+                                      placeholder="Mot de passe de session *"
                                     />
                                     <button
                                       type="button"
