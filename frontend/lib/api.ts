@@ -122,7 +122,7 @@ export const authAPI = {
           firstName: u.firstName,
           lastName: u.lastName,
           userType: u.userType,
-          subscriptionType: json.data.account?.subscriptionType || 'STARTER',
+          subscriptionType: json.data.account?.subscriptionType || 'FREE',
         },
       } as LoginResponse;
     }
@@ -146,7 +146,7 @@ export const authAPI = {
             firstName: u.firstName,
             lastName: u.lastName,
             userType: u.userType,
-            subscriptionType: json.data.account?.subscriptionType || 'STARTER',
+            subscriptionType: json.data.account?.subscriptionType || 'FREE',
           },
         };
       }
@@ -165,7 +165,7 @@ export const authAPI = {
             firstName: u.firstName,
             lastName: u.lastName,
             userType: u.userType,
-            subscriptionType: json.data.account?.subscriptionType || 'STARTER',
+            subscriptionType: json.data.account?.subscriptionType || 'FREE',
           },
         };
       }
