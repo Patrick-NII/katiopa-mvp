@@ -1,0 +1,17 @@
+<svg width="120" height="60" viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="120" height="60" rx="8" fill="#F8F9FA"/>
+  <rect x="2" y="2" width="116" height="56" rx="6" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+  
+  <!-- PayPal logo -->
+  <g transform="translate(15, 15)">
+    <!-- PayPal blue background -->
+    <rect width="90" height="30" rx="4" fill="#0070BA"/>
+    
+    <!-- PayPal text -->
+    <text x="45" y="22" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">PayPal</text>
+    
+    <!-- PayPal accent -->
+    <rect x="70" y="8" width="12" height="14" rx="2" fill="#1546A0"/>
+  </g>
+</svg>
