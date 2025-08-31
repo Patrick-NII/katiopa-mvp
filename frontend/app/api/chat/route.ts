@@ -13,13 +13,44 @@ export async function POST(request: NextRequest) {
     const isAuthenticated = await isUserAuthenticated()
     
     if (!isAuthenticated) {
+      // Utilisateur non connecté - utiliser le modèle local pour FAQ et support
+      const userQuestion = body.messages[body.messages.length - 1]?.text?.toLowerCase() || ''
+      
+      // Détecter les questions de support/FAQ
+      const supportKeywords = [
+        'aide', 'support', 'faq', 'question', 'comment', 'problème',
+        'inscription', 'connexion', 'compte', 'mot de passe',
+        'tarif', 'prix', 'abonnement', 'facturation',
+        'technique', 'bug', 'erreur', 'fonctionne pas'
+      ]
+      
+      const isSupportQuestion = supportKeywords.some(keyword => 
+        userQuestion.includes(keyword)
+      )
+
+      if (isSupportQuestion) {
+        // Réponse de support local
+        return NextResponse.json({
+          text: `🔧 **Support CubeAI**\n\nJe peux vous aider avec les questions de base. Voici quelques informations utiles :\n\n📧 **Contact** : support@cubeai.com\n📞 **Téléphone** : +33 1 23 45 67 89\n🌐 **Site web** : https://cubeai.com/support\n\n💡 **Questions fréquentes :**\n• Inscription : Cliquez sur "Commencer gratuitement"\n• Connexion : Utilisez votre Session ID et mot de passe\n• Tarifs : Voir la page des abonnements\n\nPour une assistance personnalisée, veuillez vous connecter à votre compte.`,
+          actions: [
+            { label: "Se connecter", href: "/login" },
+            { label: "Créer un compte", href: "/register" },
+            { label: "Voir les tarifs", href: "/register" }
+          ],
+          model: 'local-support',
+          subscriptionType: 'none'
+        })
+      }
+
+      // Réponse générique pour les utilisateurs non connectés
       return NextResponse.json({
-        text: "🔐 **Authentification requise**\n\nVous devez être connecté pour utiliser Bubix avec toutes ses fonctionnalités.\n\n💡 **Pour vous connecter :**\n1. Cliquez sur 'Connexion' en haut à droite\n2. Utilisez votre Session ID et mot de passe\n3. Ou créez un compte si vous n'en avez pas\n\nUne fois connecté, je pourrai vous aider avec vos informations personnelles !",
+        text: "👋 **Bienvenue sur CubeAI !**\n\nJe suis Bubix, votre assistant IA. Pour accéder à toutes mes fonctionnalités et obtenir des réponses personnalisées, veuillez vous connecter à votre compte.\n\n🔐 **Avantages de la connexion :**\n• Réponses personnalisées selon votre profil\n• Accès à l'historique de vos conversations\n• Fonctionnalités avancées selon votre abonnement\n\n💡 **Pour commencer :**\n1. Créez un compte gratuit\n2. Ou connectez-vous si vous en avez déjà un\n3. Profitez de l'expérience complète !",
         actions: [
           { label: "Se connecter", href: "/login" },
           { label: "Créer un compte", href: "/register" }
         ],
-        error: 'NOT_AUTHENTICATED'
+        model: 'local-base',
+        subscriptionType: 'none'
       })
     }
 
@@ -70,11 +101,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérifier si le LLM est activé pour cet abonnement
-    // Débloqué pour tous les comptes (spécialement Aylon-007)
     if (!isLLMEnabled(userInfo.subscriptionType)) {
       return NextResponse.json({ 
-        text: "Bubix est maintenant disponible pour tous les abonnements ! 🎉", 
-        actions: [],
+        text: `🔒 **Accès LLM limité**\n\nVotre abonnement actuel (${userInfo.subscriptionType}) ne permet pas l'accès au mode LLM avancé.\n\n💡 **Pour débloquer l'IA avancée :**\n• Passez à un abonnement PRO ou PRO_PLUS\n• Accédez à des réponses plus intelligentes et personnalisées\n• Profitez de plus de tokens et de fonctionnalités avancées\n\n📚 **En attendant, vous pouvez :**\n• Utiliser la base de connaissances locale\n• Consulter la FAQ et le support\n• Explorer les fonctionnalités de base`,
+        actions: [
+          { label: "Voir les abonnements", href: "/register" },
+          { label: "FAQ", href: "/support" }
+        ],
         error: 'LLM_NOT_AVAILABLE'
       })
     }

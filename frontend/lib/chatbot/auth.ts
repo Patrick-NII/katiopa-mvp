@@ -2,7 +2,7 @@
 import { authAPI } from '@/lib/api'
 
 export interface UserSubscription {
-  subscriptionType: 'STARTER' | 'PRO' | 'PREMIUM'
+  subscriptionType: 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE'
   userType: 'PARENT' | 'CHILD'
   isActive: boolean
 }
@@ -14,7 +14,7 @@ export interface UserInfo {
   lastName: string
   email?: string
   userType: 'PARENT' | 'CHILD'
-  subscriptionType: 'STARTER' | 'PRO' | 'PREMIUM'
+  subscriptionType: 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE'
   isActive: boolean
 }
 
@@ -30,7 +30,7 @@ export async function getUserInfo(): Promise<UserInfo | null> {
         lastName: response.user.lastName,
         email: response.user.email,
         userType: response.user.userType as 'PARENT' | 'CHILD',
-        subscriptionType: response.user.subscriptionType as 'STARTER' | 'PRO' | 'PREMIUM',
+        subscriptionType: response.user.subscriptionType as 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE',
         isActive: true
       }
     }
@@ -88,37 +88,38 @@ export async function getUserSubscription(): Promise<UserSubscription | null> {
 }
 
 export function getModelForSubscription(subscriptionType: string): string {
-  // Débloquer le meilleur modèle pour le compte Aylon-007
-  // Pour les autres comptes, modèle selon l'abonnement
+  // Configuration normale selon l'abonnement
   switch (subscriptionType) {
-    case 'STARTER':
-      return 'gpt-4o' // Débloqué pour Aylon-007
+    case 'FREE':
+      return 'gpt-3.5-turbo' // Modèle de base pour les abonnements gratuits
     case 'PRO':
-      return 'gpt-4o' // Débloqué pour Aylon-007
-    case 'PREMIUM':
-      return 'gpt-4o' // Débloqué pour Aylon-007
+      return 'gpt-4o-mini' // Modèle intermédiaire pour PRO
+    case 'PRO_PLUS':
+      return 'gpt-4o' // Modèle premium pour PRO_PLUS
+    case 'ENTERPRISE':
+      return 'gpt-4o' // Modèle premium pour ENTERPRISE
     default:
-      return 'gpt-4o' // Débloqué pour Aylon-007
+      return 'gpt-3.5-turbo' // Fallback par défaut
   }
 }
 
 export function isLLMEnabled(subscriptionType: string): boolean {
-  // Débloquer tous les accès pour le compte Aylon-007
-  // Pour les autres comptes, seuls les abonnements payants ont accès au LLM
-  return true // Temporairement débloqué pour tous
+  // Seuls les abonnements payants ont accès au LLM
+  return subscriptionType !== 'FREE'
 }
 
 export function getMaxTokensForSubscription(subscriptionType: string): number {
-  // Débloquer tous les accès pour le compte Aylon-007
-  // Pour les autres comptes, limitation selon l'abonnement
+  // Limitation selon l'abonnement
   switch (subscriptionType) {
-    case 'STARTER':
-      return 800 // Débloqué pour Aylon-007
+    case 'FREE':
+      return 0 // Pas de LLM pour les abonnements gratuits
     case 'PRO':
-      return 800 // Débloqué pour Aylon-007
-    case 'PREMIUM':
-      return 800 // Débloqué pour Aylon-007
+      return 400 // Limitation pour PRO
+    case 'PRO_PLUS':
+      return 800 // Plus de tokens pour PRO_PLUS
+    case 'ENTERPRISE':
+      return 1000 // Maximum pour ENTERPRISE
     default:
-      return 800 // Débloqué pour Aylon-007
+      return 0
   }
 }
