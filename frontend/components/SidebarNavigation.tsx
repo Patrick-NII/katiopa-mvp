@@ -38,6 +38,8 @@ interface SidebarNavigationProps {
   onTabChange: (tab: NavigationTab) => void
   userSubscriptionType: string
   userType: 'CHILD' | 'PARENT' | 'TEACHER' | 'ADMIN'
+  collapsed?: boolean
+  onCollapsedChange?: (collapsed: boolean) => void
 }
 
 interface TabItem {
@@ -66,7 +68,9 @@ export default function SidebarNavigation({
   activeTab, 
   onTabChange, 
   userSubscriptionType,
-  userType 
+  userType,
+  collapsed: collapsedProp,
+  onCollapsedChange
 }: SidebarNavigationProps) {
   // Normaliser le type d'abonnement
   const normalizedType = userSubscriptionType?.toUpperCase() || 'FREE'
@@ -82,8 +86,16 @@ export default function SidebarNavigation({
   const isParent = userType === 'PARENT'
   const isTeacher = userType === 'TEACHER'
   const isAdmin = userType === 'ADMIN'
+  
+  // Supporter un mode contrôlé/non-contrôlé pour la rétractation
+  const [internalCollapsed, setInternalCollapsed] = useState(false)
+  const collapsed = typeof collapsedProp === 'boolean' ? collapsedProp : internalCollapsed
+  const toggleCollapsed = () => {
+    if (onCollapsedChange) return onCollapsedChange(!collapsed)
+    setInternalCollapsed(v => !v)
+  }
 
-  const tabs: TabItem[] = [
+  let tabs: TabItem[] = [
     {
       id: 'dashboard',
       label: 'Dashboard',
@@ -134,21 +146,7 @@ export default function SidebarNavigation({
       description: 'Historique et paiements',
       available: !isChild && !isFree // Parents + comptes Pro et supérieurs
     },
-    // Nouveaux onglets pour les enfants
-    {
-      id: 'communautes',
-      label: 'Communautés',
-      icon: Home,
-      description: 'Échangez avec d\'autres apprenants',
-      available: isChild // Seuls les enfants ont accès aux communautés
-    },
-    {
-      id: 'photo',
-      label: 'Changer sa photo',
-      icon: User,
-      description: 'Personnalisez votre profil',
-      available: isChild // Seuls les enfants peuvent changer leur photo
-    },
+    // Nouveaux onglets pour les enfants (réduits à une expérience unique)
     {
       id: 'jeux',
       label: 'Jeux',
@@ -172,9 +170,15 @@ export default function SidebarNavigation({
     }
   ]
 
+  // Espace enfant: ne conserver que Expériences, Jeux, Réglages
+  if (isChild) {
+    const keep: NavigationTab[] = ['experiences', 'jeux', 'reglages']
+    tabs = tabs.filter(t => keep.includes(t.id))
+  }
+
   return (
     <motion.div 
-      className="fixed left-0 top-0 h-screen w-64 bg-white shadow-2xl z-50 flex flex-col"
+      className={`fixed left-0 top-0 h-screen ${collapsed ? 'w-16' : 'w-64'} bg-white shadow-2xl z-50 flex flex-col transition-[width] duration-300`}
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -196,19 +200,30 @@ export default function SidebarNavigation({
           >
             <AnimatedIcon type="home" className="w-5 h-5 text-white" />
           </motion.div>
-                      <div>
+          {!collapsed && (
+            <div>
               <h1 className="text-lg font-bold text-gray-900">CubeAI</h1>
               <p className="text-m text-gray-700">Espace personnel</p>
             </div>
+          )}
+          {/* Bouton rétractable */}
+          <button 
+            onClick={toggleCollapsed} 
+            className={`ml-auto p-2 rounded-md hover:bg-gray-100 text-gray-600 transition ${collapsed ? 'mx-auto' : ''}`}
+            aria-label={collapsed ? 'Déplier la navigation' : 'Replier la navigation'}
+            title={collapsed ? 'Déplier' : 'Replier'}
+          >
+            <ChevronRight className={`w-4 h-4 transition-transform ${collapsed ? '-rotate-180' : 'rotate-0'}`} />
+          </button>
         </div>
         
         {/* Indicateur de type de compte */}
-        <div className={`px-3 py-2 rounded-lg text-sm font-bold text-center ${
+        <div className={`px-3 py-2 rounded-lg text-sm font-bold ${collapsed ? 'text-center' : 'text-center'} ${
           isPremium 
             ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
             : 'bg-gradient-to-r from-green-600 to-blue-600 text-white shadow-md'
         }`}>
-          {isPremium ? '✨ Compte Premium' : '🎁 Compte Gratuit'}
+          {!collapsed && (isPremium ? '✨ Compte Premium' : '🎁 Compte Gratuit')}
         </div>
       </div>
 
@@ -221,7 +236,7 @@ export default function SidebarNavigation({
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
                 className={`
-                  w-full flex items-center gap-3 px-3 py-4 rounded-lg text-sm font-semibold
+                  w-full flex items-center gap-3 ${collapsed ? 'px-2 py-3 justify-center' : 'px-3 py-4'} rounded-lg text-sm font-semibold
                   ${activeTab === tab.id
                     ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-105'
                     : 'text-gray-700'
@@ -229,6 +244,7 @@ export default function SidebarNavigation({
                 `}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                title={tab.label}
               >
                 <div className={`
                   ${activeTab === tab.id
@@ -238,9 +254,13 @@ export default function SidebarNavigation({
                 `}>
                   <tab.icon size={16} />
                 </div>
-                <span className="flex-1 text-left font-semibold">{tab.label}</span>
+                {!collapsed && (
+                  <span className="flex-1 text-left font-semibold">{tab.label}</span>
+                )}
                 {tab.badge && (
-                  <span className={`
+                  <span className={`${
+                    collapsed ? 'hidden' : ''
+                  } 
                     px-2 py-0.5 rounded-full text-xs font-bold
                     ${activeTab === tab.id
                       ? 'bg-white/20 text-white'
@@ -252,7 +272,7 @@ export default function SidebarNavigation({
                 )}
                 {activeTab === tab.id && (
                   <motion.div
-                    className="w-2 h-2 bg-white rounded-full"
+                    className={`${collapsed ? 'hidden' : ''} w-2 h-2 bg-white rounded-full`}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.2 }}
@@ -266,10 +286,12 @@ export default function SidebarNavigation({
 
       {/* Footer de la sidebar */}
       <div className="p-3 border-t border-gray-200">
-        <div className="text-xs text-gray-700 text-center font-medium">
-          <p>Version 1.0.0</p>
-          <p>© 2025 CubeAI</p>
-        </div>
+        {!collapsed && (
+          <div className="text-xs text-gray-700 text-center font-medium">
+            <p>Version 1.0.0</p>
+            <p>© 2025 CubeAI</p>
+          </div>
+        )}
       </div>
     </motion.div>
   )
