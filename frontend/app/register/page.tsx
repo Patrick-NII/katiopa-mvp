@@ -1,13 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { User, Mail, Lock, Eye, EyeOff, Check, ArrowRight, ArrowLeft, Plus, X, Users, Crown, Gift } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  User, Mail, Lock, Eye, EyeOff, Check, ArrowRight, ArrowLeft, Plus, X, Users, Gift, Star, Sparkles,
+  CreditCard, ShieldCheck, Edit3, WalletMinimal, Tags, Apple, Landmark, CircleCheck, Info
+} from 'lucide-react'
 import Link from 'next/link'
 import { authAPI } from '@/lib/api'
 import { CubeAILogo } from '@/components/MulticolorText'
-import { AnimatePresence } from 'framer-motion'
+
+/* ----------------------------- Types & helpers ---------------------------- */
 
 interface FamilyMember {
   firstName: string
@@ -16,6 +20,8 @@ interface FamilyMember {
   userType: 'CHILD' | 'PARENT'
   dateOfBirth: string
   grade?: string
+  username?: string            // identifiant de session
+  sessionPassword?: string     // mot de passe de session
 }
 
 interface RegistrationData {
@@ -27,16 +33,57 @@ interface RegistrationData {
   subscriptionType: 'STARTER' | 'PRO' | 'PREMIUM'
   familyMembers: FamilyMember[]
   acceptTerms: boolean
+
+  promoCode?: string
+  selectedPaymentMethod?: 'card' | 'applepay' | 'paypal' | 'sepa'
+  paymentMethodId?: string        // id tokenisé PSP (Stripe/PayPal/SEPA)
+  parentPrompts?: {
+    objectives?: string
+    preferences?: string
+    concerns?: string
+  }
 }
+
+const PLAN_PRICES: Record<RegistrationData['subscriptionType'], number> = {
+  STARTER: 0,
+  PRO: 29.99,
+  PREMIUM: 69.99
+}
+
+function formatPrice(n: number) {
+  return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '€'
+}
+
+function generateUsername(base: string, taken: Set<string>) {
+  const seed = base.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10) || 'user'
+  let candidate = seed
+  let i = 1
+  while (taken.has(candidate)) {
+    candidate = `${seed}${i++}`
+  }
+  return candidate
+}
+
+function generatePassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*'
+  let out = ''
+  for (let i = 0; i < 12; i++) out += chars[Math.floor(Math.random() * chars.length)]
+  return out
+}
+
+/* -------------------------------- Component ------------------------------- */
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [step, setStep] = useState<'subscription' | 'account' | 'family' | 'success'>('subscription')
+  const [step, setStep] = useState<'subscription' | 'account' | 'family' | 'payment' | 'success'>('subscription')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  
+
+  const [promoStatus, setPromoStatus] = useState<'applied' | 'invalid' | null>(null)
+  const [promoDiscountPct, setPromoDiscountPct] = useState<number>(0)
+
   const [formData, setFormData] = useState<RegistrationData>({
     email: '',
     firstName: '',
@@ -51,19 +98,29 @@ export default function RegisterPage() {
         gender: 'UNKNOWN',
         userType: 'PARENT',
         dateOfBirth: '',
-        grade: ''
+        grade: '',
+        username: '',            // ID parent stocké ici
+        sessionPassword: ''      // (non utilisé pour le parent)
       }
     ],
-    acceptTerms: false
+    acceptTerms: false,
+    promoCode: '',
+    selectedPaymentMethod: 'card',
+    parentPrompts: {
+      objectives: '',
+      preferences: '',
+      concerns: ''
+    }
   })
 
+  /* --------------------------------- PLANS --------------------------------- */
   const subscriptionPlans = [
     {
       id: 'STARTER',
       name: 'Starter',
       price: '0€',
       period: '/mois',
-      description: 'Parfait pour commencer l\'aventure',
+      description: 'Démarrez gratuitement et découvrez CubeAI en douceur.',
       features: [
         '1 session simultanée',
         '1 propriétaire (admin)',
@@ -73,17 +130,26 @@ export default function RegisterPage() {
         'Évaluation et coaching IA basique',
         '3 mois gratuit puis 9,99€/mois'
       ],
-      maxMembers: 1,
+      maxMembers: 2,
       popular: false,
       starter: true,
-      cardClass: 'card-starter'
+      cardClass: 'card-starter',
+      icon: Gift,
+      color: 'from-green-500 to-emerald-600',
+      selected: {
+        container: 'border-emerald-900 bg-gradient-to-br from-emerald-800 to-teal-900',
+        ring: 'ring-emerald-400/50',
+        buttonBorder: 'border-emerald-800',
+        glow: 'shadow-[0_10px_40px_rgba(16,185,129,0.45)]'
+      },
+      cta: 'Commencer gratuitement'
     },
     {
       id: 'PRO',
       name: 'Pro',
       price: '29,99€',
       period: '/mois',
-      description: 'L\'expérience complète recommandée',
+      description: 'Progressez chaque semaine avec des rapports et un coach IA.',
       features: [
         '2 sessions simultanées',
         '1 propriétaire + 1 membre',
@@ -96,17 +162,26 @@ export default function RegisterPage() {
       ],
       maxMembers: 2,
       popular: true,
-      cardClass: 'card-pro'
+      cardClass: 'card-pro',
+      icon: Star,
+      color: 'from-blue-500 to-indigo-600',
+      selected: {
+        container: 'border-indigo-900 bg-gradient-to-br from-indigo-800 to-blue-900',
+        ring: 'ring-indigo-400/50',
+        buttonBorder: 'border-indigo-800',
+        glow: 'shadow-[0_10px_40px_rgba(79,70,229,0.45)]'
+      },
+      cta: 'Choisir Pro'
     },
     {
       id: 'PREMIUM',
       name: 'Premium',
       price: '69,99€',
       period: '/mois',
-      description: 'La solution complète pour les familles',
+      description: 'La solution familiale la plus complète, sans compromis.',
       features: [
         '6 sessions simultanées',
-        '1 propriétaire + jusqu\'à 5 membres',
+        "1 propriétaire + jusqu'à 5 membres",
         'IA coach Premium avancé',
         'Certificats officiels reconnus',
         'Exports PDF/Excel détaillés',
@@ -118,18 +193,29 @@ export default function RegisterPage() {
       maxMembers: 6,
       popular: false,
       complete: true,
-      cardClass: 'card-premium'
+      cardClass: 'card-premium',
+      icon: Sparkles,
+      color: 'from-purple-500 to-pink-600',
+      selected: {
+        container: 'border-fuchsia-900 bg-gradient-to-br from-purple-900 to-fuchsia-900',
+        ring: 'ring-fuchsia-400/50',
+        buttonBorder: 'border-fuchsia-800',
+        glow: 'shadow-[0_10px_40px_rgba(217,70,239,0.45)]'
+      },
+      cta: 'Passer en Premium'
     }
-  ]
+  ] as const
 
-  const selectedPlan = subscriptionPlans.find(p => p.id === formData.subscriptionType)
+  const selectedPlan = subscriptionPlans.find(p => p.id === formData.subscriptionType)!
+
+  /* -------------------------- Handlers & Validations ------------------------ */
 
   const handleInputChange = (field: keyof RegistrationData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     setError('')
   }
 
-  const handleFamilyMemberChange = (index: number, field: keyof FamilyMember, value: any) => {
+    const handleFamilyMemberChange = (index: number, field: keyof FamilyMember, value: any) => {
     setFormData(prev => ({
       ...prev,
       familyMembers: prev.familyMembers.map((member, i) => 
@@ -139,35 +225,72 @@ export default function RegisterPage() {
     setError('')
   }
 
+  // Fonction pour formater la date en français jj/mm/aaaa
+  const formatDateToFrench = (dateString: string) => {
+    if (!dateString) return ''
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return dateString
+    return date.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
+  }
+
+  // Fonction pour convertir le format français vers ISO
+  const formatFrenchToISO = (frenchDate: string) => {
+    if (!frenchDate || !frenchDate.match(/^\d{2}\/\d{2}\/\d{4}$/)) return frenchDate
+    const [day, month, year] = frenchDate.split('/')
+    return `${year}-${month}-${day}`
+  }
+
+  // Fonction pour valider et formater la saisie de date
+  const handleDateInput = (index: number, value: string) => {
+    // Supprimer tous les caractères non numériques sauf /
+    let cleaned = value.replace(/[^\d\/]/g, '')
+    
+    // Limiter à 10 caractères (jj/mm/aaaa)
+    if (cleaned.length > 10) cleaned = cleaned.slice(0, 10)
+    
+    // Ajouter automatiquement les /
+    if (cleaned.length === 2 && !cleaned.includes('/')) {
+      cleaned = cleaned + '/'
+    }
+    if (cleaned.length === 5 && cleaned.split('/').length === 2) {
+      cleaned = cleaned + '/'
+    }
+    
+    handleFamilyMemberChange(index, 'dateOfBirth', cleaned)
+  }
+
   const addFamilyMember = () => {
     const currentMemberCount = formData.familyMembers.length
     const maxMembers = selectedPlan?.maxMembers || 1
-    
     if (currentMemberCount >= maxMembers) {
       setError(`Vous ne pouvez ajouter que ${maxMembers} membre(s) maximum avec le plan ${selectedPlan?.name}`)
       return
     }
-
     setFormData(prev => ({
       ...prev,
-      familyMembers: [...prev.familyMembers, {
-        firstName: '',
-        lastName: '',
-        gender: 'UNKNOWN',
-        userType: 'CHILD',
-        dateOfBirth: '',
-        grade: ''
-      }]
+      familyMembers: [
+        ...prev.familyMembers,
+        {
+          firstName: '',
+          lastName: '',
+          gender: 'UNKNOWN',
+          userType: 'CHILD',
+          dateOfBirth: '',
+          grade: '',
+          username: '',
+          sessionPassword: ''
+        }
+      ]
     }))
     setError('')
   }
 
   const removeFamilyMember = (index: number) => {
-    if (index === 0) {
-      setError('Le propriétaire ne peut pas être supprimé')
-      return
-    }
-    
+    if (index === 0) return // on ne touche pas au parent ici
     setFormData(prev => ({
       ...prev,
       familyMembers: prev.familyMembers.filter((_, i) => i !== index)
@@ -178,6 +301,10 @@ export default function RegisterPage() {
   const validateStep1 = () => {
     if (!formData.email || !formData.firstName || !formData.lastName || !formData.password || !formData.confirmPassword) {
       setError('Tous les champs sont obligatoires')
+      return false
+    }
+    if (!formData.familyMembers[0].username) {
+      setError('Veuillez choisir un identifiant de connexion pour le parent')
       return false
     }
     if (formData.password !== formData.confirmPassword) {
@@ -196,64 +323,132 @@ export default function RegisterPage() {
   }
 
   const validateStep2 = () => {
-    const hasValidMembers = formData.familyMembers.every(member => 
-      member.firstName && member.lastName && member.dateOfBirth
+    // On ne valide que les enfants (index > 0)
+    const children = formData.familyMembers.slice(1)
+    const hasValidMembers = children.every(member =>
+      member.firstName && member.lastName && member.dateOfBirth && member.username && member.sessionPassword
     )
-    if (!hasValidMembers) {
-      setError('Tous les membres doivent avoir un prénom, nom et date de naissance')
+    if (!hasValidMembers && children.length > 0) {
+      setError('Chaque membre doit avoir prénom, nom, date de naissance, identifiant et mot de passe de session')
       return false
     }
     return true
   }
 
+  const validateStepPayment = () => {
+    if (!formData.selectedPaymentMethod) {
+      setError('Veuillez sélectionner une méthode de paiement')
+      return false
+    }
+    if (formData.selectedPaymentMethod !== 'applepay' && selectedPlan.id !== 'STARTER' && !formData.paymentMethodId) {
+      setError('Veuillez renseigner vos informations de paiement')
+      return false
+    }
+    return true
+  }
+
+  /* --------------------------- Prix, promo, résumé -------------------------- */
+
+  const basePrice = useMemo(() => PLAN_PRICES[formData.subscriptionType], [formData.subscriptionType])
+  const discountedPrice = useMemo(() => {
+    if (!promoDiscountPct) return basePrice
+    const after = Math.max(0, basePrice * (1 - promoDiscountPct / 100))
+    return Number(after.toFixed(2))
+  }, [basePrice, promoDiscountPct])
+
+  const applyPromo = () => {
+    const code = (formData.promoCode || '').trim().toUpperCase()
+    if (!code) { setPromoStatus(null); setPromoDiscountPct(0); return }
+    if (code === 'CUBE20') {
+      setPromoStatus('applied'); setPromoDiscountPct(20)
+    } else if (code === 'BIENVENUE10') {
+      setPromoStatus('applied'); setPromoDiscountPct(10)
+    } else {
+      setPromoStatus('invalid'); setPromoDiscountPct(0)
+    }
+  }
+
+  /* ------------------------------- Navigation ------------------------------- */
+
   const handleNext = () => {
     if (step === 'subscription') {
+      if (!formData.email) {
+        setError('Veuillez saisir votre email')
+        return
+      }
       setStep('account')
     } else if (step === 'account' && validateStep1()) {
       setStep('family')
+    } else if (step === 'family' && validateStep2()) {
+      setStep('payment')
     }
   }
 
   const handleBack = () => {
     if (step === 'account') setStep('subscription')
     else if (step === 'family') setStep('account')
+    else if (step === 'payment') {
+      // Nettoyage infos sensibles
+      setFormData(prev => ({ ...prev, paymentMethodId: undefined }))
+      setStep('family')
+    }
+  }
+
+  /* ------------------------------- Submit API ------------------------------- */
+
+  // Fonction pour générer un paymentMethodId simulé
+  const generatePaymentMethodId = () => {
+    const timestamp = Date.now()
+    const random = Math.floor(Math.random() * 10000)
+    return `pm_${formData.selectedPaymentMethod}_${timestamp}_${random}`
   }
 
   const handleSubmit = async () => {
-    if (!validateStep2()) return
+    if (step !== 'payment') return
+    if (!validateStepPayment()) return
 
     setLoading(true)
     setError('')
 
     try {
-      // Préparer les données pour l'API
       const payload = {
         email: formData.email,
-        subscriptionType: formData.subscriptionType === 'STARTER' ? 'FREE' : 
-                         formData.subscriptionType === 'PRO' ? 'PRO' : 'PRO_PLUS',
-        maxSessions: formData.subscriptionType === 'PREMIUM' ? 6 : 
-                    formData.subscriptionType === 'PRO' ? 2 : 1,
+        subscriptionType:
+          formData.subscriptionType === 'STARTER' ? 'FREE' :
+          formData.subscriptionType === 'PRO' ? 'PRO' : 'PRO_PLUS',
+        maxSessions:
+          formData.subscriptionType === 'PREMIUM' ? 6 :
+          formData.subscriptionType === 'PRO' ? 2 : 1,
         familyMembers: formData.familyMembers.map((member, index) => ({
           ...member,
-          username: index === 0 ? `${member.firstName.toLowerCase()}_${Date.now()}` : 
-                   `${member.firstName.toLowerCase()}_${Date.now()}_${index}`,
-          password: index === 0 ? formData.password : `${member.firstName.toLowerCase()}123`
+          username:
+            index === 0
+              ? (member.username && member.username.length > 0 ? member.username : `${member.firstName.toLowerCase()}_${Date.now()}`)
+              : member.username,
+          password: index === 0 ? formData.password : member.sessionPassword
         })),
         parentPrompts: {
-          objectives: '',
-          needs: '',
-          concerns: '',
-          preferences: '',
-          additionalInfo: ''
+          objectives: formData.parentPrompts?.objectives || '',
+          preferences: formData.parentPrompts?.preferences || '',
+          concerns: formData.parentPrompts?.concerns || ''
+        },
+        billing: {
+          method: formData.selectedPaymentMethod,
+          paymentMethodId: generatePaymentMethodId(),
+          promoCode: formData.promoCode || null,
+          unitPrice: basePrice,
+          discountedPrice
         },
         paymentInfo: {}
       }
 
       const response = await authAPI.register(payload)
-      
+
       if (response.success) {
         setStep('success')
-        localStorage.setItem('registrationData', JSON.stringify(response.data || response))
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('registrationData', JSON.stringify(response.data || response))
+        }
       } else {
         setError(response.error || 'Erreur lors de l\'inscription')
       }
@@ -268,521 +463,978 @@ export default function RegisterPage() {
     router.push('/login')
   }
 
+/* --------------------------- UI util: Sidebar ----------------------------- */
+const SummarySidebar = () => {
+  const stepsOrder: Array<typeof step> = ['subscription', 'account', 'family', 'payment', 'success']
+  const currentIndex = Math.max(0, stepsOrder.indexOf(step))
+  const progress = Math.min(100, (currentIndex / 3) * 100)
+
+  return (
+    <div className="xl:col-span-1 flex">
+      {/* Carte = flex-col + h-full pour s’étirer comme la gauche */}
+      <div className="bg-white/90 backdrop-blur rounded-2xl border border-gray-200 shadow-xl p-6 w-full self-stretch h-full flex flex-col min-h-[700px]">
+        {/* Contenu = flex-col pour pouvoir coller le footer en bas */}
+        <div className="w-full flex flex-col h-full">
+          {/* Stepper (contraste renforcé) */}
+          <div className="mb-8">
+            <h5 className="text-[11px] font-semibold uppercase tracking-wide text-gray-700 mb-2">
+              
+            </h5>
+            <div className="flex items-center gap-6">
+              {(['subscription','account','family','payment'] as const).map((k, idx) => {
+                const isDone = idx < currentIndex
+                const isCurrent = idx === currentIndex
+                return (
+                  <div key={k} className="flex items-center gap-6">
+                    <div
+                      className={[
+                        'w-7 h-7 rounded-full grid place-items-center text-[11px] font-bold border',
+                        isDone
+                          ? 'bg-emerald-500 text-emerald-800 border-emerald-300'
+                          : isCurrent
+                          ? 'bg-blue-500 text-blue-800 border-blue-300'
+                          : 'bg-gray-800 text-gray-100 border-gray-300',
+                      ].join(' ')}
+                    >
+                      {isDone ? '✓' : idx + 1}
+                    </div>
+                    {idx < 3 && <div className="w-6 h-1 rounded bg-gray-300" />}
+                  </div>
+                )
+              })}
+            </div>
+            <div className="mt-3 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-blue-600 to-purple-600"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Récap (textes plus foncés) */}
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-lg font-bold text-gray-900">Récapitulatif</h4>
+            <ShieldCheck className="w-5 h-5 text-emerald-600" />
+          </div>
+
+          <div className="space-y-3 text-gray-800">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Offre</span>
+              <span className="font-semibold">{selectedPlan.name}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Membres</span>
+              <span className="font-semibold">
+                {formData.familyMembers.length}/{selectedPlan.maxMembers}
+              </span>
+            </div>
+
+            <div className="pt-3 border-t border-gray-200">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700">Sous-total</span>
+                <span className="font-semibold">{formatPrice(basePrice)}</span>
+              </div>
+              {promoDiscountPct > 0 && (
+                <div className="flex items-center justify-between text-emerald-700">
+                  <span>Promo ({promoDiscountPct}%)</span>
+                  <span>-{formatPrice(Number((basePrice - discountedPrice).toFixed(2)))}</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between mt-2">
+                <span className="text-gray-700">Total / mois</span>
+                <span className="text-xl font-bold text-gray-900">{formatPrice(discountedPrice)}</span>
+              </div>
+            </div>
+
+            {/* Code promo */}
+            <div className="pt-4">
+              <label className="block text-sm font-semibold text-gray-800 mb-2 flex items-center">
+                <Tags className="w-4 h-4 mr-2 text-purple-700" />
+                Code promo
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={formData.promoCode}
+                  onChange={(e) => handleInputChange('promoCode', e.target.value)}
+                  placeholder="CUBE20, BIENVENUE10..."
+                  className="flex-1 px-3 py-2 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 text-gray-900 placeholder:text-gray-500"
+                />
+                <button
+                  onClick={applyPromo}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-900 text-white hover:bg-gray-800 transition"
+                >
+                  Appliquer
+                </button>
+              </div>
+              {promoStatus === 'applied' && (
+                <p className="text-emerald-700 text-sm mt-2">Réduction appliquée ✅</p>
+              )}
+              {promoStatus === 'invalid' && (
+                <p className="text-rose-600 text-sm mt-2">Code promo invalide ❌</p>
+              )}
+            </div>
+
+            {/* --- SPACER pour pousser le footer tout en bas --- */}
+            <div className="flex-1" />
+          </div>
+
+          {/* FOOTER collé en bas + contraste renforcé */}
+          <div className="mt-auto pt-6">
+            <p className="text-[12px] leading-relaxed text-gray-700 flex items-start">
+              <Info className="w-4 h-4 mr-2 mt-0.5 text-gray-700" />
+              <span>
+                Paiements sécurisés & 3D Secure via notre prestataire
+                (carte requise même pour Starter pour l’empreinte).
+              </span>
+            </p>
+            <p className="text-[12px] leading-relaxed text-gray-700 mt-2 text-center">
+              Sans engagement — résiliable en 1 clic. Vos progrès et profils sont conservés.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+  /* --------------------------------- Render -------------------------------- */
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Navigation */}
-      <nav className="bg-white/90 border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+      <nav className="bg-white/20 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6">
+          <div className="flex justify-between items-center h-14 lg:h-16">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <span className="font-title text-white text-2xl">C</span>
               </div>
-              <CubeAILogo className="text-4xl" />
+              <CubeAILogo className="text-3xl lg:text-4xl" />
             </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/login" className="font-body text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100">
-                Connexion
+            <div className="flex items-center space-x-3 lg:space-x-4">
+              <Link href="/" className="font-body text-gray-600 hover:text-gray-900 px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100 !text-gray-600 hover:!text-gray-900">
+                Accueil
+              </Link>
+              <Link href="/login" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 lg:px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                Se connecter
               </Link>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Main Content */}
+      {/* Main */}
       <div className="w-full">
         <AnimatePresence mode="wait">
+          {/* ------------------------- SUBSCRIPTION STEP ------------------------ */}
           {step === 'subscription' && (
             <motion.div
               key="subscription"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="min-h-screen py-20 bg-white"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="min-h-[calc(100vh-4.5rem)] py-10 lg:py-12 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100"
             >
-              <div className="w-full px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-16">
+              <div className="w-full px-4 sm:px-6 lg:px-6">
+                <div className="text-center mb-10 lg:mb-12">
                   <motion.div
-                    initial={{ opacity: 0, y: 0 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
-                    viewport={{ once: true }}
                     className="mb-6"
                   >
-                    <h1 className="text-5xl font-bold text-gray-900 mb-4">
+                    <h1 className="text-4xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text !text-gray-700 mb-3">
                       Choisissez votre plan
                     </h1>
-                    <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                      Sélectionnez l'offre qui correspond le mieux à vos besoins et commencez l'aventure CubeAI
+                    <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                      Sélectionnez l’offre qui vous convient et lancez l’aventure CubeAI dès aujourd’hui.
                     </p>
                   </motion.div>
+                  
+
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-                  {subscriptionPlans.map((plan, index) => (
-                    <motion.div
-                      key={plan.id}
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.8 }}
-                      viewport={{ once: true }}
-                      className={`relative rounded-2xl p-6 border-2 flex flex-col h-full cursor-pointer transition-all ${
-                        formData.subscriptionType === plan.id
-                          ? 'border-blue-500 bg-blue-50 shadow-xl'
-                          : 'border-gray-200 hover:border-gray-300 bg-white shadow-lg'
-                      } ${plan.cardClass}`}
-                      onClick={() => handleInputChange('subscriptionType', plan.id)}
-                    >
-                      {plan.starter && (
-                        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
-                          <Gift className="w-12 h-12 text-green-500" />
-                        </div>
-                      )}
-                      {plan.popular && (
-                        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
-                          <Crown className="w-12 h-12 text-blue-500" />
-                        </div>
-                      )}
-                      {plan.complete && (
-                        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
-                          <Crown className="w-12 h-12 text-purple-500" />
-                        </div>
-                      )}
-
-                      <div className="text-center mb-6">
-                        <h3 className="text-xl font-bold text-gray-900 mb-3">{plan.name}</h3>
-                        <div className="mb-2">
-                          <span className="text-3xl font-bold text-gray-900">{plan.price}</span>
-                          <span className="text-gray-600">{plan.period}</span>
-                        </div>
-                        <p className="text-gray-600 mb-2">{plan.description}</p>
-                        <p className="text-gray-500 text-sm italic">
-                          {plan.maxMembers === 1 ? '1 session' : plan.maxMembers === 2 ? '2 sessions' : '6 sessions'} • {plan.maxMembers === 1 ? '1 parent' : plan.maxMembers === 2 ? '1 parent + 1 enfant' : '1 parent + 5 enfants'}
-                        </p>
-                      </div>
-
-                      <ul className="space-y-3 mb-6 flex-grow">
-                        {plan.features.map((feature, featureIndex) => (
-                          <li key={featureIndex} className="flex items-start space-x-3">
-                            <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-gray-700 text-sm">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-
-                      <div className="mt-auto text-center">
-                        <button
-                          onClick={() => handleInputChange('subscriptionType', plan.id)}
-                          className={`w-full font-button px-6 py-3 rounded-xl transition-all border ${
-                            formData.subscriptionType === plan.id
-                              ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
-                              : 'bg-white/20 text-gray-700 hover:bg-gray-100 border-gray-300 hover:border-gray-400'
-                          }`}
-                        >
-                          {formData.subscriptionType === plan.id ? 'Sélectionné' : 'Choisir ce plan'}
-                        </button>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-
-                <div className="text-center mt-12">
-                  <button
-                    onClick={handleNext}
-                    className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-12 py-4 rounded-xl text-lg font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+                {/* Affichage des erreurs */}
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="max-w-md mx-auto mb-8 p-4 bg-red-50 border border-red-200 rounded-xl"
                   >
-                    Continuer
-                    <ArrowRight className="w-5 h-5 ml-2 inline" />
-                  </button>
+                    <p className="text-red-600 text-sm">{error}</p>
+                  </motion.div>
+                )}
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch max-w-7xl mx-auto">
+                  {subscriptionPlans.map((plan, index) => {
+                    const IconComponent = plan.icon
+                    const isSelected = formData.subscriptionType === plan.id
+                    return (
+                      <motion.div
+                        key={plan.id}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: index * 0.07 }}
+                        className={`relative rounded-3xl p-6 lg:p-7 border-2 flex flex-col h-full cursor-pointer transition-all duration-300 transform hover:-translate-y-0.5 ${
+                          isSelected
+                            ? `${plan.selected.container} ${plan.selected.glow} text-white -translate-y-1 ring-4 ${plan.selected.ring} ring-offset-0`
+                            : 'border-gray-200 hover:border-gray-300 bg-white shadow-xl hover:shadow-2xl'
+                        } ${plan.cardClass}`}
+                        onClick={() => handleInputChange('subscriptionType', plan.id)}
+                      >
+                        {plan.popular && (
+                          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                            <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 lg:px-4 py-1 rounded-full text-xs lg:text-sm font-semibold shadow-md">
+                              Recommandé
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="text-center mb-6">
+                          <div className={`w-14 h-14 lg:w-16 lg:h-16 bg-gradient-to-r ${plan.color} rounded-2xl flex items-center justify-center mx-auto mb-3`}>
+                            <IconComponent className="w-7 h-7 lg:w-8 lg:h-8 text-white" />
+                          </div>
+
+                          <h3 className={`text-xl lg:text-2xl font-bold mb-2 ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                            {plan.name}
+                          </h3>
+
+                          <div className="mb-2">
+                            <span className={`text-3xl lg:text-4xl font-bold ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                              {plan.price}
+                            </span>
+                            <span className={`text-base lg:text-lg ml-2 ${isSelected ? 'text-white/80' : 'text-gray-600'}`}>
+                              {plan.period}
+                            </span>
+                          </div>
+
+                          <p className={`${isSelected ? 'text-white/90' : 'text-gray-600'} mb-3 lg:mb-4 text-base lg:text-lg`}>
+                            {plan.description}
+                          </p>
+
+                          {/* pill sessions — transparent si non sélectionné */}
+                          <div className={`${isSelected ? 'bg-white/15 ring-1 ring-white/20' : 'bg-transparent'} rounded-xl p-2.5 lg:p-3`}>
+                            <p className={`font-semibold text-sm lg:text-base ${isSelected ? 'text-white drop-shadow-sm' : 'text-gray-800'}`}>
+                              {plan.maxMembers === 2 ? '2 sessions' : plan.maxMembers === 6 ? '6 sessions' : '1 session'} • {plan.maxMembers === 2 ? '1 parent + 1 enfant' : plan.maxMembers === 6 ? '1 parent + 5 enfants' : '1 parent'}
+                            </p>
+                          </div>
+                        </div>
+
+                        <ul className="space-y-3 lg:space-y-4 mb-6 lg:mb-8 flex-grow">
+                          {plan.features.map((feature, featureIndex) => (
+                            <li key={featureIndex} className="flex items-start space-x-3">
+                              <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${isSelected ? 'bg-white/20' : 'bg-green-100'}`}>
+                                <Check className={`w-3 h-3 ${isSelected ? 'text-white' : 'text-green-600'}`} />
+                              </div>
+                              <span className={`${isSelected ? 'text-white' : 'text-gray-700'} text-sm lg:text-base`}>
+                                {feature}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        {/* Bouton visible uniquement quand sélectionné */}
+                        <div className="mt-auto">
+                          {isSelected && (
+                            <button
+                              onClick={() => handleInputChange('subscriptionType', plan.id)}
+                              className={`w-full font-semibold px-5 lg:px-6 py-3.5 lg:py-4 rounded-2xl transition-all duration-300 border-2 bg-gradient-to-r ${plan.color} text-white ${plan.selected.buttonBorder} shadow-xl ring-2 ${plan.selected.ring}`}
+                            >
+                              ✓ Sélectionné
+                            </button>
+                          )}
+                        </div>
+                      </motion.div>
+                    )
+                  })}
+                </div>
+
+                <div className="mt-10 lg:mt-12">
+                  <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 max-w-4xl mx-auto">
+                    {/* Champ Email à gauche */}
+                    <div className="lg:w-1/2">
+                      <label className="block text-sm font-semibold text-gray-700 mb-3 text-left">
+                        Email de connexion *
+                      </label>
+                      <div className="relative">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <input
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => handleInputChange('email', e.target.value)}
+                          className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          placeholder="votre@email.com"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Bouton Continuer à droite */}
+                    <div className="lg:w-1/2 text-center">
+                      <motion.button
+                        onClick={handleNext}
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.96 }}
+                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-12 lg:px-16 py-3.5 lg:py-4 rounded-2xl text-lg lg:text-xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl"
+                      >
+                        Continuer
+                        <ArrowRight className="w-5 h-5 lg:w-6 lg:h-6 ml-2 lg:ml-3 inline" />
+                      </motion.button>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-sm text-gray-600 text-center">
+                    3 mois offerts sur Starter. Mettez à niveau quand vous voulez — vos progrès sont conservés.
+                  </p>
                 </div>
               </div>
             </motion.div>
           )}
 
+          {/* --------------------------- ACCOUNT STEP (bleu) -------------------- */}
           {step === 'account' && (
             <motion.div
               key="account"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="min-h-screen py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"
+              className="min-h-[calc(100vh-4.5rem)] py-10 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100"
             >
-              <div className="w-full px-4 sm:px-6 lg:px-8">
-                <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8">
-                  <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                      Créer votre compte 
-                    </h1>
-                    <p className="text-gray-600">
-                      Enregistrez vos informations en tant que propriétaire de ce compte 
-                    </p>
-                  </div>
+              <div className="w-full px-4 sm:px-6 lg:px-6 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-stretch">
+                  {/* Col gauche (2/3) */}
+                  <div className="xl:col-span-2">
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white/80 backdrop-blur rounded-3xl shadow-xl p-8 lg:p-10 min-h-[700px] h-full flex flex-col">
+                      <div className="text-center mb-8">
+                        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Créez votre espace famille</h1>
+                        <p className="text-lg text-gray-600">Enregistrez vos informations en tant que propriétaire du compte</p>
+                      </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Informations personnelles */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Informations personnelles</h3>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Prénom *
-                        </label>
-                        <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                          <input
-                            type="text"
-                            value={formData.firstName}
-                            onChange={(e) => handleInputChange('firstName', e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Votre prénom"
+                      <div className="space-y-8">
+                        {/* Prénom et Nom côte à côte */}
+                        <div>
+                          <h3 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4 flex items-center">
+                            <User className="w-5 h-5 lg:w-6 lg:h-6 mr-3 text-blue-600" />
+                            Informations personnelles
+                          </h3>
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2">Prénom *</label>
+                              <div className="relative">
+                                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <input
+                                  type="text"
+                                  value={formData.firstName}
+                                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                  placeholder="Votre prénom"
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2">Nom *</label>
+                              <div className="relative">
+                                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <input
+                                  type="text"
+                                  value={formData.lastName}
+                                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                  placeholder="Votre nom"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Date de naissance et Type */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Date de naissance * <span className="text-gray-400">(jj/mm/aaaa)</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.familyMembers[0].dateOfBirth}
+                              onChange={(e) => handleDateInput(0, e.target.value)}
+                              className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                              placeholder="jj/mm/aaaa"
+                              maxLength={10}
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Type</label>
+                            <select
+                              value={formData.familyMembers[0].gender}
+                              onChange={(e) => handleFamilyMemberChange(0, 'gender', e.target.value)}
+                              className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            >
+                              <option value="UNKNOWN">Non spécifié</option>
+                              <option value="MALE">M.</option>
+                              <option value="FEMALE">Mme</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Mots de passe */}
+                        <div>
+                          <h3 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4 flex items-center">
+                            <Lock className="w-5 h-5 lg:w-6 lg:h-6 mr-3 text-blue-600" />
+                            Sécurité
+                          </h3>
+
+                          {/* Identifiant parent */}
+                        <div className="mb-8">
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">Identifiant de connexion (parent) *</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={formData.familyMembers[0].username || ''}
+                              onChange={(e) =>
+                                setFormData(prev => {
+                                  const fm = [...prev.familyMembers]
+                                  fm[0] = { ...fm[0], username: e.target.value }
+                                  return { ...prev, familyMembers: fm }
+                                })
+                              }
+                              className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                              placeholder="ex: Patrick-007"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const suggestion = (formData.firstName || 'parent') + '-' + String(Math.floor(Math.random() * 900) + 100)
+                                setFormData(prev => {
+                                  const fm = [...prev.familyMembers]
+                                  fm[0] = { ...fm[0], username: suggestion }
+                                  return { ...prev, familyMembers: fm }
+                                })
+                              }}
+                              className="px-4 py-4 rounded-xl border-2 border-gray-200 hover:border-gray-300 text-sm !font-semibold"
+                            >
+                              Générer
+                            </button>
+                          </div>
+                        </div>
+                        
+
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2">Mot de passe *</label>
+                              <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <input
+                                  type={showPassword ? 'text' : 'password'}
+                                  value={formData.password}
+                                  onChange={(e) => handleInputChange('password', e.target.value)}
+                                  className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                  placeholder="••••••••"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                >
+                                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-semibold text-gray-700 mb-2">Confirmer le mot de passe *</label>
+                              <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <input
+                                  type={showConfirmPassword ? 'text' : 'password'}
+                                  value={formData.confirmPassword}
+                                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                                  className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                  placeholder="••••••••"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                >
+                                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Coaching IA */}
+                      <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div>
+                          <h3 className="text-xl font-semibold text-gray-900 flex items-center">
+                            <Edit3 className="w-5 h-5 mr-3 text-blue-600" />
+                            Coaching IA (optionnel)
+                          </h3>
+                          <p className="text-sm text-gray-600 mt-2">Aidez-nous à personnaliser les parcours selon vos objectifs et préférences.</p>
+                        </div>
+                        <div className="lg:col-span-2 space-y-4">
+                          <textarea
+                            value={formData.parentPrompts?.objectives || ''}
+                            onChange={(e) => handleInputChange('parentPrompts', { ...formData.parentPrompts, objectives: e.target.value })}
+                            placeholder="Objectifs (ex. découvrir la programmation, renforcer les maths)"
+                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-32 resize-none"
                           />
                         </div>
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Nom *
-                        </label>
-                        <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                          <input
-                            type="text"
-                            value={formData.lastName}
-                            onChange={(e) => handleInputChange('lastName', e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Votre nom"
-                          />
-                        </div>
-                      </div>
+                      {error && (
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8 p-4 bg-red-50 border border-red-200 rounded-xl">
+                          <p className="text-red-600 text-sm">{error}</p>
+                        </motion.div>
+                      )}
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email *
-                        </label>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                          <input
-                            type="email"
-                            value={formData.email}
-                            onChange={(e) => handleInputChange('email', e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="votre@email.com"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                      {/* Barre d’action */}
+                      <div className="mt-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <button onClick={handleBack} className="flex items-center space-x-3 text-gray-600 hover:text-gray-900 px-6 py-3 rounded-xl !font-semibold transition-all hover:bg-gray-100">
+                          <ArrowLeft className="w-5 h-5" />
+                          <span>Retour</span>
+                        </button>
 
-                    {/* Sécurité */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Sécurité</h3>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Mot de passe *
-                        </label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                          <input
-                            type={showPassword ? "text" : "password"}
-                            value={formData.password}
-                            onChange={(e) => handleInputChange('password', e.target.value)}
-                            className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="••••••••"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        <div className="flex items-center justify-between w-full">
+                          {/* Texte aligné à gauche */}
+                          <label className="flex items-center flex-1 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={formData.acceptTerms}
+                              onChange={(e) => handleInputChange('acceptTerms', e.target.checked)}
+                              className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2 shrink-0"
+                            />
+                            <span className="text-sm text-gray-700 leading-snug">
+                              J’accepte les{" "}
+                              <a className="text-blue-600 underline">conditions d’utilisation</a> et la{" "}
+                              <a className="text-blue-600 underline">politique de confidentialité</a>
+                            </span>
+                          </label>
+
+                          {/* Bouton à droite */}
+                          <motion.button
+                            onClick={handleNext}
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            disabled={!formData.acceptTerms}
+                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3.5 rounded-xl !font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-60 shrink-0"
                           >
-                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                          </button>
+                            <span className="!text-white !font-semibold">Continuer</span>
+                          </motion.button>
                         </div>
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Confirmer le mot de passe *
-                        </label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                          <input
-                            type={showConfirmPassword ? "text" : "password"}
-                            value={formData.confirmPassword}
-                            onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                            className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="••••••••"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                          >
-                            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start space-x-3 pt-4">
-                        <input
-                          type="checkbox"
-                          id="acceptTerms"
-                          checked={formData.acceptTerms}
-                          onChange={(e) => handleInputChange('acceptTerms', e.target.checked)}
-                          className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                        <label htmlFor="acceptTerms" className="text-sm text-gray-600">
-                          J'accepte les{' '}
-                          <a href="#" className="text-blue-600 hover:text-blue-800 underline">
-                            conditions d'utilisation
-                          </a>{' '}
-                          et la{' '}
-                          <a href="#" className="text-blue-600 hover:text-blue-800 underline">
-                            politique de confidentialité
-                          </a>
-                        </label>
-                      </div>
-                    </div>
+                    </motion.div>
                   </div>
 
-                  {error && (
-                    <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-red-600 text-sm">{error}</p>
-                    </div>
-                  )}
-
-                  <div className="mt-8 flex justify-between">
-                    <button
-                      onClick={handleBack}
-                      className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium transition-colors"
-                    >
-                      <ArrowLeft className="w-5 h-5" />
-                      <span>Retour</span>
-                    </button>
-                    
-                    <button
-                      onClick={handleNext}
-                      className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
-                    >
-                      <span>Continuer</span>
-                      <ArrowRight className="w-5 h-5 ml-2" />
-                    </button>
-                  </div>
+                  {/* Sidebar */}
+                  <SummarySidebar />
                 </div>
               </div>
             </motion.div>
           )}
 
+          {/* ---------------------------- FAMILY STEP (violet) ------------------ */}
           {step === 'family' && (
             <motion.div
               key="family"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="min-h-screen py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"
+              className="min-h-[calc(100vh-4.5rem)] py-10 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100"
             >
-              <div className="w-full px-4 sm:px-6 lg:px-8">
-                <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8">
-                  <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                      Membres de la famille
-                    </h1>
-                    <p className="text-gray-600">
-                      {selectedPlan && `Plan ${selectedPlan.name} : ${formData.familyMembers.length}/${selectedPlan.maxMembers} membre(s)`}
-                    </p>
-                  </div>
-
-                  <div className="space-y-6">
-                    {formData.familyMembers.map((member, index) => (
-                      <div key={index} className="border border-gray-200 rounded-lg p-6">
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {index === 0 ? 'Propriétaire (Admin)' : `Membre ${index}`}
-                          </h3>
-                          {index > 0 && (
-                            <button
-                              onClick={() => removeFamilyMember(index)}
-                              className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50"
-                            >
-                              <X className="w-5 h-5" />
-                            </button>
-                          )}
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Prénom *
-                            </label>
-                            <input
-                              type="text"
-                              value={member.firstName}
-                              onChange={(e) => handleFamilyMemberChange(index, 'firstName', e.target.value)}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="Prénom"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Nom *
-                            </label>
-                            <input
-                              type="text"
-                              value={member.lastName}
-                              onChange={(e) => handleFamilyMemberChange(index, 'lastName', e.target.value)}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="Nom"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Date de naissance *
-                            </label>
-                            <input
-                              type="date"
-                              value={member.dateOfBirth}
-                              onChange={(e) => handleFamilyMemberChange(index, 'dateOfBirth', e.target.value)}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Genre
-                            </label>
-                            <select
-                              value={member.gender}
-                              onChange={(e) => handleFamilyMemberChange(index, 'gender', e.target.value)}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                              <option value="UNKNOWN">Non spécifié</option>
-                              <option value="MALE">Masculin</option>
-                              <option value="FEMALE">Féminin</option>
-                            </select>
-                          </div>
-
-                          {member.userType === 'CHILD' && (
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Niveau scolaire
-                              </label>
-                              <input
-                                type="text"
-                                value={member.grade || ''}
-                                onChange={(e) => handleFamilyMemberChange(index, 'grade', e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="ex: CP, CE1, 6ème..."
-                              />
-                            </div>
-                          )}
-                        </div>
+              <div className="w-full px-4 sm:px-6 lg:px-6 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-stretch">
+                  {/* Col gauche (2/3) */}
+                  <div className="xl:col-span-2">
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white/80 backdrop-blur rounded-3xl shadow-xl p-8 lg:p-10 min-h-[700px] h-full flex flex-col">
+                      <div className="text-center mb-8">
+                        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Membres de la famille</h1>
+                        <p className="text-lg text-gray-600">
+                          Plan {selectedPlan.name} : {formData.familyMembers.length}/{selectedPlan.maxMembers} membre(s)
+                        </p>
+                        <p className="text-sm text-gray-500 mt-1">Vous pourrez ajouter des membres plus tard depuis votre espace Famille.</p>
                       </div>
-                    ))}
 
-                    {selectedPlan && formData.familyMembers.length < selectedPlan.maxMembers && (
-                      <button
-                        onClick={addFamilyMember}
-                        className="w-full py-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-800 transition-colors flex items-center justify-center space-x-2"
-                      >
-                        <Plus className="w-5 h-5" />
-                        <span>Ajouter un membre</span>
-                      </button>
-                    )}
-                  </div>
+                      <div className="space-y-8">
+                        {formData.familyMembers.map((member, index) => {
+                          if (index === 0) return null
+                          return (
+                            <motion.div key={index} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.07 }} className="rounded-2xl p-8 bg-white/90 backdrop-blur shadow-md">
+                              <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-2xl font-semibold text-gray-900 flex items-center">
+                                  <Users className="w-6 h-6 mr-3 text-purple-600" />
+                                  {`Membre ${index}`}
+                                </h3>
+                                <button onClick={() => removeFamilyMember(index)} className="text-rose-600 hover:text-rose-800 p-3 rounded-xl hover:bg-rose-50 transition-all">
+                                  <X className="w-6 h-6" />
+                                </button>
+                              </div>
 
-                  {error && (
-                    <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-red-600 text-sm">{error}</p>
-                    </div>
-                  )}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-3">Prénom *</label>
+                                  <input
+                                    type="text"
+                                    value={member.firstName}
+                                    onChange={(e) => handleFamilyMemberChange(index, 'firstName', e.target.value)}
+                                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                    placeholder="Prénom"
+                                  />
+                                </div>
 
-                  <div className="mt-8 flex justify-between">
-                    <button
-                      onClick={handleBack}
-                      className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium transition-colors"
-                    >
-                      <ArrowLeft className="w-5 h-5" />
-                      <span>Retour</span>
-                    </button>
-                    
-                    <button
-                      onClick={handleSubmit}
-                      disabled={loading}
-                      className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
-                    >
-                      {loading ? (
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <>
-                          <span>Créer mon compte</span>
-                          <ArrowRight className="w-5 h-5 ml-2" />
-                        </>
+                                <div>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-3">Nom *</label>
+                                  <input
+                                    type="text"
+                                    value={member.lastName}
+                                    onChange={(e) => handleFamilyMemberChange(index, 'lastName', e.target.value)}
+                                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                    placeholder="Nom"
+                                  />
+                                </div>
+
+                                <div>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                    Date de naissance * <span className="text-gray-400">(jj/mm/aaaa)</span>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={member.dateOfBirth}
+                                    onChange={(e) => handleDateInput(index, e.target.value)}
+                                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                    placeholder="jj/mm/aaaa"
+                                    maxLength={10}
+                                  />
+                                </div>
+
+                                <div>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-3">Genre</label>
+                                  <select
+                                    value={member.gender}
+                                    onChange={(e) => handleFamilyMemberChange(index, 'gender', e.target.value)}
+                                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                  >
+                                    <option value="UNKNOWN">Non spécifié</option>
+                                    <option value="MALE">Garçon</option>
+                                    <option value="FEMALE">Fille</option>
+                                  </select>
+                                </div>
+
+                                <div>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-3">Identifiant de session *</label>
+                                  <div className="flex gap-2">
+                                    <input
+                                      type="text"
+                                      value={member.username || ''}
+                                      onChange={(e) => handleFamilyMemberChange(index, 'username', e.target.value)}
+                                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                      placeholder="ex: lea3, samuel21..."
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const taken = new Set(formData.familyMembers.map(m => m.username || '').filter(Boolean))
+                                        const suggestion = generateUsername(member.firstName || 'enfant', taken)
+                                        handleFamilyMemberChange(index, 'username', suggestion)
+                                      }}
+                                      className="px-4 py-4 rounded-xl border-2 border-gray-200 hover:border-gray-300 text-sm !font-semibold"
+                                    >
+                                      Générer
+                                    </button>
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-3">Mot de passe de session *</label>
+                                  <div className="flex gap-2">
+                                    <input
+                                      type="text"
+                                      value={member.sessionPassword || ''}
+                                      onChange={(e) => handleFamilyMemberChange(index, 'sessionPassword', e.target.value)}
+                                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                      placeholder="Fort & facile à retenir"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => handleFamilyMemberChange(index, 'sessionPassword', generatePassword())}
+                                      className="px-4 py-4 rounded-xl border-2 border-gray-200 hover:border-gray-300 text-sm !font-semibold"
+                                    >
+                                      Générer
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )
+                        })}
+
+                        {selectedPlan && formData.familyMembers.length < selectedPlan.maxMembers && (
+                          <motion.button
+                            onClick={addFamilyMember}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="w-full py-8 border-2 border-dashed border-gray-300 rounded-2xl text-gray-600 hover:border-purple-400 hover:text-purple-600 transition-all flex items-center justify-center space-x-3 text-lg !font-semibold"
+                          >
+                            <Plus className="w-6 h-6" />
+                            <span>Ajouter un membre</span>
+                          </motion.button>
+                        )}
+                      </div>
+
+                      {error && (
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8 p-4 bg-red-50 border border-red-200 rounded-xl">
+                          <p className="text-red-600 text-sm">{error}</p>
+                        </motion.div>
                       )}
-                    </button>
+
+                      <div className="mt-8 flex justify-between items-center">
+                        <button onClick={handleBack} className="flex items-center space-x-3 text-gray-600 hover:text-gray-900 px-6 py-3 rounded-xl !font-semibold transition-all hover:bg-gray-100">
+                          <ArrowLeft className="w-5 h-5" />
+                          <span>Retour</span>
+                        </button>
+
+                        <motion.button
+                          onClick={handleNext}
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3.5 rounded-xl !font-semibold transition-all shadow-lg hover:shadow-xl"
+                        >
+                          <span className="!text-white !font-semibold">Continuer</span>
+                          <ArrowRight className="w-5 h-5 ml-2 inline" />
+                        </motion.button>
+                      </div>
+                    </motion.div>
                   </div>
+
+                  {/* Sidebar */}
+                  <SummarySidebar />
                 </div>
               </div>
             </motion.div>
           )}
 
-          {step === 'success' && (
+          {/* --------------------------- PAYMENT STEP --------------------------- */}
+          {step === 'payment' && (
             <motion.div
-              key="success"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="min-h-screen py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"
+              key="payment"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="min-h-[calc(100vh-4.5rem)] py-10 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100"
             >
-              <div className="w-full px-4 sm:px-6 lg:px-8">
-                <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8 text-center">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Check className="w-8 h-8 text-green-600" />
-                  </div>
-                  
-                  <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                    Bienvenue chez CubeAI ! 🎉
-                  </h1>
-                  
-                  <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                    Votre compte a été créé avec succès. Un email de bienvenue avec vos identifiants a été envoyé à votre adresse.
-                  </p>
+              <div className="w-full px-4 sm:px-6 lg:px-6 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-stretch">
+                  {/* Col gauche (2/3) */}
+                  <div className="xl:col-span-2">
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white/80 backdrop-blur rounded-3xl shadow-xl p-8 lg:p-10 min-h-[700px] flex flex-col h-full">
+                      <div className="text-center mb-8">
+                        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Paiement & vérification</h1>
+                        <p className="text-lg text-gray-600">Entrez vos informations de paiement sécurisées. Une empreinte sera créée pour Starter.</p>
+                      </div>
 
-                  <div className="bg-gray-50 rounded-xl p-5 text-left max-w-lg mx-auto mb-8">
-                    {(() => {
-                      const dataRaw = typeof window !== 'undefined' ? localStorage.getItem('registrationData') : null
-                      const data = dataRaw ? JSON.parse(dataRaw) : null
-                      const account = data?.account
-                      const plan = account?.subscriptionType
-                      const regId = data?.registrationId
-                      return (
-                        <div className="space-y-2 text-sm">
-                          {regId && (
-                            <div className="flex justify-between"><span className="text-gray-600">ID d'inscription</span><span className="font-semibold text-gray-900">{regId}</span></div>
+                      <div className="space-y-6 flex-grow">
+                        <div className="rounded-2xl border-2 border-gray-200 bg-white p-6">
+                          <div className="flex items-center mb-4">
+                            <CreditCard className="w-5 h-5 mr-2 text-blue-600" />
+                            <span className="font-semibold text-gray-900">Informations de paiement</span>
+                          </div>
+
+                          {/* Sélecteur de méthode */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                            {(['card', 'applepay', 'sepa', 'paypal'] as const).map(m => (
+                              <button
+                                key={m}
+                                onClick={() => handleInputChange('selectedPaymentMethod', m)}
+                                className={`px-4 py-3 rounded-xl border text-sm !font-medium transition text-left ${
+                                  formData.selectedPaymentMethod === m ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'
+                                }`}
+                              >
+                                <span className="!font-semibold">
+                                  {m === 'card' && 'Carte bancaire (3D Secure)'}
+                                  {m === 'applepay' && 'Apple Pay'}
+                                  {m === 'sepa' && 'SEPA (IBAN)'}
+                                  {m === 'paypal' && 'PayPal'}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Champs conditionnels */}
+                          {formData.selectedPaymentMethod === 'card' && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="md:col-span-2">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Titulaire *</label>
+                                <input
+                                  type="text"
+                                  value={formData.payCard?.name || ''}
+                                  onChange={(e) => handleInputChange('payCard', { ...(formData.payCard||{}), name: e.target.value })}
+                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  placeholder="Nom sur la carte"
+                                />
+                              </div>
+                              <div className="md:col-span-2">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Numéro de carte *</label>
+                                <input
+                                  inputMode="numeric"
+                                  placeholder="1234 5678 9012 3456"
+                                  value={formData.payCard?.number || ''}
+                                  onChange={(e) => handleInputChange('payCard', { ...(formData.payCard||{}), number: e.target.value.replace(/[^\d]/g, '') })}
+                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Exp. (MM) *</label>
+                                <input
+                                  inputMode="numeric"
+                                  maxLength={2}
+                                  value={formData.payCard?.expMonth || ''}
+                                  onChange={(e) => handleInputChange('payCard', { ...(formData.payCard||{}), expMonth: e.target.value.replace(/[^\d]/g, '') })}
+                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  placeholder="MM"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Exp. (AA) *</label>
+                                <input
+                                  inputMode="numeric"
+                                  maxLength={2}
+                                  value={formData.payCard?.expYear || ''}
+                                  onChange={(e) => handleInputChange('payCard', { ...(formData.payCard||{}), expYear: e.target.value.replace(/[^\d]/g, '') })}
+                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  placeholder="AA"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">CVC *</label>
+                                <input
+                                  inputMode="numeric"
+                                  maxLength={4}
+                                  value={formData.payCard?.cvc || ''}
+                                  onChange={(e) => handleInputChange('payCard', { ...(formData.payCard||{}), cvc: e.target.value.replace(/[^\d]/g, '') })}
+                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  placeholder="CVC"
+                                />
+                              </div>
+                            </div>
                           )}
-                          {account?.email && (
-                            <div className="flex justify-between"><span className="text-gray-600">Email</span><span className="font-semibold text-gray-900">{account.email}</span></div>
+
+                          {formData.selectedPaymentMethod === 'sepa' && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="md:col-span-2">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Titulaire *</label>
+                                <input
+                                  type="text"
+                                  value={formData.paySEPA?.name || ''}
+                                  onChange={(e) => handleInputChange('paySEPA', { ...(formData.paySEPA||{}), name: e.target.value })}
+                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  placeholder="Nom du titulaire"
+                                />
+                              </div>
+                              <div className="md:col-span-2">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">IBAN *</label>
+                                <input
+                                  type="text"
+                                  value={formData.paySEPA?.iban || ''}
+                                  onChange={(e) => handleInputChange('paySEPA', { ...(formData.paySEPA||{}), iban: e.target.value })}
+                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  placeholder="FR76 3000 6000 0112 3456 7890 189"
+                                />
+                              </div>
+                            </div>
                           )}
-                          {plan && (
-                            <div className="flex justify-between"><span className="text-gray-600">Offre</span><span className="font-semibold text-gray-900">{plan}</span></div>
+
+                          {formData.selectedPaymentMethod === 'paypal' && (
+                            <div className="grid grid-cols-1 gap-4">
+                              <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Email PayPal *</label>
+                                <input
+                                  type="email"
+                                  value={formData.payPaypal?.email || ''}
+                                  onChange={(e) => handleInputChange('payPaypal', { ...(formData.payPaypal||{}), email: e.target.value })}
+                                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  placeholder="votre-email@paypal.com"
+                                />
+                              </div>
+                            </div>
                           )}
-                          {Array.isArray(data?.sessions) && (
-                            <div className="mt-2 text-gray-600">{data.sessions.length} membre(s) créé(s)</div>
+
+                          {formData.selectedPaymentMethod === 'applepay' && (
+                            <div className="rounded-xl bg-gray-50 border border-dashed border-gray-300 p-6 text-sm text-gray-600">
+                              Apple Pay sera présenté par votre navigateur / appareil compatible au moment de la validation.
+                            </div>
                           )}
-                          <div className="mt-3 text-blue-700 bg-blue-50 border border-blue-200 rounded-lg p-3">
-                            Un email de bienvenue avec vos identifiants a été envoyé à votre adresse.
+                        </div>
+
+                        {/* Vérification */}
+                        <div className="rounded-2xl border-2 border-gray-200 bg-white p-6">
+                          <div className="flex items-center mb-4">
+                            <CircleCheck className="w-5 h-5 mr-2 text-emerald-600" />
+                            <span className="font-semibold text-gray-900">Vérification des informations</span>
+                          </div>
+                          <ul className="space-y-3 text-sm text-gray-700">
+                            <li>• Compte parent : <strong>{formData.firstName} {formData.lastName}</strong> — {formData.email}</li>
+                            <li>• ID parent : <strong>{formData.familyMembers[0].username || '—'}</strong></li>
+                            <li>• Plan : <strong>{selectedPlan.name}</strong> — {formatPrice(discountedPrice)}/mois</li>
+                            <li>• Membres enfants : {Math.max(0, formData.familyMembers.length - 1)}/{selectedPlan.maxMembers - 1}</li>
+                            <li>• Code promo : {formData.promoCode ? <span className="text-emerald-700 font-semibold">{formData.promoCode}</span> : '—'}</li>
+                          </ul>
+
+                          <div className="flex gap-3 mt-4">
+                            <button onClick={() => setStep('account')} className="px-4 py-2 rounded-xl border-2 border-gray-200 hover:bg-gray-50 text-sm !font-semibold">Modifier compte</button>
+                            <button onClick={() => setStep('family')} className="px-4 py-2 rounded-xl border-2 border-gray-200 hover:bg-gray-50 text-sm !font-semibold">Modifier membres</button>
                           </div>
                         </div>
-                      )
-                    })()}
+                      </div>
+
+                      {error && (
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8 p-4 bg-red-50 border border-red-200 rounded-xl">
+                          <p className="text-red-600 text-sm">{error}</p>
+                        </motion.div>
+                      )}
+
+                      <div className="mt-8 flex justify-between items-center">
+                        <button onClick={handleBack} className="flex items-center space-x-3 text-gray-600 hover:text-gray-900 px-6 py-3 rounded-xl !font-semibold transition-all hover:bg-gray-100">
+                          <ArrowLeft className="w-5 h-5" />
+                          <span>Retour</span>
+                        </button>
+
+                        <motion.button
+                          onClick={handleSubmit}
+                          whileHover={{ scale: loading ? 1 : 1.03 }}
+                          whileTap={{ scale: loading ? 1 : 0.97 }}
+                          disabled={loading}
+                          className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-12 py-4 rounded-xl !font-semibold transition-all shadow-lg hover:shadow-xl"
+                        >
+                          <span className="!text-white !font-semibold">{loading ? 'Validation…' : 'Valider et activer mon plan'}</span>
+                        </motion.button>
+                      </div>
+                    </motion.div>
                   </div>
-                  
-                  <button
-                    onClick={handleGoToLogin}
-                    className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
-                  >
-                    Aller à la connexion
-                  </button>
+
+                  {/* Sidebar */}
+                  <SummarySidebar />
                 </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ----------------------------- SUCCESS ------------------------------ */}
+          {step === 'success' && (
+            <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="min-h-screen py-12 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+              <div className="w-full px-4 sm:px-6 lg:px-8">
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl p-12 text-center">
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring', stiffness: 200 }} className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8">
+                    <Check className="w-10 h-10 text-white" />
+                  </motion.div>
+                  <h1 className="text-4xl font-bold text-gray-900 mb-6">Bienvenue chez CubeAI !</h1>
+                  <p className="text-xl text-gray-600 mb-10 leading-relaxed">
+                    Votre compte a été créé. Nous vous avons envoyé un email de confirmation et un mail de bienvenue avec les identifiants de connexion pour chaque session.
+                  </p>
+                  <motion.button onClick={handleGoToLogin} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-12 py-4 rounded-xl !font-semibold transition-all shadow-lg hover:shadow-xl">
+                    <span className="!text-white !font-semibold">Aller à la connexion</span>
+                  </motion.button>
+                </motion.div>
               </div>
             </motion.div>
           )}
