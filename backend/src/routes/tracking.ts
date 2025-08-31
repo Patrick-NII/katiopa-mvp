@@ -7,7 +7,7 @@ const router = express.Router();
 // Route pour enregistrer une interaction utilisateur
 router.post("/interaction", requireAuth, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     const accountId = req.user?.accountId;
     
     if (!userId || !accountId) {
@@ -73,7 +73,7 @@ router.post("/interaction", requireAuth, async (req, res) => {
 // Route pour enregistrer un prompt utilisateur
 router.post("/prompt", requireAuth, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     const accountId = req.user?.accountId;
     
     if (!userId || !accountId) {
@@ -139,7 +139,7 @@ router.post("/prompt", requireAuth, async (req, res) => {
 // Route pour démarrer une session de navigation
 router.post("/navigation/start", requireAuth, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     const accountId = req.user?.accountId;
     
     if (!userId || !accountId) {
@@ -180,7 +180,7 @@ router.post("/navigation/start", requireAuth, async (req, res) => {
 // Route pour mettre à jour une session de navigation
 router.put("/navigation/:sessionId", requireAuth, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     const { sessionId } = req.params;
     const { pageUrl, actionPerformed, sessionData } = req.body;
 
@@ -229,7 +229,7 @@ router.put("/navigation/:sessionId", requireAuth, async (req, res) => {
 // Route pour terminer une session de navigation
 router.put("/navigation/:sessionId/end", requireAuth, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     const { sessionId } = req.params;
 
     // Vérifier que la session appartient à l'utilisateur
@@ -277,7 +277,7 @@ router.put("/navigation/:sessionId/end", requireAuth, async (req, res) => {
 // Route pour enregistrer une métrique de performance
 router.post("/metric", requireAuth, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     const accountId = req.user?.accountId;
     
     if (!userId || !accountId) {
@@ -333,7 +333,7 @@ router.post("/metric", requireAuth, async (req, res) => {
 // Route pour récupérer les statistiques de tracking
 router.get("/stats", requireAuth, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     const accountId = req.user?.accountId;
     
     if (!userId || !accountId) {

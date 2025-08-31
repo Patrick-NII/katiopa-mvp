@@ -1,0 +1,5246 @@
+[
+  {
+    "id": "ai_intro_simple",
+    "q": "C’est quoi l’IA ?",
+    "topic": "ia",
+    "a_kid": "L’IA apprend avec des exemples, comme un élève qui s’entraîne. Elle reconnaît des objets ou des mots après avoir beaucoup vu d’exemples.",
+    "a_pro": "L’IA regroupe des méthodes (ML/DL) qui apprennent des patterns à partir de données et généralisent pour prédire/agir.",
+    "tags": [
+      "ia",
+      "intelligence artificielle",
+      "apprendre",
+      "exemples",
+      "decouverte"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "division_euclidienne",
+    "q": "Division euclidienne",
+    "topic": "math",
+    "a_kid": "Quand on partage 17 bonbons entre 5 amis: chacun a 3 bonbons et il reste 2. On écrit 17 = 5 × 3 + 2.",
+    "a_pro": "Pour a,b entiers (b>0): il existe uniques q,r tels que a = bq + r et 0 ≤ r < b. Exemple: 17 ÷ 5 = 3 reste 2.",
+    "tags": [
+      "division",
+      "euclidienne",
+      "reste",
+      "quotient",
+      "calcul"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "division_types",
+    "q": "Différences: division euclidienne vs décimale",
+    "topic": "math",
+    "a_kid": "Euclidienne: on partage et parfois il reste. Décimale: on continue après la virgule pour partager exactement.",
+    "a_pro": "Euclidienne donne quotient entier et reste. Décimale exprime un quotient en base 10 avec précision souhaitée.",
+    "tags": [
+      "division",
+      "decimale",
+      "euclidienne",
+      "différences"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_1",
+    "q": "Addition — notion 1",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 1.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 1.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_2",
+    "q": "Addition — notion 2",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 2.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 2.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_3",
+    "q": "Addition — notion 3",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 3.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 3.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_4",
+    "q": "Addition — notion 4",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 4.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 4.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_5",
+    "q": "Addition — notion 5",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 5.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 5.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_6",
+    "q": "Addition — notion 6",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 6.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 6.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_7",
+    "q": "Addition — notion 7",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 7.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 7.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_8",
+    "q": "Addition — notion 8",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 8.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 8.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_9",
+    "q": "Addition — notion 9",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 9.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 9.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_10",
+    "q": "Addition — notion 10",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 10.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 10.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_11",
+    "q": "Addition — notion 11",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 11.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 11.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_12",
+    "q": "Addition — notion 12",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 12.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 12.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_13",
+    "q": "Addition — notion 13",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 13.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 13.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_14",
+    "q": "Addition — notion 14",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 14.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 14.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_15",
+    "q": "Addition — notion 15",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 15.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 15.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_16",
+    "q": "Addition — notion 16",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 16.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 16.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_17",
+    "q": "Addition — notion 17",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 17.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 17.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_18",
+    "q": "Addition — notion 18",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 18.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 18.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_19",
+    "q": "Addition — notion 19",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 19.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 19.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_20",
+    "q": "Addition — notion 20",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 20.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 20.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_21",
+    "q": "Addition — notion 21",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 21.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 21.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_22",
+    "q": "Addition — notion 22",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 22.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 22.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_23",
+    "q": "Addition — notion 23",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 23.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 23.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_24",
+    "q": "Addition — notion 24",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 24.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 24.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_25",
+    "q": "Addition — notion 25",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 25.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 25.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_26",
+    "q": "Addition — notion 26",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 26.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 26.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_27",
+    "q": "Addition — notion 27",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 27.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 27.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_28",
+    "q": "Addition — notion 28",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 28.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 28.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_29",
+    "q": "Addition — notion 29",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 29.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 29.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_30",
+    "q": "Addition — notion 30",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 30.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 30.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_31",
+    "q": "Addition — notion 31",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 31.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 31.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_32",
+    "q": "Addition — notion 32",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 32.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 32.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_33",
+    "q": "Addition — notion 33",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 33.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 33.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_34",
+    "q": "Addition — notion 34",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 34.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 34.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_35",
+    "q": "Addition — notion 35",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 35.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 35.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_36",
+    "q": "Addition — notion 36",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 36.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 36.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_37",
+    "q": "Addition — notion 37",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 37.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 37.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_38",
+    "q": "Addition — notion 38",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 38.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 38.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_39",
+    "q": "Addition — notion 39",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 39.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 39.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_40",
+    "q": "Addition — notion 40",
+    "topic": "math",
+    "a_kid": "Additionner, c’est réunir. 3 + 2 = 5. Exemple 40.",
+    "a_pro": "Addition: opération de base, commutative, associative. Exemple 40.",
+    "tags": [
+      "math",
+      "addition",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_1",
+    "q": "Soustraction — notion 1",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 1.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 1.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_2",
+    "q": "Soustraction — notion 2",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 2.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 2.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_3",
+    "q": "Soustraction — notion 3",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 3.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 3.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_4",
+    "q": "Soustraction — notion 4",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 4.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 4.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_5",
+    "q": "Soustraction — notion 5",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 5.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 5.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_6",
+    "q": "Soustraction — notion 6",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 6.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 6.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_7",
+    "q": "Soustraction — notion 7",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 7.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 7.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_8",
+    "q": "Soustraction — notion 8",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 8.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 8.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_9",
+    "q": "Soustraction — notion 9",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 9.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 9.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_10",
+    "q": "Soustraction — notion 10",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 10.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 10.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_11",
+    "q": "Soustraction — notion 11",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 11.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 11.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_12",
+    "q": "Soustraction — notion 12",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 12.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 12.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_13",
+    "q": "Soustraction — notion 13",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 13.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 13.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_14",
+    "q": "Soustraction — notion 14",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 14.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 14.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_15",
+    "q": "Soustraction — notion 15",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 15.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 15.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_16",
+    "q": "Soustraction — notion 16",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 16.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 16.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_17",
+    "q": "Soustraction — notion 17",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 17.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 17.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_18",
+    "q": "Soustraction — notion 18",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 18.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 18.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_19",
+    "q": "Soustraction — notion 19",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 19.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 19.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_20",
+    "q": "Soustraction — notion 20",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 20.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 20.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_21",
+    "q": "Soustraction — notion 21",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 21.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 21.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_22",
+    "q": "Soustraction — notion 22",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 22.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 22.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_23",
+    "q": "Soustraction — notion 23",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 23.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 23.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_24",
+    "q": "Soustraction — notion 24",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 24.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 24.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_25",
+    "q": "Soustraction — notion 25",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 25.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 25.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_26",
+    "q": "Soustraction — notion 26",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 26.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 26.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_27",
+    "q": "Soustraction — notion 27",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 27.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 27.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_28",
+    "q": "Soustraction — notion 28",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 28.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 28.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_29",
+    "q": "Soustraction — notion 29",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 29.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 29.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_30",
+    "q": "Soustraction — notion 30",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 30.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 30.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_31",
+    "q": "Soustraction — notion 31",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 31.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 31.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_32",
+    "q": "Soustraction — notion 32",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 32.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 32.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_33",
+    "q": "Soustraction — notion 33",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 33.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 33.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_34",
+    "q": "Soustraction — notion 34",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 34.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 34.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_35",
+    "q": "Soustraction — notion 35",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 35.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 35.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_36",
+    "q": "Soustraction — notion 36",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 36.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 36.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_37",
+    "q": "Soustraction — notion 37",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 37.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 37.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_38",
+    "q": "Soustraction — notion 38",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 38.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 38.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_39",
+    "q": "Soustraction — notion 39",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 39.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 39.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_40",
+    "q": "Soustraction — notion 40",
+    "topic": "math",
+    "a_kid": "Soustraire, c’est enlever. 5 − 2 = 3. Exemple 40.",
+    "a_pro": "Soustraction: inverse de l’addition dans Z. Exemple 40.",
+    "tags": [
+      "math",
+      "soustraction",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_1",
+    "q": "Multiplication — notion 1",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 1.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 1.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_2",
+    "q": "Multiplication — notion 2",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 2.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 2.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_3",
+    "q": "Multiplication — notion 3",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 3.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 3.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_4",
+    "q": "Multiplication — notion 4",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 4.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 4.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_5",
+    "q": "Multiplication — notion 5",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 5.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 5.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_6",
+    "q": "Multiplication — notion 6",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 6.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 6.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_7",
+    "q": "Multiplication — notion 7",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 7.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 7.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_8",
+    "q": "Multiplication — notion 8",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 8.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 8.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_9",
+    "q": "Multiplication — notion 9",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 9.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 9.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_10",
+    "q": "Multiplication — notion 10",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 10.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 10.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_11",
+    "q": "Multiplication — notion 11",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 11.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 11.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_12",
+    "q": "Multiplication — notion 12",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 12.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 12.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_13",
+    "q": "Multiplication — notion 13",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 13.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 13.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_14",
+    "q": "Multiplication — notion 14",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 14.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 14.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_15",
+    "q": "Multiplication — notion 15",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 15.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 15.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_16",
+    "q": "Multiplication — notion 16",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 16.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 16.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_17",
+    "q": "Multiplication — notion 17",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 17.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 17.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_18",
+    "q": "Multiplication — notion 18",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 18.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 18.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_19",
+    "q": "Multiplication — notion 19",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 19.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 19.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_20",
+    "q": "Multiplication — notion 20",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 20.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 20.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_21",
+    "q": "Multiplication — notion 21",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 21.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 21.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_22",
+    "q": "Multiplication — notion 22",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 22.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 22.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_23",
+    "q": "Multiplication — notion 23",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 23.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 23.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_24",
+    "q": "Multiplication — notion 24",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 24.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 24.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_25",
+    "q": "Multiplication — notion 25",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 25.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 25.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_26",
+    "q": "Multiplication — notion 26",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 26.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 26.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_27",
+    "q": "Multiplication — notion 27",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 27.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 27.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_28",
+    "q": "Multiplication — notion 28",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 28.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 28.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_29",
+    "q": "Multiplication — notion 29",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 29.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 29.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_30",
+    "q": "Multiplication — notion 30",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 30.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 30.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_31",
+    "q": "Multiplication — notion 31",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 31.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 31.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_32",
+    "q": "Multiplication — notion 32",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 32.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 32.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_33",
+    "q": "Multiplication — notion 33",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 33.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 33.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_34",
+    "q": "Multiplication — notion 34",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 34.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 34.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_35",
+    "q": "Multiplication — notion 35",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 35.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 35.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_36",
+    "q": "Multiplication — notion 36",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 36.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 36.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_37",
+    "q": "Multiplication — notion 37",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 37.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 37.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_38",
+    "q": "Multiplication — notion 38",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 38.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 38.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_39",
+    "q": "Multiplication — notion 39",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 39.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 39.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_40",
+    "q": "Multiplication — notion 40",
+    "topic": "math",
+    "a_kid": "Répéter une addition. 3 × 4 = 12. Exemple 40.",
+    "a_pro": "Multiplication: produit, propriétés usuelles. Exemple 40.",
+    "tags": [
+      "math",
+      "multiplication",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_1",
+    "q": "Division décimale — notion 1",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 1.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 1.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_2",
+    "q": "Division décimale — notion 2",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 2.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 2.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_3",
+    "q": "Division décimale — notion 3",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 3.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 3.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_4",
+    "q": "Division décimale — notion 4",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 4.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 4.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_5",
+    "q": "Division décimale — notion 5",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 5.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 5.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_6",
+    "q": "Division décimale — notion 6",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 6.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 6.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_7",
+    "q": "Division décimale — notion 7",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 7.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 7.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_8",
+    "q": "Division décimale — notion 8",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 8.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 8.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_9",
+    "q": "Division décimale — notion 9",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 9.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 9.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_10",
+    "q": "Division décimale — notion 10",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 10.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 10.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_11",
+    "q": "Division décimale — notion 11",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 11.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 11.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_12",
+    "q": "Division décimale — notion 12",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 12.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 12.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_13",
+    "q": "Division décimale — notion 13",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 13.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 13.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_14",
+    "q": "Division décimale — notion 14",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 14.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 14.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_15",
+    "q": "Division décimale — notion 15",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 15.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 15.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_16",
+    "q": "Division décimale — notion 16",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 16.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 16.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_17",
+    "q": "Division décimale — notion 17",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 17.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 17.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_18",
+    "q": "Division décimale — notion 18",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 18.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 18.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_19",
+    "q": "Division décimale — notion 19",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 19.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 19.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_20",
+    "q": "Division décimale — notion 20",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 20.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 20.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_21",
+    "q": "Division décimale — notion 21",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 21.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 21.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_22",
+    "q": "Division décimale — notion 22",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 22.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 22.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_23",
+    "q": "Division décimale — notion 23",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 23.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 23.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_24",
+    "q": "Division décimale — notion 24",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 24.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 24.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_25",
+    "q": "Division décimale — notion 25",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 25.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 25.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_26",
+    "q": "Division décimale — notion 26",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 26.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 26.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_27",
+    "q": "Division décimale — notion 27",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 27.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 27.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_28",
+    "q": "Division décimale — notion 28",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 28.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 28.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_29",
+    "q": "Division décimale — notion 29",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 29.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 29.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_30",
+    "q": "Division décimale — notion 30",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 30.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 30.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_31",
+    "q": "Division décimale — notion 31",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 31.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 31.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_32",
+    "q": "Division décimale — notion 32",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 32.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 32.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_33",
+    "q": "Division décimale — notion 33",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 33.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 33.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_34",
+    "q": "Division décimale — notion 34",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 34.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 34.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_35",
+    "q": "Division décimale — notion 35",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 35.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 35.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_36",
+    "q": "Division décimale — notion 36",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 36.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 36.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_37",
+    "q": "Division décimale — notion 37",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 37.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 37.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_38",
+    "q": "Division décimale — notion 38",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 38.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 38.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_39",
+    "q": "Division décimale — notion 39",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 39.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 39.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_math_40",
+    "q": "Division décimale — notion 40",
+    "topic": "math",
+    "a_kid": "On partage et on peut écrire des nombres avec une virgule. Exemple 40.",
+    "a_pro": "Division décimale: quotient en décimal. Exemple 40.",
+    "tags": [
+      "math",
+      "division décimale",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_1",
+    "q": "Eau — notion 1",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 1.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 1.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_2",
+    "q": "Eau — notion 2",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 2.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 2.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_3",
+    "q": "Eau — notion 3",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 3.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 3.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_4",
+    "q": "Eau — notion 4",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 4.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 4.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_5",
+    "q": "Eau — notion 5",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 5.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 5.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_6",
+    "q": "Eau — notion 6",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 6.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 6.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_7",
+    "q": "Eau — notion 7",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 7.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 7.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_8",
+    "q": "Eau — notion 8",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 8.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 8.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_9",
+    "q": "Eau — notion 9",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 9.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 9.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_10",
+    "q": "Eau — notion 10",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 10.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 10.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_11",
+    "q": "Eau — notion 11",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 11.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 11.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_12",
+    "q": "Eau — notion 12",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 12.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 12.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_13",
+    "q": "Eau — notion 13",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 13.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 13.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_14",
+    "q": "Eau — notion 14",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 14.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 14.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_15",
+    "q": "Eau — notion 15",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 15.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 15.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_16",
+    "q": "Eau — notion 16",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 16.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 16.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_17",
+    "q": "Eau — notion 17",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 17.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 17.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_18",
+    "q": "Eau — notion 18",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 18.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 18.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_19",
+    "q": "Eau — notion 19",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 19.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 19.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_20",
+    "q": "Eau — notion 20",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 20.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 20.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_21",
+    "q": "Eau — notion 21",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 21.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 21.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_22",
+    "q": "Eau — notion 22",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 22.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 22.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_23",
+    "q": "Eau — notion 23",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 23.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 23.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_24",
+    "q": "Eau — notion 24",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 24.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 24.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_25",
+    "q": "Eau — notion 25",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 25.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 25.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_26",
+    "q": "Eau — notion 26",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 26.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 26.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_27",
+    "q": "Eau — notion 27",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 27.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 27.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_28",
+    "q": "Eau — notion 28",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 28.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 28.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_29",
+    "q": "Eau — notion 29",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 29.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 29.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_30",
+    "q": "Eau — notion 30",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 30.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 30.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_31",
+    "q": "Eau — notion 31",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 31.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 31.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_32",
+    "q": "Eau — notion 32",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 32.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 32.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_33",
+    "q": "Eau — notion 33",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 33.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 33.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_34",
+    "q": "Eau — notion 34",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 34.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 34.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_35",
+    "q": "Eau — notion 35",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 35.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 35.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_36",
+    "q": "Eau — notion 36",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 36.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 36.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_37",
+    "q": "Eau — notion 37",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 37.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 37.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_38",
+    "q": "Eau — notion 38",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 38.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 38.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_39",
+    "q": "Eau — notion 39",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 39.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 39.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_40",
+    "q": "Eau — notion 40",
+    "topic": "science",
+    "a_kid": "L’eau peut être glace, liquide ou vapeur. Exemple 40.",
+    "a_pro": "Changements d’état: fusion, vaporisation, condensation. Exemple 40.",
+    "tags": [
+      "science",
+      "eau",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_1",
+    "q": "Planètes — notion 1",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 1.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 1.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_2",
+    "q": "Planètes — notion 2",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 2.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 2.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_3",
+    "q": "Planètes — notion 3",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 3.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 3.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_4",
+    "q": "Planètes — notion 4",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 4.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 4.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_5",
+    "q": "Planètes — notion 5",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 5.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 5.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_6",
+    "q": "Planètes — notion 6",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 6.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 6.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_7",
+    "q": "Planètes — notion 7",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 7.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 7.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_8",
+    "q": "Planètes — notion 8",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 8.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 8.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_9",
+    "q": "Planètes — notion 9",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 9.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 9.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_10",
+    "q": "Planètes — notion 10",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 10.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 10.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_11",
+    "q": "Planètes — notion 11",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 11.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 11.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_12",
+    "q": "Planètes — notion 12",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 12.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 12.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_13",
+    "q": "Planètes — notion 13",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 13.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 13.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_14",
+    "q": "Planètes — notion 14",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 14.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 14.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_15",
+    "q": "Planètes — notion 15",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 15.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 15.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_16",
+    "q": "Planètes — notion 16",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 16.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 16.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_17",
+    "q": "Planètes — notion 17",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 17.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 17.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_18",
+    "q": "Planètes — notion 18",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 18.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 18.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_19",
+    "q": "Planètes — notion 19",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 19.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 19.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_20",
+    "q": "Planètes — notion 20",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 20.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 20.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_21",
+    "q": "Planètes — notion 21",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 21.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 21.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_22",
+    "q": "Planètes — notion 22",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 22.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 22.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_23",
+    "q": "Planètes — notion 23",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 23.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 23.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_24",
+    "q": "Planètes — notion 24",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 24.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 24.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_25",
+    "q": "Planètes — notion 25",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 25.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 25.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_26",
+    "q": "Planètes — notion 26",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 26.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 26.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_27",
+    "q": "Planètes — notion 27",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 27.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 27.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_28",
+    "q": "Planètes — notion 28",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 28.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 28.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_29",
+    "q": "Planètes — notion 29",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 29.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 29.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_30",
+    "q": "Planètes — notion 30",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 30.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 30.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_31",
+    "q": "Planètes — notion 31",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 31.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 31.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_32",
+    "q": "Planètes — notion 32",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 32.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 32.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_33",
+    "q": "Planètes — notion 33",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 33.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 33.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_34",
+    "q": "Planètes — notion 34",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 34.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 34.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_35",
+    "q": "Planètes — notion 35",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 35.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 35.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_36",
+    "q": "Planètes — notion 36",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 36.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 36.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_37",
+    "q": "Planètes — notion 37",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 37.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 37.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_38",
+    "q": "Planètes — notion 38",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 38.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 38.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_39",
+    "q": "Planètes — notion 39",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 39.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 39.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_science_40",
+    "q": "Planètes — notion 40",
+    "topic": "science",
+    "a_kid": "La Terre tourne autour du Soleil. Exemple 40.",
+    "a_pro": "Système solaire: orbites, rotation, gravité. Exemple 40.",
+    "tags": [
+      "science",
+      "planètes",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_1",
+    "q": "Algorithme — notion 1",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 1.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 1.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_2",
+    "q": "Algorithme — notion 2",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 2.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 2.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_3",
+    "q": "Algorithme — notion 3",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 3.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 3.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_4",
+    "q": "Algorithme — notion 4",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 4.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 4.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_5",
+    "q": "Algorithme — notion 5",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 5.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 5.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_6",
+    "q": "Algorithme — notion 6",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 6.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 6.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_7",
+    "q": "Algorithme — notion 7",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 7.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 7.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_8",
+    "q": "Algorithme — notion 8",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 8.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 8.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_9",
+    "q": "Algorithme — notion 9",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 9.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 9.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_10",
+    "q": "Algorithme — notion 10",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 10.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 10.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_11",
+    "q": "Algorithme — notion 11",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 11.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 11.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_12",
+    "q": "Algorithme — notion 12",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 12.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 12.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_13",
+    "q": "Algorithme — notion 13",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 13.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 13.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_14",
+    "q": "Algorithme — notion 14",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 14.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 14.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_15",
+    "q": "Algorithme — notion 15",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 15.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 15.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_16",
+    "q": "Algorithme — notion 16",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 16.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 16.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_17",
+    "q": "Algorithme — notion 17",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 17.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 17.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_18",
+    "q": "Algorithme — notion 18",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 18.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 18.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_19",
+    "q": "Algorithme — notion 19",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 19.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 19.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_20",
+    "q": "Algorithme — notion 20",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 20.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 20.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_21",
+    "q": "Algorithme — notion 21",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 21.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 21.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_22",
+    "q": "Algorithme — notion 22",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 22.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 22.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_23",
+    "q": "Algorithme — notion 23",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 23.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 23.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_24",
+    "q": "Algorithme — notion 24",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 24.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 24.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_25",
+    "q": "Algorithme — notion 25",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 25.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 25.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_26",
+    "q": "Algorithme — notion 26",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 26.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 26.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_27",
+    "q": "Algorithme — notion 27",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 27.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 27.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_28",
+    "q": "Algorithme — notion 28",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 28.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 28.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_29",
+    "q": "Algorithme — notion 29",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 29.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 29.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_30",
+    "q": "Algorithme — notion 30",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 30.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 30.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_31",
+    "q": "Algorithme — notion 31",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 31.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 31.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_32",
+    "q": "Algorithme — notion 32",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 32.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 32.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_33",
+    "q": "Algorithme — notion 33",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 33.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 33.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_34",
+    "q": "Algorithme — notion 34",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 34.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 34.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_35",
+    "q": "Algorithme — notion 35",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 35.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 35.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_36",
+    "q": "Algorithme — notion 36",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 36.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 36.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_37",
+    "q": "Algorithme — notion 37",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 37.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 37.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_38",
+    "q": "Algorithme — notion 38",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 38.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 38.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_39",
+    "q": "Algorithme — notion 39",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 39.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 39.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_40",
+    "q": "Algorithme — notion 40",
+    "topic": "cs",
+    "a_kid": "Un algorithme est une suite d’étapes précises. Exemple 40.",
+    "a_pro": "Algorithme: procédure finie pour résoudre un problème. Exemple 40.",
+    "tags": [
+      "cs",
+      "algorithme",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_1",
+    "q": "Variable — notion 1",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 1.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 1.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_2",
+    "q": "Variable — notion 2",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 2.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 2.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_3",
+    "q": "Variable — notion 3",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 3.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 3.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_4",
+    "q": "Variable — notion 4",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 4.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 4.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_5",
+    "q": "Variable — notion 5",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 5.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 5.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_6",
+    "q": "Variable — notion 6",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 6.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 6.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_7",
+    "q": "Variable — notion 7",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 7.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 7.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_8",
+    "q": "Variable — notion 8",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 8.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 8.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_9",
+    "q": "Variable — notion 9",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 9.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 9.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_10",
+    "q": "Variable — notion 10",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 10.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 10.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_11",
+    "q": "Variable — notion 11",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 11.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 11.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_12",
+    "q": "Variable — notion 12",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 12.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 12.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_13",
+    "q": "Variable — notion 13",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 13.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 13.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_14",
+    "q": "Variable — notion 14",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 14.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 14.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_15",
+    "q": "Variable — notion 15",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 15.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 15.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_16",
+    "q": "Variable — notion 16",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 16.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 16.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_17",
+    "q": "Variable — notion 17",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 17.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 17.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_18",
+    "q": "Variable — notion 18",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 18.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 18.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_19",
+    "q": "Variable — notion 19",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 19.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 19.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_20",
+    "q": "Variable — notion 20",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 20.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 20.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_21",
+    "q": "Variable — notion 21",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 21.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 21.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_22",
+    "q": "Variable — notion 22",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 22.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 22.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_23",
+    "q": "Variable — notion 23",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 23.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 23.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_24",
+    "q": "Variable — notion 24",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 24.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 24.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_25",
+    "q": "Variable — notion 25",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 25.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 25.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_26",
+    "q": "Variable — notion 26",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 26.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 26.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_27",
+    "q": "Variable — notion 27",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 27.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 27.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_28",
+    "q": "Variable — notion 28",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 28.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 28.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_29",
+    "q": "Variable — notion 29",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 29.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 29.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_30",
+    "q": "Variable — notion 30",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 30.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 30.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_31",
+    "q": "Variable — notion 31",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 31.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 31.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_32",
+    "q": "Variable — notion 32",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 32.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 32.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_33",
+    "q": "Variable — notion 33",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 33.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 33.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_34",
+    "q": "Variable — notion 34",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 34.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 34.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_35",
+    "q": "Variable — notion 35",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 35.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 35.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_36",
+    "q": "Variable — notion 36",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 36.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 36.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_37",
+    "q": "Variable — notion 37",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 37.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 37.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_38",
+    "q": "Variable — notion 38",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 38.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 38.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_39",
+    "q": "Variable — notion 39",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 39.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 39.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_cs_40",
+    "q": "Variable — notion 40",
+    "topic": "cs",
+    "a_kid": "Une variable garde une valeur qu’on peut changer. Exemple 40.",
+    "a_pro": "Variable: emplacement nommé qui référence une donnée. Exemple 40.",
+    "tags": [
+      "cs",
+      "variable",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_1",
+    "q": "Phrase — notion 1",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 1.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 1.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_2",
+    "q": "Phrase — notion 2",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 2.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 2.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_3",
+    "q": "Phrase — notion 3",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 3.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 3.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_4",
+    "q": "Phrase — notion 4",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 4.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 4.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_5",
+    "q": "Phrase — notion 5",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 5.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 5.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_6",
+    "q": "Phrase — notion 6",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 6.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 6.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_7",
+    "q": "Phrase — notion 7",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 7.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 7.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_8",
+    "q": "Phrase — notion 8",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 8.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 8.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_9",
+    "q": "Phrase — notion 9",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 9.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 9.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_10",
+    "q": "Phrase — notion 10",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 10.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 10.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_11",
+    "q": "Phrase — notion 11",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 11.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 11.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_12",
+    "q": "Phrase — notion 12",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 12.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 12.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_13",
+    "q": "Phrase — notion 13",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 13.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 13.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_14",
+    "q": "Phrase — notion 14",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 14.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 14.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_15",
+    "q": "Phrase — notion 15",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 15.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 15.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_16",
+    "q": "Phrase — notion 16",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 16.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 16.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_17",
+    "q": "Phrase — notion 17",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 17.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 17.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_18",
+    "q": "Phrase — notion 18",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 18.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 18.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_19",
+    "q": "Phrase — notion 19",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 19.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 19.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_20",
+    "q": "Phrase — notion 20",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 20.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 20.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_21",
+    "q": "Phrase — notion 21",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 21.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 21.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_22",
+    "q": "Phrase — notion 22",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 22.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 22.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_23",
+    "q": "Phrase — notion 23",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 23.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 23.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_24",
+    "q": "Phrase — notion 24",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 24.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 24.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_25",
+    "q": "Phrase — notion 25",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 25.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 25.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_26",
+    "q": "Phrase — notion 26",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 26.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 26.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_27",
+    "q": "Phrase — notion 27",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 27.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 27.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_28",
+    "q": "Phrase — notion 28",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 28.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 28.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_29",
+    "q": "Phrase — notion 29",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 29.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 29.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_30",
+    "q": "Phrase — notion 30",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 30.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 30.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_31",
+    "q": "Phrase — notion 31",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 31.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 31.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_32",
+    "q": "Phrase — notion 32",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 32.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 32.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_33",
+    "q": "Phrase — notion 33",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 33.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 33.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_34",
+    "q": "Phrase — notion 34",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 34.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 34.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_35",
+    "q": "Phrase — notion 35",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 35.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 35.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_36",
+    "q": "Phrase — notion 36",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 36.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 36.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_37",
+    "q": "Phrase — notion 37",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 37.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 37.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_38",
+    "q": "Phrase — notion 38",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 38.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 38.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_39",
+    "q": "Phrase — notion 39",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 39.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 39.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_40",
+    "q": "Phrase — notion 40",
+    "topic": "reading",
+    "a_kid": "Une phrase commence par une majuscule et finit par un point. Exemple 40.",
+    "a_pro": "Syntaxe simple et ponctuation. Exemple 40.",
+    "tags": [
+      "reading",
+      "phrase",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_1",
+    "q": "Histoire courte — notion 1",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 1.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 1.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_2",
+    "q": "Histoire courte — notion 2",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 2.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 2.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_3",
+    "q": "Histoire courte — notion 3",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 3.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 3.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_4",
+    "q": "Histoire courte — notion 4",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 4.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 4.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_5",
+    "q": "Histoire courte — notion 5",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 5.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 5.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_6",
+    "q": "Histoire courte — notion 6",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 6.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 6.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_7",
+    "q": "Histoire courte — notion 7",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 7.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 7.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_8",
+    "q": "Histoire courte — notion 8",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 8.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 8.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_9",
+    "q": "Histoire courte — notion 9",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 9.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 9.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_10",
+    "q": "Histoire courte — notion 10",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 10.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 10.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_11",
+    "q": "Histoire courte — notion 11",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 11.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 11.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_12",
+    "q": "Histoire courte — notion 12",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 12.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 12.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_13",
+    "q": "Histoire courte — notion 13",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 13.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 13.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_14",
+    "q": "Histoire courte — notion 14",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 14.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 14.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_15",
+    "q": "Histoire courte — notion 15",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 15.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 15.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_16",
+    "q": "Histoire courte — notion 16",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 16.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 16.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_17",
+    "q": "Histoire courte — notion 17",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 17.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 17.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_18",
+    "q": "Histoire courte — notion 18",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 18.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 18.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_19",
+    "q": "Histoire courte — notion 19",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 19.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 19.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_20",
+    "q": "Histoire courte — notion 20",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 20.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 20.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_21",
+    "q": "Histoire courte — notion 21",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 21.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 21.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_22",
+    "q": "Histoire courte — notion 22",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 22.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 22.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_23",
+    "q": "Histoire courte — notion 23",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 23.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 23.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_24",
+    "q": "Histoire courte — notion 24",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 24.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 24.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_25",
+    "q": "Histoire courte — notion 25",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 25.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 25.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_26",
+    "q": "Histoire courte — notion 26",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 26.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 26.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_27",
+    "q": "Histoire courte — notion 27",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 27.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 27.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_28",
+    "q": "Histoire courte — notion 28",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 28.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 28.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_29",
+    "q": "Histoire courte — notion 29",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 29.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 29.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_30",
+    "q": "Histoire courte — notion 30",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 30.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 30.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_31",
+    "q": "Histoire courte — notion 31",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 31.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 31.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_32",
+    "q": "Histoire courte — notion 32",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 32.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 32.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_33",
+    "q": "Histoire courte — notion 33",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 33.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 33.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_34",
+    "q": "Histoire courte — notion 34",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 34.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 34.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_35",
+    "q": "Histoire courte — notion 35",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 35.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 35.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_36",
+    "q": "Histoire courte — notion 36",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 36.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 36.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_37",
+    "q": "Histoire courte — notion 37",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 37.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 37.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_38",
+    "q": "Histoire courte — notion 38",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 38.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 38.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_39",
+    "q": "Histoire courte — notion 39",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 39.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 39.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  },
+  {
+    "id": "lesson_reading_40",
+    "q": "Histoire courte — notion 40",
+    "topic": "reading",
+    "a_kid": "On lit pour comprendre et imaginer. Exemple 40.",
+    "a_pro": "Compréhension: personnages, lieu, début, fin. Exemple 40.",
+    "tags": [
+      "reading",
+      "histoire courte",
+      "notion"
+    ],
+    "kind": "lesson"
+  }
+]

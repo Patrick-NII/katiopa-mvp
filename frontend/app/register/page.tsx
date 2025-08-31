@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -93,12 +93,18 @@ export default function RegisterPage() {
   const [step, setStep] = useState<'subscription' | 'account' | 'family' | 'payment' | 'success'>('subscription')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'checking' | 'available' | 'taken' | 'invalid'>('idle')
+  const [emailHelper, setEmailHelper] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const [promoStatus, setPromoStatus] = useState<'applied' | 'invalid' | null>(null)
   const [promoDiscountPct, setPromoDiscountPct] = useState<number>(0)
-
+  const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle')
+  const [usernameHelper, setUsernameHelper] = useState('')
+  const [childUsernameStatus, setChildUsernameStatus] = useState<Record<number, { status: 'idle' | 'checking' | 'available' | 'taken', helper: string }>>({})
+  const [showChildPassword, setShowChildPassword] = useState<Record<number, boolean>>({})
+  
   const [formData, setFormData] = useState<RegistrationData>({
     email: '',
     firstName: '',
@@ -230,7 +236,7 @@ export default function RegisterPage() {
     setError('')
   }
 
-    const handleFamilyMemberChange = (index: number, field: keyof FamilyMember, value: any) => {
+  const handleFamilyMemberChange = (index: number, field: keyof FamilyMember, value: any) => {
     setFormData(prev => ({
       ...prev,
       familyMembers: prev.familyMembers.map((member, i) => 
@@ -290,11 +296,11 @@ export default function RegisterPage() {
       familyMembers: [
         ...prev.familyMembers,
         {
-          firstName: '',
-          lastName: '',
-          gender: 'UNKNOWN',
-          userType: 'CHILD',
-          dateOfBirth: '',
+        firstName: '',
+        lastName: '',
+        gender: 'UNKNOWN',
+        userType: 'CHILD',
+        dateOfBirth: '',
           grade: '',
           username: '',
           sessionPassword: ''
@@ -322,6 +328,10 @@ export default function RegisterPage() {
       setError('Veuillez choisir un identifiant de connexion pour le parent')
       return false
     }
+    if (usernameStatus === 'taken') {
+      setError("Cet identifiant de connexion est déjà utilisé")
+      return false
+    }
     if (formData.password !== formData.confirmPassword) {
       setError('Les mots de passe ne correspondent pas')
       return false
@@ -345,6 +355,31 @@ export default function RegisterPage() {
     )
     if (!hasValidMembers && children.length > 0) {
       setError('Chaque membre doit avoir prénom, nom, date de naissance, identifiant et mot de passe de session')
+      return false
+    }
+    // Unicité des identifiants dans la famille
+    const usernames = formData.familyMembers.map(m => (m.username || '').toLowerCase()).filter(Boolean)
+    const hasDupUsername = usernames.some((u, i) => usernames.indexOf(u) !== i)
+    if (hasDupUsername) {
+      setError('Chaque identifiant de session doit être unique dans la famille')
+      return false
+    }
+    // Vérifier disponibilités côté serveur (enfants)
+    const takenChild = Object.entries(childUsernameStatus).some(([, v]) => v?.status === 'taken')
+    if (takenChild) {
+      setError('Un ou plusieurs identifiants sont déjà pris. Merci d\'en choisir d\'autres.')
+      return false
+    }
+    // Unicité des mots de passe (différent du parent et entre enfants)
+    const parentPwd = formData.password
+    const childPwds = children.map(c => c.sessionPassword || '')
+    if (childPwds.includes(parentPwd)) {
+      setError('Le mot de passe d\'un enfant ne peut pas être identique à celui du parent')
+      return false
+    }
+    const childPwdDup = childPwds.some((p, i) => p && childPwds.indexOf(p) !== i)
+    if (childPwdDup) {
+      setError('Les mots de passe des enfants doivent être tous différents')
       return false
     }
     return true
@@ -387,11 +422,30 @@ export default function RegisterPage() {
 
   const handleNext = () => {
     if (step === 'subscription') {
-      if (!formData.email) {
+      const email = (formData.email || '').trim()
+      if (!email) {
         setError('Veuillez saisir votre email')
         return
       }
+      // Validation basique
+      const basicOk = /.+@.+\..+/.test(email)
+      if (!basicOk) {
+        setError("Veuillez saisir un email valide")
+        return
+      }
+      // Vérification immédiate côté serveur pour éviter un échec tardif
+      setLoading(true)
+      authAPI.checkEmail(email)
+        .then(res => {
+          if (res && res.available) {
       setStep('account')
+            setError('')
+          } else {
+            setError('Un compte avec cet email existe déjà. Veuillez vous connecter ou utiliser un autre email.')
+          }
+        })
+        .catch(() => setError("Impossible de vérifier l'email pour le moment"))
+        .finally(() => setLoading(false))
     } else if (step === 'account' && validateStep1()) {
       setStep('family')
     } else if (step === 'family' && validateStep2()) {
@@ -434,7 +488,7 @@ export default function RegisterPage() {
         confirmPassword: formData.confirmPassword,
         subscriptionType:
           formData.subscriptionType === 'STARTER' ? 'FREE' :
-          formData.subscriptionType === 'PRO' ? 'PRO' : 'PRO_PLUS',
+                         formData.subscriptionType === 'PRO' ? 'PRO' : 'PRO_PLUS',
         familyMembers: formData.familyMembers.map((member, index) => ({
           firstName: member.firstName,
           lastName: member.lastName,
@@ -460,17 +514,22 @@ export default function RegisterPage() {
       }
 
       const response = await authAPI.register(payload)
-
+      
       if (response.success) {
         setStep('success')
         if (typeof window !== 'undefined') {
-          localStorage.setItem('registrationData', JSON.stringify(response.data || response))
+        localStorage.setItem('registrationData', JSON.stringify(response.data || response))
         }
       } else {
         setError(response.error || 'Erreur lors de l\'inscription')
       }
     } catch (err: any) {
+      if (err?.code === 'EMAIL_ALREADY_EXISTS' || err?.status === 409) {
+        setError('Un compte avec cet email existe déjà. Veuillez vous connecter ou utiliser un autre email.')
+        setStep('subscription')
+      } else {
       setError(err.message || 'Erreur de connexion au serveur')
+      }
     } finally {
       setLoading(false)
     }
@@ -479,6 +538,91 @@ export default function RegisterPage() {
   const handleGoToLogin = () => {
     router.push('/login')
   }
+
+  // Vérification email en temps réel (debounce)
+  useEffect(() => {
+    const email = (formData.email || '').trim()
+    if (!email) {
+      setEmailStatus('idle')
+      setEmailHelper('')
+      return
+    }
+    const basicOk = /.+@.+\..+/.test(email)
+    if (!basicOk) {
+      setEmailStatus('invalid')
+      setEmailHelper('Format email invalide')
+      return
+    }
+    setEmailStatus('checking')
+    setEmailHelper('Vérification de la disponibilité...')
+    const t = setTimeout(async () => {
+      try {
+        const res = await authAPI.checkEmail(email)
+        if (res.available) {
+          setEmailStatus('available')
+          setEmailHelper('Email disponible')
+        } else {
+          setEmailStatus('taken')
+          setEmailHelper('Un compte existe déjà avec cet email')
+        }
+      } catch (e) {
+        setEmailStatus('idle')
+        setEmailHelper('')
+      }
+    }, 400)
+    return () => clearTimeout(t)
+  }, [formData.email])
+
+  // Vérification identifiant parent en temps réel (debounce)
+  useEffect(() => {
+    const uname = (formData.familyMembers?.[0]?.username || '').trim()
+    if (!uname) { setUsernameStatus('idle'); setUsernameHelper(''); return }
+    setUsernameStatus('checking'); setUsernameHelper('Vérification de la disponibilité...')
+    const t = setTimeout(async () => {
+      try {
+        const res = await authAPI.checkSession(uname)
+        if (res.available) { setUsernameStatus('available'); setUsernameHelper('Identifiant disponible') }
+        else { setUsernameStatus('taken'); setUsernameHelper('Identifiant déjà pris') }
+      } catch { setUsernameStatus('idle'); setUsernameHelper('') }
+    }, 400)
+    return () => clearTimeout(t)
+  }, [formData.familyMembers?.[0]?.username])
+
+  // Vérification identifiants enfants en temps réel (debounce groupé)
+  useEffect(() => {
+    const entries = formData.familyMembers
+      .map((m, i) => ({ i, u: (m.username || '').trim() }))
+      .filter(x => x.i > 0 && x.u)
+
+    if (entries.length === 0) {
+      setChildUsernameStatus({})
+      return
+    }
+
+    // Pré-état: checking
+    setChildUsernameStatus(prev => {
+      const next = { ...prev }
+      for (const { i } of entries) next[i] = { status: 'checking', helper: 'Vérification de la disponibilité...' }
+      return next
+    })
+
+    const t = setTimeout(async () => {
+      const results: Record<number, { status: 'idle' | 'checking' | 'available' | 'taken', helper: string }> = {}
+      for (const { i, u } of entries) {
+        try {
+          const res = await authAPI.checkSession(u)
+          results[i] = res.available
+            ? { status: 'available', helper: 'Identifiant disponible' }
+            : { status: 'taken', helper: 'Identifiant déjà pris' }
+        } catch {
+          results[i] = { status: 'idle', helper: '' }
+        }
+      }
+      setChildUsernameStatus(prev => ({ ...prev, ...results }))
+    }, 400)
+
+    return () => clearTimeout(t)
+  }, [JSON.stringify(formData.familyMembers.map((m, i) => (i > 0 ? (m.username || '') : '')))])
 
 /* --------------------------- UI util: Sidebar ----------------------------- */
 const SummarySidebar = () => {
@@ -631,10 +775,10 @@ const SummarySidebar = () => {
             <div className="flex items-center space-x-3 lg:space-x-4">
               <Link href="/" className="font-body text-gray-600 hover:text-gray-900 px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100 !text-gray-600 hover:!text-gray-900">
                 Accueil
-              </Link>
+        </Link>
               <Link href="/login" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 lg:px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
                 Se connecter
-              </Link>
+        </Link>
             </div>
           </div>
         </div>
@@ -753,12 +897,12 @@ const SummarySidebar = () => {
                         {/* Bouton visible uniquement quand sélectionné */}
                         <div className="mt-auto">
                           {isSelected && (
-                            <button
-                              onClick={() => handleInputChange('subscriptionType', plan.id)}
+                          <button
+                            onClick={() => handleInputChange('subscriptionType', plan.id)}
                               className={`w-full font-semibold px-5 lg:px-6 py-3.5 lg:py-4 rounded-2xl transition-all duration-300 border-2 bg-gradient-to-r ${plan.color} text-white ${plan.selected.buttonBorder} shadow-xl ring-2 ${plan.selected.ring}`}
                             >
                               ✓ Sélectionné
-                            </button>
+                          </button>
                           )}
                         </div>
                       </motion.div>
@@ -782,19 +926,41 @@ const SummarySidebar = () => {
                           className="w-full pl-12 pr-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                           placeholder="Email de contact  *"
                         />
+                        {emailStatus !== 'idle' && (
+                          <div className="mt-2">
+                            <p className={
+                              emailStatus === 'available' ? 'text-emerald-600 text-sm' :
+                              emailStatus === 'checking' ? 'text-gray-600 text-sm' :
+                              'text-red-600 text-sm'
+                            }>
+                              {emailHelper}
+                            </p>
+                            {emailStatus === 'taken' && (
+                              <div className="mt-2">
+                                <button
+                                  type="button"
+                                  onClick={() => router.push('/login')}
+                                  className="text-sm font-semibold text-blue-600 hover:text-blue-800"
+                                >
+                                  Se connecter →
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
 
                     {/* Bouton Continuer à droite */}
                     <div className="lg:w-1/2 text-center">
-                      <motion.button
-                        onClick={handleNext}
+                  <motion.button
+                    onClick={handleNext}
                         whileHover={{ scale: 1.04 }}
                         whileTap={{ scale: 0.96 }}
                         className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-12 lg:px-16 py-3.5 lg:py-4 rounded-2xl text-lg lg:text-xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl"
-                      >
-                        Continuer
-                      </motion.button>
+                  >
+                    Continuer
+                  </motion.button>
                     </div>
                   </div>
                   <p className="mt-4 text-sm text-gray-600 text-center">
@@ -822,41 +988,41 @@ const SummarySidebar = () => {
                       <div className="text-center mb-8">
                         <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Créez votre espace famille</h1>
                         <p className="text-lg text-gray-600">Enregistrez vos informations en tant que propriétaire du compte</p>
-                      </div>
+                    </div>
 
                       <div className="space-y-8">
                         {/* Prénom et Nom côte à côte */}
                         <div>
                           <h3 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4 flex items-center">
                             <User className="w-5 h-5 lg:w-6 lg:h-6 mr-3 text-blue-600" />
-                            Informations personnelles
-                          </h3>
+                          Informations personnelles
+                        </h3>
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div>
+                        <div>
                               <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
-                              <div className="relative">
+                          <div className="relative">
                                 <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
-                                  type="text"
-                                  value={formData.firstName}
-                                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                            <input
+                              type="text"
+                              value={formData.firstName}
+                              onChange={(e) => handleInputChange('firstName', e.target.value)}
                                   className="w-full pl-12 pr-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                                   placeholder="Prénom *"
-                                />
-                              </div>
-                            </div>
+                            />
+                          </div>
+                        </div>
 
-                            <div>
+                        <div>
                               <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
-                              <div className="relative">
+                          <div className="relative">
                                 <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
-                                  type="text"
-                                  value={formData.lastName}
-                                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                            <input
+                              type="text"
+                              value={formData.lastName}
+                              onChange={(e) => handleInputChange('lastName', e.target.value)}
                                   className="w-full pl-12 pr-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                                   placeholder="Nom *"
-                                />
+                            />
                               </div>
                             </div>
                           </div>
@@ -864,10 +1030,10 @@ const SummarySidebar = () => {
 
                         {/* Date de naissance et Type */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                          <div>
+                        <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
                               <span className="text-gray-400"></span>
-                            </label>
+                          </label>
                             <input
                               type="text"
                               value={formData.familyMembers[0].dateOfBirth}
@@ -889,16 +1055,16 @@ const SummarySidebar = () => {
                               <option value="MALE">M.</option>
                               <option value="FEMALE">Mme</option>
                             </select>
-                          </div>
                         </div>
+                      </div>
 
                         {/* Mots de passe */}
                         <div>
                           <h3 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4 flex items-center">
                             <Lock className="w-5 h-5 lg:w-6 lg:h-6 mr-3 text-blue-600" />
-                            Sécurité
-                          </h3>
-
+                          Sécurité
+                        </h3>
+                        
                           {/* Identifiant parent */}
                         <div className="mb-8">
                           <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
@@ -931,54 +1097,63 @@ const SummarySidebar = () => {
                               Générer
                             </button>
                           </div>
+                          {usernameStatus !== 'idle' && (
+                            <p className={
+                              usernameStatus === 'available' ? 'text-emerald-600 text-sm mt-2' :
+                              usernameStatus === 'checking' ? 'text-gray-600 text-sm mt-2' :
+                              'text-red-600 text-sm mt-2'
+                            }>
+                              {usernameHelper}
+                            </p>
+                          )}
                         </div>
                         
 
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div>
+                        <div>
                               <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
-                              <div className="relative">
+                          <div className="relative">
                                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
+                            <input
                                   type={showPassword ? 'text' : 'password'}
-                                  value={formData.password}
-                                  onChange={(e) => handleInputChange('password', e.target.value)}
+                              value={formData.password}
+                              onChange={(e) => handleInputChange('password', e.target.value)}
                                   className="w-full pl-12 pr-12 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                                   placeholder="Mot de passe *"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => setShowPassword(!showPassword)}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
                                   className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                >
-                                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                </button>
-                              </div>
-                            </div>
+                            >
+                              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </button>
+                          </div>
+                        </div>
 
-                            <div>
+                        <div>
                               <label className="block text-sm font-semibold text-gray-700 mb-2"></label>
-                              <div className="relative">
+                          <div className="relative">
                                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
+                            <input
                                   type={showConfirmPassword ? 'text' : 'password'}
-                                  value={formData.confirmPassword}
-                                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                              value={formData.confirmPassword}
+                              onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                                   className="w-full pl-12 pr-12 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
                                   placeholder="Confirmer le mot de passe *"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                   className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                >
-                                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                </button>
+                            >
+                              {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </button>
                               </div>
                             </div>
                           </div>
+                          </div>
                         </div>
-                      </div>
 
                       {/* Coaching IA */}
                       <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -996,20 +1171,20 @@ const SummarySidebar = () => {
                             placeholder="Objectifs (ex. découvrir la programmation, renforcer les maths)"
                             className="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent h-32 resize-none"
                           />
-                        </div>
                       </div>
+                    </div>
 
-                      {error && (
+                    {error && (
                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8 p-4 bg-red-50 border border-red-200 rounded-xl">
-                          <p className="text-red-600 text-sm">{error}</p>
-                        </motion.div>
-                      )}
+                        <p className="text-red-600 text-sm">{error}</p>
+                      </motion.div>
+                    )}
 
                       {/* Barre d’action */}
                       <div className="mt-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <button onClick={handleBack} className="flex items-center space-x-3 text-gray-600 hover:text-gray-900 px-6 py-3 rounded-xl !font-semibold transition-all hover:bg-gray-100">
-                          <ArrowLeft className="w-5 h-5" />
-                          <span>Retour</span>
+                        <ArrowLeft className="w-5 h-5" />
+                        <span>Retour</span>
                         </button>
 
                         <div className="flex items-center justify-between w-full">
@@ -1029,18 +1204,18 @@ const SummarySidebar = () => {
                           </label>
 
                           {/* Bouton à droite */}
-                          <motion.button
-                            onClick={handleNext}
+                      <motion.button
+                        onClick={handleNext}
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
                             disabled={!formData.acceptTerms}
                             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3.5 rounded-xl !font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-60 shrink-0"
                           >
                             <span className="!text-white !font-semibold">Continuer</span>
-                          </motion.button>
+                      </motion.button>
                         </div>
-                      </div>
-                    </motion.div>
+                    </div>
+                  </motion.div>
                   </div>
 
                   {/* Sidebar */}
@@ -1070,77 +1245,77 @@ const SummarySidebar = () => {
                           Plan {selectedPlan.name} : {formData.familyMembers.length}/{selectedPlan.maxMembers} membre(s)
                         </p>
                         <p className="text-sm text-gray-500 mt-1">Vous pourrez ajouter des membres plus tard depuis votre espace Famille.</p>
-                      </div>
+                    </div>
 
-                      <div className="space-y-8">
+                    <div className="space-y-8">
                         {formData.familyMembers.map((member, index) => {
                           if (index === 0) return null
                           return (
                             <motion.div key={index} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.07 }} className="rounded-2xl p-8 bg-white/90 backdrop-blur shadow-md">
-                              <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-2xl font-semibold text-gray-900 flex items-center">
+                          <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-2xl font-semibold text-gray-900 flex items-center">
                                   <Users className="w-6 h-6 mr-3 text-purple-600" />
                                   {`Membre ${index}`}
-                                </h3>
+                            </h3>
                                 <button onClick={() => removeFamilyMember(index)} className="text-rose-600 hover:text-rose-800 p-3 rounded-xl hover:bg-rose-50 transition-all">
-                                  <X className="w-6 h-6" />
+                                <X className="w-6 h-6" />
                                 </button>
-                              </div>
+                          </div>
 
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
                                   <label className="block text-sm font-semibold text-gray-700 mb-3"></label>
-                                  <input
-                                    type="text"
-                                    value={member.firstName}
-                                    onChange={(e) => handleFamilyMemberChange(index, 'firstName', e.target.value)}
+                              <input
+                                type="text"
+                                value={member.firstName}
+                                onChange={(e) => handleFamilyMemberChange(index, 'firstName', e.target.value)}
                                     className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
                                     placeholder="Prénom *"
-                                  />
-                                </div>
+                              />
+                            </div>
 
-                                <div>
+                            <div>
                                   <label className="block text-sm font-semibold text-gray-700 mb-3"></label>
-                                  <input
-                                    type="text"
-                                    value={member.lastName}
-                                    onChange={(e) => handleFamilyMemberChange(index, 'lastName', e.target.value)}
+                              <input
+                                type="text"
+                                value={member.lastName}
+                                onChange={(e) => handleFamilyMemberChange(index, 'lastName', e.target.value)}
                                     className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
                                     placeholder="Nom *"
-                                  />
-                                </div>
+                              />
+                            </div>
 
-                                <div>
-                                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                            <div>
+                              <label className="block text-sm font-semibold text-gray-700 mb-3">
                                     <span className="text-gray-400"></span>
-                                  </label>
-                                  <input
+                              </label>
+                              <input
                                     type="text"
-                                    value={member.dateOfBirth}
+                                value={member.dateOfBirth}
                                     onChange={(e) => handleDateInput(index, e.target.value)}
                                     className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
                                     placeholder="Date de naissance jj/mm/aaaa *"
                                     maxLength={10}
-                                  />
-                                </div>
+                              />
+                            </div>
 
-                                <div>
+                            <div>
                                   <label className="block text-sm font-semibold text-gray-700 mb-3"></label>
-                                  <select
-                                    value={member.gender}
-                                    onChange={(e) => handleFamilyMemberChange(index, 'gender', e.target.value)}
+                              <select
+                                value={member.gender}
+                                onChange={(e) => handleFamilyMemberChange(index, 'gender', e.target.value)}
                                     className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
-                                  >
+                              >
                                     <option value="MALE">Garçon</option>
                                     <option value="FEMALE">Fille</option>
-                                  </select>
-                                </div>
+                              </select>
+                            </div>
 
-                                <div>
+                              <div>
                                   <label className="block text-sm font-semibold text-gray-700 mb-3"></label>
                                   <div className="flex gap-2">
-                                    <input
-                                      type="text"
+                                <input
+                                  type="text"
                                       value={member.username || ''}
                                       onChange={(e) => handleFamilyMemberChange(index, 'username', e.target.value)}
                                       className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
@@ -1157,19 +1332,38 @@ const SummarySidebar = () => {
                                     >
                                       Générer
                                     </button>
-                                  </div>
+                              </div>
+                                  {childUsernameStatus[index] && (
+                                    <p className={
+                                      childUsernameStatus[index].status === 'available' ? 'text-emerald-600 text-sm mt-2' :
+                                      childUsernameStatus[index].status === 'checking' ? 'text-gray-600 text-sm mt-2' :
+                                      'text-red-600 text-sm mt-2'
+                                    }>
+                                      {childUsernameStatus[index].helper}
+                                    </p>
+                                  )}
                                 </div>
 
                                 <div>
                                   <label className="block text-sm font-semibold text-gray-700 mb-3"></label>
                                   <div className="flex gap-2">
-                                    <input
-                                      type="text"
+                                    <div className="relative w-full">
+                                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                      <input
+                                      type={showChildPassword[index] ? 'text' : 'password'}
                                       value={member.sessionPassword || ''}
                                       onChange={(e) => handleFamilyMemberChange(index, 'sessionPassword', e.target.value)}
-                                      className="w-full px-4 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
+                                      className="w-full pl-12 pr-12 py-4 border-b-2 border-gray-300 focus:border-b-purple-500 transition-all bg-transparent"
                                       placeholder="Mot de passe de session *"
-                                    />
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => setShowChildPassword(prev => ({ ...prev, [index]: !prev[index] }))}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                      >
+                                        {showChildPassword[index] ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                      </button>
+                                    </div>
                                     <button
                                       type="button"
                                       onClick={() => handleFamilyMemberChange(index, 'sessionPassword', generatePassword())}
@@ -1179,37 +1373,37 @@ const SummarySidebar = () => {
                                     </button>
                                   </div>
                                 </div>
-                              </div>
-                            </motion.div>
+                          </div>
+                        </motion.div>
                           )
                         })}
 
-                        {selectedPlan && formData.familyMembers.length < selectedPlan.maxMembers && (
-                          <motion.button
-                            onClick={addFamilyMember}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                      {selectedPlan && formData.familyMembers.length < selectedPlan.maxMembers && (
+                        <motion.button
+                          onClick={addFamilyMember}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                             className="w-full py-8 border-2 border-dashed border-gray-300 rounded-2xl text-gray-600 hover:border-purple-400 hover:text-purple-600 transition-all flex items-center justify-center space-x-3 text-lg !font-semibold"
-                          >
-                            <Plus className="w-6 h-6" />
-                            <span>Ajouter un membre</span>
-                          </motion.button>
-                        )}
-                      </div>
-
-                      {error && (
-                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8 p-4 bg-red-50 border border-red-200 rounded-xl">
-                          <p className="text-red-600 text-sm">{error}</p>
-                        </motion.div>
+                        >
+                          <Plus className="w-6 h-6" />
+                          <span>Ajouter un membre</span>
+                        </motion.button>
                       )}
+                    </div>
+
+                    {error && (
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8 p-4 bg-red-50 border border-red-200 rounded-xl">
+                        <p className="text-red-600 text-sm">{error}</p>
+                      </motion.div>
+                    )}
 
                       <div className="mt-8 flex justify-between items-center">
                         <button onClick={handleBack} className="flex items-center space-x-3 text-gray-600 hover:text-gray-900 px-6 py-3 rounded-xl !font-semibold transition-all hover:bg-gray-100">
-                          <ArrowLeft className="w-5 h-5" />
-                          <span>Retour</span>
+                        <ArrowLeft className="w-5 h-5" />
+                        <span>Retour</span>
                         </button>
-
-                        <motion.button
+                      
+                      <motion.button
                           onClick={handleNext}
                           whileHover={{ scale: 1.03 }}
                           whileTap={{ scale: 0.97 }}
@@ -1217,9 +1411,9 @@ const SummarySidebar = () => {
                         >
                           <span className="!text-white !font-semibold">Continuer</span>
                           <ArrowRight className="w-5 h-5 ml-2 inline" />
-                        </motion.button>
-                      </div>
-                    </motion.div>
+                      </motion.button>
+                    </div>
+                  </motion.div>
                   </div>
 
                   {/* Sidebar */}
@@ -1242,15 +1436,15 @@ const SummarySidebar = () => {
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-stretch">
                   {/* Col gauche (2/3) */}
                   <div className="xl:col-span-2">
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                       className="bg-white/80 backdrop-blur rounded-3xl shadow-xl p-8 lg:p-10 min-h-[700px] flex flex-col h-full"
                     >
                       <div className="text-center mb-8">
                         <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Paiement & vérification</h1>
                         <p className="text-lg text-gray-600">
-                          Entrez vos informations de paiement sécurisées. Une empreinte sera créée pour Starter.
+                          Entrez vos informations de paiement sécurisées.
                         </p>
                       </div>
 
@@ -1258,8 +1452,7 @@ const SummarySidebar = () => {
                         {/* Carte “Informations de paiement” — style épuré */}
                         <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
                           <div className="flex items-center mb-5">
-                            <CreditCard className="w-5 h-5 mr-2 text-blue-600" />
-                            <span className="font-semibold text-gray-900">Informations de paiement</span>
+                            <span className="font-semibold text-gray-900"></span>
                           </div>
 
                           {/* Sélecteur de méthode — logos alignés sur une ligne */}
@@ -1271,7 +1464,7 @@ const SummarySidebar = () => {
                               { id: 'paypal', label: '', logo: '/payments/paypal.png' }
                             ] as const).map(m => {
                               const active = formData.selectedPaymentMethod === m.id
-                              return (
+                      return (
                                 <button
                                   key={m.id}
                                   onClick={() => handleInputChange('selectedPaymentMethod', m.id)}
@@ -1403,14 +1596,14 @@ const SummarySidebar = () => {
                               Apple Pay sera présenté par votre navigateur / appareil compatible au moment de la validation.
                             </div>
                           )}
-                        </div>
+                          </div>
 
                         {/* Vérification */}
                         <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
                           <div className="flex items-center mb-4">
                             <CircleCheck className="w-5 h-5 mr-2 text-emerald-600" />
                             <span className="font-semibold text-gray-900">Vérification des informations</span>
-                          </div>
+                        </div>
                           <ul className="space-y-3 text-sm text-gray-700">
                             <li>• Compte parent : <strong>{formData.firstName} {formData.lastName}</strong> — {formData.email}</li>
                             <li>• ID parent : <strong>{formData.familyMembers[0].username || '—'}</strong></li>
@@ -1433,7 +1626,7 @@ const SummarySidebar = () => {
                       {error && (
                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8 p-4 bg-red-50 border border-red-200 rounded-xl">
                           <p className="text-red-600 text-sm">{error}</p>
-                        </motion.div>
+                  </motion.div>
                       )}
 
                       <div className="mt-8 flex justify-between items-center">
@@ -1444,8 +1637,8 @@ const SummarySidebar = () => {
                           <ArrowLeft className="w-5 h-5" />
                           <span>Retour</span>
                         </button>
-
-                        <motion.button
+                  
+                  <motion.button
                           onClick={handleSubmit}
                           whileHover={{ scale: loading ? 1 : 1.03 }}
                           whileTap={{ scale: loading ? 1 : 0.97 }}
@@ -1455,7 +1648,7 @@ const SummarySidebar = () => {
                           <span className="!text-white !font-semibold">
                             {loading ? 'Validation…' : 'Valider et activer mon plan'}
                           </span>
-                        </motion.button>
+                  </motion.button>
                       </div>
                     </motion.div>
                   </div>

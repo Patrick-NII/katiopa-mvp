@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { MulticolorText, CubeAILogo, AnimatedMulticolorText } from '@/components/MulticolorText'
-import ChatBubble from '@/components/ChatBubble'
+import ChatbotWrapper from '@/components/chatbot/ChatbotWrapper'
 import AnimatedIcon from '@/components/AnimatedIcons'
 
 export default function HomePage() {
@@ -781,7 +781,7 @@ export default function HomePage() {
       </footer>
 
       {/* Bulle de chat flottante */}
-      <ChatBubble />
+              <ChatbotWrapper />
     </div>
   )
 }

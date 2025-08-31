@@ -13,14 +13,19 @@ export async function sendWelcomeEmail(data: WelcomeEmailData) {
   const { toEmail, toName, subscriptionType, familyMembers, createdSessions, registrationId } = data;
 
   // Configuration du transporteur email
-  const transporter = nodemailer.createTransporter({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: false, // true pour 465, false pour les autres ports
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const port = parseInt(process.env.SMTP_PORT || '587');
+  const secure = process.env.SMTP_SECURE
+    ? process.env.SMTP_SECURE === 'true'
+    : port === 465; // 465 => TLS
+  const smtpUser = process.env.SMTP_USERNAME || process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASSWORD || process.env.SMTP_PASS;
+
+  const transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    auth: smtpUser && smtpPass ? { user: smtpUser, pass: smtpPass } : undefined,
   });
 
   // Déterminer le plan d'abonnement
@@ -43,7 +48,7 @@ export async function sendWelcomeEmail(data: WelcomeEmailData) {
         name: `${session.firstName} ${session.lastName}`,
         type: session.userType === 'PARENT' ? 'Parent' : 'Enfant',
         sessionId: session.sessionId,
-        password: member?.password || `${session.firstName.toLowerCase()}123`
+        password: member?.sessionPassword || `${session.firstName.toLowerCase()}123`
       };
     });
   };
@@ -223,8 +228,9 @@ export async function sendWelcomeEmail(data: WelcomeEmailData) {
   `;
 
   // Options de l'email
+  const fromAddress = process.env.SMTP_FROM || smtpUser || 'no-reply@localhost';
   const mailOptions = {
-    from: `"CubeAI" <${process.env.SMTP_USER}>`,
+    from: `"CubeAI" <${fromAddress}>`,
     to: toEmail,
     subject: `Bienvenue chez CubeAI ! Votre compte a été créé (${registrationId})`,
     html: emailContent,
