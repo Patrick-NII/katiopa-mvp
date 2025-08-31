@@ -184,47 +184,43 @@ export default function SidebarNavigation({
       transition={{ duration: 0.3 }}
     >
       {/* En-tête de la sidebar */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center gap-3 mb-3">
+      <div className="relative p-3 border-b border-gray-200">
+        <div className="flex items-center gap-3">
           <motion.div
-            className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg"
-            animate={{ 
-              scale: [1, 1.05, 1],
-              rotate: [0, 2, -2, 0]
-            }}
-            transition={{ 
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
+            className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0"
+            animate={collapsed ? undefined : { scale: [1, 1.05, 1], rotate: [0, 2, -2, 0] }}
+            transition={collapsed ? undefined : { duration: 3, repeat: Infinity, ease: "easeInOut" }}
           >
             <AnimatedIcon type="home" className="w-5 h-5 text-white" />
           </motion.div>
           {!collapsed && (
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">CubeAI</h1>
+            <div className="min-w-0">
+              <h1 className="text-lg font-bold text-gray-900 leading-tight">CubeAI</h1>
               <p className="text-m text-gray-700">Espace personnel</p>
             </div>
           )}
-          {/* Bouton rétractable */}
-          <button 
-            onClick={toggleCollapsed} 
-            className={`ml-auto p-2 rounded-md hover:bg-gray-100 text-gray-600 transition ${collapsed ? 'mx-auto' : ''}`}
-            aria-label={collapsed ? 'Déplier la navigation' : 'Replier la navigation'}
-            title={collapsed ? 'Déplier' : 'Replier'}
-          >
-            <ChevronRight className={`w-4 h-4 transition-transform ${collapsed ? '-rotate-180' : 'rotate-0'}`} />
-          </button>
         </div>
-        
+        {/* Bouton rétractable positionné */}
+        <button 
+          onClick={toggleCollapsed} 
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-gray-100 text-gray-600 transition"
+          aria-label={collapsed ? 'Déplier la navigation' : 'Replier la navigation'}
+          aria-expanded={!collapsed}
+          title={collapsed ? 'Déplier' : 'Replier'}
+        >
+          <ChevronRight className={`w-4 h-4 transition-transform ${collapsed ? '-rotate-180' : 'rotate-0'}`} />
+        </button>
+
         {/* Indicateur de type de compte */}
-        <div className={`px-3 py-2 rounded-lg text-sm font-bold ${collapsed ? 'text-center' : 'text-center'} ${
-          isPremium 
-            ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
-            : 'bg-gradient-to-r from-green-600 to-blue-600 text-white shadow-md'
-        }`}>
-          {!collapsed && (isPremium ? '✨ Compte Premium' : '🎁 Compte Gratuit')}
-        </div>
+        {!collapsed && (
+          <div className={`mt-3 px-3 py-2 rounded-lg text-sm font-bold text-center ${
+            isPremium 
+              ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
+              : 'bg-gradient-to-r from-green-600 to-blue-600 text-white shadow-md'
+          }`}>
+            {isFree ? '🎁 Gratuit' : isPro ? '✨ Pro' : isProPlus ? '✨ Pro Plus' : isEnterprise ? '✨ Entreprise' : '✨ Premium'}
+          </div>
+        )}
       </div>
 
       {/* Navigation des onglets - verticale */}
@@ -246,13 +242,8 @@ export default function SidebarNavigation({
                 whileTap={{ scale: 0.98 }}
                 title={tab.label}
               >
-                <div className={`
-                  ${activeTab === tab.id
-                    ? 'bg-white/20 text-white'
-                    : 'text-black'
-                  }
-                `}>
-                  <tab.icon size={16} />
+                <div className={`${activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700'} w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0`}>
+                  <tab.icon size={20} />
                 </div>
                 {!collapsed && (
                   <span className="flex-1 text-left font-semibold">{tab.label}</span>
