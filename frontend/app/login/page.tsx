@@ -62,8 +62,7 @@ export default function LoginPage() {
               <CubeAILogo className="text-4xl" />
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/" className="font-body text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100 flex items-center gap-2">
-                <AnimatedIcon type="home" className="w-5 h-5" />
+            <Link href="/" className="font-body text-gray-600 hover:text-gray-900 px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100 !text-gray-600 hover:!text-gray-900">
                 Accueil
               </Link>
               <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium">
