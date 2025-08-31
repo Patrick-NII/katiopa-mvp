@@ -72,30 +72,38 @@ async function askBackendLLM(history: Message[], userText: string, signal: Abort
     const data = await res.json()
     if(!data?.text) return null
     
-    // Gérer les erreurs spécifiques
-    if (data.error) {
-      if (data.error === 'LLM_NOT_AVAILABLE') {
-        return { 
-          text: data.text, 
-          actions: data.actions || [],
-          error: 'LLM_NOT_AVAILABLE'
+          // Gérer les erreurs spécifiques
+      if (data.error) {
+        if (data.error === 'LLM_NOT_AVAILABLE') {
+          return { 
+            text: data.text, 
+            actions: data.actions || [],
+            error: 'LLM_NOT_AVAILABLE'
+          }
+        }
+        if (data.error === 'NOT_AUTHENTICATED') {
+          return { 
+            text: data.text, 
+            actions: data.actions || [],
+            error: 'NOT_AUTHENTICATED'
+          }
+        }
+        if (data.error === 'USER_INFO_ERROR') {
+          return { 
+            text: data.text, 
+            actions: data.actions || [],
+            error: 'USER_INFO_ERROR'
+          }
         }
       }
-      if (data.error === 'NOT_AUTHENTICATED') {
-        return { 
-          text: data.text, 
-          actions: data.actions || [],
-          error: 'NOT_AUTHENTICATED'
-        }
+      
+      return { 
+        text: data.text as string, 
+        actions: (data.actions || []) as LinkAction[],
+        model: data.model,
+        subscriptionType: data.subscriptionType,
+        userInfo: data.userInfo
       }
-    }
-    
-    return { 
-      text: data.text as string, 
-      actions: (data.actions || []) as LinkAction[],
-      model: data.model,
-      subscriptionType: data.subscriptionType
-    }
   }catch{ return null }
 }
 
@@ -177,13 +185,23 @@ export default function ChatBubble(){
   function systemCommands(raw:string): boolean {
     const t = normalize(raw.trim())
     if(t === '/help'){
-      pushBot("Commandes Bubix : /help, /reset, /export, /mode kid, /mode pro, /status.")
+      pushBot("Commandes Bubix : /help, /reset, /export, /mode kid, /mode pro, /status, /profile.")
       return true
     }
     if(t === '/status'){
       pushBot("🔍 Statut spécial pour Aylon-007 :\n\n🚀 **ACCÈS COMPLET DÉBLOQUÉ** 🚀\n💡 Mode base de connaissances : ✅ Actif\n🤖 Mode LLM IA Premium : ✅ Actif\n🧠 Modèle GPT-4 : ✅ Actif\n⚡ Tokens illimités : ✅ Actif\n\nTu as accès à toutes les fonctionnalités de Bubix !")
       return true
     }
+          if(t === '/profile'){
+        // Utiliser l'API pour récupérer les informations du profil
+        const profileResponse = await askBackendLLM([], "montre-moi mon profil et mes informations personnelles", new AbortController().signal)
+        if (profileResponse && profileResponse.text) {
+          pushBot(profileResponse.text)
+        } else {
+          pushBot("❌ Impossible de récupérer vos informations de profil. Assurez-vous d'être connecté.")
+        }
+        return true
+      }
     if(t === '/reset'){
       const hello: Message = { id: uid(), sender:'bot', timestamp: now(), text: 'Conversation effacée ! Je suis toujours Bubix, prêt à t\'aider. Comment puis-je t\'aider ?' }
       setMessages([hello]); setTags([]); setSummary(''); setPersona('kid')

@@ -11,6 +11,8 @@ import { BillingTab } from '@/components/BillingTab';
 import FamilyMembersTab from '@/components/FamilyMembersTab';
 import CubeAIExperiencesTab from '@/components/CubeAIExperiencesTab';
 import ChatbotWrapper from '@/components/chatbot/ChatbotWrapper';
+import KidsGamesTab from '@/components/kids/KidsGamesTab';
+import KidsSettingsTab from '@/components/kids/KidsSettingsTab';
 import { authAPI, statsAPI } from '@/lib/api';
 
 interface User {
@@ -43,6 +45,7 @@ export default function DashboardPage() {
   const [chatResponse, setChatResponse] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState<any[]>([]);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Chargement des données
   const loadData = async () => {
@@ -51,6 +54,9 @@ export default function DashboardPage() {
       const userResponse = await authAPI.verify();
       if (userResponse.success) {
         setUser(userResponse.user);
+        if (userResponse.user.userType === 'CHILD') {
+          setActiveTab('experiences');
+        }
       }
 
       // Récupération des statistiques
@@ -172,6 +178,10 @@ export default function DashboardPage() {
         );
       case 'statistics':
         return <StatisticsTab user={user} activities={[]} summary={summary} />;
+      case 'jeux':
+        return <KidsGamesTab user={user} />;
+      case 'reglages':
+        return <KidsSettingsTab user={user} />;
       case 'profile':
         return <ProfileTab user={user} />;
       case 'subscription':
@@ -212,10 +222,12 @@ export default function DashboardPage() {
         onTabChange={setActiveTab as any}
         userSubscriptionType={user.subscriptionType}
         userType={user.userType as any}
+        collapsed={sidebarCollapsed}
+        onCollapsedChange={setSidebarCollapsed}
       />
 
       {/* Contenu principal */}
-      <main className="flex-1 ml-64 p-6 min-h-screen">
+      <main className={`flex-1 ${sidebarCollapsed ? 'ml-16' : 'ml-64'} p-6 min-h-screen transition-[margin] duration-300`}>
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, x: 20 }}
