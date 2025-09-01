@@ -102,9 +102,9 @@ export function MulticolorText({
 }
 
 // Composant spécialisé pour le logo CubeAI
-export function CubeAILogo({ className = '' }: { className?: string }) {
+export function CubeAILogo({ className = '', animated = true }: { className?: string; animated?: boolean }) {
   return (
-    <div className={`logo-multicolor ${className}`}>
+    <div className={`logo-multicolor ${animated ? '' : 'logo-no-anim'} ${className}`}>
       <span>C</span>
       <span>u</span>
       <span>b</span>
