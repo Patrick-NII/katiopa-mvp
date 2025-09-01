@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { 
   LayoutDashboard, 
@@ -15,9 +16,11 @@ import {
   Home,
   Target,
   TrendingUp,
-  Users
+  Users,
+  LogOut
 } from 'lucide-react'
 import AnimatedIcon from './AnimatedIcons'
+import { CubeAILogo } from '@/components/MulticolorText'
 
 export type NavigationTab = 
   | 'dashboard'
@@ -72,6 +75,7 @@ export default function SidebarNavigation({
   collapsed: collapsedProp,
   onCollapsedChange
 }: SidebarNavigationProps) {
+  const router = useRouter()
   // Normaliser le type d'abonnement
   const normalizedType = userSubscriptionType?.toUpperCase() || 'FREE'
   
@@ -183,33 +187,28 @@ export default function SidebarNavigation({
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* En-tête de la sidebar */}
+      {/* En-tête de la sidebar — branding unifié */}
       <div className="relative p-3 border-b border-gray-200">
         <div className="flex items-center gap-3">
-          <motion.div
-            className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0"
-            animate={collapsed ? undefined : { scale: [1, 1.05, 1], rotate: [0, 2, -2, 0] }}
-            transition={collapsed ? undefined : { duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <AnimatedIcon type="home" className="w-5 h-5 text-white" />
-          </motion.div>
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0">
+            <span className="font-title text-white text-2xl leading-none">C</span>
+          </div>
           {!collapsed && (
             <div className="min-w-0">
-              <h1 className="text-lg font-bold text-gray-900 leading-tight">CubeAI</h1>
-              <p className="text-m text-gray-700">Espace personnel</p>
+              <CubeAILogo className="text-4xl" />
             </div>
           )}
+          {/* Bouton rétractable aligné au logo */}
+          <button 
+            onClick={toggleCollapsed} 
+            className="ml-1 p-2 rounded-md hover:bg-gray-100 text-gray-600 transition"
+            aria-label={collapsed ? 'Déplier la navigation' : 'Replier la navigation'}
+            aria-expanded={!collapsed}
+            title={collapsed ? 'Déplier' : 'Replier'}
+          >
+            <ChevronRight className={`w-4 h-4 transition-transform ${collapsed ? 'rotate-0' : '-rotate-180'}`} />
+          </button>
         </div>
-        {/* Bouton rétractable positionné */}
-        <button 
-          onClick={toggleCollapsed} 
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-gray-100 text-gray-600 transition"
-          aria-label={collapsed ? 'Déplier la navigation' : 'Replier la navigation'}
-          aria-expanded={!collapsed}
-          title={collapsed ? 'Déplier' : 'Replier'}
-        >
-          <ChevronRight className={`w-4 h-4 transition-transform ${collapsed ? '-rotate-180' : 'rotate-0'}`} />
-        </button>
 
         {/* Indicateur de type de compte */}
         {!collapsed && (
@@ -283,6 +282,58 @@ export default function SidebarNavigation({
             )
           ))}
         </nav>
+      </div>
+
+      {/* Actions rapides: Accueil + Déconnexion */}
+      <div className="px-3 pb-3 space-y-2">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => router.push('/')}
+          className={`
+            group relative w-full flex items-center gap-3 ${collapsed ? 'px-2 py-3 justify-center' : 'px-3 py-3'}
+            rounded-lg text-sm font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 transition
+          `}
+          title="Accueil"
+          aria-label="Accueil"
+        >
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-gray-700 shadow-sm">
+            <Home size={20} />
+          </div>
+          {!collapsed && <span>Accueil</span>}
+          {collapsed && (
+            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 pointer-events-none opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-150 delay-150">
+              <div className="relative px-2 py-1 rounded-md bg-gray-900 text-white text-xs shadow-lg whitespace-nowrap">
+                <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45 shadow-md"></div>
+                Accueil
+              </div>
+            </div>
+          )}
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={async () => { try { await (await import('@/lib/api')).authAPI.logout(); router.push('/login'); } catch (e) {} }}
+          className={`
+            group relative w-full flex items-center gap-3 ${collapsed ? 'px-2 py-3 justify-center' : 'px-3 py-3'}
+            rounded-lg text-sm font-semibold bg-red-50 hover:bg-red-100 text-red-700 transition
+          `}
+          title="Déconnexion"
+          aria-label="Déconnexion"
+        >
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-red-700 shadow-sm">
+            <LogOut size={20} />
+          </div>
+          {!collapsed && <span>Déconnexion</span>}
+          {collapsed && (
+            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 pointer-events-none opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-150 delay-150">
+              <div className="relative px-2 py-1 rounded-md bg-gray-900 text-white text-xs shadow-lg whitespace-nowrap">
+                <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45 shadow-md"></div>
+                Déconnexion
+              </div>
+            </div>
+          )}
+        </motion.button>
       </div>
 
       {/* Footer de la sidebar */}
