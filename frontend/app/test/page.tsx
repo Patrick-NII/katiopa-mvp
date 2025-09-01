@@ -1,7 +1,7 @@
 'use client'
 import { apiGet } from '@/lib/api'
 import { useState, useEffect } from 'react'
-import NavBar from '@/components/NavBar'
+import Navbar from '@/components/Navbar'
 
 export default function TestPage() {
   const [token, setToken] = useState<string | null>(null)
@@ -26,7 +26,7 @@ export default function TestPage() {
 
   return (
     <>
-      <NavBar />
+      <Navbar />
       <div className="container-narrow">
         <div className="card">
           <h1 className="text-2xl font-semibold mb-4">Page de Test</h1>

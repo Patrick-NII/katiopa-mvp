@@ -23,14 +23,15 @@ export async function getUserInfo(): Promise<UserInfo | null> {
   try {
     const response = await authAPI.verify()
     if (response.success && response.user) {
+      const user = response.user as any; // Cast pour accéder aux propriétés supplémentaires
       return {
-        id: response.user.id,
-        sessionId: response.user.sessionId,
-        firstName: response.user.firstName,
-        lastName: response.user.lastName,
-        email: response.user.email,
-        userType: response.user.userType as 'PARENT' | 'CHILD',
-        subscriptionType: response.user.subscriptionType as 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE',
+        id: user.id,
+        sessionId: user.sessionId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email || 'Non renseigné',
+        userType: user.userType as 'PARENT' | 'CHILD',
+        subscriptionType: user.subscriptionType as 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE',
         isActive: true
       }
     }

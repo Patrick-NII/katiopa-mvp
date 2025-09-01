@@ -1,0 +1,910 @@
+"use client";
+import React, { useEffect, useMemo, useReducer, useState } from 'react';
+import { Gamepad2, Lightbulb, RotateCcw, Volume2, VolumeX, Play, Pause, Settings, Target, Zap, X, Trophy, Users, Clock } from 'lucide-react';
+import { cubematchAPI, CubeMatchScore, CubeMatchStats } from '../lib/api/cubematch';
+
+// Hook pour détecter les changements de taille d'écran
+const useViewportSize = () => {
+  const [size, setSize] = useState({ width: 1200, height: 800 });
+  
+  useEffect(() => {
+    const updateSize = () => {
+      setSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+    
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+  
+  return size;
+};
+
+type Operator = 'ADD' | 'SUB' | 'MUL' | 'DIV';
+type Cell = { id: string; row: number; col: number; value: number | null; bornAt: number };
+type Coords = { row: number; col: number };
+
+type Config = {
+  rows: number;
+  cols: number;
+  operator: Operator;
+  target: number;              // ex: 10 pour ADD, 2 pour DIV, etc.
+  allowDiagonals: boolean;     // adjacence 4 ou 8
+  tickMs: number;              // vitesse de remplissage au niveau courant
+  spawnPerTick: [number, number]; // min,max cellules à remplir
+  maxSize: number;             // limite de la grille
+  theme?: 'classic' | 'ocean' | 'sunset' | 'forest';
+  assistOnSelect?: boolean;    // surligner voisins jouables après 1er clic
+};
+
+type State = {
+  grid: Cell[][];
+  selected: Coords[];          // 0..2 éléments
+  score: number;
+  combo: number;
+  level: number;
+  config: Config;
+  running: boolean;
+  lastTick: number;
+  seed: number;                // pour random local
+  hint: Coords[] | null;
+  gameOver: boolean;
+  // Améliorations
+  timePlayedMs: number;        // temps total joué
+  soundEnabled: boolean;       // sons activés/désactivés
+  lastAction: 'HIT' | 'MISS' | null; // pour feedback audio visuel
+};
+
+type Action =
+  | { type: 'INIT'; payload?: Partial<Config> }
+  | { type: 'TICK'; now: number }
+  | { type: 'CLICK'; at: Coords }
+  | { type: 'SET_OPERATOR'; op: Operator; target: number }
+  | { type: 'SET_SIZE'; rows: number; cols: number }
+  | { type: 'SET_TICK_MS'; tickMs: number }
+  | { type: 'SET_SPAWN'; min: number; max: number }
+  | { type: 'SET_MAXSIZE'; max: number }
+  | { type: 'SET_THEME'; theme: NonNullable<Config['theme']> }
+  | { type: 'TOGGLE_ASSIST' }
+  | { type: 'PAUSE_TOGGLE' }
+  | { type: 'TOGGLE_DIAG' }
+  | { type: 'HINT' }
+  | { type: 'LEVEL_UP' }
+  | { type: 'RESTART' }
+  | { type: 'TICK_TIME'; delta: number }
+  | { type: 'TOGGLE_SOUND' };
+
+const rand = (seed: number) => {
+  // LCG deterministic
+  const a = 1664525, c = 1013904223, m = 2 ** 32;
+  const next = (a * seed + c) % m;
+  return { next, r01: next / m };
+};
+
+const emptyGrid = (rows: number, cols: number, bornAt = 0): Cell[][] =>
+  Array.from({ length: rows }, (_, r) =>
+    Array.from({ length: cols }, (_, c) => ({
+      id: `${r}-${c}`, row: r, col: c, value: null, bornAt
+    }))
+  );
+
+const defaultConfig: Config = {
+  rows: 6, cols: 6,
+  operator: 'ADD',
+  target: 10,
+  allowDiagonals: false,
+  tickMs: 6000,
+  spawnPerTick: [1, 3],
+  maxSize: 9,
+  theme: 'classic',
+  assistOnSelect: true,
+};
+
+const STORAGE_KEY = 'cubeMatch:v1';
+
+function loadUserPrefs(): { cfg: Partial<Config>; soundEnabled?: boolean } {
+  try {
+    if (typeof window === 'undefined') return { cfg: {} };
+    const raw = localStorage.getItem('userSettings');
+    if (!raw) return { cfg: {} };
+    const data = JSON.parse(raw);
+    const cm = data?.cubematch ?? {};
+    const cfg: Partial<Config> = {
+      allowDiagonals: Boolean(cm.diagonals ?? false),
+      assistOnSelect: Boolean(cm.assistOnSelect ?? true),
+      theme: (cm.theme ?? 'classic') as any,
+      operator: (cm.operator ?? 'ADD') as Operator,
+      target: Number(cm.target ?? 10) || 10,
+    };
+    const soundEnabled = Boolean(cm.sound ?? true);
+    return { cfg, soundEnabled };
+  } catch {}
+  return { cfg: {} };
+}
+
+// Palette de thèmes (classes Tailwind explicitement listées pour JIT)
+const themePalette = {
+  classic: {
+    headerFrom: 'from-indigo-600', headerTo: 'to-fuchsia-600',
+    activeFrom: 'from-indigo-600', activeTo: 'to-fuchsia-600',
+    ring: 'ring-indigo-500', outline: 'outline-amber-400',
+  },
+  ocean: {
+    headerFrom: 'from-cyan-600', headerTo: 'to-blue-600',
+    activeFrom: 'from-cyan-600', activeTo: 'to-blue-600',
+    ring: 'ring-sky-500', outline: 'outline-emerald-400',
+  },
+  sunset: {
+    headerFrom: 'from-orange-500', headerTo: 'to-pink-600',
+    activeFrom: 'from-orange-500', activeTo: 'to-pink-600',
+    ring: 'ring-rose-500', outline: 'outline-amber-400',
+  },
+  forest: {
+    headerFrom: 'from-emerald-600', headerTo: 'to-lime-600',
+    activeFrom: 'from-emerald-600', activeTo: 'to-lime-600',
+    ring: 'ring-emerald-500', outline: 'outline-lime-400',
+  },
+} as const;
+
+function loadSaved(): State | null {
+  try {
+    if (typeof window === 'undefined') return null;
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (!data || !Array.isArray(data.grid)) return null;
+    // reconstruire la grille de manière sûre
+    const rows = data.grid.length;
+    const cols = rows ? data.grid[0].length : 0;
+    const grid: Cell[][] = Array.from({ length: rows }, (_, r) =>
+      Array.from({ length: cols }, (_, c) => {
+        const cell = data.grid[r][c];
+        return {
+          id: `${r}-${c}`,
+          row: r,
+          col: c,
+          value: (cell?.value ?? null) as number | null,
+          bornAt: Number(cell?.bornAt ?? 0)
+        } as Cell;
+      })
+    );
+    const state: State = {
+      grid,
+      selected: [],
+      score: Number(data.score ?? 0),
+      combo: Number(data.combo ?? 0),
+      level: Number(data.level ?? 1),
+      config: {
+        ...defaultConfig,
+        ...(data.config ?? {}),
+      } as Config,
+      running: Boolean(data.running ?? true),
+      lastTick: Number(data.lastTick ?? Date.now()),
+      seed: Number(data.seed ?? Math.floor(Math.random() * 2 ** 31)),
+      hint: null,
+      gameOver: Boolean(data.gameOver ?? false),
+      timePlayedMs: Number(data.timePlayedMs ?? 0),
+      soundEnabled: Boolean(data.soundEnabled ?? true),
+      lastAction: null,
+    };
+    return state;
+  } catch {}
+  return null;
+}
+
+function projectForSave(state: State) {
+  // Ne pas sauvegarder les sélections/hints transitoires
+  return {
+    grid: state.grid.map(row => row.map(c => ({ value: c.value, bornAt: c.bornAt }))),
+    score: state.score,
+    combo: state.combo,
+    level: state.level,
+    config: state.config,
+    running: state.running,
+    lastTick: state.lastTick,
+    seed: state.seed,
+    gameOver: state.gameOver,
+    timePlayedMs: state.timePlayedMs,
+    soundEnabled: state.soundEnabled,
+  };
+}
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'INIT': {
+      const cfg = { ...defaultConfig, ...(action.payload || {}) };
+      return {
+        grid: emptyGrid(cfg.rows, cfg.cols),
+        selected: [],
+        score: 0,
+        combo: 0,
+        level: 1,
+        config: cfg,
+        running: true,
+        lastTick: Date.now(),
+        seed: Math.floor(Math.random() * 2 ** 31),
+        hint: null,
+        gameOver: false,
+        timePlayedMs: 0,
+        soundEnabled: true,
+        lastAction: null,
+      } as State;
+    }
+
+    case 'TICK': {
+      if (!state.running || state.gameOver) return state;
+      // remplir quelques cases vides
+      const now = action.now;
+      let { seed } = state;
+      const flat = state.grid.flat();
+      const empties = flat.filter(c => c.value === null);
+      if (empties.length === 0) {
+        // plus de place : si aucun coup possible -> Game Over
+        const any = findAnyMatch(state);
+        if (!any) return { ...state, running: false, gameOver: true } as State;
+        return state;
+      }
+      const nMin = state.config.spawnPerTick[0];
+      const nMax = state.config.spawnPerTick[1];
+      // combien à spawn
+      ({ next: seed } = rand(seed));
+      const toSpawn = Math.min(
+        empties.length,
+        nMin + Math.floor(rand(seed).r01 * (nMax - nMin + 1))
+      );
+
+      // choisir des positions vides aléatoires et leur donner des valeurs 1..9
+      const chosen: Cell[] = [];
+      let pool = [...empties];
+      for (let i = 0; i < toSpawn && pool.length; i++) {
+        ({ next: seed } = rand(seed));
+        const idx = Math.floor(rand(seed).r01 * pool.length);
+        const cell = pool.splice(idx, 1)[0];
+        ({ next: seed } = rand(seed));
+        const val = 1 + Math.floor(rand(seed).r01 * 9);
+        chosen.push({ ...cell, value: val, bornAt: now });
+      }
+
+      // reconstruire la grille
+      const map = new Map(chosen.map(c => [c.id, c]));
+      const newGrid = state.grid.map(row =>
+        row.map(c => (map.has(c.id) ? (map.get(c.id) as Cell) : c))
+      );
+
+      // si plein et aucun coup → Game Over
+      const full = newGrid.flat().every(c => c.value !== null);
+      if (full && !findAnyMatch({ ...state, grid: newGrid } as State)) {
+        return { ...state, grid: newGrid, running: false, gameOver: true, seed } as State;
+      }
+
+      return { ...state, grid: newGrid, lastTick: now, seed } as State;
+    }
+
+    case 'CLICK': {
+      if (!state.running || state.gameOver) return state;
+      const { row, col } = action.at;
+      const cell = state.grid[row][col];
+      if (cell.value === null) return state;
+
+      let selected = [...state.selected];
+      // toggle
+      const exists = selected.find(s => s.row === row && s.col === col);
+      if (exists) {
+        selected = selected.filter(s => !(s.row === row && s.col === col));
+        return { ...state, selected, hint: null } as State;
+      }
+      if (selected.length === 2) selected = []; // reset si déjà 2
+      selected.push({ row, col });
+
+      if (selected.length < 2) {
+        // Assistance visuelle: surligner voisins jouables
+        let hint: Coords[] | null = null;
+        if (state.config.assistOnSelect) {
+          const neighbors: Coords[] = [];
+          const dirs = state.config.allowDiagonals
+            ? [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]
+            : [[1,0],[-1,0],[0,1],[0,-1]];
+          for (const [dr, dc] of dirs) {
+            const r2 = row + dr, c2 = col + dc;
+            if (r2 < 0 || c2 < 0 || r2 >= state.grid.length || c2 >= state.grid[0].length) continue;
+            const v2 = state.grid[r2][c2].value;
+            if (v2 === null) continue;
+            if (checkRule(cell.value!, v2, state.config.operator, state.config.target)) {
+              neighbors.push({ row: r2, col: c2 });
+            }
+          }
+          hint = neighbors.length ? neighbors : null;
+        }
+        return { ...state, selected, hint } as State;
+      }
+
+      // valider la paire
+      const [a, b] = selected.map(s => state.grid[s.row][s.col]);
+      if (!areAdjacent(a, b, state.config.allowDiagonals)) {
+        // mauvaise adjacence
+        return { ...state, selected: [], combo: 0, hint: null, lastAction: 'MISS' } as State;
+      }
+
+      const ok = checkRule(a.value!, b.value!, state.config.operator, state.config.target);
+      if (!ok) {
+        return { ...state, selected: [], combo: 0, hint: null, lastAction: 'MISS' } as State;
+      }
+
+      // retirer la paire (vider les cases) + score
+      const newGrid = state.grid.map(row =>
+        row.map(c =>
+          (c.id === a.id || c.id === b.id) ? { ...c, value: null } : c
+        )
+      );
+
+      const combo = state.combo + 1;
+      const gain = 10 * Math.max(1, combo);
+      let next: State = {
+        ...state,
+        grid: newGrid,
+        selected: [],
+        combo,
+        score: state.score + gain,
+        hint: null,
+        lastAction: 'HIT',
+      } as State;
+
+      // passage de niveau tous les 50 pts
+      if (next.score >= state.level * 50) {
+        next = levelUp(next);
+      }
+      return next;
+    }
+
+    case 'SET_OPERATOR': {
+      return {
+        ...state,
+        config: { ...state.config, operator: action.op, target: action.target },
+        selected: [],
+        hint: null,
+      } as State;
+    }
+
+    case 'SET_SIZE': {
+      const rows = Math.max(3, Math.min(action.rows, state.config.maxSize));
+      const cols = Math.max(3, Math.min(action.cols, state.config.maxSize));
+      return {
+        ...state,
+        grid: fitGrid(state.grid, rows, cols),
+        config: { ...state.config, rows, cols },
+        selected: [],
+        hint: null,
+      } as State;
+    }
+
+    case 'SET_TICK_MS': {
+      const tickMs = Math.max(500, action.tickMs | 0);
+      return { ...state, config: { ...state.config, tickMs } } as State;
+    }
+
+    case 'SET_SPAWN': {
+      const min = Math.max(1, Math.min(action.min | 0, 9));
+      const max = Math.max(min, Math.min(action.max | 0, 9));
+      return { ...state, config: { ...state.config, spawnPerTick: [min, max] } } as State;
+    }
+
+    case 'SET_MAXSIZE': {
+      const max = Math.max(3, Math.min(action.max | 0, 12));
+      const rows = Math.min(state.config.rows, max);
+      const cols = Math.min(state.config.cols, max);
+      return { ...state, config: { ...state.config, maxSize: max, rows, cols }, grid: fitGrid(state.grid, rows, cols) } as State;
+    }
+
+    case 'SET_THEME': {
+      return { ...state, config: { ...state.config, theme: action.theme } } as State;
+    }
+
+    case 'TOGGLE_ASSIST': {
+      return { ...state, config: { ...state.config, assistOnSelect: !state.config.assistOnSelect } } as State;
+    }
+
+    case 'PAUSE_TOGGLE': {
+      return { ...state, running: !state.running } as State;
+    }
+
+    case 'TOGGLE_DIAG': {
+      return { ...state, config: { ...state.config, allowDiagonals: !state.config.allowDiagonals } } as State;
+    }
+
+    case 'HINT': {
+      const match = findAnyMatch(state);
+      return { ...state, hint: match ? [match.a, match.b] : null, score: match ? state.score - 15 : state.score } as State;
+    }
+
+    case 'LEVEL_UP': {
+      return levelUp(state);
+    }
+
+    case 'RESTART': {
+      return reducer(state, { type: 'INIT' });
+    }
+
+    case 'TICK_TIME': {
+      if (!state.running || state.gameOver) return state;
+      return { ...state, timePlayedMs: state.timePlayedMs + action.delta } as State;
+    }
+
+    case 'TOGGLE_SOUND': {
+      return { ...state, soundEnabled: !state.soundEnabled } as State;
+    }
+
+    default:
+      return state;
+  }
+}
+
+function levelUp(state: State): State {
+  const { rows, cols, tickMs, maxSize } = state.config;
+  const newRows = Math.min(maxSize, rows + 1);
+  const newCols = Math.min(maxSize, cols + 1);
+  const newTick = Math.max(1500, tickMs - 500);
+  const newGrid = fitGrid(state.grid, newRows, newCols);
+  return {
+    ...state,
+    grid: newGrid,
+    level: state.level + 1,
+    config: { ...state.config, rows: newRows, cols: newCols, tickMs: newTick },
+  } as State;
+}
+
+function fitGrid(grid: Cell[][], rows: number, cols: number): Cell[][] {
+  const ng = emptyGrid(rows, cols);
+  for (let r = 0; r < Math.min(rows, grid.length); r++) {
+    for (let c = 0; c < Math.min(cols, grid[0].length); c++) {
+      ng[r][c] = { ...ng[r][c], value: grid[r][c].value, bornAt: grid[r][c].bornAt };
+    }
+  }
+  return ng;
+}
+
+function areAdjacent(a: Cell, b: Cell, diagonals: boolean) {
+  const dr = Math.abs(a.row - b.row);
+  const dc = Math.abs(a.col - b.col);
+  if (diagonals) return dr <= 1 && dc <= 1 && !(dr === 0 && dc === 0);
+  return (dr + dc === 1); // 4-neighbours
+}
+
+function checkRule(a: number, b: number, op: Operator, target: number) {
+  switch (op) {
+    case 'ADD': return a + b === target;
+    case 'SUB': return Math.abs(a - b) === target;
+    case 'MUL': return a * b === target;
+    case 'DIV': return (a % b === 0 && a / b === target) || (b % a === 0 && b / a === target);
+  }
+}
+
+function findAnyMatch(state: State): { a: Coords; b: Coords } | null {
+  const { allowDiagonals, operator, target } = state.config;
+  const dirs = allowDiagonals
+    ? [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]
+    : [[1,0],[-1,0],[0,1],[0,-1]];
+  for (let r = 0; r < state.grid.length; r++) {
+    for (let c = 0; c < state.grid[0].length; c++) {
+      const v = state.grid[r][c].value;
+      if (v === null) continue;
+      for (const [dr, dc] of dirs) {
+        const r2 = r + dr, c2 = c + dc;
+        if (r2 < 0 || c2 < 0 || r2 >= state.grid.length || c2 >= state.grid[0].length) continue;
+        const v2 = state.grid[r2][c2].value;
+        if (v2 === null) continue;
+        if (checkRule(v, v2, operator, target)) {
+          return { a: { row: r, col: c }, b: { row: r2, col: c2 } };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+export default function CubeMatch() {
+  const [showOptions, setShowOptions] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [topScores, setTopScores] = useState<CubeMatchScore[]>([]);
+  const [stats, setStats] = useState<CubeMatchStats | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [state, dispatch] = useReducer(reducer, undefined as any, () => {
+    const saved = loadSaved();
+    if (saved) return saved;
+    const prefs = loadUserPrefs();
+    const initial = reducer({} as any, { type: 'INIT', payload: prefs.cfg });
+    // Appliquer préférences hors config (sons)
+    (initial as any).soundEnabled = prefs.soundEnabled ?? true;
+    return initial;
+  });
+  const viewportSize = useViewportSize();
+
+  // Tick (remplissage du cube)
+  useEffect(() => {
+    if (!state.running) return;
+    const id = setInterval(() => {
+      dispatch({ type: 'TICK', now: Date.now() });
+    }, state.config.tickMs);
+    return () => clearInterval(id);
+  }, [state.running, state.config.tickMs]);
+
+  // Tick temps joué (chaque seconde)
+  useEffect(() => {
+    const id = setInterval(() => {
+      dispatch({ type: 'TICK_TIME', delta: 1000 });
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Sauvegarde automatique
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(projectForSave(state)));
+      }
+    } catch {}
+  }, [state]);
+
+  // Lecture d'un léger son à la validation
+  useEffect(() => {
+    if (!state.soundEnabled) return;
+    if (state.lastAction !== 'HIT') return;
+    try {
+      const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioCtx();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine'; o.frequency.value = 880; // la4*2
+      g.gain.setValueAtTime(0.0001, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.1, ctx.currentTime + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
+      o.start(); o.stop(ctx.currentTime + 0.14);
+    } catch {}
+  }, [state.lastAction, state.soundEnabled]);
+
+  // Charger les scores et statistiques
+  useEffect(() => {
+    const loadScores = async () => {
+      setLoading(true);
+      try {
+        const [scores, gameStats] = await Promise.all([
+          cubematchAPI.getTopScores(10),
+          cubematchAPI.getStats()
+        ]);
+        setTopScores(scores);
+        setStats(gameStats);
+      } catch (error) {
+        console.error('Erreur lors du chargement des scores:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (showLeaderboard) {
+      loadScores();
+    }
+  }, [showLeaderboard]);
+
+  // Sauvegarder le score quand la partie se termine
+  useEffect(() => {
+    if (state.gameOver && state.score > 0) {
+      const saveScore = async () => {
+        try {
+          await cubematchAPI.saveScore({
+            userId: 'current-user', // À remplacer par l'ID utilisateur connecté
+            username: 'Joueur', // À remplacer par le nom d'utilisateur connecté
+            score: state.score,
+            level: state.level,
+            timePlayedMs: state.timePlayedMs,
+            operator: state.config.operator,
+            target: state.config.target,
+            allowDiagonals: state.config.allowDiagonals,
+          });
+        } catch (error) {
+          console.error('Erreur lors de la sauvegarde du score:', error);
+        }
+      };
+      saveScore();
+    }
+  }, [state.gameOver, state.score, state.level, state.timePlayedMs, state.config]);
+
+  // Grille responsive - Adaptée à la hauteur de l'écran
+  const cellSize = useMemo(() => {
+    // Calcul basé sur la hauteur de l'écran disponible
+    const availableHeight = viewportSize.height - 400; // Réserve pour l'en-tête et les marges
+    const maxCellHeight = Math.floor(availableHeight / state.config.rows);
+    
+    // Calcul basé sur la largeur de l'écran
+    const availableWidth = Math.min(viewportSize.width - 100, 1400); // Largeur max de 1400px
+    const maxCellWidth = Math.floor(availableWidth / state.config.cols);
+    
+    // Prendre la plus petite des deux pour s'assurer que la grille tient dans l'écran
+    const baseSize = Math.min(maxCellHeight, maxCellWidth, 140); // Taille max de 140px
+    const minSize = Math.max(50, baseSize); // Taille min de 50px
+    
+    return `${minSize}px`;
+  }, [state.config.rows, state.config.cols, viewportSize]);
+
+  // Couleur du chiffre selon la valeur pour une meilleure lisibilité
+  const valueClass = (v: number | null) => {
+    if (v == null) return 'text-gray-300';
+    if (v <= 2) return 'text-sky-700';
+    if (v <= 4) return 'text-emerald-700';
+    if (v <= 6) return 'text-amber-700';
+    if (v <= 8) return 'text-orange-700';
+    return 'text-rose-700';
+  };
+
+  const theme = themePalette[(state.config.theme ?? 'classic') as keyof typeof themePalette];
+
+  return (
+    <div className="w-full max-w-7xl mx-auto p-6">
+      {/* Fenêtre des paramètres */}
+      {showOptions && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Paramètres</h2>
+              <button 
+                onClick={() => setShowOptions(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Opérateur */}
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-3">Opérateur</h3>
+                <OpButton current={state.config} onChange={(op, target)=>dispatch({type:'SET_OPERATOR', op, target})}/>
+              </div>
+              
+              {/* Cible */}
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-3">Cible</h3>
+                <TargetControl current={state.config} onChange={(target)=>dispatch({type:'SET_OPERATOR', op: state.config.operator, target})} />
+              </div>
+              
+              {/* Diagonales */}
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-3">Mode de jeu</h3>
+                <button 
+                  className={`w-full px-4 py-3 rounded-lg border font-medium transition-colors ${
+                    state.config.allowDiagonals 
+                      ? 'bg-purple-50 border-purple-200 text-purple-700' 
+                      : 'bg-gray-50 border-gray-200 text-gray-700'
+                  }`} 
+                  onClick={()=>dispatch({type:'TOGGLE_DIAG'})}
+                >
+                  {state.config.allowDiagonals ? 'Diagonales activées' : 'Diagonales désactivées'}
+                </button>
+              </div>
+              
+              {/* Aide */}
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-3">Aide visuelle</h3>
+                <button 
+                  className={`w-full px-4 py-3 rounded-lg border font-medium transition-colors ${
+                    state.config.assistOnSelect 
+                      ? 'bg-green-50 border-green-200 text-green-700' 
+                      : 'bg-red-50 border-red-200 text-red-700'
+                  }`} 
+                  onClick={()=>dispatch({type:'TOGGLE_ASSIST'})}
+                >
+                  {state.config.assistOnSelect ? 'Aide activée' : 'Aide désactivée'}
+                </button>
+              </div>
+              
+              {/* Son */}
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-3">Son</h3>
+                <button 
+                  className={`w-full px-4 py-3 rounded-lg border font-medium transition-colors ${
+                    state.soundEnabled 
+                      ? 'bg-green-50 border-green-200 text-green-700' 
+                      : 'bg-red-50 border-red-200 text-red-700'
+                  }`} 
+                  onClick={()=>dispatch({type:'TOGGLE_SOUND'})}
+                >
+                  {state.soundEnabled ? 'Son activé' : 'Son désactivé'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      <header className="mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <h1 className={`text-3xl sm:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r ${theme.headerFrom} ${theme.headerTo}`}>
+              <Gamepad2 className="inline w-8 h-8 mr-2" /> Cube Match
+            </h1>
+            <div className="flex gap-2">
+              <span className="px-4 py-2 rounded-full bg-indigo-50 text-indigo-700 text-sm font-semibold border border-indigo-100 shadow-sm">
+                Niveau {state.level}
+              </span>
+              <span className="px-4 py-2 rounded-full bg-emerald-50 text-emerald-700 text-sm font-semibold border border-emerald-100 shadow-sm">
+                Score {state.score}
+              </span>
+              {state.combo > 1 && (
+                <span className="px-4 py-2 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold border border-blue-100 shadow-sm">
+                  Combo ×{state.combo}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="px-4 py-2 rounded-lg border bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100 font-medium transition-colors" onClick={()=>dispatch({type:'HINT'})}>
+              <Lightbulb className="inline w-4 h-4 mr-1" /> Indice (-15)
+            </button>
+            <button className="px-4 py-2 rounded-lg border bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 font-medium transition-colors" onClick={()=>dispatch({type:'RESTART'})}>
+              <RotateCcw className="inline w-4 h-4 mr-1" /> Rejouer
+            </button>
+            <button className={`px-4 py-2 rounded-lg border font-medium transition-colors ${
+              state.running 
+                ? 'bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100' 
+                : 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100'
+            }`} onClick={()=>dispatch({type:'PAUSE_TOGGLE'})}>
+              {state.running ? <Pause className="inline w-4 h-4 mr-1" /> : <Play className="inline w-4 h-4 mr-1" />} {state.running ? 'Pause' : 'Continuer'}
+            </button>
+            <button className="px-4 py-2 rounded-lg border bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100 font-medium transition-colors" onClick={()=>setShowOptions(true)}>
+              <Settings className="inline w-4 h-4 mr-1" /> Paramètres
+            </button>
+            <button className="px-4 py-2 rounded-lg border bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100 font-medium transition-colors" onClick={()=>setShowLeaderboard(true)}>
+              <Trophy className="inline w-4 h-4 mr-1" /> Classement
+            </button>
+          </div>
+        </div>
+        <div className="text-center mb-4">
+          <div className="text-sm text-gray-600 mb-2 flex items-center justify-center gap-1">
+            <Target className="w-4 h-4" /> Temps de jeu: {formatMs(state.timePlayedMs)}
+          </div>
+          {/* barre de progression vers le prochain niveau (tous les 50 pts) */}
+          <div className="w-full max-w-md mx-auto">
+            {(() => {
+              const base = (state.level - 1) * 50;
+              const progress = Math.max(0, state.score - base);
+              const pct = Math.min(100, Math.round((progress / 50) * 100));
+              return (
+                <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+                  <div 
+                    className="h-3 bg-gradient-to-r from-indigo-500 to-fuchsia-500 transition-all duration-500 ease-out rounded-full shadow-sm" 
+                    style={{ width: `${pct}%` }} 
+                  />
+                </div>
+              );
+            })()}
+            <div className="text-xs text-gray-500 mt-1">
+              {(() => {
+                const base = (state.level - 1) * 50;
+                const progress = Math.max(0, state.score - base);
+                return `${progress}/50 points vers le niveau ${state.level + 1}`;
+              })()}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div
+          className="grid bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-2xl shadow-lg border border-gray-200 overflow-hidden"
+          style={{
+            gridTemplateColumns: `repeat(${state.config.cols}, ${cellSize})`,
+            gridTemplateRows: `repeat(${state.config.rows}, ${cellSize})`,
+            gap: '8px',
+            maxWidth: 'fit-content',
+            maxHeight: 'calc(100vh - 300px)',
+            minHeight: '300px'
+          }}
+        >
+        {state.grid.flat().map(cell => {
+          const isSel = state.selected.some(s => s.row === cell.row && s.col === cell.col);
+          const isHint = state.hint?.some(h => h.row === cell.row && h.col === cell.col);
+          const isPlayable = state.config.assistOnSelect && state.selected.length > 0 && 
+            (state.selected.length === 1 ? 
+              (state.config.allowDiagonals ? 
+                Math.abs(cell.row - state.selected[0].row) <= 1 && Math.abs(cell.col - state.selected[0].col) <= 1 :
+                (Math.abs(cell.row - state.selected[0].row) + Math.abs(cell.col - state.selected[0].col)) === 1
+              ) : false);
+          
+          return (
+            <button
+              key={cell.id}
+              onClick={() => dispatch({ type: 'CLICK', at: { row: cell.row, col: cell.col } })}
+              className={`flex items-center justify-center rounded-xl border-2 font-extrabold select-none transition-colors
+                ${cell.value === null ? 'bg-white border-gray-200' : 'bg-white border-gray-300'}
+                ${isSel ? `ring-2 ${theme.ring} shadow-md` : 'hover:shadow-md'}
+                ${isHint ? `outline outline-2 ${theme.outline}` : ''}
+                ${isPlayable ? 'bg-blue-50 border-blue-300' : ''}
+                ${valueClass(cell.value)}
+                ${cell.value !== null ? 'hover:bg-gray-50' : ''}
+              `}
+              style={{
+                minWidth: cellSize,
+                minHeight: cellSize,
+                fontSize: `calc(${cellSize} * 0.8)`
+              }}
+            >
+              {cell.value ?? '·'}
+            </button>
+          );
+        })}
+        </div>
+      </div>
+
+      {state.gameOver && (
+        <div className="mt-6 p-6 border-2 border-rose-200 rounded-2xl bg-rose-50 shadow-lg">
+          <div className="flex items-center gap-3 mb-4">
+            <Zap className="w-6 h-6 text-rose-600" />
+            <h3 className="text-xl font-bold text-rose-800">Partie terminée</h3>
+          </div>
+          <div className="space-y-2 mb-4">
+            <p className="text-rose-700"><strong>Score final :</strong> {state.score} points</p>
+            <p className="text-rose-700"><strong>Niveau atteint :</strong> {state.level}</p>
+            <p className="text-rose-700"><strong>Temps de jeu :</strong> {formatMs(state.timePlayedMs)}</p>
+          </div>
+          <button 
+            className="px-6 py-3 bg-rose-600 text-white rounded-lg font-semibold hover:bg-rose-700 transition-colors shadow-md" 
+            onClick={()=>dispatch({type:'RESTART'})}
+          >
+            <RotateCcw className="inline w-4 h-4 mr-2" /> Nouvelle partie
+          </button>
+        </div>
+      )}
+
+      <p className="text-sm text-gray-500 mt-4">
+        Règle par défaut : addition pour atteindre 10, cases adjacentes orthogonales.
+        Change l’opérateur et la cible avec les boutons.
+      </p>
+    </div>
+  );
+}
+
+function formatMs(ms: number) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+}
+
+function OpButton({ current, onChange }: { current: Config; onChange: (op: Operator, target: number)=>void }) {
+  const theme = themePalette[(current.theme ?? 'classic') as keyof typeof themePalette];
+  const Item = ({ label, op, target }: { label: string; op: Operator; target: number }) => (
+    <button
+      onClick={()=>onChange(op, target)}
+      className={`px-4 py-2 rounded-md text-sm font-semibold transition border
+        ${current.operator===op
+          ? `bg-gradient-to-r ${theme.activeFrom} ${theme.activeTo} text-white border-transparent`
+          : 'bg-white text-gray-800 hover:bg-gray-50 border-gray-200'}
+      `}
+      title={`Opérateur ${label} — cible ${target}`}
+    >{label}</button>
+  );
+  return (
+    <div className="flex gap-2 bg-gray-100 p-1 rounded-lg border border-gray-200">
+      <Item label="+10" op="ADD" target={10} />
+      <Item label="−2" op="SUB" target={2} />
+      <Item label="×12" op="MUL" target={12} />
+      <Item label="÷2" op="DIV" target={2} />
+    </div>
+  );
+}
+
+function TargetControl({ current, onChange }: { current: Config; onChange: (target: number)=>void }) {
+  return (
+    <div className="flex items-center gap-2">
+      <label className="text-sm text-gray-600">Cible</label>
+      <input
+        type="number"
+        min={1}
+        max={99}
+        value={current.target}
+        onChange={e=>onChange(parseInt(e.target.value||'0',10) || current.target)}
+        className="w-20 px-3 py-2 rounded-md border border-gray-300 bg-white text-gray-800"
+      />
+    </div>
+  );
+}

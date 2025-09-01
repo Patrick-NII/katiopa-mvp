@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { 
   Settings, 
@@ -30,7 +31,8 @@ import {
   Unlock,
   Heart,
   Brain,
-  Target
+  Target,
+  Gamepad2
 } from 'lucide-react'
 import AvatarSelector from './AvatarSelector'
 import { authAPI } from '@/lib/api'
@@ -42,6 +44,14 @@ interface SettingsTabProps {
 
 interface UserSettings {
   avatarPath: string
+  cubematch?: {
+    sound: boolean
+    diagonals: boolean
+    assistOnSelect: boolean
+    theme: 'classic' | 'ocean' | 'sunset' | 'forest'
+    operator: 'ADD' | 'SUB' | 'MUL' | 'DIV'
+    target: number
+  }
   notifications: {
     email: boolean
     push: boolean
@@ -99,7 +109,7 @@ interface UserSettings {
   }
 }
 
-type SettingsTabType = 'personalisation' | 'notifications' | 'privacy' | 'appearance' | 'accessibility' | 'learning' | 'performance'
+type SettingsTabType = 'personalisation' | 'notifications' | 'privacy' | 'appearance' | 'accessibility' | 'learning' | 'performance' | 'cubematch'
 
 export default function SettingsTab({ userType }: SettingsTabProps) {
   const { selectedAvatar, updateAvatarFromSettings } = useAvatar()
@@ -107,6 +117,14 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
   
   const [settings, setSettings] = useState<UserSettings>({
     avatarPath: '',
+    cubematch: {
+      sound: true,
+      diagonals: false,
+      assistOnSelect: true,
+      theme: 'classic',
+      operator: 'ADD',
+      target: 10,
+    },
     notifications: {
       email: true,
       push: true,
@@ -255,13 +273,16 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
   // Gérer les changements de réglages
   const updateSetting = (category: keyof UserSettings, key: string, value: any) => {
-    setSettings(prev => ({
-      ...prev,
-      [category]: {
-        ...prev[category],
-        [key]: value
+    setSettings(prev => {
+      const currentCategory = prev[category] as Record<string, any>
+      return {
+        ...prev,
+        [category]: {
+          ...currentCategory,
+          [key]: value
+        }
       }
-    }))
+    })
   }
 
   // Composant Switch personnalisé
@@ -278,7 +299,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
   }) => (
     <div className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 transition-colors">
       <div className="flex-1">
-        <label className="text-sm font-medium text-gray-100 cursor-pointer">
+        <label className="text-sm font-medium text-gray-900 cursor-pointer">
           {label}
         </label>
         {description && (
@@ -351,16 +372,103 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
     { id: 'appearance', label: 'Apparence', icon: Palette, color: 'from-orange-500 to-red-500' },
     { id: 'accessibility', label: 'Accessibilité', icon: Accessibility, color: 'from-teal-500 to-cyan-500' },
     { id: 'learning', label: 'Apprentissage', icon: Brain, color: 'from-indigo-500 to-purple-500' },
-    { id: 'performance', label: 'Performance', icon: Zap, color: 'from-yellow-500 to-orange-500' }
+    { id: 'performance', label: 'Performance', icon: Zap, color: 'from-yellow-500 to-orange-500' },
+    { id: 'cubematch', label: 'CubeMatch', icon: Gamepad2, color: 'from-emerald-500 to-blue-500' }
   ]
 
   // Rendu du contenu des onglets
   const renderTabContent = () => {
     switch (activeTab) {
+      case 'cubematch':
+        return (
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Aperçu + Bouton jouer */}
+            <div className="md:col-span-1">
+              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+                <div className="flex items-center gap-3 mb-3">
+                  <img src="/images/tabs/cubematch.svg" alt="CubeMatch" className="w-12 h-12" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">CubeMatch</h3>
+                    <p className="text-sm text-gray-600">Réglages du jeu</p>
+                  </div>
+                </div>
+                <Link href="/dashboard/mathcube/cubematch" className="inline-flex items-center justify-center w-full px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-blue-500 text-white font-medium hover:shadow-md">
+                  Jouer maintenant
+                </Link>
+              </div>
+            </div>
+            {/* Réglages */}
+            <div className="md:col-span-2">
+              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Thème</label>
+                    <select
+                      value={settings.cubematch?.theme || 'classic'}
+                      onChange={(e) => updateSetting('cubematch', 'theme', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="classic">Classic</option>
+                      <option value="ocean">Ocean</option>
+                      <option value="sunset">Sunset</option>
+                      <option value="forest">Forest</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Opérateur par défaut</label>
+                    <select
+                      value={settings.cubematch?.operator || 'ADD'}
+                      onChange={(e) => updateSetting('cubematch', 'operator', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="ADD">Addition (+)</option>
+                      <option value="SUB">Soustraction (−)</option>
+                      <option value="MUL">Multiplication (×)</option>
+                      <option value="DIV">Division (÷)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Cible</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={99}
+                      value={settings.cubematch?.target ?? 10}
+                      onChange={(e) => updateSetting('cubematch', 'target', parseInt(e.target.value || '10', 10))}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-3 gap-4">
+                  <Switch
+                    checked={!!settings.cubematch?.sound}
+                    onChange={(checked) => updateSetting('cubematch', 'sound', checked)}
+                    label="Sons du jeu"
+                    description="Activer/Désactiver les sons"
+                  />
+                  <Switch
+                    checked={!!settings.cubematch?.diagonals}
+                    onChange={(checked) => updateSetting('cubematch', 'diagonals', checked)}
+                    label="Diagonales"
+                    description="Autoriser les diagonales"
+                  />
+                  <Switch
+                    checked={!!settings.cubematch?.assistOnSelect}
+                    onChange={(checked) => updateSetting('cubematch', 'assistOnSelect', checked)}
+                    label="Aide sur sélection"
+                    description="Surligner les coups possibles"
+                  />
+                </div>
+
+                <p className="text-xs text-gray-500">Astuce: ces réglages définissent vos préférences de jeu. La partie en cours garde ses paramètres actuels.</p>
+              </div>
+            </div>
+          </div>
+        )
       case 'personalisation':
         return (
           <div className="space-y-3">
-            
             <AvatarSelector
               currentAvatar={settings.avatarPath}
               onAvatarChange={handleAvatarChange}
@@ -682,7 +790,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
                 </select>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <Switch
                   checked={settings.learning.autoSave}
                   onChange={(checked) => updateSetting('learning', 'autoSave', checked)}
@@ -776,7 +884,6 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
       
-
       {/* Padding haut */}
       <div className="h-24"></div>
 
@@ -795,7 +902,11 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
                     : 'bg-white/80 text-gray-700 hover:bg-white hover:shadow-md'
                 }`}
               >
-                <Icon className="w-5 h-5" />
+                {tab.id === 'cubematch' ? (
+                  <img src="/images/tabs/cubematch.svg" alt="CubeMatch" className="w-5 h-5" />
+                ) : (
+                  <Icon className="w-5 h-5" />
+                )}
                 <span>{tab.label}</span>
               </button>
             )

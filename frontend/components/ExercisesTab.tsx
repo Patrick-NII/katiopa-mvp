@@ -246,8 +246,7 @@ export default function ExercisesTab() {
                           
                           <div className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(activity.status)}`}>
                             {activity.status === 'en_cours' ? 'En cours' :
-                             activity.status === 'termine' ? 'Terminé' :
-                             activity.status === 'en_attente' ? 'En attente' : 'Planifié'}
+                             activity.status === 'termine' ? 'Terminé' : 'Planifié'}
                           </div>
                         </div>
                       </div>

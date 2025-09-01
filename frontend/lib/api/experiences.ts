@@ -99,20 +99,23 @@ export interface ActivityStats {
 export const gamesAPI = {
   // Récupérer tous les jeux actifs
   getAll: async (): Promise<Game[]> => {
-    const response = await apiFetch('/experiences/games')
-    return response.games
+    const response = await apiFetch('/api/experiences/games')
+    const data = await response.json()
+    return data.games || []
   },
 
   // Récupérer les jeux recommandés
   getRecommended: async (): Promise<Game[]> => {
-    const response = await apiFetch('/experiences/games/recommended')
-    return response.games
+    const response = await apiFetch('/api/experiences/games/recommended')
+    const data = await response.json()
+    return data.games || []
   },
 
   // Récupérer les top jeux par domaine
   getTopByDomain: async (domain: string): Promise<Game[]> => {
-    const response = await apiFetch(`/experiences/games/top/${domain}`)
-    return response.games
+    const response = await apiFetch(`/api/experiences/games/top/${domain}`)
+    const data = await response.json()
+    return data.games || []
   }
 }
 
@@ -120,20 +123,23 @@ export const gamesAPI = {
 export const exercisesAPI = {
   // Récupérer tous les exercices actifs
   getAll: async (): Promise<Exercise[]> => {
-    const response = await apiFetch('/experiences/exercises')
-    return response.exercises
+    const response = await apiFetch('/api/experiences/exercises')
+    const data = await response.json()
+    return data.exercises || []
   },
 
   // Récupérer les exercices recommandés
   getRecommended: async (): Promise<Exercise[]> => {
-    const response = await apiFetch('/experiences/exercises/recommended')
-    return response.exercises
+    const response = await apiFetch('/api/experiences/exercises/recommended')
+    const data = await response.json()
+    return data.exercises || []
   },
 
   // Récupérer les top exercices par domaine
   getTopByDomain: async (domain: string): Promise<Exercise[]> => {
-    const response = await apiFetch(`/experiences/exercises/top/${domain}`)
-    return response.exercises
+    const response = await apiFetch(`/api/experiences/exercises/top/${domain}`)
+    const data = await response.json()
+    return data.exercises || []
   }
 }
 
@@ -141,8 +147,9 @@ export const exercisesAPI = {
 export const scheduleAPI = {
   // Récupérer le planning de l'utilisateur
   getUserSchedule: async (): Promise<Schedule[]> => {
-    const response = await apiFetch('/experiences/schedule')
-    return response.schedules
+    const response = await apiFetch('/api/experiences/schedule')
+    const data = await response.json()
+    return data.schedules || []
   },
 
   // Créer un nouvel événement
@@ -154,11 +161,12 @@ export const scheduleAPI = {
     type: Schedule['type']
     priority?: Schedule['priority']
   }): Promise<Schedule> => {
-    const response = await apiFetch('/experiences/schedule', {
+    const response = await apiFetch('/api/experiences/schedule', {
       method: 'POST',
       body: JSON.stringify(eventData)
     })
-    return response.schedule
+    const data = await response.json()
+    return data.schedule
   }
 }
 
@@ -166,8 +174,9 @@ export const scheduleAPI = {
 export const welcomeMessageAPI = {
   // Récupérer le message d'accueil personnalisé
   getPersonalized: async (): Promise<WelcomeMessage | { content: string; messageType: string; isGenerated: boolean }> => {
-    const response = await apiFetch('/experiences/welcome-message')
-    return response.message
+    const response = await apiFetch('/api/experiences/welcome-message')
+    const data = await response.json()
+    return data.message || { content: "Bienvenue !", messageType: "greeting", isGenerated: false }
   }
 }
 
@@ -175,8 +184,9 @@ export const welcomeMessageAPI = {
 export const recommendationsAPI = {
   // Récupérer les recommandations personnalisées
   getPersonalized: async (): Promise<Recommendation[]> => {
-    const response = await apiFetch('/experiences/recommendations')
-    return response.recommendations
+    const response = await apiFetch('/api/experiences/recommendations')
+    const data = await response.json()
+    return data.recommendations || []
   }
 }
 
@@ -184,8 +194,15 @@ export const recommendationsAPI = {
 export const statsAPI = {
   // Récupérer les statistiques d'activité
   getActivityStats: async (): Promise<ActivityStats> => {
-    const response = await apiFetch('/experiences/stats/activity')
-    return response.stats
+    const response = await apiFetch('/api/experiences/stats/activity')
+    const data = await response.json()
+    return data.stats || {
+      totalActivities: 0,
+      totalDuration: 0,
+      averageScore: 0,
+      topDomains: [],
+      recentActivities: []
+    }
   }
 }
 

@@ -65,7 +65,7 @@ export function MulticolorText({
       scale: 1,
       rotate: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 100,
         damping: 10
       }
@@ -90,7 +90,7 @@ export function MulticolorText({
           whileHover={animate ? {
             scale: 1.1,
             rotate: 2,
-            transition: { type: "spring", stiffness: 300, damping: 15 }
+            transition: { type: "spring" as const, stiffness: 300, damping: 15 }
           } : {}}
           className={char === ' ' ? 'mx-1' : ''}
         >

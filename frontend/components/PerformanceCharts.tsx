@@ -22,7 +22,7 @@ interface PerformanceChartsProps {
 
 type Granularity = 'day' | 'week' | 'month' | 'quarter' | 'year'
 
-export default function PerformanceCharts({ userId, memberSince, activities }: PerformanceChartsProps) {
+export default function PerformanceCharts({ userId, memberSince, activities, summary }: PerformanceChartsProps) {
   const [selectedGranularity, setSelectedGranularity] = useState<Granularity>('month')
   const [selectedDomain, setSelectedDomain] = useState<string>('all')
 

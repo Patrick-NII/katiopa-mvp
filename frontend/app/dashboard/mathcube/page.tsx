@@ -11,8 +11,11 @@ import {
   TrendingUp,
   Brain,
   Zap,
-  Heart
+  Heart,
+  Gamepad2,
+  Play
 } from 'lucide-react'
+import Link from 'next/link'
 
 export default function MathCubePage() {
   const [currentLevel, setCurrentLevel] = useState(1)
@@ -20,53 +23,73 @@ export default function MathCubePage() {
   const [streak, setStreak] = useState(0)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      {/* En-tête MathCube */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg mb-4">
-          <BookOpen className="w-6 h-6 mr-2" />
-          <span className="font-bold text-xl">MathCube</span>
-        </div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          🧮 Mathématiques Gamifiées
-        </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Apprends les mathématiques en t'amusant ! Défie-toi avec des exercices adaptés à ton niveau.
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 relative overflow-hidden">
+      {/* Cubes flottants colorés */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Cube rouge */}
+        <div className="absolute top-20 left-10 w-16 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-lg transform rotate-12 animate-pulse opacity-60"></div>
+        
+        {/* Cube orange */}
+        <div className="absolute top-40 right-20 w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg transform -rotate-12 animate-bounce opacity-70"></div>
+        
+        {/* Cube jaune */}
+        <div className="absolute top-60 left-1/4 w-14 h-14 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg transform rotate-45 animate-pulse opacity-50"></div>
+        
+        {/* Cube vert */}
+        <div className="absolute top-80 right-1/3 w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-lg transform -rotate-45 animate-bounce opacity-80"></div>
+        
+        {/* Cube bleu */}
+        <div className="absolute top-32 left-1/2 w-18 h-18 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg transform rotate-30 animate-pulse opacity-65"></div>
+        
+        {/* Cube violet */}
+        <div className="absolute top-100 right-10 w-13 h-13 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg transform -rotate-30 animate-bounce opacity-55"></div>
+        
+        {/* Cube rose */}
+        <div className="absolute top-120 left-1/3 w-11 h-11 bg-gradient-to-br from-pink-400 to-pink-600 rounded-lg transform rotate-60 animate-pulse opacity-75"></div>
+        
+        {/* Cube cyan */}
+        <div className="absolute top-140 right-1/4 w-15 h-15 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-lg transform -rotate-60 animate-bounce opacity-60"></div>
+        
+        {/* Cube indigo */}
+        <div className="absolute top-160 left-20 w-12 h-12 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-lg transform rotate-15 animate-pulse opacity-70"></div>
       </div>
+
+      {/* Espacement */}
+      <div className="mb-20"></div>
+      
 
       {/* Statistiques rapides */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
-          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Target className="w-6 h-6 text-blue-600" />
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <Target className="w-7 h-7 text-blue-600" />
           </div>
-          <p className="text-sm font-medium text-gray-600">Niveau actuel</p>
-          <p className="text-2xl font-bold text-gray-900">{currentLevel}</p>
+          <p className="text-sm font-medium text-gray-600 mb-1">Niveau actuel</p>
+          <p className="text-3xl font-bold text-gray-900">{currentLevel}</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
-          <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Trophy className="w-6 h-6 text-green-600" />
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div className="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <Trophy className="w-7 h-7 text-green-600" />
           </div>
-          <p className="text-sm font-medium text-gray-600">Score total</p>
-          <p className="text-2xl font-bold text-gray-900">{score}</p>
+          <p className="text-sm font-medium text-gray-600 mb-1">Score total</p>
+          <p className="text-3xl font-bold text-gray-900">{score}</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
-          <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <TrendingUp className="w-6 h-6 text-orange-600" />
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <TrendingUp className="w-7 h-7 text-orange-600" />
           </div>
-          <p className="text-sm font-medium text-gray-600">Série actuelle</p>
-          <p className="text-2xl font-bold text-gray-900">{streak}</p>
+          <p className="text-sm font-medium text-gray-600 mb-1">Série actuelle</p>
+          <p className="text-3xl font-bold text-gray-900">{streak}</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
-          <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Star className="w-6 h-6 text-purple-600" />
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <Star className="w-7 h-7 text-purple-600" />
           </div>
-          <p className="text-sm font-medium text-gray-600">Étoiles</p>
-          <p className="text-2xl font-bold text-gray-900">⭐⭐⭐</p>
+          <p className="text-sm font-medium text-gray-600 mb-1">Étoiles</p>
+          <p className="text-3xl font-bold text-gray-900">⭐⭐⭐</p>
         </div>
       </div>
 
@@ -127,7 +150,131 @@ export default function MathCubePage() {
         </div>
       </div>
 
-      {/* Défis quotidiens */}
+      {/* Jeu CubeMatch - Section spéciale avec effet gloss */}
+      <div className="relative">
+        {/* Effet de brillance/gloss */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-y-6 -translate-y-20 pointer-events-none"></div>
+        
+        <div className="relative bg-gradient-to-r from-emerald-50 to-blue-50 rounded-3xl p-8 shadow-2xl border border-emerald-200 mb-8 backdrop-blur-sm">
+          {/* Effet de reflet */}
+          <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-3xl pointer-events-none"></div>
+          
+          {/* Contenu principal */}
+          <div className="relative z-10">
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-6 transition-transform duration-300">
+                <Gamepad2 className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900 bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
+                  🎮 CubeMatch
+                </h2>
+                <p className="text-gray-600 text-lg">Le jeu de calcul le plus amusant !</p>
+              </div>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Description du jeu */}
+              <div className="space-y-6">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-lg flex items-center justify-center">
+                      <img src="/images/tabs/cubematch.svg" alt="CubeMatch" className="w-5 h-5" />
+                    </div>
+                    Comment jouer
+                  </h3>
+                  <ul className="space-y-3 text-sm text-gray-700">
+                    <li className="flex items-start gap-3">
+                      <span className="w-3 h-3 bg-emerald-500 rounded-full mt-2 flex-shrink-0 shadow-sm"></span>
+                      Sélectionne des cases adjacentes pour former des calculs
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="w-3 h-3 bg-emerald-500 rounded-full mt-2 flex-shrink-0 shadow-sm"></span>
+                      Atteins la cible pour marquer des points
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="w-3 h-3 bg-emerald-500 rounded-full mt-2 flex-shrink-0 shadow-sm"></span>
+                      Plus tu vas vite, plus tu gagnes de points !
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="w-3 h-3 bg-emerald-500 rounded-full mt-2 flex-shrink-0 shadow-sm"></span>
+                      Monte en niveau et débloque de nouveaux défis
+                    </li>
+                  </ul>
+                </div>
+                
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">🎯 Objectifs pédagogiques</h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                      <Calculator className="w-5 h-5 text-blue-600" />
+                      <span className="font-medium">Calcul mental</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                      <Target className="w-5 h-5 text-green-600" />
+                      <span className="font-medium">Stratégie</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
+                      <Clock className="w-5 h-5 text-orange-600" />
+                      <span className="font-medium">Rapidité</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
+                      <Brain className="w-5 h-5 text-purple-600" />
+                      <span className="font-medium">Logique</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Statistiques et bouton de jeu */}
+              <div className="space-y-6">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-6">📊 Mes statistiques</h3>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="text-center p-4 bg-emerald-50 rounded-xl">
+                      <div className="text-3xl font-bold text-emerald-600">1,247</div>
+                      <div className="text-sm text-gray-600 font-medium">Score total</div>
+                    </div>
+                    <div className="text-center p-4 bg-blue-50 rounded-xl">
+                      <div className="text-3xl font-bold text-blue-600">8</div>
+                      <div className="text-sm text-gray-600 font-medium">Niveau atteint</div>
+                    </div>
+                    <div className="text-center p-4 bg-orange-50 rounded-xl">
+                      <div className="text-3xl font-bold text-orange-600">156</div>
+                      <div className="text-sm text-gray-600 font-medium">Parties jouées</div>
+                    </div>
+                    <div className="text-center p-4 bg-purple-50 rounded-xl">
+                      <div className="text-3xl font-bold text-purple-600">23</div>
+                      <div className="text-sm text-gray-600 font-medium">Série max</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-gradient-to-r from-emerald-500 to-blue-500 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
+                  {/* Effet de brillance sur le bouton */}
+                  <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent rounded-t-2xl"></div>
+                  
+                  <div className="relative z-10">
+                    <h3 className="text-2xl font-bold mb-4">🚀 Prêt à jouer ?</h3>
+                    <p className="text-emerald-100 mb-6 text-lg">
+                      Défie tes limites et améliore tes compétences en calcul mental !
+                    </p>
+                    <Link 
+                      href="/dashboard/mathcube/cubematch" 
+                      className="inline-flex items-center justify-center w-full px-8 py-4 bg-white text-emerald-600 rounded-xl font-bold text-lg hover:bg-gray-50 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                    >
+                      <Play className="w-6 h-6 mr-3" />
+                      Jouer maintenant
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Défis quotidiens 
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
         <div className="flex items-center space-x-3 mb-6">
           <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
@@ -137,11 +284,12 @@ export default function MathCubePage() {
         </div>
         
         <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-6 border border-orange-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">
-            🎯 Défi spécial : Série de calculs rapides
+          <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <img src="/images/tabs/cubematch.svg" alt="CubeMatch" className="w-6 h-6" />
+            🎯 Défi CubeMatch : Série de calculs rapides
           </h3>
           <p className="text-gray-700 mb-4">
-            Résous 10 calculs en moins de 2 minutes et gagne des points bonus !
+            Résous 10 calculs en moins de 2 minutes dans CubeMatch et gagne des points bonus !
           </p>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
@@ -153,11 +301,12 @@ export default function MathCubePage() {
               <span className="text-sm text-gray-600">Bonus: +50 points</span>
             </div>
           </div>
-          <button className="mt-4 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-medium hover:shadow-lg transition-shadow">
+          <Link href="/dashboard/mathcube/cubematch" className="mt-4 inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-medium hover:shadow-lg transition-shadow">
+            <Play className="w-5 h-5 mr-2" />
             🚀 Commencer le défi
-          </button>
+          </Link>
         </div>
-      </div>
+      </div>*/}
 
       {/* Récompenses et badges */}
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
