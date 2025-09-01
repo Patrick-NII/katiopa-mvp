@@ -627,6 +627,14 @@ app.get('/api/stats/summary', async (req, res) => {
   }
 });
 
+// ===== ROUTES CUBEMATCH =====
+import cubematchRouter from './routes/cubematch';
+app.use('/api/cubematch', cubematchRouter);
+
+// ===== ROUTES EXPERIENCES =====
+import experiencesRouter from './routes/experiences';
+app.use('/api/experiences', experiencesRouter);
+
 // ===== GESTION DES ERREURS =====
 
 // 404 handler

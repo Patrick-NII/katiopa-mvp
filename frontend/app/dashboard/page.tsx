@@ -172,9 +172,25 @@ export default function DashboardPage() {
 
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardTab user={user} summary={summary} />;
+        return <DashboardTab 
+          user={user} 
+          activities={[]}
+          summary={summary}
+          llmResponse={null}
+          loading={false}
+          focus=""
+          onFocusChange={() => {}}
+          onEvaluateLLM={() => {}}
+          onExerciseSelect={() => {}}
+          onSendChatMessage={() => {}}
+          chatResponse=""
+          chatLoading={false}
+          chatHistory={[]}
+          onLoadChatHistory={() => {}}
+          subscriptionType={(user?.subscriptionType as 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE') || 'FREE'}
+        />;
       case 'statistiques':
-        return <StatisticsTab user={user} summary={summary} />;
+        return <StatisticsTab user={user} activities={[]} summary={summary} />;
       case 'experiences':
         return <CubeAIExperiencesTab
           userType={user?.userType as 'CHILD' | 'PARENT'}
@@ -199,7 +215,7 @@ export default function DashboardPage() {
       case 'abonnements':
         return <SubscriptionTab user={user} />;
       case 'family-members':
-        return <FamilyMembersTab user={user} />;
+        return <FamilyMembersTab />;
       case 'facturation':
         return <BillingTab user={user} />;
       case 'reglages':
@@ -207,7 +223,23 @@ export default function DashboardPage() {
       case 'aide':
         return <div className="p-6">Page d'aide et support</div>;
       default:
-        return <DashboardTab user={user} summary={summary} />;
+        return <DashboardTab 
+          user={user} 
+          activities={[]}
+          summary={summary}
+          llmResponse={null}
+          loading={false}
+          focus=""
+          onFocusChange={() => {}}
+          onEvaluateLLM={() => {}}
+          onExerciseSelect={() => {}}
+          onSendChatMessage={() => {}}
+          chatResponse=""
+          chatLoading={false}
+          chatHistory={[]}
+          onLoadChatHistory={() => {}}
+          subscriptionType={(user?.subscriptionType as 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE') || 'FREE'}
+        />;
     }
   };
 

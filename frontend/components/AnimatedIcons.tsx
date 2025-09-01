@@ -1,4 +1,6 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+import { Crown, Star, Trophy, Rocket, Sparkles } from 'lucide-react';
 
 interface AnimatedIconProps {
   type: 'gift' | 'star' | 'crown' | 'home' | 'cube';
