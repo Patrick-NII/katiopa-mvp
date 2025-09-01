@@ -2,6 +2,7 @@
 
 import { ReactNode } from "react"
 import { usePathname } from "next/navigation"
+import InactivityManager from "./InactivityManager"
 
 type Props = {
   children: ReactNode
@@ -13,6 +14,10 @@ export default function ClientRouteWrapper({ children }: Props) {
   const pathname = usePathname()
   const isHome = pathname === "/"
 
-  return <div className={isHome ? undefined : "fredoka-scope"}>{children}</div>
+  return (
+    <div className={isHome ? undefined : "fredoka-scope"}>
+      <InactivityManager />
+      {children}
+    </div>
+  )
 }
-

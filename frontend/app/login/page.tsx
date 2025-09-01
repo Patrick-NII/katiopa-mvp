@@ -8,6 +8,7 @@ import { authAPI } from '@/lib/api';
 import { CubeAILogo } from '@/components/MulticolorText';
 import AnimatedIcon from '@/components/AnimatedIcons';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 export default function LoginPage() {
   const [sessionId, setSessionId] = useState('');
@@ -16,6 +17,9 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  useEffect(() => {
+    try { localStorage.setItem('cubeai:auth', 'check:' + Date.now()); } catch {}
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
