@@ -1,11 +1,31 @@
 'use client'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { MulticolorText, CubeAILogo, AnimatedMulticolorText } from '@/components/MulticolorText'
 import ChatbotWrapper from '@/components/chatbot/ChatbotWrapper'
 import AnimatedIcon from '@/components/AnimatedIcons'
+import { authAPI } from '@/lib/api'
 
 export default function HomePage() {
+  const router = useRouter()
+  const [user, setUser] = useState<any>(null)
+  useEffect(() => {
+    let mounted = true
+    authAPI.verify().then(res => {
+      if (mounted && res?.success) setUser(res.user)
+    }).catch(() => {})
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'cubeai:auth') {
+        authAPI.verify().then(res => {
+          if (mounted) setUser(res?.success ? res.user : null)
+        }).catch(() => { if (mounted) setUser(null) })
+      }
+    }
+    window.addEventListener('storage', onStorage)
+    return () => { mounted = false; window.removeEventListener('storage', onStorage) }
+  }, [])
   const plans = [
     {
       name: 'Starter',
@@ -84,12 +104,32 @@ export default function HomePage() {
               <CubeAILogo className="text-4xl" />
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/login" className="font-body text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100">
-                Connexion
-              </Link>
-              <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
-                Commencer gratuitement
-              </Link>
+              {user ? (
+                <>
+                  <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-white/70 border border-green-200 text-sm font-medium text-green-700">
+                    <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>
+                    En ligne
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white flex items-center justify-center font-bold">
+                    {user.firstName?.charAt(0) || user.sessionId?.charAt(0) || 'U'}
+                  </div>
+                  <button
+                    onClick={async () => { try { await authAPI.logout(); localStorage.setItem('cubeai:auth', 'logged_out:' + Date.now()); router.push('/login'); } catch {} }}
+                    className="font-button bg-red-50 text-red-700 hover:bg-red-100 px-4 py-2 rounded-lg text-sm font-medium border border-red-200"
+                  >
+                    Se déconnecter
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" className="font-body text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100">
+                    Connexion
+                  </Link>
+                  <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                    Commencer gratuitement
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
