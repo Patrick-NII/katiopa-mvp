@@ -153,9 +153,9 @@ export default function MathCubePage() {
               <span className="text-sm text-gray-600">Bonus: +50 points</span>
             </div>
           </div>
-          <a href="/dashboard/mathcube/cubematch" className="inline-block mt-4 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-medium hover:shadow-lg transition-shadow">
+          <button className="mt-4 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-medium hover:shadow-lg transition-shadow">
             🚀 Commencer le défi
-          </a>
+          </button>
         </div>
       </div>
 
