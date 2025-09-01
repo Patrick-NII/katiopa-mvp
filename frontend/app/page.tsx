@@ -106,9 +106,29 @@ export default function HomePage() {
             <div className="flex items-center space-x-4">
               {user ? (
                 <>
-                  <div className="flex items-center gap-2 text-sm font-medium text-green-700">
-                    <span className="font-mono text-xs text-gray-900">{user.sessionId}</span>
-                    <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <div className="flex items-center">
+                      <span className="font-title text-xl font-bold multicolor-id">
+                        {user.sessionId.split('').map((char: string, index: number) => (
+                          <span
+                            key={index}
+                            className="inline-block"
+                            style={{
+                              color: [
+                                '#3B82F6', // sky blue
+                                '#8B5CF6', // soft violet
+                                '#EC4899', // raspberry pink
+                                '#10B981', // mint green
+                                '#F59E0B'  // peach orange
+                              ][index % 5]
+                            }}
+                          >
+                            {char}
+                          </span>
+                        ))}
+                      </span>
+                      <span className="inline-block w-2 h-2 rounded-full bg-green-500 ml-2"></span>
+                    </div>
                   </div>
                   <button
                     onClick={async () => { try { await authAPI.logout(); localStorage.setItem('cubeai:auth', 'logged_out:' + Date.now()); router.push('/login'); } catch {} }}
