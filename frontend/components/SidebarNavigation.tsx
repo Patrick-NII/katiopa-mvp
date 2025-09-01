@@ -17,7 +17,8 @@ import {
   Target,
   TrendingUp,
   Users,
-  LogOut
+  LogOut,
+  Box
 } from 'lucide-react'
 import AnimatedIcon from './AnimatedIcons'
 import { CubeAILogo } from '@/components/MulticolorText'
@@ -54,15 +55,21 @@ interface TabItem {
   badge?: string
 }
 
-// Composant personnalisé pour l'icône cube
-const CubeIcon = ({ size = 18, className = "" }) => {
+// Composant personnalisé pour l'icône cube 3D
+const Cube3DIcon = ({ size = 18, className = "" }) => {
   return (
-    <div className={className}>
-      <img 
-        src="/icons/cube-icon.svg" 
-        alt="Cube icon"
-        style={{ width: size, height: size }}
-      />
+    <div className={`${className} relative`} style={{ width: size, height: size }}>
+      {/* Cube 3D avec ombre et perspective */}
+      <div className="relative w-full h-full transform rotate-45">
+        {/* Face avant */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-sm shadow-lg"></div>
+        {/* Face droite */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-blue-700 rounded-sm shadow-lg transform rotate-y-90 translate-x-1/2 origin-left"></div>
+        {/* Face supérieure */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 rounded-sm shadow-lg transform rotate-x-90 translate-y-1/2 origin-top"></div>
+        {/* Ombre portée */}
+        <div className="absolute inset-0 bg-gray-800 rounded-sm transform translate-x-1 translate-y-1 opacity-30"></div>
+      </div>
     </div>
   );
 };
@@ -117,7 +124,7 @@ export default function SidebarNavigation({
     {
       id: 'experiences',
       label: 'Expériences',
-      icon: CubeIcon,
+      icon: Cube3DIcon,
       description: 'Toutes les fonctionnalités CubeAI',
       available: true // Tous les utilisateurs ont accès aux expériences
     },
@@ -243,7 +250,11 @@ export default function SidebarNavigation({
                 aria-label={tab.label}
               >
                 <div className={`${activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700'} w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0`}>
-                  <tab.icon size={20} />
+                  {tab.icon === Cube3DIcon ? (
+                    <Cube3DIcon size={20} />
+                  ) : (
+                    <tab.icon size={20} />
+                  )}
                 </div>
                 {!collapsed && (
                   <span className="flex-1 text-left font-semibold">{tab.label}</span>
