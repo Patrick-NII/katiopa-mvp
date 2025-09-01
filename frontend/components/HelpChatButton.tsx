@@ -29,7 +29,7 @@ export default function HelpChatButton() {
     {
       id: '1',
       type: 'assistant',
-      content: 'Bonjour ! Je suis votre assistant Katiopa. Comment puis-je vous aider aujourd\'hui ?',
+      content: 'Bonjour ! Je suis votre assistant IA CubeAI. Comment puis-je vous aider aujourd\'hui ?',
       timestamp: new Date()
     }
   ])

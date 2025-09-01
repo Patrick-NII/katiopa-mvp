@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { User, Lock, Eye, EyeOff, ArrowRight, User as UserIcon } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, ArrowRight, User as UserIcon, LogOut } from 'lucide-react';
 import { authAPI } from '@/lib/api';
 import { CubeAILogo } from '@/components/MulticolorText';
 import AnimatedIcon from '@/components/AnimatedIcons';
@@ -113,10 +113,11 @@ export default function LoginPage() {
                     }}
                     title="Se déconnecter"
                     aria-label="Se déconnecter"
-                    className="px-2 py-2 rounded-lg text-xl transition transform hover:rotate-12 hover:scale-110"
+                    className="p-2 rounded-lg text-gray-700 hover:text-red-600 transition transform hover:rotate-12 hover:scale-110"
                   >
-                    🚪
+                    <LogOut className="w-5 h-5" />
                   </button>
+                  <a href="/dashboard" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 py-2 rounded-lg text-sm font-medium">Espace personnel</a>
                 </>
               ) : (
                 <>

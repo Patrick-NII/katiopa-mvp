@@ -797,7 +797,6 @@ const SummarySidebar = () => {
                     <span className="font-mono text-xs text-green-800">{navUser.sessionId}</span>
                     <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>
                   </div>
-                  <a href="/dashboard" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 py-2 rounded-lg text-sm font-medium">Espace personnel</a>
                   <button
                     onClick={async () => { try { await authAPI.logout(); localStorage.setItem('cubeai:auth', 'logged_out:' + Date.now()); setNavUser(null); router.push('/login'); } catch {} }}
                     title="Se déconnecter"
