@@ -130,12 +130,15 @@ export default function HomePage() {
                       <span className="inline-block w-2 h-2 rounded-full bg-green-500 ml-2"></span>
                     </div>
                   </div>
+                  <a href="/dashboard" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 py-2 rounded-lg text-sm font-medium">Espace personnel</a>
+
                   <button
                     onClick={async () => { try { await authAPI.logout(); localStorage.setItem('cubeai:auth', 'logged_out:' + Date.now()); router.push('/login'); } catch {} }}
                     title="Se déconnecter"
                     aria-label="Se déconnecter"
                     className="p-2 rounded-lg text-gray-700 hover:text-red-600 transition-all duration-300 hover:bg-red-50 hover:scale-110"
                   >
+                    
                     {/* Icône de déconnexion moderne */}
                     <svg 
                       className="w-5 h-5" 
@@ -152,10 +155,17 @@ export default function HomePage() {
                       />
                     </svg>
                   </button>
-                  <a href="/dashboard" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 py-2 rounded-lg text-sm font-medium">Espace personnel</a>
                 </>
               ) : (
                 <>
+                <div className="flex items-center space-x-4">
+              <Link href="/login" className="font-body text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100">
+                Connexion
+              </Link>
+              <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                Commencer gratuitement
+              </Link>
+            </div>
                   
                 </>
               )}

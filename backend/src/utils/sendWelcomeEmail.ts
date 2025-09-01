@@ -38,17 +38,21 @@ export async function sendWelcomeEmail(data: WelcomeEmailData) {
     }
   };
 
-  // Générer la liste des identifiants de connexion
+  // Générer la liste des identifiants de connexion avec les vrais mots de passe
   const generateLoginCredentials = () => {
     return createdSessions.map(session => {
       const member = familyMembers.find(m => 
         m.firstName === session.firstName && m.lastName === session.lastName
       );
+      
+      // Utiliser le vrai mot de passe du membre ou un mot de passe par défaut
+      const password = member?.sessionPassword || `${session.firstName.toLowerCase()}123`;
+      
       return {
         name: `${session.firstName} ${session.lastName}`,
         type: session.userType === 'PARENT' ? 'Parent' : 'Enfant',
         sessionId: session.sessionId,
-        password: member?.sessionPassword || `${session.firstName.toLowerCase()}123`
+        password: password
       };
     });
   };
@@ -154,6 +158,13 @@ export async function sendWelcomeEmail(data: WelcomeEmailData) {
             border-left: 4px solid #f59e0b;
             margin: 20px 0;
         }
+        .important {
+            background: #fee2e2;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #ef4444;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -188,8 +199,13 @@ export async function sendWelcomeEmail(data: WelcomeEmailData) {
             `).join('')}
         </div>
         
-        <div class="highlight">
-            <strong>💡 Conseil de sécurité :</strong> Nous vous recommandons de changer les mots de passe par défaut après votre première connexion.
+        <div class="important">
+            <strong>🔒 Sécurité importante :</strong> 
+            <ul style="margin: 10px 0; padding-left: 20px;">
+                <li>Conservez ces identifiants en lieu sûr</li>
+                <li>Ne partagez jamais vos mots de passe</li>
+                <li>Vous pouvez changer vos mots de passe depuis votre espace personnel</li>
+            </ul>
         </div>
         
         <div style="text-align: center;">
@@ -241,7 +257,8 @@ export async function sendWelcomeEmail(data: WelcomeEmailData) {
     console.log('📧 Email de bienvenue envoyé avec succès:', {
       messageId: info.messageId,
       to: toEmail,
-      registrationId
+      registrationId,
+      membersCount: credentials.length
     });
     return { success: true, messageId: info.messageId };
   } catch (error) {
