@@ -25,7 +25,7 @@ interface UserInfo {
 async function verifyAuthServerSide(): Promise<UserInfo | null> {
   try {
     const cookieStore = await cookies()
-    const token = cookieStore.get('accessToken')?.value
+               const token = cookieStore.get('authToken')?.value
 
     if (!token) {
       console.log('❌ Pas de token trouvé')
