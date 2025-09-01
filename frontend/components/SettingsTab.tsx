@@ -99,11 +99,11 @@ interface UserSettings {
   }
 }
 
-type SettingsTabType = 'avatar' | 'notifications' | 'privacy' | 'appearance' | 'accessibility' | 'learning' | 'performance'
+type SettingsTabType = 'personalisation' | 'notifications' | 'privacy' | 'appearance' | 'accessibility' | 'learning' | 'performance'
 
 export default function SettingsTab({ userType }: SettingsTabProps) {
   const { selectedAvatar, updateAvatarFromSettings } = useAvatar()
-  const [activeTab, setActiveTab] = useState<SettingsTabType>('avatar')
+  const [activeTab, setActiveTab] = useState<SettingsTabType>('personalisation')
   
   const [settings, setSettings] = useState<UserSettings>({
     avatarPath: '',
@@ -278,7 +278,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
   }) => (
     <div className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 transition-colors">
       <div className="flex-1">
-        <label className="text-sm font-medium text-gray-900 cursor-pointer">
+        <label className="text-sm font-medium text-gray-100 cursor-pointer">
           {label}
         </label>
         {description && (
@@ -345,7 +345,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
   // Configuration des onglets
   const tabs = [
-    { id: 'avatar', label: 'Avatar', icon: User, color: 'from-purple-500 to-pink-500' },
+    { id: 'personalisation', label: 'Personalisation', icon: User, color: 'from-purple-500 to-pink-500' },
     { id: 'notifications', label: 'Notifications', icon: Bell, color: 'from-blue-500 to-indigo-500' },
     { id: 'privacy', label: 'Confidentialité', icon: Shield, color: 'from-green-500 to-emerald-500' },
     { id: 'appearance', label: 'Apparence', icon: Palette, color: 'from-orange-500 to-red-500' },
@@ -357,13 +357,10 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
   // Rendu du contenu des onglets
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'avatar':
+      case 'personalisation':
         return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Personnalisation de l'avatar</h2>
-              <p className="text-gray-600">Choisis l'avatar qui te représente le mieux</p>
-            </div>
+          <div className="space-y-3">
+            
             <AvatarSelector
               currentAvatar={settings.avatarPath}
               onAvatarChange={handleAvatarChange}
@@ -374,12 +371,8 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
       case 'notifications':
         return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Gestion des notifications</h2>
-              <p className="text-gray-600">Configure tes préférences de notifications</p>
-            </div>
-            <div className="space-y-3">
+          <div className="space-y-3">
+            <div className="space-y-2">
               <Switch
                 checked={settings.notifications.email}
                 onChange={(checked) => updateSetting('notifications', 'email', checked)}
@@ -428,12 +421,8 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
       case 'privacy':
         return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Contrôle de la confidentialité</h2>
-              <p className="text-gray-600">Gère qui peut voir tes informations et activités</p>
-            </div>
-            <div className="space-y-3">
+          <div className="space-y-3">
+            <div className="space-y-2">
               <Switch
                 checked={settings.privacy.profileVisible}
                 onChange={(checked) => updateSetting('privacy', 'profileVisible', checked)}
@@ -476,12 +465,8 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
       case 'appearance':
         return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Personnalisation de l'apparence</h2>
-              <p className="text-gray-600">Adapte l'interface à tes préférences visuelles</p>
-            </div>
-            <div className="space-y-6">
+          <div className="space-y-3">
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Thème
@@ -611,12 +596,8 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
       case 'accessibility':
         return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Options d'accessibilité</h2>
-              <p className="text-gray-600">Adapte l'interface à tes besoins d'accessibilité</p>
-            </div>
-            <div className="space-y-3">
+          <div className="space-y-3">
+            <div className="space-y-2">
               <Switch
                 checked={settings.accessibility.screenReader}
                 onChange={(checked) => updateSetting('accessibility', 'screenReader', checked)}
@@ -683,12 +664,8 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
       case 'learning':
         return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Préférences d'apprentissage</h2>
-              <p className="text-gray-600">Personnalise ton expérience d'apprentissage</p>
-            </div>
-            <div className="space-y-6">
+          <div className="space-y-3">
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Niveau de difficulté
@@ -755,12 +732,8 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
       case 'performance':
         return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Optimisation des performances</h2>
-              <p className="text-gray-600">Configure les paramètres de performance de l'application</p>
-            </div>
-            <div className="space-y-3">
+          <div className="space-y-3">
+            <div className="space-y-2">
               <Switch
                 checked={settings.performance.autoOptimize}
                 onChange={(checked) => updateSetting('performance', 'autoOptimize', checked)}
@@ -802,18 +775,32 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
-      {/* En-tête des réglages */}
-      <div className="text-center mb-8">
-        <div className={`inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r ${colors.gradient} text-white shadow-lg mb-4`}>
-          <Settings className="w-6 h-6 mr-2" />
-          <span className="font-bold text-xl">Réglages</span>
+      
+
+      {/* Padding haut */}
+      <div className="h-24"></div>
+
+      {/* Navigation par onglets */}
+      <div className="max-w-8xl mx-auto mb-8">
+        <div className="flex flex-wrap justify-center gap-2">
+          {tabs.map((tab) => {
+            const Icon = tab.icon
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as SettingsTabType)}
+                className={`flex items-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                  activeTab === tab.id
+                    ? `bg-gradient-to-r ${tab.color} text-white shadow-lg transform scale-105`
+                    : 'bg-white/80 text-gray-700 hover:bg-white hover:shadow-md'
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span>{tab.label}</span>
+              </button>
+            )
+          })}
         </div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          ⚙️ Configuration & Personnalisation
-        </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Personnalise ton expérience CubeAI selon tes préférences et besoins.
-        </p>
       </div>
 
       {/* Bouton de sauvegarde */}
@@ -837,37 +824,14 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
         </button>
       </div>
 
-      {/* Navigation par onglets */}
-      <div className="max-w-6xl mx-auto mb-8">
-        <div className="flex flex-wrap justify-center gap-2">
-          {tabs.map((tab) => {
-            const Icon = tab.icon
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as SettingsTabType)}
-                className={`flex items-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? `bg-gradient-to-r ${tab.color} text-white shadow-lg transform scale-105`
-                    : 'bg-white/80 text-gray-700 hover:bg-white hover:shadow-md'
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span>{tab.label}</span>
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Contenu de l'onglet actif */}
-      <div className="max-w-4xl mx-auto">
+      {/* Contenu de l'onglet actif avec espaces réduits */}
+      <div className="max-w-6xl mx-auto px-8 space-y-3">
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="p-8 rounded-2xl"
+          className="p-4 rounded-2xl"
         >
           {renderTabContent()}
         </motion.div>
