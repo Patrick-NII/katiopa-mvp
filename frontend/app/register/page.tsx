@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { authAPI } from '@/lib/api'
-import { CubeAILogo } from '@/components/MulticolorText'
+import Navbar from '@/components/Navbar'
 import Image from 'next/image'
 
 /* ----------------------------- Types & helpers ---------------------------- */
@@ -100,7 +100,6 @@ export default function RegisterPage() {
 
   const [promoStatus, setPromoStatus] = useState<'applied' | 'invalid' | null>(null)
   const [promoDiscountPct, setPromoDiscountPct] = useState<number>(0)
-  const [navUser, setNavUser] = useState<any>(null)
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle')
   const [usernameHelper, setUsernameHelper] = useState('')
   const [childUsernameStatus, setChildUsernameStatus] = useState<Record<number, { status: 'idle' | 'checking' | 'available' | 'taken', helper: string }>>({})
@@ -230,22 +229,7 @@ export default function RegisterPage() {
 
   const selectedPlan = subscriptionPlans.find(p => p.id === formData.subscriptionType)!
 
-  // État connexion pour la nav (en ligne + avatar + déconnexion)
-  useEffect(() => {
-    let mounted = true
-    authAPI.verify().then(res => {
-      if (mounted && res?.success) setNavUser(res.user)
-    }).catch(() => {})
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === 'cubeai:auth') {
-        authAPI.verify().then(res => {
-          if (mounted) setNavUser(res?.success ? res.user : null)
-        }).catch(() => { if (mounted) setNavUser(null) })
-      }
-    }
-    window.addEventListener('storage', onStorage)
-    return () => { mounted = false; window.removeEventListener('storage', onStorage) }
-  }, [])
+
 
   /* -------------------------- Handlers & Validations ------------------------ */
 
@@ -781,45 +765,7 @@ const SummarySidebar = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Navigation */}
-      <nav className="bg-white/20 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6">
-          <div className="flex justify-between items-center h-14 lg:h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="font-title text-white text-2xl">C</span>
-              </div>
-              <CubeAILogo className="text-3xl lg:text-4xl" />
-            </div>
-            <div className="flex items-center space-x-3 lg:space-x-4">
-              {navUser ? (
-                <>
-                  <div className="flex items-center gap-2 text-sm font-medium text-green-700">
-                    <span className="font-mono text-xs text-gray-900">{navUser.sessionId}</span>
-                    <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>
-                  </div>
-                  <button
-                    onClick={async () => { try { await authAPI.logout(); localStorage.setItem('cubeai:auth', 'logged_out:' + Date.now()); setNavUser(null); router.push('/login'); } catch {} }}
-                    title="Se déconnecter"
-                    aria-label="Se déconnecter"
-                    className="px-2 py-2 rounded-lg text-xl transition transform hover:rotate-12 hover:scale-110"
-                  >
-                    🚪
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link href="/" className="font-body text-gray-600 hover:text-gray-900 px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100 !text-gray-600 hover:!text-gray-900">
-                    Accueil
-                  </Link>
-                  <Link href="/login" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 lg:px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
-                    Se connecter
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Main */}
       <div className="w-full">
