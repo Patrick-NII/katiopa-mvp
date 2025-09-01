@@ -49,7 +49,7 @@ export default function UserHeader({ userType, subscriptionType }: UserHeaderPro
       '/avatar/C680597F-C476-47A3-8AFD-5BF7480AB18F_1_105_c.jpeg',
       '/avatar/9032E0D4-24CB-43FF-A828-D73BACF6A2CB_1_105_c.jpeg',
       '/avatar/AFABF252-DC83-4CB8-96FD-F93E4848144F_1_105_c.jpeg',
-      '/avatar/630F22-5A32-4B9D-89F2-BE41C6D06047_1_105_c.jpeg',
+      '/avatar/630F3A22-5A32-4B9D-89F2-BE41C6D06047_1_105_c.jpeg',
       '/avatar/B651627E-16E8-4B38-964C-52AC717EA8A6_1_105_c.jpeg',
       '/avatar/4585039E-FE54-402B-967A-49505261DCCA_1_105_c.jpeg',
       '/avatar/46634418-D597-4138-A12C-ED6DB610C8BD_1_105_c.jpeg',
@@ -121,7 +121,7 @@ export default function UserHeader({ userType, subscriptionType }: UserHeaderPro
   return (
     <div className="fixed top-4 right-4 z-50">
       <motion.div
-        className="flex items-center space-x-3 p-3 rounded-2xl bg-white/90 backdrop-blur-sm shadow-lg border border-gray-200"
+        className="flex items-center space-x-3 p-3"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.3 }}

@@ -94,7 +94,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
     if (selectedAvatar && selectedAvatar !== settings.avatarPath) {
       setSettings(prev => ({ ...prev, avatarPath: selectedAvatar }))
     }
-  }, [selectedAvatar])
+  }, [selectedAvatar, settings.avatarPath])
 
   // Sauvegarder les réglages
   const saveSettings = async () => {
@@ -120,9 +120,11 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
   // Gérer le changement d'avatar
   const handleAvatarChange = (avatarPath: string) => {
-    setSettings(prev => ({ ...prev, avatarPath }))
-    // Mettre à jour le contexte global immédiatement
-    updateAvatarFromSettings(avatarPath)
+    if (avatarPath && avatarPath.trim() !== '') {
+      setSettings(prev => ({ ...prev, avatarPath }))
+      // Mettre à jour le contexte global immédiatement
+      updateAvatarFromSettings(avatarPath)
+    }
   }
 
   // Gérer les changements de réglages
