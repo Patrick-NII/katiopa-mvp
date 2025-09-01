@@ -10,7 +10,27 @@ import {
   Palette, 
   Globe,
   Save,
-  CheckCircle
+  CheckCircle,
+  Eye,
+  EyeOff,
+  Volume2,
+  VolumeX,
+  Sun,
+  Moon,
+  Monitor,
+  Languages,
+  Type,
+  Accessibility,
+  Zap,
+  Smartphone,
+  Mail,
+  Calendar,
+  Users,
+  Lock,
+  Unlock,
+  Heart,
+  Brain,
+  Target
 } from 'lucide-react'
 import AvatarSelector from './AvatarSelector'
 import { authAPI } from '@/lib/api'
@@ -27,21 +47,55 @@ interface UserSettings {
     push: boolean
     daily: boolean
     weekly: boolean
+    achievements: boolean
+    reminders: boolean
+    social: boolean
   }
   privacy: {
     profileVisible: boolean
     activityVisible: boolean
     allowMessages: boolean
+    showProgress: boolean
+    shareStats: boolean
+    allowFriendRequests: boolean
   }
   appearance: {
     theme: 'light' | 'dark' | 'auto'
     language: 'fr' | 'en' | 'es'
     fontSize: 'small' | 'medium' | 'large'
+    colorBlind: boolean
+    highContrast: boolean
+    reduceAnimations: boolean
+    compactMode: boolean
   }
   accessibility: {
-    highContrast: boolean
-    reduceMotion: boolean
     screenReader: boolean
+    keyboardNavigation: boolean
+    voiceCommands: boolean
+    textToSpeech: boolean
+    audioDescriptions: boolean
+    focusIndicators: boolean
+    motionReduction: boolean
+    colorBlindSupport: boolean
+    dyslexiaFriendly: boolean
+    largeCursors: boolean
+  }
+  learning: {
+    difficulty: 'easy' | 'medium' | 'hard' | 'adaptive'
+    autoSave: boolean
+    hints: boolean
+    explanations: boolean
+    practiceMode: boolean
+    timeLimit: boolean
+    soundEffects: boolean
+    backgroundMusic: boolean
+  }
+  performance: {
+    autoOptimize: boolean
+    cacheData: boolean
+    preloadContent: boolean
+    lowBandwidth: boolean
+    offlineMode: boolean
   }
 }
 
@@ -54,22 +108,56 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
       email: true,
       push: true,
       daily: false,
-      weekly: true
+      weekly: true,
+      achievements: true,
+      reminders: true,
+      social: false
     },
     privacy: {
       profileVisible: true,
       activityVisible: true,
-      allowMessages: true
+      allowMessages: true,
+      showProgress: true,
+      shareStats: false,
+      allowFriendRequests: true
     },
     appearance: {
       theme: 'auto',
       language: 'fr',
-      fontSize: 'medium'
+      fontSize: 'medium',
+      colorBlind: false,
+      highContrast: false,
+      reduceAnimations: false,
+      compactMode: false
     },
     accessibility: {
-      highContrast: false,
-      reduceMotion: false,
-      screenReader: false
+      screenReader: false,
+      keyboardNavigation: true,
+      voiceCommands: false,
+      textToSpeech: false,
+      audioDescriptions: false,
+      focusIndicators: true,
+      motionReduction: false,
+      colorBlindSupport: false,
+      dyslexiaFriendly: false,
+      largeCursors: false
+    },
+    learning: {
+      difficulty: 'adaptive',
+      autoSave: true,
+      hints: true,
+      explanations: true,
+      practiceMode: false,
+      timeLimit: false,
+      soundEffects: true,
+      backgroundMusic: false
+    },
+    performance: {
+      autoOptimize: true,
+      cacheData: true,
+      preloadContent: true,
+      lowBandwidth: false,
+      offlineMode: false
     }
   })
 
@@ -108,6 +196,9 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
       // Sauvegarder dans le localStorage
       localStorage.setItem('userSettings', JSON.stringify(settings))
       
+      // Appliquer les réglages en temps réel
+      applySettings(settings)
+      
       setSaveStatus('saved')
       setTimeout(() => setSaveStatus('idle'), 2000)
     } catch (error) {
@@ -115,6 +206,38 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
       setTimeout(() => setSaveStatus('idle'), 3000)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  // Appliquer les réglages en temps réel
+  const applySettings = (newSettings: UserSettings) => {
+    // Appliquer le thème
+    if (newSettings.appearance.theme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else if (newSettings.appearance.theme === 'light') {
+      document.documentElement.classList.remove('dark')
+    }
+
+    // Appliquer la taille de police
+    const fontSizeMap = {
+      small: 'text-sm',
+      medium: 'text-base',
+      large: 'text-lg'
+    }
+    document.body.className = fontSizeMap[newSettings.appearance.fontSize] || 'text-base'
+
+    // Appliquer le contraste élevé
+    if (newSettings.appearance.highContrast) {
+      document.documentElement.classList.add('high-contrast')
+    } else {
+      document.documentElement.classList.remove('high-contrast')
+    }
+
+    // Appliquer la réduction d'animations
+    if (newSettings.accessibility.motionReduction) {
+      document.documentElement.classList.add('reduce-motion')
+    } else {
+      document.documentElement.classList.remove('reduce-motion')
     }
   }
 
@@ -137,6 +260,42 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
       }
     }))
   }
+
+  // Composant Switch personnalisé
+  const Switch = ({ 
+    checked, 
+    onChange, 
+    label, 
+    description 
+  }: { 
+    checked: boolean
+    onChange: (checked: boolean) => void
+    label: string
+    description?: string
+  }) => (
+    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+      <div className="flex-1">
+        <label className="text-sm font-medium text-gray-900 cursor-pointer">
+          {label}
+        </label>
+        {description && (
+          <p className="text-xs text-gray-500 mt-1">{description}</p>
+        )}
+      </div>
+      <button
+        onClick={() => onChange(!checked)}
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+          checked ? 'bg-blue-600' : 'bg-gray-200'
+        }`}
+      >
+        <span
+          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+            checked ? 'translate-x-6' : 'translate-x-1'
+          }`}
+        />
+      </button>
+    </div>
+  )
 
   // Obtenir les couleurs selon le type d'utilisateur
   const getUserTypeColors = () => {
@@ -218,9 +377,15 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
         </button>
       </div>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
         {/* Section Avatar */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className={`w-10 h-10 bg-gradient-to-r ${colors.gradient} rounded-full flex items-center justify-center`}>
+              <User className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900">Avatar</h2>
+          </div>
           <AvatarSelector
             currentAvatar={settings.avatarPath}
             onAvatarChange={handleAvatarChange}
@@ -237,46 +402,49 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
             <h2 className="text-2xl font-bold text-gray-900">Notifications</h2>
           </div>
 
-          <div className="space-y-4">
-            <label className="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.notifications.email}
-                onChange={(e) => updateSetting('notifications', 'email', e.target.checked)}
-                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-              />
-              <span className="text-gray-700">Notifications par email</span>
-            </label>
-
-            <label className="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.notifications.push}
-                onChange={(e) => updateSetting('notifications', 'push', e.target.checked)}
-                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-              />
-              <span className="text-gray-700">Notifications push</span>
-            </label>
-
-            <label className="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.notifications.daily}
-                onChange={(e) => updateSetting('notifications', 'daily', e.target.checked)}
-                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-              />
-              <span className="text-gray-700">Résumé quotidien</span>
-            </label>
-
-            <label className="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.notifications.weekly}
-                onChange={(e) => updateSetting('notifications', 'weekly', e.target.checked)}
-                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-              />
-              <span className="text-gray-700">Résumé hebdomadaire</span>
-            </label>
+          <div className="space-y-3">
+            <Switch
+              checked={settings.notifications.email}
+              onChange={(checked) => updateSetting('notifications', 'email', checked)}
+              label="Notifications par email"
+              description="Recevoir des emails pour les activités importantes"
+            />
+            <Switch
+              checked={settings.notifications.push}
+              onChange={(checked) => updateSetting('notifications', 'push', checked)}
+              label="Notifications push"
+              description="Notifications instantanées sur ton appareil"
+            />
+            <Switch
+              checked={settings.notifications.daily}
+              onChange={(checked) => updateSetting('notifications', 'daily', checked)}
+              label="Résumé quotidien"
+              description="Récapitulatif de tes activités de la journée"
+            />
+            <Switch
+              checked={settings.notifications.weekly}
+              onChange={(checked) => updateSetting('notifications', 'weekly', checked)}
+              label="Résumé hebdomadaire"
+              description="Bilan de ta semaine d'apprentissage"
+            />
+            <Switch
+              checked={settings.notifications.achievements}
+              onChange={(checked) => updateSetting('notifications', 'achievements', checked)}
+              label="Nouveaux succès"
+              description="Être informé de tes nouvelles récompenses"
+            />
+            <Switch
+              checked={settings.notifications.reminders}
+              onChange={(checked) => updateSetting('notifications', 'reminders', checked)}
+              label="Rappels d'activité"
+              description="Rappels pour maintenir ton rythme d'apprentissage"
+            />
+            <Switch
+              checked={settings.notifications.social}
+              onChange={(checked) => updateSetting('notifications', 'social', checked)}
+              label="Activités sociales"
+              description="Nouvelles amitiés et messages de la communauté"
+            />
           </div>
         </div>
 
@@ -289,36 +457,43 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
             <h2 className="text-2xl font-bold text-gray-900">Confidentialité</h2>
           </div>
 
-          <div className="space-y-4">
-            <label className="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.privacy.profileVisible}
-                onChange={(e) => updateSetting('privacy', 'profileVisible', e.target.checked)}
-                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-              />
-              <span className="text-gray-700">Profil visible par les autres</span>
-            </label>
-
-            <label className="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.privacy.activityVisible}
-                onChange={(e) => updateSetting('privacy', 'activityVisible', e.target.checked)}
-                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-              />
-              <span className="text-gray-700">Activités visibles</span>
-            </label>
-
-            <label className="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.privacy.allowMessages}
-                onChange={(e) => updateSetting('privacy', 'allowMessages', e.target.checked)}
-                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-              />
-              <span className="text-gray-700">Autoriser les messages</span>
-            </label>
+          <div className="space-y-3">
+            <Switch
+              checked={settings.privacy.profileVisible}
+              onChange={(checked) => updateSetting('privacy', 'profileVisible', checked)}
+              label="Profil visible"
+              description="Permettre aux autres de voir ton profil"
+            />
+            <Switch
+              checked={settings.privacy.activityVisible}
+              onChange={(checked) => updateSetting('privacy', 'activityVisible', checked)}
+              label="Activités visibles"
+              description="Partager tes activités d'apprentissage"
+            />
+            <Switch
+              checked={settings.privacy.allowMessages}
+              onChange={(checked) => updateSetting('privacy', 'allowMessages', checked)}
+              label="Autoriser les messages"
+              description="Recevoir des messages des autres utilisateurs"
+            />
+            <Switch
+              checked={settings.privacy.showProgress}
+              onChange={(checked) => updateSetting('privacy', 'showProgress', checked)}
+              label="Afficher la progression"
+              description="Partager tes progrès avec la communauté"
+            />
+            <Switch
+              checked={settings.privacy.shareStats}
+              onChange={(checked) => updateSetting('privacy', 'shareStats', checked)}
+              label="Partager les statistiques"
+              description="Partager tes performances et statistiques"
+            />
+            <Switch
+              checked={settings.privacy.allowFriendRequests}
+              onChange={(checked) => updateSetting('privacy', 'allowFriendRequests', checked)}
+              label="Demandes d'amis"
+              description="Autoriser les demandes d'amis"
+            />
           </div>
         </div>
 
@@ -336,15 +511,41 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Thème
               </label>
-              <select
-                value={settings.appearance.theme}
-                onChange={(e) => updateSetting('appearance', 'theme', e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="light">Clair</option>
-                <option value="dark">Sombre</option>
-                <option value="auto">Automatique</option>
-              </select>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => updateSetting('appearance', 'theme', 'light')}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    settings.appearance.theme === 'light'
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Sun className="w-5 h-5 mx-auto mb-1" />
+                  <span className="text-xs">Clair</span>
+                </button>
+                <button
+                  onClick={() => updateSetting('appearance', 'theme', 'dark')}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    settings.appearance.theme === 'dark'
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Moon className="w-5 h-5 mx-auto mb-1" />
+                  <span className="text-xs">Sombre</span>
+                </button>
+                <button
+                  onClick={() => updateSetting('appearance', 'theme', 'auto')}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    settings.appearance.theme === 'auto'
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Monitor className="w-5 h-5 mx-auto mb-1" />
+                  <span className="text-xs">Auto</span>
+                </button>
+              </div>
             </div>
 
             <div>
@@ -354,11 +555,11 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
               <select
                 value={settings.appearance.language}
                 onChange={(e) => updateSetting('appearance', 'language', e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="fr">Français</option>
-                <option value="en">English</option>
-                <option value="es">Español</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="en">🇬🇧 English</option>
+                <option value="es">🇪🇸 Español</option>
               </select>
             </div>
 
@@ -366,15 +567,68 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Taille de police
               </label>
-              <select
-                value={settings.appearance.fontSize}
-                onChange={(e) => updateSetting('appearance', 'fontSize', e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="small">Petite</option>
-                <option value="medium">Moyenne</option>
-                <option value="large">Grande</option>
-              </select>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => updateSetting('appearance', 'fontSize', 'small')}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    settings.appearance.fontSize === 'small'
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Type className="w-4 h-4 mx-auto mb-1" />
+                  <span className="text-xs">Petite</span>
+                </button>
+                <button
+                  onClick={() => updateSetting('appearance', 'fontSize', 'medium')}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    settings.appearance.fontSize === 'medium'
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Type className="w-5 h-5 mx-auto mb-1" />
+                  <span className="text-xs">Moyenne</span>
+                </button>
+                <button
+                  onClick={() => updateSetting('appearance', 'fontSize', 'large')}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    settings.appearance.fontSize === 'large'
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Type className="w-6 h-6 mx-auto mb-1" />
+                  <span className="text-xs">Grande</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Switch
+                checked={settings.appearance.colorBlind}
+                onChange={(checked) => updateSetting('appearance', 'colorBlind', checked)}
+                label="Mode daltonien"
+                description="Adapter les couleurs pour les utilisateurs daltoniens"
+              />
+              <Switch
+                checked={settings.appearance.highContrast}
+                onChange={(checked) => updateSetting('appearance', 'highContrast', checked)}
+                label="Contraste élevé"
+                description="Améliorer la lisibilité du texte"
+              />
+              <Switch
+                checked={settings.appearance.reduceAnimations}
+                onChange={(checked) => updateSetting('appearance', 'reduceAnimations', checked)}
+                label="Réduire les animations"
+                description="Minimiser les effets visuels"
+              />
+              <Switch
+                checked={settings.appearance.compactMode}
+                onChange={(checked) => updateSetting('appearance', 'compactMode', checked)}
+                label="Mode compact"
+                description="Interface plus dense pour plus d'informations"
+              />
             </div>
           </div>
         </div>
@@ -383,41 +637,188 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center space-x-3 mb-6">
             <div className={`w-10 h-10 bg-gradient-to-r ${colors.gradient} rounded-full flex items-center justify-center`}>
-              <Globe className="w-5 h-5 text-white" />
+              <Accessibility className="w-5 h-5 text-white" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900">Accessibilité</h2>
           </div>
 
+          <div className="space-y-3">
+            <Switch
+              checked={settings.accessibility.screenReader}
+              onChange={(checked) => updateSetting('accessibility', 'screenReader', checked)}
+              label="Lecteur d'écran"
+              description="Support complet des lecteurs d'écran"
+            />
+            <Switch
+              checked={settings.accessibility.keyboardNavigation}
+              onChange={(checked) => updateSetting('accessibility', 'keyboardNavigation', checked)}
+              label="Navigation clavier"
+              description="Navigation complète au clavier"
+            />
+            <Switch
+              checked={settings.accessibility.voiceCommands}
+              onChange={(checked) => updateSetting('accessibility', 'voiceCommands', checked)}
+              label="Commandes vocales"
+              description="Contrôler l'application par la voix"
+            />
+            <Switch
+              checked={settings.accessibility.textToSpeech}
+              onChange={(checked) => updateSetting('accessibility', 'textToSpeech', checked)}
+              label="Synthèse vocale"
+              description="Lire le texte à haute voix"
+            />
+            <Switch
+              checked={settings.accessibility.audioDescriptions}
+              onChange={(checked) => updateSetting('accessibility', 'audioDescriptions', checked)}
+              label="Descriptions audio"
+              description="Descriptions audio des éléments visuels"
+            />
+            <Switch
+              checked={settings.accessibility.focusIndicators}
+              onChange={(checked) => updateSetting('accessibility', 'focusIndicators', checked)}
+              label="Indicateurs de focus"
+              description="Mise en évidence claire de l'élément actif"
+            />
+            <Switch
+              checked={settings.accessibility.motionReduction}
+              onChange={(checked) => updateSetting('accessibility', 'motionReduction', checked)}
+              label="Réduction des mouvements"
+              description="Minimiser les animations et transitions"
+            />
+            <Switch
+              checked={settings.accessibility.colorBlindSupport}
+              onChange={(checked) => updateSetting('accessibility', 'colorBlindSupport', checked)}
+              label="Support daltonien"
+              description="Interface adaptée aux daltoniens"
+            />
+            <Switch
+              checked={settings.accessibility.dyslexiaFriendly}
+              onChange={(checked) => updateSetting('accessibility', 'dyslexiaFriendly', checked)}
+              label="Mode dyslexie"
+              description="Police et espacement adaptés"
+            />
+            <Switch
+              checked={settings.accessibility.largeCursors}
+              onChange={(checked) => updateSetting('accessibility', 'largeCursors', checked)}
+              label="Curseurs agrandis"
+              description="Curseurs plus visibles"
+            />
+          </div>
+        </div>
+
+        {/* Section Apprentissage */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className={`w-10 h-10 bg-gradient-to-r ${colors.gradient} rounded-full flex items-center justify-center`}>
+              <Brain className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900">Apprentissage</h2>
+          </div>
+
           <div className="space-y-4">
-            <label className="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.accessibility.highContrast}
-                onChange={(e) => updateSetting('accessibility', 'highContrast', e.target.checked)}
-                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-              />
-              <span className="text-gray-700">Contraste élevé</span>
-            </label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Niveau de difficulté
+              </label>
+              <select
+                value={settings.learning.difficulty}
+                onChange={(e) => updateSetting('learning', 'difficulty', e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="easy">🟢 Facile - Débutant</option>
+                <option value="medium">🟡 Moyen - Intermédiaire</option>
+                <option value="hard">🔴 Difficile - Avancé</option>
+                <option value="adaptive">🎯 Adaptatif - S'ajuste automatiquement</option>
+              </select>
+            </div>
 
-            <label className="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.accessibility.reduceMotion}
-                onChange={(e) => updateSetting('accessibility', 'reduceMotion', e.target.checked)}
-                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+            <div className="space-y-3">
+              <Switch
+                checked={settings.learning.autoSave}
+                onChange={(checked) => updateSetting('learning', 'autoSave', checked)}
+                label="Sauvegarde automatique"
+                description="Sauvegarder automatiquement ta progression"
               />
-              <span className="text-gray-700">Réduire les animations</span>
-            </label>
+              <Switch
+                checked={settings.learning.hints}
+                onChange={(checked) => updateSetting('learning', 'hints', checked)}
+                label="Indices et conseils"
+                description="Recevoir des indices pour t'aider"
+              />
+              <Switch
+                checked={settings.learning.explanations}
+                onChange={(checked) => updateSetting('learning', 'explanations', checked)}
+                label="Explications détaillées"
+                description="Explications complètes des concepts"
+              />
+              <Switch
+                checked={settings.learning.practiceMode}
+                onChange={(checked) => updateSetting('learning', 'practiceMode', checked)}
+                label="Mode entraînement"
+                description="S'entraîner sans pression de temps"
+              />
+              <Switch
+                checked={settings.learning.timeLimit}
+                onChange={(checked) => updateSetting('learning', 'timeLimit', checked)}
+                label="Limite de temps"
+                description="Ajouter une pression temporelle"
+              />
+              <Switch
+                checked={settings.learning.soundEffects}
+                onChange={(checked) => updateSetting('learning', 'soundEffects', checked)}
+                label="Effets sonores"
+                description="Sons pour les interactions"
+              />
+              <Switch
+                checked={settings.learning.backgroundMusic}
+                onChange={(checked) => updateSetting('learning', 'backgroundMusic', checked)}
+                label="Musique de fond"
+                description="Musique d'ambiance pendant l'apprentissage"
+              />
+            </div>
+          </div>
+        </div>
 
-            <label className="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.accessibility.screenReader}
-                onChange={(e) => updateSetting('accessibility', 'screenReader', e.target.checked)}
-                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-              />
-              <span className="text-gray-700">Mode lecteur d'écran</span>
-            </label>
+        {/* Section Performance */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className={`w-10 h-10 bg-gradient-to-r ${colors.gradient} rounded-full flex items-center justify-center`}>
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900">Performance</h2>
+          </div>
+
+          <div className="space-y-3">
+            <Switch
+              checked={settings.performance.autoOptimize}
+              onChange={(checked) => updateSetting('performance', 'autoOptimize', checked)}
+              label="Optimisation automatique"
+              description="Optimiser automatiquement les performances"
+            />
+            <Switch
+              checked={settings.performance.cacheData}
+              onChange={(checked) => updateSetting('performance', 'cacheData', checked)}
+              label="Mise en cache"
+              description="Mettre en cache les données pour un accès plus rapide"
+            />
+            <Switch
+              checked={settings.performance.preloadContent}
+              onChange={(checked) => updateSetting('performance', 'preloadContent', checked)}
+              label="Préchargement"
+              description="Précharger le contenu pour une navigation fluide"
+            />
+            <Switch
+              checked={settings.performance.lowBandwidth}
+              onChange={(checked) => updateSetting('performance', 'lowBandwidth', checked)}
+              label="Mode basse bande passante"
+              description="Optimiser pour les connexions lentes"
+            />
+            <Switch
+              checked={settings.performance.offlineMode}
+              onChange={(checked) => updateSetting('performance', 'offlineMode', checked)}
+              label="Mode hors ligne"
+              description="Fonctionner sans connexion internet"
+            />
           </div>
         </div>
       </div>
@@ -427,7 +828,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
         <div className={`inline-flex items-center px-4 py-2 rounded-full ${colors.bg} ${colors.border}`}>
           <CheckCircle className={`w-4 h-4 ${colors.text} mr-2`} />
           <span className={`text-sm ${colors.text}`}>
-            Tous les réglages sont sauvegardés automatiquement dans ton navigateur
+            Tous les réglages sont sauvegardés automatiquement et appliqués en temps réel
           </span>
         </div>
       </div>
