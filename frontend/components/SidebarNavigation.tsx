@@ -18,7 +18,13 @@ import {
   TrendingUp,
   Users,
   LogOut,
-  Box
+  Box,
+  Code,
+  Gamepad2,
+  Heart,
+  Lightbulb,
+  Globe,
+  Sparkles
 } from 'lucide-react'
 import AnimatedIcon from './AnimatedIcons'
 import { CubeAILogo } from '@/components/MulticolorText'
@@ -36,6 +42,12 @@ export type NavigationTab =
   | 'photo'
   | 'jeux'
   | 'family-members'
+  | 'mathcube'
+  | 'codecube'
+  | 'playcube'
+  | 'sciencecube'
+  | 'dreamcube'
+  | 'comcube'
 
 interface SidebarNavigationProps {
   activeTab: NavigationTab
@@ -98,67 +110,110 @@ export default function SidebarNavigation({
   const isTeacher = userType === 'TEACHER'
   const isAdmin = userType === 'ADMIN'
 
-  // Déterminer les couleurs selon le type d'abonnement (basé sur les cartes)
+  // État local pour la sidebar
+  const [internalCollapsed, setInternalCollapsed] = useState(true)
+  const collapsed = collapsedProp ?? internalCollapsed
+  
+  const toggleCollapsed = () => {
+    const newCollapsed = !collapsed
+    setInternalCollapsed(newCollapsed)
+    onCollapsedChange?.(newCollapsed)
+  }
+
+  // Obtenir les couleurs selon l'abonnement
   const getSubscriptionColors = () => {
-    if (isProPlus || isEnterprise) {
-      return {
-        gradient: 'from-orange-500 to-violet-600',
-        hoverGradient: 'from-orange-600 to-violet-700',
-        buttonBg: 'bg-orange-500',
-        buttonHover: 'hover:bg-orange-600',
-        lightBg: 'bg-orange-50',
-        lightText: 'text-orange-700',
-        lightBgHover: 'hover:bg-orange-100',
-        iconBg: 'bg-orange-100',
-        primary: 'orange',
-        cubeGradient: 'from-orange-500 to-violet-600'
-      }
-    } else if (isPro) {
-      return {
-        gradient: 'from-violet-600 to-pink-500',
-        hoverGradient: 'from-violet-700 to-pink-600',
-        buttonBg: 'bg-violet-600',
-        buttonHover: 'hover:bg-violet-700',
-        lightBg: 'bg-violet-50',
-        lightText: 'text-violet-700',
-        lightBgHover: 'hover:bg-violet-100',
-        iconBg: 'bg-violet-100',
-        primary: 'violet',
-        cubeGradient: 'from-violet-600 to-pink-500'
-      }
-    } else {
-      return {
-        gradient: 'from-blue-600 to-purple-600',
-        hoverGradient: 'from-blue-700 to-purple-700',
-        buttonBg: 'bg-blue-600',
-        buttonHover: 'hover:bg-blue-700',
-        lightBg: 'bg-blue-50',
-        lightText: 'text-blue-700',
-        lightBgHover: 'hover:bg-blue-100',
-        iconBg: 'bg-blue-100',
-        primary: 'blue',
-        cubeGradient: 'from-blue-500 to-purple-600'
-      }
+    switch (normalizedType) {
+      case 'PRO':
+        return {
+          gradient: 'from-blue-500 to-indigo-600',
+          cubeGradient: 'from-blue-400 to-indigo-500',
+          accent: 'text-blue-600',
+          bg: 'bg-blue-50'
+        }
+      case 'PREMIUM':
+      case 'PRO_PLUS':
+        return {
+          gradient: 'from-fuchsia-500 to-violet-600',
+          cubeGradient: 'from-fuchsia-400 to-violet-500',
+          accent: 'text-fuchsia-600',
+          bg: 'bg-fuchsia-50'
+        }
+      case 'ENTERPRISE':
+        return {
+          gradient: 'from-purple-500 to-pink-600',
+          cubeGradient: 'from-purple-400 to-pink-500',
+          accent: 'text-purple-600',
+          bg: 'bg-purple-50'
+        }
+      default:
+        return {
+          gradient: 'from-blue-500 to-violet-600',
+          cubeGradient: 'from-blue-400 to-violet-500',
+          accent: 'text-blue-600',
+          bg: 'bg-blue-50'
+        }
     }
   }
 
   const colors = getSubscriptionColors()
-  
-  // Supporter un mode contrôlé/non-contrôlé pour la rétractation
-  const [internalCollapsed, setInternalCollapsed] = useState(false)
-  const collapsed = typeof collapsedProp === 'boolean' ? collapsedProp : internalCollapsed
-  const toggleCollapsed = () => {
-    if (onCollapsedChange) return onCollapsedChange(!collapsed)
-    setInternalCollapsed(v => !v)
-  }
 
+  // Définir les onglets de navigation
   let tabs: TabItem[] = [
+    {
+      id: 'experiences',
+      label: 'Expériences',
+      icon: Sparkles,
+      description: 'Tableau de bord central',
+      available: true
+    },
+    {
+      id: 'mathcube',
+      label: 'MathCube',
+      icon: BookOpen,
+      description: 'Mathématiques gamifiées',
+      available: isChild // Seuls les enfants ont accès
+    },
+    {
+      id: 'codecube',
+      label: 'CodeCube',
+      icon: Code,
+      description: 'Initiation à la programmation',
+      available: isChild
+    },
+    {
+      id: 'playcube',
+      label: 'PlayCube',
+      icon: Gamepad2,
+      description: 'Jeux de détente + éducatifs',
+      available: isChild
+    },
+    {
+      id: 'sciencecube',
+      label: 'ScienceCube',
+      icon: Lightbulb,
+      description: 'Découvertes scientifiques',
+      available: isChild
+    },
+    {
+      id: 'dreamcube',
+      label: 'DreamCube',
+      icon: Heart,
+      description: 'Espace de rêve, objectifs, métiers',
+      available: isChild
+    },
+    {
+      id: 'comcube',
+      label: 'ComCube',
+      icon: Globe,
+      description: 'Communauté et partage',
+      available: true // Visible parents/enfants
+    },
     {
       id: 'dashboard',
       label: 'Dashboard',
       icon: LayoutDashboard,
-      description: 'Vue d\'ensemble et statistiques',
-      available: !isChild // Seuls les parents ont accès au dashboard
+      description: 'Suivi et statistiques',
+      available: !isChild // Seuls les parents ont accès
     },
     {
       id: 'statistiques',
@@ -166,13 +221,6 @@ export default function SidebarNavigation({
       icon: BarChart3,
       description: 'Graphiques et analyses détaillées',
       available: !isChild && !isFree // Parents + comptes Pro et supérieurs
-    },
-    {
-      id: 'experiences',
-      label: 'Expériences',
-      icon: Box,
-      description: 'Toutes les fonctionnalités CubeAI',
-      available: true // Tous les utilisateurs ont accès aux expériences
     },
     {
       id: 'informations',
@@ -203,14 +251,6 @@ export default function SidebarNavigation({
       description: 'Historique et paiements',
       available: !isChild && !isFree // Parents + comptes Pro et supérieurs
     },
-    // Nouveaux onglets pour les enfants (réduits à une expérience unique)
-    {
-      id: 'jeux',
-      label: 'Jeux',
-      icon: Target,
-      description: 'Apprenez en vous amusant',
-      available: isChild // Seuls les enfants ont accès aux jeux
-    },
     {
       id: 'reglages',
       label: 'Réglages',
@@ -227,22 +267,22 @@ export default function SidebarNavigation({
     }
   ]
 
-  // Espace enfant: ne conserver que Expériences, Jeux, Réglages
+  // Espace enfant: Expériences + tous les cubes + communauté + réglages + aide
   if (isChild) {
-    const keep: NavigationTab[] = ['experiences', 'jeux', 'reglages']
+    const keep: NavigationTab[] = ['experiences', 'mathcube', 'codecube', 'playcube', 'sciencecube', 'dreamcube', 'comcube', 'reglages', 'aide']
     tabs = tabs.filter(t => keep.includes(t.id))
   }
 
   return (
     <motion.div 
-      className={`fixed left-0 top-0 h-screen ${collapsed ? 'w-16' : 'w-64'} bg-white shadow-2xl z-50 flex flex-col transition-[width] duration-300`}
-      initial={{ x: -100, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.3 }}
+      className={"fixed left-0 top-0 h-screen bg-white shadow-2xl z-50 flex flex-col overflow-hidden"}
+      initial={{ width: collapsed ? 74 : 256 }}
+      animate={{ width: collapsed ? 75 : 256 }}
+      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
     >
       {/* En-tête de la sidebar — branding unifié */}
-      <div className="relative p-3 border-b border-gray-200">
-        <div className="flex items-center gap-3">
+      <div className="relative h-16 px-3 pr-10 border-b border-gray-200 flex items-center">
+        <div className="flex items-center gap-3 w-full">
                       <div className={`w-10 h-10 bg-gradient-to-r ${colors.gradient} rounded-lg flex items-center justify-center shadow-lg flex-shrink-0`}>
             <span className="font-title text-white text-2xl leading-none">C</span>
           </div>
@@ -254,21 +294,16 @@ export default function SidebarNavigation({
           {/* Bouton rétractable aligné au logo */}
           <button 
             onClick={toggleCollapsed} 
-            className="ml-1 p-2 rounded-md hover:bg-gray-100 text-gray-600 transition"
+            className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-gray-100 text-gray-600"
             aria-label={collapsed ? 'Déplier la navigation' : 'Replier la navigation'}
             aria-expanded={!collapsed}
             title={collapsed ? 'Déplier' : 'Replier'}
           >
-            <ChevronRight className={`w-4 h-4 transition-transform ${collapsed ? 'rotate-0' : '-rotate-180'}`} />
+            <ChevronRight className={`w-4 h-4 ${collapsed ? 'rotate-0' : '-rotate-180'}`} />
           </button>
         </div>
 
-        {/* Indicateur de type de compte */}
-        {!collapsed && (
-          <div className={`mt-3 px-3 py-2 rounded-lg text-sm font-bold text-center bg-gradient-to-r ${colors.gradient} text-white shadow-md`}>
-            {isFree ? '🎁 Gratuit' : isPro ? '✨ Pro' : isProPlus ? '✨ Pro Plus' : isEnterprise ? '✨ Entreprise' : '✨ Premium'}
-          </div>
-        )}
+        {/* Indicateur de type de compte (désactivé ici pour stabilité de layout) */}
       </div>
 
       {/* Navigation des onglets - verticale */}
@@ -276,18 +311,16 @@ export default function SidebarNavigation({
         <nav className="space-y-3 px-3">
           {tabs.map((tab) => (
             tab.available && (
-              <motion.button
+              <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
                 className={`
-                  group relative w-full flex items-center gap-2 ${collapsed ? 'px-2 py-3 justify-center' : 'px-3 py-4'} rounded-lg text-sm font-semibold
+                  group relative w-full flex items-center gap-2 px-2 py-2 rounded-lg text-sm font-semibold
                   ${activeTab === tab.id
-                    ? `bg-gradient-to-r ${colors.gradient} text-white shadow-lg transform scale-105`
+                    ? `bg-gradient-to-r ${colors.gradient} text-white shadow-lg`
                     : 'text-gray-700'
                   }
                 `}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
                 title={tab.label}
                 aria-label={tab.label}
               >
@@ -324,14 +357,9 @@ export default function SidebarNavigation({
                   </span>
                 )}
                 {activeTab === tab.id && (
-                  <motion.div
-                    className={`${collapsed ? 'hidden' : ''} w-2 h-2 bg-white rounded-full`}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.2 }}
-                  />
+                  <div className={`${collapsed ? 'hidden' : ''} w-2 h-2 bg-white rounded-full`} />
                 )}
-              </motion.button>
+              </button>
             )
           ))}
         </nav>
@@ -339,16 +367,14 @@ export default function SidebarNavigation({
 
       {/* Actions rapides: Accueil + Déconnexion */}
       <div className="px-3 pb-3 space-y-2">
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        <button
           onClick={() => router.push('/')}
           className={`
-            group relative w-full flex items-center gap-3 ${collapsed ? 'px-2 py-3 justify-center' : 'px-3 py-3'}
+            group relative w-full flex items-center gap-3 px-3 py-3
             rounded-lg text-sm font-semibold bg-white-100 hover:bg-gray-200 text-gray-300 transition
           `}
           title="Accueil"
-          aria-label="Accueil"
+          aria-label=""
         >
           <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-gray-700 shadow-sm">
             <Home size={20} />
@@ -362,17 +388,15 @@ export default function SidebarNavigation({
               </div>
             </div>
           )}
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        </button>
+        <button
           onClick={async () => { try { await (await import('@/lib/api')).authAPI.logout(); router.push('/login'); } catch (e) {} }}
           className={`
-            group relative w-full flex items-center gap-3 ${collapsed ? 'px-2 py-3 justify-center' : 'px-3 py-3'}
+            group relative w-full flex items-center gap-3 px-3 py-3
             rounded-lg text-sm font-semibold bg-white-50 hover:bg-red-100 text-red-300 transition
           `}
           title="Déconnexion"
-          aria-label="Déconnexion"
+          aria-label=""
         >
           <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-red-700 shadow-sm">
             <LogOut size={20} />
@@ -386,7 +410,7 @@ export default function SidebarNavigation({
               </div>
             </div>
           )}
-        </motion.button>
+        </button>
       </div>
 
       {/* Footer de la sidebar */}
