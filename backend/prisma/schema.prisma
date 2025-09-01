@@ -70,6 +70,37 @@ model UserSession {
   recommendations   Recommendation[]
   gameRatings       GameRating[]
   exerciseRatings   ExerciseRating[]
+  settings          UserSettings?
+}
+
+// Réglages utilisateur
+model UserSettings {
+  id            String   @id @default(cuid())
+  userSessionId String   @unique
+  userSession   UserSession @relation(fields: [userSessionId], references: [id], onDelete: Cascade)
+  
+  // Notifications
+  notifications Json     @default("{}")
+  
+  // Confidentialité
+  privacy       Json     @default("{}")
+  
+  // Apparence
+  appearance    Json     @default("{}")
+  
+  // Accessibilité
+  accessibility Json     @default("{}")
+  
+  // Apprentissage
+  learning      Json     @default("{}")
+  
+  // Performance
+  performance   Json     @default("{}")
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("user_settings")
 }
 
 // Profil détaillé de l'utilisateur
