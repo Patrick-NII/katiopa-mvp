@@ -106,8 +106,8 @@ export default function HomePage() {
             <div className="flex items-center space-x-4">
               {user ? (
                 <>
-                  <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-green-700">
-                    <span className="font-mono text-xs text-green-800">{user.sessionId}</span>
+                  <div className="flex items-center gap-2 text-sm font-medium text-green-700">
+                    <span className="font-mono text-xs text-gray-900">{user.sessionId}</span>
                     <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>
                   </div>
                   <button
@@ -117,7 +117,7 @@ export default function HomePage() {
                     className="p-2 rounded-lg text-gray-700 hover:text-red-600 transition transform hover:rotate-12 hover:scale-110"
                   >
                     {/* Icone de déconnexion */}
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+                    ⎋
                   </button>
                   <a href="/dashboard" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 py-2 rounded-lg text-sm font-medium">Espace personnel</a>
                 </>

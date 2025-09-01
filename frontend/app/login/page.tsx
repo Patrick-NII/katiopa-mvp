@@ -97,8 +97,8 @@ export default function LoginPage() {
             <div className="flex items-center space-x-4">
               {navUser ? (
                 <>
-                  <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-white/70 border border-green-200 text-sm font-medium text-green-700">
-                    <span className="font-mono text-xs text-green-800">{navUser.sessionId}</span>
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/70 border border-green-200 text-sm font-medium text-green-700">
+                    <span className="font-mono text-xs text-gray-900">{navUser.sessionId}</span>
                     <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>
                   </div>
                   <a href="/dashboard" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 py-2 rounded-lg text-sm font-medium">Espace personnel</a>
@@ -115,7 +115,7 @@ export default function LoginPage() {
                     aria-label="Se déconnecter"
                     className="p-2 rounded-lg text-gray-700 hover:text-red-600 transition transform hover:rotate-12 hover:scale-110"
                   >
-                    <LogOut className="w-5 h-5" />
+                    ⏻
                   </button>
                   <a href="/dashboard" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 py-2 rounded-lg text-sm font-medium">Espace personnel</a>
                 </>
