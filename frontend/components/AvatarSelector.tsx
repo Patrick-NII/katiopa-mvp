@@ -24,7 +24,7 @@ export default function AvatarSelector({
     '/avatar/C680597F-C476-47A3-8AFD-5BF7480AB18F_1_105_c.jpeg',
     '/avatar/9032E0D4-24CB-43FF-A828-D73BACF6A2CB_1_105_c.jpeg',
     '/avatar/AFABF252-DC83-4CB8-96FD-F93E4848144F_1_105_c.jpeg',
-    '/avatar/630F22-5A32-4B9D-89F2-BE41C6D06047_1_105_c.jpeg',
+    '/avatar/630F3A22-5A32-4B9D-89F2-BE41C6D06047_1_105_c.jpeg',
     '/avatar/B651627E-16E8-4B38-964C-52AC717EA8A6_1_105_c.jpeg',
     '/avatar/4585039E-FE54-402B-967A-49505261DCCA_1_105_c.jpeg',
     '/avatar/46634418-D597-4138-A12C-ED6DB610C8BD_1_105_c.jpeg',
@@ -238,21 +238,8 @@ export default function AvatarSelector({
         )}
       </AnimatePresence>
 
-      {/* Conseils d'utilisation */}
-      <div className={`p-4 ${colors.bg} rounded-2xl border ${colors.border}`}>
-        <div className="flex items-start space-x-3">
-          <Settings className={`w-5 h-5 ${colors.text} mt-0.5`} />
-          <div>
-            <h4 className="font-medium text-gray-900 mb-1">Conseils</h4>
-            <ul className="text-sm text-gray-700 space-y-1">
-              <li>• Choisis un avatar qui te ressemble ou te plaît</li>
-              <li>• Tu peux changer d'avatar à tout moment</li>
-              <li>• Ton avatar sera visible par les autres membres</li>
-              <li>• Les avatars sont automatiquement redimensionnés</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+     
+      
     </div>
   )
 }
