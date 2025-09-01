@@ -7,7 +7,7 @@ import {
   Calendar, 
   Star, 
   Clock, 
-  TrendingUp, 
+  TrendingUp,
   Sparkles,
   BookOpen,
   Gamepad2,
@@ -226,8 +226,8 @@ function ParentInterface({
               <Lightbulb className="w-5 h-5 text-white" />
             </div>
             <h2 className="text-xl font-semibold text-gray-900">Recommandations de Bubix</h2>
-          </div>
-          
+      </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recommendations.slice(0, 6).map((rec: any) => (
               <div key={rec.id} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
@@ -248,9 +248,9 @@ function ParentInterface({
                       </div>
                       <span className="text-xs text-gray-400">•</span>
                       <span className="text-xs text-gray-500 capitalize">{rec.type.toLowerCase()}</span>
-                    </div>
-                  </div>
-                </div>
+                            </div>
+                              </div>
+                            </div>
               </div>
             ))}
           </div>
@@ -269,8 +269,8 @@ function ParentInterface({
           <button className={`px-4 py-2 rounded-lg bg-gradient-to-r ${colors.primary} text-white text-sm font-medium hover:shadow-lg transition-shadow`}>
             Modifier
           </button>
-        </div>
-
+                          </div>
+                          
         {schedule.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {schedule.slice(0, 6).map((event: any) => (
@@ -291,11 +291,11 @@ function ParentInterface({
                   }`}>
                     {event.status === 'COMPLETED' ? 'Terminé' :
                      event.status === 'IN_PROGRESS' ? 'En cours' : 'Planifié'}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
         ) : (
           <div className="text-center py-12 bg-gray-50 rounded-xl">
             <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -461,9 +461,9 @@ function ChildInterface({
                     <Star className="w-3 h-3 text-yellow-400 fill-current" />
                     <span className="text-xs text-gray-600">{formatScore(game.rating)}</span>
                   </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       )}
@@ -477,7 +477,7 @@ function ChildInterface({
             </div>
             <h2 className="text-xl font-semibold text-gray-900">Ton classement</h2>
           </div>
-          
+
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <div className="space-y-4">
               {ranking.map((rank: any, index: number) => (
@@ -506,6 +506,6 @@ function ChildInterface({
           </div>
         </div>
       )}
-    </div>
+      </div>
   )
 } 
