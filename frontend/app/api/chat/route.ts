@@ -11,10 +11,10 @@ export async function POST(request: NextRequest) {
 
     // Vérifier si l'utilisateur est connecté
     const isAuthenticated = await isUserAuthenticated()
+    const userQuestion = body.messages[body.messages.length - 1]?.text?.toLowerCase() || ''
     
     if (!isAuthenticated) {
       // Utilisateur non connecté - utiliser le modèle local pour FAQ et support
-      const userQuestion = body.messages[body.messages.length - 1]?.text?.toLowerCase() || ''
       
       // Détecter les questions de support/FAQ
       const supportKeywords = [
@@ -27,6 +27,32 @@ export async function POST(request: NextRequest) {
       const isSupportQuestion = supportKeywords.some(keyword => 
         userQuestion.includes(keyword)
       )
+
+      // Détecter les questions sur les informations personnelles
+      const personalInfoKeywords = [
+        'email', 'adresse mail', 'mail', 'e-mail',
+        'nom', 'prénom', 'nom complet',
+        'profil', 'informations', 'données',
+        'session', 'identifiant', 'id',
+        'abonnement', 'subscription',
+        'type', 'parent', 'enfant'
+      ]
+      
+      const isAskingForPersonalInfo = personalInfoKeywords.some(keyword => 
+        userQuestion.includes(keyword)
+      )
+
+      if (isAskingForPersonalInfo) {
+        return NextResponse.json({
+          text: "🔐 **Connexion requise**\n\nPour accéder à vos informations personnelles, vous devez d'abord vous connecter à votre compte.\n\n💡 **Pour vous connecter :**\n1. Cliquez sur 'Connexion' en haut à droite\n2. Utilisez votre Session ID et mot de passe\n3. Ou créez un compte si vous n'en avez pas\n\nUne fois connecté, je pourrai vous aider avec vos informations personnelles !",
+          actions: [
+            { label: "Se connecter", href: "/login" },
+            { label: "Créer un compte", href: "/register" }
+          ],
+          model: 'local-auth-required',
+          subscriptionType: 'none'
+        })
+      }
 
       if (isSupportQuestion) {
         // Réponse de support local
@@ -68,9 +94,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Analyser la question de l'utilisateur pour détecter les demandes d'informations personnelles
-    const userQuestion = body.messages[body.messages.length - 1]?.text?.toLowerCase() || ''
-    
-    // Détecter les questions sur les informations personnelles
     const personalInfoKeywords = [
       'email', 'adresse mail', 'mail', 'e-mail',
       'nom', 'prénom', 'nom complet',

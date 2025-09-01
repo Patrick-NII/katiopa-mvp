@@ -64,7 +64,7 @@ async function askBackendLLM(history: Message[], userText: string, signal: Abort
   try{
     const res = await fetch('/api/chat', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ system: "Tu es l’assistant du site Katiopa. Réponds clairement. Oriente vers les liens internes. Si la question concerne des enfants, utilise un ton adapté si persona=kid.",
+      body: JSON.stringify({ system: "Tu es l’assistant IA de CubeAI. Réponds clairement. Oriente vers les liens internes. Si la question concerne des enfants, utilise un ton adapté si persona=kid.",
         messages: history.concat({ id: uid(), text: userText, sender:'user', timestamp: now() }) }),
       signal
     })
