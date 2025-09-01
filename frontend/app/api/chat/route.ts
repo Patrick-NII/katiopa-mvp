@@ -2,6 +2,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 type ChatMsg = { role: 'system' | 'user' | 'assistant'; content: string }
 type ReqBody = { system?: string; messages: Array<{ id:string; text:string; sender:'user'|'bot'; timestamp:number }> }
@@ -18,13 +21,14 @@ interface UserInfo {
   isActive: boolean
 }
 
-// Fonction pour vérifier l'authentification côté serveur
+// Fonction pour vérifier l'authentification côté serveur avec Prisma
 async function verifyAuthServerSide(): Promise<UserInfo | null> {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('accessToken')?.value
 
     if (!token) {
+      console.log('❌ Pas de token trouvé')
       return null
     }
 
@@ -32,38 +36,42 @@ async function verifyAuthServerSide(): Promise<UserInfo | null> {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any
     
     if (!decoded || !decoded.userId) {
+      console.log('❌ Token invalide ou pas de userId')
       return null
     }
 
-    // Récupérer les informations utilisateur depuis la base de données
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/auth/verify`, {
-      headers: {
-        'Cookie': `accessToken=${token}`
+    console.log('🔍 Recherche utilisateur avec userId:', decoded.userId)
+
+    // Récupérer directement depuis la base de données avec Prisma
+    const userSession = await prisma.userSession.findUnique({
+      where: {
+        id: decoded.userId
+      },
+      include: {
+        account: true
       }
     })
 
-    if (!response.ok) {
+    if (!userSession) {
+      console.log('❌ Utilisateur non trouvé en base')
       return null
     }
 
-    const data = await response.json()
-    
-    if (data.success && data.user) {
-      return {
-        id: data.user.id,
-        sessionId: data.user.sessionId,
-        firstName: data.user.firstName,
-        lastName: data.user.lastName,
-        email: data.user.email,
-        userType: data.user.userType,
-        subscriptionType: data.user.subscriptionType,
-        isActive: true
-      }
+    console.log('✅ Utilisateur trouvé:', userSession.sessionId)
+
+    return {
+      id: userSession.id,
+      sessionId: userSession.sessionId,
+      firstName: userSession.firstName,
+      lastName: userSession.lastName,
+      email: userSession.account.email,
+      userType: userSession.userType as 'PARENT' | 'CHILD',
+      subscriptionType: userSession.account.subscriptionType as 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE',
+      isActive: userSession.isActive
     }
 
-    return null
   } catch (error) {
-    console.error('Erreur vérification auth côté serveur:', error)
+    console.error('❌ Erreur vérification auth côté serveur:', error)
     return null
   }
 }
@@ -113,6 +121,8 @@ export async function POST(request: NextRequest) {
     const userInfo = await verifyAuthServerSide()
     const userQuestion = body.messages[body.messages.length - 1]?.text?.toLowerCase() || ''
     
+    console.log('🔍 Vérification auth - userInfo:', userInfo ? 'Connecté' : 'Non connecté')
+    
     if (!userInfo) {
       // Utilisateur non connecté - utiliser le modèle local pour FAQ et support
       
@@ -135,7 +145,7 @@ export async function POST(request: NextRequest) {
         'profil', 'informations', 'données',
         'session', 'identifiant', 'id',
         'abonnement', 'subscription',
-        'type', 'parent', 'enfant'
+        'type', 'parent', 'enfant', 'qui suis', 'qui suis-je'
       ]
       
       const isAskingForPersonalInfo = personalInfoKeywords.some(keyword => 
@@ -187,7 +197,7 @@ export async function POST(request: NextRequest) {
       'profil', 'informations', 'données',
       'session', 'identifiant', 'id',
       'abonnement', 'subscription',
-      'type', 'parent', 'enfant'
+      'type', 'parent', 'enfant', 'qui suis', 'qui suis-je'
     ]
     
     const isAskingForPersonalInfo = personalInfoKeywords.some(keyword => 
@@ -229,16 +239,24 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const system = body.system ?? `Tu es Bubix, l'assistant IA de CubeAI. Sois clair, utile, bienveillant et adapté aux enfants. Oriente vers des liens internes quand pertinent.
+    const system = body.system ?? `Tu es Bubix, l'assistant IA de CubeAI. Tu dois être un professeur bienveillant et attentionné qui connaît personnellement son élève.
 
 INFORMATIONS UTILISATEUR ACTUEL :
-- Nom : ${userInfo.firstName} ${userInfo.lastName}
+- Prénom : ${userInfo.firstName}
+- Nom complet : ${userInfo.firstName} ${userInfo.lastName}
 - Type : ${userInfo.userType === 'PARENT' ? 'Parent' : 'Enfant'}
 - Abonnement : ${userInfo.subscriptionType}
 - Session ID : ${userInfo.sessionId}
 ${userInfo.email ? `- Email : ${userInfo.email}` : ''}
 
-Tu peux utiliser ces informations pour personnaliser tes réponses. Si l'utilisateur demande ses informations personnelles, tu peux les fournir.`
+INSTRUCTIONS IMPORTANTES :
+1. Tu dois t'adresser à ${userInfo.firstName} par son prénom
+2. Sois personnel et bienveillant comme un professeur qui connaît son élève
+3. Adapte ton langage selon si c'est un enfant (${userInfo.userType === 'CHILD' ? 'oui' : 'non'})
+4. Utilise ces informations pour personnaliser tes réponses
+5. Si ${userInfo.firstName} demande ses informations personnelles, tu peux les fournir
+6. Sois encourageant et pédagogique`
+
     const history: ChatMsg[] = [{ role: 'system', content: system }]
 
     for (const m of body.messages.slice(-12)) {
@@ -262,7 +280,7 @@ Tu peux utiliser ces informations pour personnaliser tes réponses. Si l'utilisa
     const payload = {
       model: model,
       messages: history,
-      temperature: 0.6,
+      temperature: 0.7,
       max_tokens: maxTokens,
     }
 
@@ -301,6 +319,7 @@ Tu peux utiliser ces informations pour personnaliser tes réponses. Si l'utilisa
       }
     })
   } catch (e: any) {
+    console.error('❌ Erreur API chat:', e)
     return NextResponse.json({
       text: "Impossible d'interroger le LLM pour le moment. Utilisez les liens et le moteur local.",
       actions: [],
