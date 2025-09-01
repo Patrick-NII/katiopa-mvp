@@ -69,10 +69,10 @@ export default function NavBar() {
     <nav className="w-full bg-white border-b border-gray-200 shadow-sm">
       <div className="w-full px-6 py-4">
         <div className="flex justify-between items-center">
-          {/* Logo KATIOPA à gauche */}
+          {/* Logo CubeAI à gauche */}
           <Link href="/" className="flex items-center">
             <span className="text-2xl font-black text-gray-900 tracking-wider">
-              KATIOPA
+              CubeAI
             </span>
           </Link>
           

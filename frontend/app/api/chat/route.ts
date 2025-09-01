@@ -7,7 +7,12 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 type ChatMsg = { role: 'system' | 'user' | 'assistant'; content: string }
-type ReqBody = { system?: string; messages: Array<{ id:string; text:string; sender:'user'|'bot'; timestamp:number }> }
+type ReqBody = { 
+  system?: string; 
+  messages: Array<{ id:string; text:string; sender:'user'|'bot'; timestamp:number }>;
+  persona?: 'kid' | 'pro';
+  lang?: 'fr' | 'en';
+}
 
 // Interface pour les informations utilisateur
 interface UserInfo {
@@ -21,11 +26,24 @@ interface UserInfo {
   isActive: boolean
 }
 
+// Interface pour le contexte utilisateur
+interface UserContext {
+  displayName: string
+  role: 'child' | 'parent'
+  goals?: any
+  progress?: Array<{
+    domain: string
+    level: number
+    stats: any
+    updatedAt: Date
+  }>
+}
+
 // Fonction pour vérifier l'authentification côté serveur avec Prisma
 async function verifyAuthServerSide(): Promise<UserInfo | null> {
   try {
     const cookieStore = await cookies()
-               const token = cookieStore.get('authToken')?.value
+    const token = cookieStore.get('authToken')?.value
 
     if (!token) {
       console.log('❌ Pas de token trouvé')
@@ -76,6 +94,203 @@ async function verifyAuthServerSide(): Promise<UserInfo | null> {
   }
 }
 
+// Fonction pour obtenir le contexte utilisateur
+async function getUserContext(userInfo: UserInfo): Promise<UserContext> {
+  try {
+    const displayName = userInfo.firstName || userInfo.email || 'Utilisateur'
+    const role = userInfo.userType === 'CHILD' ? 'child' : 'parent'
+    
+    // TODO: Récupérer les objectifs et progression depuis la base de données
+    // Pour l'instant, on utilise des données factices
+    const goals = {
+      shortTerm: "découvrir CubeAI",
+      longTerm: "apprentissage personnalisé"
+    }
+    
+    const progress = [
+      {
+        domain: "math",
+        level: 2,
+        stats: { mastered: ["additions <= 20"], struggling: ["soustractions ≤ 20"] },
+        updatedAt: new Date()
+      }
+    ]
+
+    return {
+      displayName,
+      role,
+      goals,
+      progress
+    }
+  } catch (error) {
+    console.error('❌ Erreur récupération contexte:', error)
+    return {
+      displayName: userInfo.firstName || 'Utilisateur',
+      role: userInfo.userType === 'CHILD' ? 'child' : 'parent'
+    }
+  }
+}
+
+// Fonction pour détecter l'intention de la question
+function detectIntent(userQuery: string): string {
+  const query = userQuery.toLowerCase()
+  
+  // Intentions d'action
+  if (query.includes('tarif') || query.includes('prix') || query.includes('abonnement') || query.includes('facturation')) {
+    return 'pricing'
+  }
+  if (query.includes('inscription') || query.includes('créer') || query.includes('compte') || query.includes('signup')) {
+    return 'signup'
+  }
+  if (query.includes('souscrire') || query.includes('acheter') || query.includes('subscribe')) {
+    return 'subscribe'
+  }
+  if (query.includes('aide') || query.includes('support') || query.includes('faq') || query.includes('problème')) {
+    return 'support'
+  }
+  
+  // Intentions personnelles
+  if (query.includes('email') || query.includes('mail') || query.includes('adresse mail')) {
+    return 'personal_info'
+  }
+  if (query.includes('profil') || query.includes('informations') || query.includes('données') || query.includes('qui suis')) {
+    return 'personal_info'
+  }
+  
+  // Intentions éducatives
+  if (query.includes('math') || query.includes('calcul') || query.includes('addition') || query.includes('soustraction')) {
+    return 'educational'
+  }
+  if (query.includes('histoire') || query.includes('conte') || query.includes('récit')) {
+    return 'story'
+  }
+  if (query.includes('ia') || query.includes('intelligence artificielle') || query.includes('robot')) {
+    return 'ai_education'
+  }
+  
+  return 'general'
+}
+
+// Fonction pour récupérer des extraits RAG
+function getRAGSnippets(intent: string, userQuery: string): string[] {
+  const query = userQuery.toLowerCase()
+  const snippets: string[] = []
+  
+  // Base de connaissances selon l'intention
+  switch (intent) {
+    case 'pricing':
+      snippets.push(
+        "Tarifs CubeAI : Essai gratuit de 3 mois, puis abonnements famille à partir de 9,99€/mois.",
+        "Plans disponibles : Starter (gratuit), Pro (29,99€/mois), Premium (69,99€/mois).",
+        "Avantages Premium : 6 sessions simultanées, IA coach avancé, certificats officiels."
+      )
+      break
+    case 'signup':
+      snippets.push(
+        "Inscription : Créez votre compte en 2 minutes avec votre email.",
+        "Processus : 1) Créer compte, 2) Personnaliser profil enfant, 3) Commencer à apprendre.",
+        "Sécurité : Données cryptées, conformité RGPD, protection maximale des enfants."
+      )
+      break
+    case 'educational':
+      snippets.push(
+        "Mathématiques : Additions, soustractions, géométrie adaptées aux 5-7 ans.",
+        "Progression : Niveaux adaptatifs, exercices personnalisés, suivi en temps réel.",
+        "Méthode : Approche ludique avec jeux éducatifs et récompenses."
+      )
+      break
+    case 'ai_education':
+      snippets.push(
+        "IA pour enfants : Explications simples de l'intelligence artificielle.",
+        "Sécurité IA : Contenu filtré, pas d'informations personnelles partagées.",
+        "Apprentissage IA : L'IA s'adapte au niveau et au rythme de chaque enfant."
+      )
+      break
+    default:
+      snippets.push(
+        "CubeAI : Plateforme d'apprentissage intelligent pour enfants de 5 à 7 ans.",
+        "Fonctionnalités : Mathématiques, lecture, sciences, développement créativité.",
+        "Personnalisation : IA adaptative qui s'ajuste aux besoins de chaque enfant."
+      )
+  }
+  
+  return snippets
+}
+
+// Fonction pour construire les prompts selon le workflow
+function buildPrompts({
+  persona,
+  role,
+  lang,
+  context,
+  rag,
+  history,
+  userQuery,
+  intent
+}: {
+  persona: 'kid' | 'pro'
+  role: 'child' | 'parent'
+  lang: 'fr' | 'en'
+  context: string
+  rag: string[]
+  history: any[]
+  userQuery: string
+  intent: string
+}) {
+  
+  const system = `
+Tu es Bubix, l'assistant IA de CubeAI.
+
+Public: ${role === 'child' ? 'enfant 5–7 ans' : 'parent'}.
+Langue: ${lang}.
+Ton: ${persona === 'kid' ? 'bienveillant, simple, ludique' : 'clair, concis, orienté actions'}.
+
+Règles:
+- Réponds d'abord à la question. Sois concret et utile.
+- Oriente vers des liens internes si pertinent (ex: /pricing, /signup, /subscribe).
+- Personnalise avec objectifs/progression seulement si utile.
+- Respect RGPD. Jamais d'infos d'autres utilisateurs.
+- Si hors périmètre, propose une mini-leçon adaptée à l'âge/niveau.
+- Si l'utilisateur demande "comment faire X sur le site", donne des étapes courtes (1–2–3) + CTA.
+- Si tu es incertain, demande une clarification en 1 phrase.
+- Adapte ton langage selon le persona (kid = phrases courtes, vocabulaire simple).
+`.trim()
+
+  const developer = `
+Contraintes de sortie:
+- Longueur: ${persona === 'kid' ? '2–5 phrases' : '1–4 phrases'}.
+- Pas de jargon sans exemple simple (kid).
+- Si lien: libellé clair + route interne (relative).
+- Si exercices/math: un exemple simple (+ solution si demandé).
+- Si liste: 3–5 puces maximum.
+- Format CTA: "Libellé → /route"
+`.trim()
+
+  const ctxBlock = `
+CONTEXT
+${context}
+
+RAG
+${rag.length ? rag.join('\n---\n') : 'n/a'}
+
+INTENT
+${intent}
+`.trim()
+
+  const messages = [
+    { role: 'system', content: system },
+    { role: 'system', content: developer },
+    { role: 'system', content: ctxBlock },
+    ...history.slice(-10).map(m => ({
+      role: m.sender === 'user' ? 'user' : 'assistant' as const,
+      content: m.text
+    })),
+    { role: 'user', content: userQuery }
+  ]
+  
+  return { messages }
+}
+
 // Fonction pour obtenir le modèle selon l'abonnement
 function getModelForSubscription(subscriptionType: string): string {
   switch (subscriptionType) {
@@ -113,46 +328,66 @@ function getMaxTokensForSubscription(subscriptionType: string): number {
   }
 }
 
+// Fonction pour post-traiter la réponse
+function postProcessResponse(text: string, persona: 'kid' | 'pro', intent: string): { text: string, actions: any[] } {
+  let processedText = text
+  const actions: any[] = []
+  
+  // Ajouter des CTA selon l'intention
+  switch (intent) {
+    case 'pricing':
+      actions.push(
+        { label: "Voir les tarifs", href: "/register" },
+        { label: "Souscrire", href: "/register" }
+      )
+      break
+    case 'signup':
+      actions.push(
+        { label: "Créer un compte", href: "/register" },
+        { label: "Se connecter", href: "/login" }
+      )
+      break
+    case 'subscribe':
+      actions.push(
+        { label: "Souscrire", href: "/register" },
+        { label: "Voir les plans", href: "/register" }
+      )
+      break
+    case 'support':
+      actions.push(
+        { label: "Centre d'aide", href: "/support" },
+        { label: "Contact", href: "/contact" }
+      )
+      break
+  }
+  
+  // Simplifier pour les enfants si nécessaire
+  if (persona === 'kid' && processedText.length > 200) {
+    // Garder seulement les 2-3 premières phrases
+    const sentences = processedText.split(/[.!?]+/).filter(s => s.trim()).slice(0, 3)
+    processedText = sentences.join('. ') + '.'
+  }
+  
+  return { text: processedText, actions }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as ReqBody
+    const userQuery = body.messages[body.messages.length - 1]?.text || ''
+    const persona = body.persona || 'pro'
+    const lang = body.lang || 'fr'
 
     // Vérifier l'authentification côté serveur
     const userInfo = await verifyAuthServerSide()
-    const userQuestion = body.messages[body.messages.length - 1]?.text?.toLowerCase() || ''
     
     console.log('🔍 Vérification auth - userInfo:', userInfo ? 'Connecté' : 'Non connecté')
     
     if (!userInfo) {
       // Utilisateur non connecté - utiliser le modèle local pour FAQ et support
+      const intent = detectIntent(userQuery)
       
-      // Détecter les questions de support/FAQ
-      const supportKeywords = [
-        'aide', 'support', 'faq', 'question', 'comment', 'problème',
-        'inscription', 'connexion', 'compte', 'mot de passe',
-        'tarif', 'prix', 'abonnement', 'facturation',
-        'technique', 'bug', 'erreur', 'fonctionne pas'
-      ]
-      
-      const isSupportQuestion = supportKeywords.some(keyword => 
-        userQuestion.includes(keyword)
-      )
-
-      // Détecter les questions sur les informations personnelles
-      const personalInfoKeywords = [
-        'email', 'adresse mail', 'mail', 'e-mail',
-        'nom', 'prénom', 'nom complet',
-        'profil', 'informations', 'données',
-        'session', 'identifiant', 'id',
-        'abonnement', 'subscription',
-        'type', 'parent', 'enfant', 'qui suis', 'qui suis-je'
-      ]
-      
-      const isAskingForPersonalInfo = personalInfoKeywords.some(keyword => 
-        userQuestion.includes(keyword)
-      )
-
-      if (isAskingForPersonalInfo) {
+      if (intent === 'personal_info') {
         return NextResponse.json({
           text: "🔐 **Connexion requise**\n\nPour accéder à vos informations personnelles, vous devez d'abord vous connecter à votre compte.\n\n💡 **Pour vous connecter :**\n1. Cliquez sur 'Connexion' en haut à droite\n2. Utilisez votre Session ID et mot de passe\n3. Ou créez un compte si vous n'en avez pas\n\nUne fois connecté, je pourrai vous aider avec vos informations personnelles !",
           actions: [
@@ -164,48 +399,26 @@ export async function POST(request: NextRequest) {
         })
       }
 
-      if (isSupportQuestion) {
-        // Réponse de support local
-        return NextResponse.json({
-          text: `🔧 **Support CubeAI**\n\nJe peux vous aider avec les questions de base. Voici quelques informations utiles :\n\n📧 **Contact** : support@cubeai.com\n📞 **Téléphone** : +33 1 23 45 67 89\n🌐 **Site web** : https://cubeai.com/support\n\n💡 **Questions fréquentes :**\n• Inscription : Cliquez sur "Commencer gratuitement"\n• Connexion : Utilisez votre Session ID et mot de passe\n• Tarifs : Voir la page des abonnements\n\nPour une assistance personnalisée, veuillez vous connecter à votre compte.`,
-          actions: [
-            { label: "Se connecter", href: "/login" },
-            { label: "Créer un compte", href: "/register" },
-            { label: "Voir les tarifs", href: "/register" }
-          ],
-          model: 'local-support',
-          subscriptionType: 'none'
-        })
-      }
-
-      // Réponse générique pour les utilisateurs non connectés
+      // Réponse de support local avec RAG
+      const ragSnippets = getRAGSnippets(intent, userQuery)
+      const supportResponse = `🔧 **Support CubeAI**\n\n${ragSnippets.join('\n\n')}\n\n💡 **Pour une assistance personnalisée, veuillez vous connecter à votre compte.**`
+      
       return NextResponse.json({
-        text: "👋 **Bienvenue sur CubeAI !**\n\nJe suis Bubix, votre assistant IA. Pour accéder à toutes mes fonctionnalités et obtenir des réponses personnalisées, veuillez vous connecter à votre compte.\n\n🔐 **Avantages de la connexion :**\n• Réponses personnalisées selon votre profil\n• Accès à l'historique de vos conversations\n• Fonctionnalités avancées selon votre abonnement\n\n💡 **Pour commencer :**\n1. Créez un compte gratuit\n2. Ou connectez-vous si vous en avez déjà un\n3. Profitez de l'expérience complète !",
+        text: supportResponse,
         actions: [
           { label: "Se connecter", href: "/login" },
           { label: "Créer un compte", href: "/register" }
         ],
-        model: 'local-base',
+        model: 'local-support',
         subscriptionType: 'none'
       })
     }
 
-    // Utilisateur connecté - analyser la question
-    const personalInfoKeywords = [
-      'email', 'adresse mail', 'mail', 'e-mail',
-      'nom', 'prénom', 'nom complet',
-      'profil', 'informations', 'données',
-      'session', 'identifiant', 'id',
-      'abonnement', 'subscription',
-      'type', 'parent', 'enfant', 'qui suis', 'qui suis-je'
-    ]
+    // Utilisateur connecté - workflow complet
+    const intent = detectIntent(userQuery)
     
-    const isAskingForPersonalInfo = personalInfoKeywords.some(keyword => 
-      userQuestion.includes(keyword)
-    )
-
     // Si l'utilisateur demande ses informations personnelles, les fournir directement
-    if (isAskingForPersonalInfo) {
+    if (intent === 'personal_info') {
       const profileInfo = `👤 **Profil Utilisateur :**
 📧 Email : ${userInfo.email || 'Non renseigné'}
 👨‍👩‍👧‍👦 Type : ${userInfo.userType === 'PARENT' ? 'Parent' : 'Enfant'}
@@ -239,29 +452,30 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const system = body.system ?? `Tu es Bubix, l'assistant IA de CubeAI. Tu dois être un professeur bienveillant et attentionné qui connaît personnellement son élève.
+    // Workflow complet : Récupérer le contexte utilisateur
+    const userContext = await getUserContext(userInfo)
+    
+    // Récupérer les extraits RAG
+    const ragSnippets = getRAGSnippets(intent, userQuery)
+    
+    // Construire le contexte
+    const context = `Utilisateur: ${userContext.displayName}
+Role: ${userContext.role}
+Objectifs: ${JSON.stringify(userContext.goals) || 'n/a'}
+Progression (3 derniers):
+${userContext.progress?.map(p => `- ${p.domain}: level ${p.level}, stats: ${JSON.stringify(p.stats)}`).join('\n') || 'n/a'}`
 
-INFORMATIONS UTILISATEUR ACTUEL :
-- Prénom : ${userInfo.firstName}
-- Nom complet : ${userInfo.firstName} ${userInfo.lastName}
-- Type : ${userInfo.userType === 'PARENT' ? 'Parent' : 'Enfant'}
-- Abonnement : ${userInfo.subscriptionType}
-- Session ID : ${userInfo.sessionId}
-${userInfo.email ? `- Email : ${userInfo.email}` : ''}
-
-INSTRUCTIONS IMPORTANTES :
-1. Tu dois t'adresser à ${userInfo.firstName} par son prénom
-2. Sois personnel et bienveillant comme un professeur qui connaît son élève
-3. Adapte ton langage selon si c'est un enfant (${userInfo.userType === 'CHILD' ? 'oui' : 'non'})
-4. Utilise ces informations pour personnaliser tes réponses
-5. Si ${userInfo.firstName} demande ses informations personnelles, tu peux les fournir
-6. Sois encourageant et pédagogique`
-
-    const history: ChatMsg[] = [{ role: 'system', content: system }]
-
-    for (const m of body.messages.slice(-12)) {
-      history.push({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text })
-    }
+    // Construire les prompts selon le workflow
+    const { messages } = buildPrompts({
+      persona,
+      role: userContext.role,
+      lang,
+      context,
+      rag: ragSnippets,
+      history: body.messages,
+      userQuery,
+      intent
+    })
 
     const key = process.env.OPENAI_API_KEY
     if (!key || key === 'sk-your-openai-api-key-here') {
@@ -279,8 +493,8 @@ INSTRUCTIONS IMPORTANTES :
     // Call OpenAI Chat Completions
     const payload = {
       model: model,
-      messages: history,
-      temperature: 0.7,
+      messages: messages,
+      temperature: persona === 'kid' ? 0.6 : 0.4,
       max_tokens: maxTokens,
     }
 
@@ -295,6 +509,7 @@ INSTRUCTIONS IMPORTANTES :
 
     if (!r.ok) {
       const txt = await r.text()
+      console.error('❌ Erreur OpenAI:', txt)
       return NextResponse.json({
         text: "Le service LLM a renvoyé une erreur. Fallback local activé.",
         actions: [],
@@ -302,12 +517,16 @@ INSTRUCTIONS IMPORTANTES :
         error: 'LLM_ERROR'
       })
     }
+    
     const data = await r.json()
-    const text = data.choices?.[0]?.message?.content ?? "Réponse vide du modèle."
+    const rawText = data.choices?.[0]?.message?.content ?? "Réponse vide du modèle."
+
+    // Post-traiter la réponse
+    const { text, actions } = postProcessResponse(rawText, persona, intent)
 
     return NextResponse.json({
       text,
-      actions: [],
+      actions,
       model: model,
       subscriptionType: userInfo.subscriptionType,
       userInfo: {
@@ -316,7 +535,9 @@ INSTRUCTIONS IMPORTANTES :
         name: `${userInfo.firstName} ${userInfo.lastName}`,
         userType: userInfo.userType,
         subscriptionType: userInfo.subscriptionType
-      }
+      },
+      intent,
+      persona
     })
   } catch (e: any) {
     console.error('❌ Erreur API chat:', e)
