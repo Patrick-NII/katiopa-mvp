@@ -538,6 +538,7 @@ router.post('/login', async (req, res) => {
         },
         userSession: {
           id: userSession.id,
+          sessionId: userSession.sessionId,
           firstName: userSession.firstName,
           lastName: userSession.lastName,
           userType: userSession.userType,
@@ -593,20 +594,13 @@ router.get('/verify', requireAuth, async (req, res) => {
 
     res.json({
       success: true,
-      data: {
-        account: {
-          id: userSession.account.id,
-          email: userSession.account.email,
-          subscriptionType: userSession.account.subscriptionType,
-          maxSessions: userSession.account.maxSessions
-        },
-        userSession: {
-          id: userSession.id,
-          firstName: userSession.firstName,
-          lastName: userSession.lastName,
-          userType: userSession.userType,
-          profile: userSession.profile
-        }
+      user: {
+        id: userSession.id,
+        sessionId: userSession.sessionId,
+        firstName: userSession.firstName,
+        lastName: userSession.lastName,
+        userType: userSession.userType,
+        subscriptionType: userSession.account.subscriptionType
       }
     });
 
@@ -657,6 +651,7 @@ router.get('/me', requireAuth, async (req, res) => {
         },
         userSession: {
           id: userSession.id,
+          sessionId: userSession.sessionId,
           firstName: userSession.firstName,
           lastName: userSession.lastName,
           userType: userSession.userType,
