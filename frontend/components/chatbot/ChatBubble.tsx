@@ -198,16 +198,16 @@ export default function ChatBubble(){
       }
       return true
     }
-          if(t === '/profile'){
-        // Utiliser l'API pour récupérer les informations du profil
-        const profileResponse = await askBackendLLM([], "montre-moi mon profil et mes informations personnelles", new AbortController().signal)
-        if (profileResponse && profileResponse.text) {
-          pushBot(profileResponse.text)
-        } else {
-          pushBot("❌ Impossible de récupérer vos informations de profil. Assurez-vous d'être connecté.")
-        }
-        return true
+    if(t === '/profile'){
+      // Utiliser l'API pour récupérer les informations du profil
+      const profileResponse = await askBackendLLM([], "montre-moi mon profil et mes informations personnelles", new AbortController().signal)
+      if (profileResponse && profileResponse.text) {
+        pushBot(profileResponse.text)
+      } else {
+        pushBot("❌ Impossible de récupérer vos informations de profil. Assurez-vous d'être connecté.")
       }
+      return true
+    }
     if(t === '/reset'){
       const hello: Message = { id: uid(), sender:'bot', timestamp: now(), text: 'Conversation effacée ! Je suis toujours Bubix, prêt à t\'aider. Comment puis-je t\'aider ?' }
       setMessages([hello]); setTags([]); setSummary(''); setPersona('kid')

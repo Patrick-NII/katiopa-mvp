@@ -1,19 +1,119 @@
 // app/api/chat/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserSubscription, getModelForSubscription, isLLMEnabled, getMaxTokensForSubscription, getUserInfo, isUserAuthenticated, getUserProfileInfo } from '@/lib/chatbot/auth'
+import { cookies } from 'next/headers'
+import jwt from 'jsonwebtoken'
 
 type ChatMsg = { role: 'system' | 'user' | 'assistant'; content: string }
 type ReqBody = { system?: string; messages: Array<{ id:string; text:string; sender:'user'|'bot'; timestamp:number }> }
+
+// Interface pour les informations utilisateur
+interface UserInfo {
+  id: string
+  sessionId: string
+  firstName: string
+  lastName: string
+  email?: string
+  userType: 'PARENT' | 'CHILD'
+  subscriptionType: 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE'
+  isActive: boolean
+}
+
+// Fonction pour vérifier l'authentification côté serveur
+async function verifyAuthServerSide(): Promise<UserInfo | null> {
+  try {
+    const cookieStore = await cookies()
+    const token = cookieStore.get('accessToken')?.value
+
+    if (!token) {
+      return null
+    }
+
+    // Vérifier le token JWT
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any
+    
+    if (!decoded || !decoded.userId) {
+      return null
+    }
+
+    // Récupérer les informations utilisateur depuis la base de données
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/auth/verify`, {
+      headers: {
+        'Cookie': `accessToken=${token}`
+      }
+    })
+
+    if (!response.ok) {
+      return null
+    }
+
+    const data = await response.json()
+    
+    if (data.success && data.user) {
+      return {
+        id: data.user.id,
+        sessionId: data.user.sessionId,
+        firstName: data.user.firstName,
+        lastName: data.user.lastName,
+        email: data.user.email,
+        userType: data.user.userType,
+        subscriptionType: data.user.subscriptionType,
+        isActive: true
+      }
+    }
+
+    return null
+  } catch (error) {
+    console.error('Erreur vérification auth côté serveur:', error)
+    return null
+  }
+}
+
+// Fonction pour obtenir le modèle selon l'abonnement
+function getModelForSubscription(subscriptionType: string): string {
+  switch (subscriptionType) {
+    case 'FREE':
+      return 'gpt-3.5-turbo'
+    case 'PRO':
+      return 'gpt-4o-mini'
+    case 'PRO_PLUS':
+      return 'gpt-4o'
+    case 'ENTERPRISE':
+      return 'gpt-4o'
+    default:
+      return 'gpt-3.5-turbo'
+  }
+}
+
+// Fonction pour vérifier si le LLM est activé
+function isLLMEnabled(subscriptionType: string): boolean {
+  return subscriptionType !== 'FREE'
+}
+
+// Fonction pour obtenir le nombre max de tokens
+function getMaxTokensForSubscription(subscriptionType: string): number {
+  switch (subscriptionType) {
+    case 'FREE':
+      return 0
+    case 'PRO':
+      return 400
+    case 'PRO_PLUS':
+      return 800
+    case 'ENTERPRISE':
+      return 1000
+    default:
+      return 0
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as ReqBody
 
-    // Vérifier si l'utilisateur est connecté
-    const isAuthenticated = await isUserAuthenticated()
+    // Vérifier l'authentification côté serveur
+    const userInfo = await verifyAuthServerSide()
     const userQuestion = body.messages[body.messages.length - 1]?.text?.toLowerCase() || ''
     
-    if (!isAuthenticated) {
+    if (!userInfo) {
       // Utilisateur non connecté - utiliser le modèle local pour FAQ et support
       
       // Détecter les questions de support/FAQ
@@ -80,20 +180,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Récupérer les informations complètes de l'utilisateur
-    const userInfo = await getUserInfo()
-    
-    if (!userInfo) {
-      return NextResponse.json({
-        text: "❌ **Erreur de récupération des données**\n\nImpossible de récupérer vos informations utilisateur. Veuillez vous reconnecter.",
-        actions: [
-          { label: "Se reconnecter", href: "/login" }
-        ],
-        error: 'USER_INFO_ERROR'
-      })
-    }
-
-    // Analyser la question de l'utilisateur pour détecter les demandes d'informations personnelles
+    // Utilisateur connecté - analyser la question
     const personalInfoKeywords = [
       'email', 'adresse mail', 'mail', 'e-mail',
       'nom', 'prénom', 'nom complet',
@@ -109,7 +196,14 @@ export async function POST(request: NextRequest) {
 
     // Si l'utilisateur demande ses informations personnelles, les fournir directement
     if (isAskingForPersonalInfo) {
-      const profileInfo = await getUserProfileInfo()
+      const profileInfo = `👤 **Profil Utilisateur :**
+📧 Email : ${userInfo.email || 'Non renseigné'}
+👨‍👩‍👧‍👦 Type : ${userInfo.userType === 'PARENT' ? 'Parent' : 'Enfant'}
+📋 Nom : ${userInfo.firstName} ${userInfo.lastName}
+🆔 Session ID : ${userInfo.sessionId}
+💎 Abonnement : ${userInfo.subscriptionType}
+✅ Statut : Actif`
+
       return NextResponse.json({
         text: `🔍 **Vos informations personnelles :**\n\n${profileInfo}\n\n💡 **Note :** Ces informations sont privées et ne sont visibles que par vous.`,
         actions: [],

@@ -100,6 +100,7 @@ export default function RegisterPage() {
 
   const [promoStatus, setPromoStatus] = useState<'applied' | 'invalid' | null>(null)
   const [promoDiscountPct, setPromoDiscountPct] = useState<number>(0)
+  const [navUser, setNavUser] = useState<any>(null)
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle')
   const [usernameHelper, setUsernameHelper] = useState('')
   const [childUsernameStatus, setChildUsernameStatus] = useState<Record<number, { status: 'idle' | 'checking' | 'available' | 'taken', helper: string }>>({})
@@ -228,6 +229,23 @@ export default function RegisterPage() {
   ] as const
 
   const selectedPlan = subscriptionPlans.find(p => p.id === formData.subscriptionType)!
+
+  // État connexion pour la nav (en ligne + avatar + déconnexion)
+  useEffect(() => {
+    let mounted = true
+    authAPI.verify().then(res => {
+      if (mounted && res?.success) setNavUser(res.user)
+    }).catch(() => {})
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'cubeai:auth') {
+        authAPI.verify().then(res => {
+          if (mounted) setNavUser(res?.success ? res.user : null)
+        }).catch(() => { if (mounted) setNavUser(null) })
+      }
+    }
+    window.addEventListener('storage', onStorage)
+    return () => { mounted = false; window.removeEventListener('storage', onStorage) }
+  }, [])
 
   /* -------------------------- Handlers & Validations ------------------------ */
 
@@ -773,12 +791,35 @@ const SummarySidebar = () => {
               <CubeAILogo className="text-3xl lg:text-4xl" />
             </div>
             <div className="flex items-center space-x-3 lg:space-x-4">
-              <Link href="/" className="font-body text-gray-600 hover:text-gray-900 px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100 !text-gray-600 hover:!text-gray-900">
-                Accueil
-        </Link>
-              <Link href="/login" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 lg:px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
-                Se connecter
-        </Link>
+              {navUser ? (
+                <>
+                  <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-white/70 border border-green-200 text-sm font-medium text-green-700">
+                    <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>
+                    En ligne
+                    <span className="text-green-700/80">• ID:</span>
+                    <span className="font-mono text-xs text-green-800">{navUser.sessionId}</span>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white flex items-center justify-center font-bold">
+                    {navUser.firstName?.charAt(0) || navUser.sessionId?.charAt(0) || 'U'}
+                  </div>
+                  <a href="/dashboard" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 py-2 rounded-lg text-sm font-medium">Espace personnel</a>
+                  <button
+                    onClick={async () => { try { await authAPI.logout(); localStorage.setItem('cubeai:auth', 'logged_out:' + Date.now()); setNavUser(null); router.push('/login'); } catch {} }}
+                    className="font-button bg-red-50 text-red-700 hover:bg-red-100 px-4 py-2 rounded-lg text-sm font-medium border border-red-200"
+                  >
+                    Se déconnecter
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/" className="font-body text-gray-600 hover:text-gray-900 px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100 !text-gray-600 hover:!text-gray-900">
+                    Accueil
+                  </Link>
+                  <Link href="/login" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 lg:px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                    Se connecter
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

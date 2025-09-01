@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { User, Lock, Eye, EyeOff, ArrowRight, User as UserIcon } from 'lucide-react';
@@ -8,7 +8,6 @@ import { authAPI } from '@/lib/api';
 import { CubeAILogo } from '@/components/MulticolorText';
 import AnimatedIcon from '@/components/AnimatedIcons';
 import Link from 'next/link';
-import { useEffect } from 'react';
 
 export default function LoginPage() {
   const [sessionId, setSessionId] = useState('');
@@ -16,7 +15,36 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [navUser, setNavUser] = useState<any>(null);
   const router = useRouter();
+  
+  // État connexion pour la nav (en ligne + avatar + déconnexion)
+  useEffect(() => {
+    let mounted = true;
+    authAPI
+      .verify()
+      .then((res) => {
+        if (mounted && res?.success) setNavUser(res.user);
+      })
+      .catch(() => {});
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'cubeai:auth') {
+        authAPI
+          .verify()
+          .then((res) => {
+            if (mounted) setNavUser(res?.success ? res.user : null);
+          })
+          .catch(() => {
+            if (mounted) setNavUser(null);
+          });
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => {
+      mounted = false;
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
   useEffect(() => {
     try { localStorage.setItem('cubeai:auth', 'check:' + Date.now()); } catch {}
   }, [])
@@ -35,7 +63,8 @@ export default function LoginPage() {
         
         console.log('✅ Connexion réussie:', response.user);
         
-        // Redirection vers le dashboard
+        // Signal cross-onglets + redirection
+        try { localStorage.setItem('cubeai:auth', 'logged_in:' + Date.now()); } catch {}
         router.push('/dashboard');
       } else {
         setError('Erreur de connexion');
@@ -66,12 +95,39 @@ export default function LoginPage() {
               <CubeAILogo className="text-4xl" />
             </div>
             <div className="flex items-center space-x-4">
-            <Link href="/" className="font-body text-gray-600 hover:text-gray-900 px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100 !text-gray-600 hover:!text-gray-900">
-                Accueil
-              </Link>
-              <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium">
-                S'inscrire
-              </Link>
+              {navUser ? (
+                <>
+                  <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-white/70 border border-green-200 text-sm font-medium text-green-700">
+                    <span className="font-mono text-xs text-green-800">{navUser.sessionId}</span>
+                    <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>
+                  </div>
+                  <a href="/dashboard" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 py-2 rounded-lg text-sm font-medium">Espace personnel</a>
+                  <button
+                    onClick={async () => {
+                      try {
+                        await authAPI.logout();
+                        localStorage.setItem('cubeai:auth', 'logged_out:' + Date.now());
+                        setNavUser(null);
+                        router.push('/login');
+                      } catch {}
+                    }}
+                    title="Se déconnecter"
+                    aria-label="Se déconnecter"
+                    className="px-2 py-2 rounded-lg text-xl transition transform hover:rotate-12 hover:scale-110"
+                  >
+                    🚪
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/" className="font-body text-gray-600 hover:text-gray-900 px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100 !text-gray-600 hover:!text-gray-900">
+                    Accueil
+                  </Link>
+                  <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium">
+                    S'inscrire
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
