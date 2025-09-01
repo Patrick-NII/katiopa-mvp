@@ -124,7 +124,7 @@ export default function SidebarNavigation({
     {
       id: 'experiences',
       label: 'Expériences',
-      icon: Cube3DIcon,
+      icon: Box,
       description: 'Toutes les fonctionnalités CubeAI',
       available: true // Tous les utilisateurs ont accès aux expériences
     },

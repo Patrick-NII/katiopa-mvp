@@ -1,133 +1,129 @@
 'use client'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { useSession } from '../hooks/useSession'
 
-interface User {
-  id: string
-  firstName: string
-  lastName: string
-  email: string
-  role: string
-  createdAt?: string
+import { useState, useEffect } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
+import { authAPI } from '@/lib/api'
+import { CubeAILogo } from '@/components/MulticolorText'
+
+interface NavbarProps {
+  className?: string
 }
 
-export default function NavBar() {
-  const [token, setToken] = useState<string | null>(null)
-  const [user, setUser] = useState<User | null>(null)
-  const { currentSessionTime, clearSession } = useSession()
+export default function Navbar({ className = '' }: NavbarProps) {
+  const [navUser, setNavUser] = useState<any>(null)
+  const router = useRouter()
+  const pathname = usePathname()
   
+  // État connexion pour la nav
   useEffect(() => {
-    const storedToken = localStorage.getItem('token')
-    setToken(storedToken)
+    let mounted = true
+    authAPI.verify().then(res => {
+      if (mounted && res?.success) setNavUser(res.user)
+    }).catch(() => {})
     
-    if (storedToken) {
-      loadUserProfile()
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'cubeai:auth') {
+        authAPI.verify().then(res => {
+          if (mounted) setNavUser(res?.success ? res.user : null)
+        }).catch(() => { if (mounted) setNavUser(null) })
+      }
     }
+    window.addEventListener('storage', onStorage)
+    return () => { mounted = false; window.removeEventListener('storage', onStorage) }
   }, [])
 
-  async function loadUserProfile() {
+  useEffect(() => {
+    try { localStorage.setItem('cubeai:auth', 'check:' + Date.now()); } catch {}
+  }, [])
+
+  const handleLogout = async () => {
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:4000'
-      const response = await fetch(`${apiBase}/auth/me`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      })
-      if (response.ok) {
-        const data = await response.json()
-        setUser(data.user)
-      }
-    } catch (err) {
-      console.error('Failed to load user profile:', err)
-    }
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    clearSession()
-    setToken(null)
-    setUser(null)
-    window.location.href = '/'
-  }
-
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-    const secs = seconds % 60
-    
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`
-    } else if (minutes > 0) {
-      return `${minutes}m ${secs}s`
-    } else {
-      return `${secs}s`
-    }
+      await authAPI.logout()
+      localStorage.setItem('cubeai:auth', 'logged_out:' + Date.now())
+      setNavUser(null)
+      router.push('/login')
+    } catch {}
   }
 
   return (
-    <nav className="w-full bg-white border-b border-gray-200 shadow-sm">
-      <div className="w-full px-6 py-4">
-        <div className="flex justify-between items-center">
-          {/* Logo CubeAI à gauche */}
-          <Link href="/" className="flex items-center">
-            <span className="text-2xl font-black text-gray-900 tracking-wider">
-              CubeAI
-            </span>
-          </Link>
+    <nav className={`bg-white/90 border-b border-gray-200 sticky top-0 z-50 ${className}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <span className="font-title text-white text-2xl">C</span>
+            </div>
+            <CubeAILogo className="text-4xl" />
+          </div>
           
-          <div className="flex items-center space-x-8">
-            {token ? (
+          <div className="flex items-center space-x-4">
+            {navUser ? (
+              // Utilisateur connecté
               <>
-                {/* Informations utilisateur et session sur une ligne */}
-                <div className="flex items-center space-x-6">
-                  {/* Nom et rôle */}
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-gray-900">
-                      {user ? `${user.firstName} ${user.lastName}` : 'Utilisateur'}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {user ? user.role.toLowerCase() : 'connecté'}
-                    </div>
-                  </div>
-                  
-                  {/* Avatar */}
-                  <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-bold text-white">
-                      {user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase() : 'U'}
-                    </span>
-                  </div>
-                  
-                  {/* Durée de session */}
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm font-mono text-gray-600">
-                      {formatTime(currentSessionTime)}
-                    </span>
-                  </div>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/70 border border-green-200 text-sm font-medium text-green-700">
+                  <span className="font-mono text-xs text-gray-900">{navUser.sessionId}</span>
+                  <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>
                 </div>
-                
-                {/* Boutons à droite superposés */}
-                <div className="flex flex-col space-y-2">
-                  <Link href="/dashboard" className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm">
-                    Dashboard
-                  </Link>
-                  <button 
-                    onClick={handleLogout} 
-                    className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg font-medium transition-colors text-sm"
-                  >
-                    Déconnexion
-                  </button>
-                </div>
+                <Link 
+                  href="/dashboard" 
+                  className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 py-2 rounded-lg text-sm font-medium"
+                >
+                  Espace personnel
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  title="Se déconnecter"
+                  aria-label="Se déconnecter"
+                  className="p-2 rounded-lg text-gray-700 hover:text-red-600 transition transform hover:rotate-12 hover:scale-110"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                </button>
               </>
             ) : (
+              // Utilisateur non connecté
               <>
-                <Link href="/login" className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium transition-colors">
-                  Connexion
+                <Link 
+                  href="/" 
+                  className="font-body text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100"
+                >
+                  Accueil
                 </Link>
-                <Link href="/register" className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                  Inscription
-                </Link>
+                {pathname === '/login' ? (
+                  // Sur la page login, afficher "S'inscrire"
+                  <Link 
+                    href="/register" 
+                    className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+                  >
+                    S'inscrire
+                  </Link>
+                ) : pathname === '/register' ? (
+                  // Sur la page register, afficher "Se connecter"
+                  <Link 
+                    href="/login" 
+                    className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+                  >
+                    Se connecter
+                  </Link>
+                ) : (
+                  // Sur les autres pages, afficher les deux
+                  <>
+                    <Link 
+                      href="/login" 
+                      className="font-body text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100"
+                    >
+                      Connexion
+                    </Link>
+                    <Link 
+                      href="/register" 
+                      className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+                    >
+                      Commencer gratuitement
+                    </Link>
+                  </>
+                )}
               </>
             )}
           </div>
