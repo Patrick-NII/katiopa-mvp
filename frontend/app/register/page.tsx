@@ -482,6 +482,25 @@ export default function RegisterPage() {
     setError('')
 
     try {
+      // Synchroniser les données du parent (index 0) avec les champs principaux
+      const updatedFamilyMembers = formData.familyMembers.map((member, index) => {
+        if (index === 0) {
+          // Pour le parent, utiliser les données principales du formulaire
+          return {
+            ...member,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            gender: member.gender,
+            userType: 'PARENT',
+            dateOfBirth: member.dateOfBirth,
+            grade: member.grade,
+            username: member.username,
+            sessionPassword: formData.password // Le parent utilise le mot de passe principal
+          }
+        }
+        return member
+      })
+
       const payload = {
         email: formData.email,
         firstName: formData.firstName,
@@ -491,7 +510,7 @@ export default function RegisterPage() {
         subscriptionType:
           formData.subscriptionType === 'STARTER' ? 'FREE' :
                          formData.subscriptionType === 'PRO' ? 'PRO' : 'PRO_PLUS',
-        familyMembers: formData.familyMembers.map((member, index) => ({
+        familyMembers: updatedFamilyMembers.map((member, index) => ({
           firstName: member.firstName,
           lastName: member.lastName,
           gender: member.gender,
@@ -500,7 +519,7 @@ export default function RegisterPage() {
           dateOfBirth: formatFrenchToISO(member.dateOfBirth),
           grade: member.grade,
           username: member.username || `${member.firstName.toLowerCase()}_${Date.now()}`,
-          sessionPassword: index === 0 ? formData.password : member.sessionPassword
+          sessionPassword: member.sessionPassword
         })),
         parentPrompts: {
           objectives: formData.parentPrompts?.objectives || '',
@@ -574,6 +593,27 @@ export default function RegisterPage() {
     }, 400)
     return () => clearTimeout(t)
   }, [formData.email])
+
+  // Synchronisation automatique des données du parent avec les champs principaux
+  useEffect(() => {
+    if (formData.familyMembers.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        familyMembers: prev.familyMembers.map((member, index) => {
+          if (index === 0) {
+            // Synchroniser le parent avec les champs principaux
+            return {
+              ...member,
+              firstName: prev.firstName,
+              lastName: prev.lastName,
+              userType: 'PARENT'
+            }
+          }
+          return member
+        })
+      }))
+    }
+  }, [formData.firstName, formData.lastName])
 
   // Vérification identifiant parent en temps réel (debounce)
   useEffect(() => {

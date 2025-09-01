@@ -347,15 +347,21 @@ router.post('/register', async (req, res) => {
       const parentReq = familyMembers.find((m: any) => (m.userType || 'CHILD') === 'PARENT') || familyMembers[0]
       const toName = parentReq ? `${parentReq.firstName || ''} ${parentReq.lastName || ''}`.trim() : account.email
 
+      // Préparer les données pour l'email avec les mots de passe en clair
+      const emailFamilyMembers = familyMembers.map((member: any, index: number) => ({
+        ...member,
+        sessionPassword: member.sessionPassword || (index === 0 ? password : `${member.firstName?.toLowerCase() || 'user'}123`)
+      }))
+
       await sendWelcomeEmail({
         toEmail: account.email,
         toName: toName || account.email,
         subscriptionType: account.subscriptionType,
-        familyMembers: familyMembers || [],
+        familyMembers: emailFamilyMembers,
         createdSessions: createdSessions as any,
         registrationId,
       })
-      console.log('📧 Email de bienvenue déclenché pour', account.email)
+      console.log('📧 Email de bienvenue envoyé avec succès pour', account.email, 'avec', emailFamilyMembers.length, 'membres')
     } catch (e) {
       console.warn('⚠️ Envoi de l\'email de bienvenue échoué (non bloquant):', (e as any)?.message)
     }
