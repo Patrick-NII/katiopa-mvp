@@ -26,6 +26,10 @@ const ST_PERSONA = 'katiopa_chat_persona_v1'
 
 type Persona = 'kid' | 'pro'
 
+interface ChatBubbleProps {
+  subscriptionType?: 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE'
+}
+
 function now(){ return Date.now() }
 function uid(){ return (globalThis.crypto as any)?.randomUUID?.() ?? `${Date.now()}_${Math.random()}` }
 function sleep(ms:number){ return new Promise(r=>setTimeout(r,ms)) }
@@ -111,7 +115,7 @@ async function askBackendLLM(history: Message[], userText: string, signal: Abort
   }catch{ return null }
 }
 
-export default function ChatBubble(){
+export default function ChatBubble({ subscriptionType = 'FREE' }: ChatBubbleProps){
   const [open, setOpen] = useState(false)
   const [maxi, setMaxi] = useState(false)
   const [persona, setPersona] = useState<Persona>('kid')
@@ -126,6 +130,37 @@ export default function ChatBubble(){
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const abortRef = useRef<AbortController|null>(null)
+
+  // Déterminer les couleurs selon le type d'abonnement (basé sur les cartes)
+  const getSubscriptionColors = () => {
+    if (subscriptionType === 'PRO_PLUS' || subscriptionType === 'ENTERPRISE') {
+      return {
+        gradient: 'from-orange-500 to-violet-600',
+        hoverGradient: 'from-orange-600 to-violet-700',
+        buttonBg: 'bg-orange-500',
+        buttonHover: 'hover:bg-orange-600',
+        text: 'Bubix Premium'
+      }
+    } else if (subscriptionType === 'PRO') {
+      return {
+        gradient: 'from-violet-600 to-pink-500',
+        hoverGradient: 'from-violet-700 to-pink-600',
+        buttonBg: 'bg-violet-600',
+        buttonHover: 'hover:bg-violet-700',
+        text: 'Bubix Pro'
+      }
+    } else {
+      return {
+        gradient: 'from-blue-600 to-purple-600',
+        hoverGradient: 'from-blue-700 to-purple-700',
+        buttonBg: 'bg-blue-600',
+        buttonHover: 'hover:bg-blue-700',
+        text: 'Bubix'
+      }
+    }
+  }
+
+  const colors = getSubscriptionColors()
 
   // INIT
   useEffect(()=>{
@@ -319,7 +354,7 @@ export default function ChatBubble(){
       >
         <motion.button
           onClick={()=>setOpen(v=>!v)}
-          className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform"
+          className={`w-16 h-16 bg-gradient-to-r ${colors.gradient} rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform`}
           whileTap={{ scale: 0.95 }}
           aria-label={open?'Fermer le chat':'Ouvrir le chat'}
         >
@@ -347,14 +382,14 @@ export default function ChatBubble(){
             transition={{ duration: 0.2, type: 'spring', stiffness: 200 }}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3">
+            <div className={`bg-gradient-to-r ${colors.gradient} text-white p-3`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center">
                     <Bot size={22} />
                   </div>
                   <div className="leading-tight">
-                    <div className="font-semibold">Bubix — Assistant IA CubeAI</div>
+                    <div className="font-semibold">{colors.text} — Assistant IA CubeAI</div>
                     <div className="text-[11px] text-blue-100">Disponible • Mémoire activée • Mode {persona === 'kid' ? 'enfant' : 'parent/pro'}</div>
                   </div>
                 </div>
@@ -374,7 +409,7 @@ export default function ChatBubble(){
               <div className="space-y-3">
                 {messages.map(m => (
                   <motion.div key={m.id} className={`flex ${m.sender==='user'?'justify-end':'justify-start'}`} initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{duration:0.15}}>
-                    <div className={`max-w-[85%] p-3 rounded-2xl ${m.sender==='user' ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-gray-800 rounded-bl-md shadow-sm'}`}>
+                    <div className={`max-w-[85%] p-3 rounded-2xl ${m.sender==='user' ? `${colors.buttonBg} text-white rounded-br-md` : 'bg-white text-gray-800 rounded-bl-md shadow-sm'}`}>
                       <p className="text-[14px] whitespace-pre-wrap leading-relaxed">{m.text}</p>
                       <p className={`text-[10px] mt-1 ${m.sender==='user'?'text-blue-100':'text-gray-500'}`}>
                         {new Date(m.timestamp).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}
@@ -409,7 +444,7 @@ export default function ChatBubble(){
                 <button
                   onClick={handleSend}
                   disabled={!input.trim()}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className={`px-4 py-2 ${colors.buttonBg} text-white rounded-lg ${colors.buttonHover} disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
                 >
                   <Send size={16}/>
                 </button>
