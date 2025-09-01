@@ -1,4 +1,3 @@
-
 'use client'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -46,7 +45,7 @@ function jaccard(a:Set<string>, b:Set<string>){
 
 function say(persona: Persona, pro: string | undefined, kid?: string | undefined){
   if(persona === 'kid' && kid) return kid
-  return pro ?? kid ?? 'Je n’ai pas cette information.'
+  return pro ?? kid ?? 'Je n\'ai pas cette information.'
 }
 
 // Weighted KB score
@@ -64,7 +63,7 @@ async function askBackendLLM(history: Message[], userText: string, signal: Abort
   try{
     const res = await fetch('/api/chat', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ system: "Tu es l’assistant IA de CubeAI. Réponds clairement. Oriente vers les liens internes. Si la question concerne des enfants, utilise un ton adapté si persona=kid.",
+      body: JSON.stringify({ system: "Tu es Bubix, l'assistant IA de CubeAI. Réponds clairement. Oriente vers les liens internes. Si la question concerne des enfants, utilise un ton adapté si persona=kid.",
         messages: history.concat({ id: uid(), text: userText, sender:'user', timestamp: now() }) }),
       signal
     })
@@ -262,55 +261,6 @@ export default function ChatBubble(){
     maybeSummarize()
   }
 
-  function fromIntent(intent: string): { text: string, actions?: LinkAction[] } | null {
-    switch(intent){
-      case 'greeting':
-        return { text: "Bonjour, je suis l’assistant IA CubeAI. Dites ce que vous cherchez: inscription, tarifs, matières, sécurité, vision, blague, histoire, mini-leçon." }
-      case 'signup':
-        return { text: say(persona, "Inscription rapide. Créez votre compte, ajoutez votre enfant, choisissez un parcours 5–7 ans.",
-                                   "Pour commencer, clique sur « Commencer gratuitement ».") ,
-                 actions: [{label:'Créer un compte', href: LINKS.signup}, {label:'Tarifs', href: LINKS.pricing}] }
-      case 'pricing':
-        return { text: say(persona, "Essai gratuit puis offres famille. Les plans payants débloquent plus de contenus et des rapports parentaux.",
-                                   "Tu peux essayer gratuitement. Après, il y a des formules famille.") ,
-                 actions: [{label:'Voir les tarifs', href: LINKS.pricing}, {label:'Souscrire', href: LINKS.subscribe}] }
-      case 'subscribe':
-        return { text: "La souscription active les contenus premium et les outils parentaux avancés.",
-                 actions: [{label:'Souscrire', href: LINKS.subscribe}] }
-      case 'age':
-        return { text: say(persona, "Le prototype couvre 5–7 ans avec séquences et évaluations adaptées.",
-                                   "Nous guidons surtout les 5 à 7 ans, avec des missions adaptées.") }
-      case 'subjects':
-        return { text: say(persona, "MathCube (maths), CodeCube (programmation & IA), PlayCube (détente/échecs/créations).",
-                                   "Il y a MathCube, CodeCube et PlayCube.") ,
-                 actions: [{label:'MathCube',href:LINKS.mathcube},{label:'CodeCube',href:LINKS.codecube},{label:'PlayCube',href:LINKS.playcube}] }
-      case 'security':
-        return { text: "Conformité RGPD, minimisation des données, chiffrement. Contrôle parental et droit à l’oubli." }
-      case 'vision':
-        return { text: say(persona, "Notre intention: une aventure d’apprentissage, ludique, guidée par l’IA, avec les parents comme co-pilotes.",
-                                   "Notre but: apprendre en s’amusant.") }
-      case 'contact':
-        return { text: "Expliquez votre besoin ici ou utilisez la page contact.", actions: [{label:'Contacter le support', href: LINKS.contact}] }
-      case 'method':
-        return { text: "Parcours en quêtes, objectifs clairs, feedback immédiat, certificat final." }
-      case 'parents':
-        return { text: "Les parents définissent des objectifs, valident des défis et suivent la progression via des rapports." }
-      case 'joke':
-        return { text: say(persona, "Voici une blague adaptée: Pourquoi le livre de maths sourit-il ? Parce qu’il a trouvé la solution.",
-                                   "Blague: Pourquoi le livre de maths sourit-il ? Parce qu’il a trouvé la solution.") }
-      case 'story':
-        return { text: say(persona, "Histoire courte: Un enfant curieux découvre une idée et la partage pour aider ses amis à apprendre.",
-                                   "Micro-récit: un scénario simple pour soutenir la lecture et la compréhension.") }
-      case 'lesson':
-        return { text: say(persona, "Mini-leçon: L’IA apprend à partir d’exemples. Elle n’est pas magique, elle s’entraîne.",
-                                   "Mini-leçon: L’IA (ML/DL) apprend des patterns à partir de données.") }
-      case 'math_problem':
-        return { text: say(persona, "Petit exercice: 7 + 5 = ?",
-                                   "Exercice simple: 7 + 5 = 12.") }
-    }
-    return null
-  }
-
   async function handleSend(){
     const raw = input
     if(!raw.trim()) return
@@ -320,30 +270,11 @@ export default function ChatBubble(){
 
     if(await systemCommands(raw)) return
 
-    // 1) Intent
-    const intent = detectIntent(raw)
-    const templ = fromIntent(intent)
-    if(templ){
-      await streamBot(templ.text, templ.actions)
-      return
-    }
-
-    // 2) RAG over KB
-    if(KB.length){
-      const ranked = scoreKB(raw, KB)
-      const top = ranked[0]
-      if(top && top.score >= 0.55){
-        const it = top.item
-        const text = say(persona, it.a_pro || it.a, it.a_kid)
-        await streamBot(text, it.actions)
-        return
-      }
-    }
-
-    // 3) Fallback LLM
+    // Utiliser directement l'API LLM pour toutes les questions
     setTyping(true)
     abortRef.current?.abort()
     const ctrl = new AbortController(); abortRef.current = ctrl
+    
     const llm = await Promise.race([
       askBackendLLM(messages, raw, ctrl.signal),
       (async()=>{ await sleep(3500); return null })(),
@@ -355,18 +286,17 @@ export default function ChatBubble(){
       return
     }
 
-    // 4) Last guidance
-    await streamBot("Je n’ai pas trouvé dans ma base locale. Voulez-vous parler de l’inscription, des tarifs, de la pédagogie, de la sécurité, de la vision, d’une blague, d’une histoire ou d’une mini-leçon ?", [
-      {label:'Inscription', href: LINKS.signup},
-      {label:'Tarifs', href: LINKS.pricing},
-      {label:'Souscrire', href: LINKS.subscribe},
+    // Fallback si l'API LLM ne répond pas
+    await streamBot("Je n'ai pas pu traiter votre demande pour le moment. Pouvez-vous reformuler votre question ?", [
+      {label:'Aide', href: '/help'},
+      {label:'Contact', href: '/contact'},
     ])
   }
 
   const suggestions = useMemo(()=>[
     "Comment inscrire mon enfant ?",
     "Quels sont les tarifs ?",
-    "Explique l’IA en mots simples",
+    "Explique l'IA en mots simples",
   ],[])
 
   const width = maxi ? 'w-[560px]' : 'w-[460px]'
@@ -480,7 +410,7 @@ export default function ChatBubble(){
                 </button>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
-                {["Comment inscrire mon enfant ?", "Quels sont les tarifs ?", "Explique l’IA en mots simples"].map((s,i)=>(
+                {["Comment inscrire mon enfant ?", "Quels sont les tarifs ?", "Explique l'IA en mots simples"].map((s,i)=>(
                   <button key={i} onClick={()=>setInput(s)} className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full hover:bg-gray-200 transition-colors">
                     {s}
                   </button>

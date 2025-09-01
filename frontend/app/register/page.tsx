@@ -793,8 +793,8 @@ const SummarySidebar = () => {
             <div className="flex items-center space-x-3 lg:space-x-4">
               {navUser ? (
                 <>
-                  <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-white/70 border border-green-200 text-sm font-medium text-green-700">
-                    <span className="font-mono text-xs text-green-800">{navUser.sessionId}</span>
+                  <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-green-700">
+                    <span className="font-mono text-xs text-gray-900">{navUser.sessionId}</span>
                     <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>
                   </div>
                   <button
