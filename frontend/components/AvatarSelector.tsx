@@ -119,9 +119,7 @@ export default function AvatarSelector({
           </div>
           <h2 className="text-2xl font-bold text-gray-900">Personnalisation de l'avatar</h2>
         </div>
-        <p className="text-gray-600">
-          Choisis l'avatar qui te représente le mieux ! Tu peux le changer à tout moment.
-        </p>
+        
       </div>
 
       {/* Avatar actuel */}

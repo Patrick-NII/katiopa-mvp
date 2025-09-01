@@ -176,7 +176,7 @@ export default function DashboardPage() {
         return <StatisticsTab user={user} summary={summary} />;
       case 'experiences':
         return <CubeAIExperiencesTab
-          userType={user?.userType || 'PARENT'}
+          userType={user?.userType as 'CHILD' | 'PARENT'}
           userSubscriptionType={user?.subscriptionType || 'FREE'}
           firstName={user?.firstName || ''}
           lastName={user?.lastName || ''}
@@ -202,7 +202,7 @@ export default function DashboardPage() {
       case 'facturation':
         return <BillingTab user={user} />;
       case 'reglages':
-        return <SettingsTab userType={user.userType as any} />;
+        return <SettingsTab userType={user.userType as 'CHILD' | 'PARENT' | 'TEACHER' | 'ADMIN'} />;
       case 'aide':
         return <div className="p-6">Page d'aide et support</div>;
       default:

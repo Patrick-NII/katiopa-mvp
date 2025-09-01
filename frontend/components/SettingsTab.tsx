@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import AvatarSelector from './AvatarSelector'
 import { authAPI } from '@/lib/api'
+import { useAvatar } from '@/contexts/AvatarContext'
 
 interface SettingsTabProps {
   userType: 'CHILD' | 'PARENT' | 'TEACHER' | 'ADMIN'
@@ -45,6 +46,8 @@ interface UserSettings {
 }
 
 export default function SettingsTab({ userType }: SettingsTabProps) {
+  const { selectedAvatar, updateAvatarFromSettings } = useAvatar()
+  
   const [settings, setSettings] = useState<UserSettings>({
     avatarPath: '',
     notifications: {
@@ -86,6 +89,13 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
     }
   }, [])
 
+  // Synchroniser l'avatar avec le contexte global
+  useEffect(() => {
+    if (selectedAvatar && selectedAvatar !== settings.avatarPath) {
+      setSettings(prev => ({ ...prev, avatarPath: selectedAvatar }))
+    }
+  }, [selectedAvatar])
+
   // Sauvegarder les réglages
   const saveSettings = async () => {
     setIsLoading(true)
@@ -111,6 +121,8 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
   // Gérer le changement d'avatar
   const handleAvatarChange = (avatarPath: string) => {
     setSettings(prev => ({ ...prev, avatarPath }))
+    // Mettre à jour le contexte global immédiatement
+    updateAvatarFromSettings(avatarPath)
   }
 
   // Gérer les changements de réglages
