@@ -16,6 +16,7 @@ import KidsSettingsTab from '@/components/kids/KidsSettingsTab';
 import UserHeader from '@/components/UserHeader';
 import SettingsTab from '@/components/SettingsTab';
 import { authAPI, statsAPI } from '@/lib/api';
+import { AvatarProvider } from '@/contexts/AvatarContext';
 
 // Import des nouvelles pages des cubes
 import MathCubePage from './mathcube/page';
@@ -211,47 +212,49 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* En-tête utilisateur avec avatar */}
-      <UserHeader 
-        userType={user?.userType as any}
-        subscriptionType={user?.subscriptionType}
-      />
+    <AvatarProvider>
+      <div className="min-h-screen bg-gray-50">
+        {/* En-tête utilisateur avec avatar */}
+        <UserHeader 
+          userType={user?.userType as any}
+          subscriptionType={user?.subscriptionType}
+        />
 
-      {/* Sidebar de navigation */}
-      <SidebarNavigation
-        activeTab={activeTab as any}
-        onTabChange={setActiveTab}
-        userSubscriptionType={user?.subscriptionType || 'FREE'}
-        userType={user?.userType as any}
-        collapsed={sidebarCollapsed}
-        onCollapsedChange={setSidebarCollapsed}
-      />
+        {/* Sidebar de navigation */}
+        <SidebarNavigation
+          activeTab={activeTab as any}
+          onTabChange={setActiveTab}
+          userSubscriptionType={user?.subscriptionType || 'FREE'}
+          userType={user?.userType as any}
+          collapsed={sidebarCollapsed}
+          onCollapsedChange={setSidebarCollapsed}
+        />
 
-      {/* Contenu principal */}
-      <div className={`transition-all duration-300 ${
-        sidebarCollapsed ? 'ml-20' : 'ml-64'
-      }`}>
-        <main className="p-6">
-          {ready ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              {renderTabContent()}
-            </motion.div>
-          ) : (
-            <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-              <span className="ml-3 text-gray-600">Chargement...</span>
-            </div>
-          )}
-        </main>
+        {/* Contenu principal */}
+        <div className={`transition-all duration-300 ${
+          sidebarCollapsed ? 'ml-20' : 'ml-64'
+        }`}>
+          <main className="p-6">
+            {ready ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                {renderTabContent()}
+              </motion.div>
+            ) : (
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <span className="ml-3 text-gray-600">Chargement...</span>
+              </div>
+            )}
+          </main>
+        </div>
+
+        {/* Chatbot flottant */}
+        <ChatbotWrapper />
       </div>
-
-      {/* Chatbot flottant */}
-      <ChatbotWrapper />
-    </div>
+    </AvatarProvider>
   );
 } 
