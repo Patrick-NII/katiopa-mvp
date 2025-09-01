@@ -59,50 +59,55 @@ function scoreKB(query: string, items: KBItem[]){
   }).sort((a,b)=>b.score-a.score)
 }
 
-async function askBackendLLM(history: Message[], userText: string, signal: AbortSignal){
+async function askBackendLLM(history: Message[], userText: string, signal: AbortSignal, persona: Persona = 'pro'){
   try{
     const res = await fetch('/api/chat', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ system: "Tu es Bubix, l'assistant IA de CubeAI. Réponds clairement. Oriente vers les liens internes. Si la question concerne des enfants, utilise un ton adapté si persona=kid.",
-        messages: history.concat({ id: uid(), text: userText, sender:'user', timestamp: now() }) }),
+      body: JSON.stringify({ 
+        messages: history.concat({ id: uid(), text: userText, sender:'user', timestamp: now() }),
+        persona: persona,
+        lang: 'fr'
+      }),
       signal
     })
     if(!res.ok) return null
     const data = await res.json()
     if(!data?.text) return null
     
-          // Gérer les erreurs spécifiques
-      if (data.error) {
-        if (data.error === 'LLM_NOT_AVAILABLE') {
-          return { 
-            text: data.text, 
-            actions: data.actions || [],
-            error: 'LLM_NOT_AVAILABLE'
-          }
-        }
-        if (data.error === 'NOT_AUTHENTICATED') {
-          return { 
-            text: data.text, 
-            actions: data.actions || [],
-            error: 'NOT_AUTHENTICATED'
-          }
-        }
-        if (data.error === 'USER_INFO_ERROR') {
-          return { 
-            text: data.text, 
-            actions: data.actions || [],
-            error: 'USER_INFO_ERROR'
-          }
+    // Gérer les erreurs spécifiques
+    if (data.error) {
+      if (data.error === 'LLM_NOT_AVAILABLE') {
+        return { 
+          text: data.text, 
+          actions: data.actions || [],
+          error: 'LLM_NOT_AVAILABLE'
         }
       }
-      
-      return { 
-        text: data.text as string, 
-        actions: (data.actions || []) as LinkAction[],
-        model: data.model,
-        subscriptionType: data.subscriptionType,
-        userInfo: data.userInfo
+      if (data.error === 'NOT_AUTHENTICATED') {
+        return { 
+          text: data.text, 
+          actions: data.actions || [],
+          error: 'NOT_AUTHENTICATED'
+        }
       }
+      if (data.error === 'USER_INFO_ERROR') {
+        return { 
+          text: data.text, 
+          actions: data.actions || [],
+          error: 'USER_INFO_ERROR'
+        }
+      }
+    }
+    
+    return { 
+      text: data.text as string, 
+      actions: (data.actions || []) as LinkAction[],
+      model: data.model,
+      subscriptionType: data.subscriptionType,
+      userInfo: data.userInfo,
+      intent: data.intent,
+      persona: data.persona
+    }
   }catch{ return null }
 }
 
@@ -270,13 +275,13 @@ export default function ChatBubble(){
 
     if(await systemCommands(raw)) return
 
-    // Utiliser directement l'API LLM pour toutes les questions
+    // Utiliser directement l'API LLM pour toutes les questions avec le persona actuel
     setTyping(true)
     abortRef.current?.abort()
     const ctrl = new AbortController(); abortRef.current = ctrl
     
     const llm = await Promise.race([
-      askBackendLLM(messages, raw, ctrl.signal),
+      askBackendLLM(messages, raw, ctrl.signal, persona),
       (async()=>{ await sleep(3500); return null })(),
     ])
     setTyping(false)
