@@ -42,6 +42,7 @@ interface DashboardTabProps {
   chatLoading: boolean
   chatHistory?: any[]
   onLoadChatHistory?: () => void
+  subscriptionType?: 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE'
 }
 
 export default function DashboardTab({
@@ -58,13 +59,57 @@ export default function DashboardTab({
   chatResponse,
   chatLoading,
   chatHistory = [],
-  onLoadChatHistory
+  onLoadChatHistory,
+  subscriptionType = 'FREE'
 }: DashboardTabProps) {
   const [chatMessage, setChatMessage] = useState('');
   const [activeSessions, setActiveSessions] = useState<any[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [realSummary, setRealSummary] = useState<any>(null);
   const [summaryLoading, setSummaryLoading] = useState(true);
+
+  // Déterminer les couleurs selon le type d'abonnement (basé sur les cartes)
+  const getSubscriptionColors = () => {
+    if (subscriptionType === 'PRO_PLUS' || subscriptionType === 'ENTERPRISE') {
+      return {
+        gradient: 'from-orange-500 to-violet-600',
+        hoverGradient: 'from-orange-600 to-violet-700',
+        buttonBg: 'bg-orange-500',
+        buttonHover: 'hover:bg-orange-600',
+        lightBg: 'bg-orange-50',
+        lightText: 'text-orange-700',
+        lightBgHover: 'hover:bg-orange-100',
+        iconBg: 'bg-orange-100',
+        primary: 'orange'
+      }
+    } else if (subscriptionType === 'PRO') {
+      return {
+        gradient: 'from-violet-600 to-pink-500',
+        hoverGradient: 'from-violet-700 to-pink-600',
+        buttonBg: 'bg-violet-600',
+        buttonHover: 'hover:bg-violet-700',
+        lightBg: 'bg-violet-50',
+        lightText: 'text-violet-700',
+        lightBgHover: 'hover:bg-violet-100',
+        iconBg: 'bg-violet-100',
+        primary: 'violet'
+      }
+    } else {
+      return {
+        gradient: 'from-blue-600 to-purple-600',
+        hoverGradient: 'from-blue-700 to-purple-700',
+        buttonBg: 'bg-blue-600',
+        buttonHover: 'hover:bg-blue-700',
+        lightBg: 'bg-blue-50',
+        lightText: 'text-blue-700',
+        lightBgHover: 'hover:bg-blue-100',
+        iconBg: 'bg-blue-100',
+        primary: 'blue'
+      }
+    }
+  }
+
+  const colors = getSubscriptionColors()
 
   // Initialisation du tracking
   const { trackPrompt, trackMetric } = useTracking({
@@ -428,7 +473,7 @@ export default function DashboardTab({
                     }
                   }}
                   disabled={chatLoading || !chatMessage.trim()}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-xl transition-colors shadow-sm flex items-center gap-3 text-base disabled:cursor-not-allowed font-semibold"
+                  className={`bg-gradient-to-r ${colors.gradient} ${colors.hoverGradient} disabled:bg-gray-400 text-white px-8 py-3 rounded-xl transition-colors shadow-sm flex items-center gap-3 text-base disabled:cursor-not-allowed font-semibold`}
                 >
                   {chatLoading ? (
                     <>
@@ -452,7 +497,7 @@ export default function DashboardTab({
                   className="mt-8 p-8 bg-white rounded-2xl shadow-sm"
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                    <div className={`w-10 h-10 bg-gradient-to-r ${colors.gradient} rounded-full flex items-center justify-center`}>
                       <MessageCircle size={20} className="text-white" />
                     </div>
                     <h4 className="text-lg font-semibold text-gray-900">Réponse de l'IA Coach</h4>
@@ -473,14 +518,14 @@ export default function DashboardTab({
                 >
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                      <div className={`w-10 h-10 bg-gradient-to-r ${colors.gradient} rounded-full flex items-center justify-center`}>
                         <MessageCircle size={20} className="text-white" />
                       </div>
                       <h4 className="text-lg font-semibold text-gray-900">Historique des Conversations</h4>
                     </div>
                     <button 
                       onClick={onLoadChatHistory}
-                      className="text-sm text-blue-600 hover:text-blue-800 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
+                      className={`text-sm ${colors.lightText} hover:text-${colors.primary}-800 font-medium px-4 py-2 rounded-lg ${colors.lightBgHover} transition-colors`}
                     >
                       Actualiser
                     </button>
@@ -488,7 +533,7 @@ export default function DashboardTab({
                   
                   <div className="space-y-4 max-h-96 overflow-y-auto">
                     {chatHistory.slice(0, 5).map((conv, index) => (
-                      <div key={conv.id} className="border-l-2 border-blue-300 pl-4 py-2">
+                      <div key={conv.id} className={`border-l-2 border-${colors.primary}-300 pl-4 py-2`}>
                         <div className="text-sm text-gray-500 mb-1">
                           {new Date(conv.createdAt).toLocaleDateString('fr-FR', {
                             day: '2-digit',
@@ -497,7 +542,7 @@ export default function DashboardTab({
                             minute: '2-digit'
                           })}
                           {conv.focus && (
-                            <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                            <span className={`ml-2 px-2 py-1 ${colors.iconBg} ${colors.lightText} text-xs rounded-full`}>
                               {conv.focus}
                             </span>
                           )}
@@ -588,7 +633,7 @@ export default function DashboardTab({
         {/* Actions rapides */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
           <button className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-3 text-left">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white flex items-center justify-center">
+            <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${colors.gradient} text-white flex items-center justify-center`}>
               <Send size={18} />
             </div>
             <div>
@@ -597,7 +642,7 @@ export default function DashboardTab({
             </div>
           </button>
           <button className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-3 text-left">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white flex items-center justify-center">
+            <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${colors.gradient} text-white flex items-center justify-center`}>
               <TrendingUp size={18} />
             </div>
             <div>
@@ -606,7 +651,7 @@ export default function DashboardTab({
             </div>
           </button>
           <button className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-3 text-left">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white flex items-center justify-center">
+            <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${colors.gradient} text-white flex items-center justify-center`}>
               <Users size={18} />
             </div>
             <div>

@@ -56,17 +56,17 @@ interface TabItem {
 }
 
 // Composant personnalisé pour l'icône cube 3D
-const Cube3DIcon = ({ size = 18, className = "" }) => {
+const Cube3DIcon = ({ size = 18, className = "", colors }: { size?: number, className?: string, colors: any }) => {
   return (
     <div className={`${className} relative`} style={{ width: size, height: size }}>
       {/* Cube 3D avec ombre et perspective */}
       <div className="relative w-full h-full transform rotate-45">
         {/* Face avant */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-sm shadow-lg"></div>
+        <div className={`absolute inset-0 bg-gradient-to-br ${colors.cubeGradient} rounded-sm shadow-lg`}></div>
         {/* Face droite */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-blue-700 rounded-sm shadow-lg transform rotate-y-90 translate-x-1/2 origin-left"></div>
+        <div className={`absolute inset-0 bg-gradient-to-br ${colors.cubeGradient} rounded-sm shadow-lg transform rotate-y-90 translate-x-1/2 origin-left`}></div>
         {/* Face supérieure */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 rounded-sm shadow-lg transform rotate-x-90 translate-y-1/2 origin-top"></div>
+        <div className={`absolute inset-0 bg-gradient-to-br ${colors.cubeGradient} rounded-sm shadow-lg transform rotate-x-90 translate-y-1/2 origin-top`}></div>
         {/* Ombre portée */}
         <div className="absolute inset-0 bg-gray-800 rounded-sm transform translate-x-1 translate-y-1 opacity-30"></div>
       </div>
@@ -97,6 +97,52 @@ export default function SidebarNavigation({
   const isParent = userType === 'PARENT'
   const isTeacher = userType === 'TEACHER'
   const isAdmin = userType === 'ADMIN'
+
+  // Déterminer les couleurs selon le type d'abonnement (basé sur les cartes)
+  const getSubscriptionColors = () => {
+    if (isProPlus || isEnterprise) {
+      return {
+        gradient: 'from-orange-500 to-violet-600',
+        hoverGradient: 'from-orange-600 to-violet-700',
+        buttonBg: 'bg-orange-500',
+        buttonHover: 'hover:bg-orange-600',
+        lightBg: 'bg-orange-50',
+        lightText: 'text-orange-700',
+        lightBgHover: 'hover:bg-orange-100',
+        iconBg: 'bg-orange-100',
+        primary: 'orange',
+        cubeGradient: 'from-orange-500 to-violet-600'
+      }
+    } else if (isPro) {
+      return {
+        gradient: 'from-violet-600 to-pink-500',
+        hoverGradient: 'from-violet-700 to-pink-600',
+        buttonBg: 'bg-violet-600',
+        buttonHover: 'hover:bg-violet-700',
+        lightBg: 'bg-violet-50',
+        lightText: 'text-violet-700',
+        lightBgHover: 'hover:bg-violet-100',
+        iconBg: 'bg-violet-100',
+        primary: 'violet',
+        cubeGradient: 'from-violet-600 to-pink-500'
+      }
+    } else {
+      return {
+        gradient: 'from-blue-600 to-purple-600',
+        hoverGradient: 'from-blue-700 to-purple-700',
+        buttonBg: 'bg-blue-600',
+        buttonHover: 'hover:bg-blue-700',
+        lightBg: 'bg-blue-50',
+        lightText: 'text-blue-700',
+        lightBgHover: 'hover:bg-blue-100',
+        iconBg: 'bg-blue-100',
+        primary: 'blue',
+        cubeGradient: 'from-blue-500 to-purple-600'
+      }
+    }
+  }
+
+  const colors = getSubscriptionColors()
   
   // Supporter un mode contrôlé/non-contrôlé pour la rétractation
   const [internalCollapsed, setInternalCollapsed] = useState(false)
@@ -197,7 +243,7 @@ export default function SidebarNavigation({
       {/* En-tête de la sidebar — branding unifié */}
       <div className="relative p-3 border-b border-gray-200">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg flex-shrink-0">
+                      <div className={`w-10 h-10 bg-gradient-to-r ${colors.gradient} rounded-lg flex items-center justify-center shadow-lg flex-shrink-0`}>
             <span className="font-title text-white text-2xl leading-none">C</span>
           </div>
           {!collapsed && (
@@ -219,11 +265,7 @@ export default function SidebarNavigation({
 
         {/* Indicateur de type de compte */}
         {!collapsed && (
-          <div className={`mt-3 px-3 py-2 rounded-lg text-sm font-bold text-center ${
-            isPremium 
-              ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
-              : 'bg-gradient-to-r from-green-600 to-blue-600 text-white shadow-md'
-          }`}>
+          <div className={`mt-3 px-3 py-2 rounded-lg text-sm font-bold text-center bg-gradient-to-r ${colors.gradient} text-white shadow-md`}>
             {isFree ? '🎁 Gratuit' : isPro ? '✨ Pro' : isProPlus ? '✨ Pro Plus' : isEnterprise ? '✨ Entreprise' : '✨ Premium'}
           </div>
         )}
@@ -238,9 +280,9 @@ export default function SidebarNavigation({
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
                 className={`
-                  group relative w-full flex items-center gap-3 ${collapsed ? 'px-2 py-3 justify-center' : 'px-3 py-4'} rounded-lg text-sm font-semibold
+                  group relative w-full flex items-center gap-2 ${collapsed ? 'px-2 py-3 justify-center' : 'px-3 py-4'} rounded-lg text-sm font-semibold
                   ${activeTab === tab.id
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-105'
+                    ? `bg-gradient-to-r ${colors.gradient} text-white shadow-lg transform scale-105`
                     : 'text-gray-700'
                   }
                 `}
@@ -249,10 +291,10 @@ export default function SidebarNavigation({
                 title={tab.label}
                 aria-label={tab.label}
               >
-                <div className={`${activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700'} w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0`}>
-                  {tab.icon === Cube3DIcon ? (
-                    <Cube3DIcon size={20} />
-                  ) : (
+                <div className={`${activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-10 text-gray-800'} w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0`}>
+                                  {tab.icon === Cube3DIcon ? (
+                  <Cube3DIcon size={20} colors={colors} />
+                ) : (
                     <tab.icon size={20} />
                   )}
                 </div>
@@ -303,7 +345,7 @@ export default function SidebarNavigation({
           onClick={() => router.push('/')}
           className={`
             group relative w-full flex items-center gap-3 ${collapsed ? 'px-2 py-3 justify-center' : 'px-3 py-3'}
-            rounded-lg text-sm font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 transition
+            rounded-lg text-sm font-semibold bg-white-100 hover:bg-gray-200 text-gray-300 transition
           `}
           title="Accueil"
           aria-label="Accueil"
@@ -327,7 +369,7 @@ export default function SidebarNavigation({
           onClick={async () => { try { await (await import('@/lib/api')).authAPI.logout(); router.push('/login'); } catch (e) {} }}
           className={`
             group relative w-full flex items-center gap-3 ${collapsed ? 'px-2 py-3 justify-center' : 'px-3 py-3'}
-            rounded-lg text-sm font-semibold bg-red-50 hover:bg-red-100 text-red-700 transition
+            rounded-lg text-sm font-semibold bg-white-50 hover:bg-red-100 text-red-300 transition
           `}
           title="Déconnexion"
           aria-label="Déconnexion"
