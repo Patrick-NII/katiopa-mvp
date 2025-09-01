@@ -76,7 +76,7 @@ export default function StatisticsTab({
               <h3 className="text-sm font-medium text-gray-600">Score moyen</h3>
               <p className="text-2xl font-bold text-gray-900">
                 {summary.length > 0 
-                  ? Math.round(summary.reduce((acc, s) => acc + s.avg, 0) / summary.length)
+                  ? Math.round(summary.reduce((acc: number, s: any) => acc + s.avg, 0) / summary.length)
                   : 'N/A'
                 }/100
               </p>
@@ -150,7 +150,7 @@ export default function StatisticsTab({
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {summary?.domains?.map((domain, index) => (
+          {summary?.domains?.map((domain: any, index: number) => (
             <motion.div 
               key={domain.domain}
               className="p-6 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
@@ -240,7 +240,7 @@ export default function StatisticsTab({
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-green-800">Score > 80%</span>
+                <span className="text-sm text-green-800">Score &gt; 80%</span>
                 <span className="ml-auto text-sm font-medium text-green-900">✅</span>
               </div>
               <div className="flex items-center gap-3">

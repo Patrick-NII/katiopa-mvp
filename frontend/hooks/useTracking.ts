@@ -81,7 +81,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
     trackingAPI.trackInteraction({
       interactionType: 'CLICK',
       elementType: getElementType(target),
-      elementId,
+      elementId: elementId || undefined,
       elementName,
       elementValue,
       pageUrl: pathname,
@@ -107,7 +107,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
     trackingAPI.trackInteraction({
       interactionType: 'INPUT',
       elementType: getElementType(target),
-      elementId,
+      elementId: elementId || undefined,
       elementName,
       elementValue,
       pageUrl: pathname,
@@ -226,7 +226,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
               metricType: 'ERROR_RATE',
               value: 1,
               unit: 'count',
-              context: { url: args[0], error: error.message }
+              context: { url: args[0], error: error instanceof Error ? error.message : String(error) }
             });
             throw error;
           }
