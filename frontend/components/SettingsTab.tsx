@@ -361,7 +361,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">👤 Personnalisation de l'avatar</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Personnalisation de l'avatar</h2>
               <p className="text-gray-600">Choisis l'avatar qui te représente le mieux</p>
             </div>
             <AvatarSelector
@@ -376,7 +376,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">🔔 Gestion des notifications</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Gestion des notifications</h2>
               <p className="text-gray-600">Configure tes préférences de notifications</p>
             </div>
             <div className="space-y-3">
@@ -430,7 +430,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">🔒 Contrôle de la confidentialité</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Contrôle de la confidentialité</h2>
               <p className="text-gray-600">Gère qui peut voir tes informations et activités</p>
             </div>
             <div className="space-y-3">
@@ -478,7 +478,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">🎨 Personnalisation de l'apparence</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Personnalisation de l'apparence</h2>
               <p className="text-gray-600">Adapte l'interface à tes préférences visuelles</p>
             </div>
             <div className="space-y-6">
@@ -532,9 +532,9 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
                   onChange={(e) => updateSetting('appearance', 'language', e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="fr">🇫🇷 Français</option>
-                  <option value="en">🇬🇧 English</option>
-                  <option value="es">🇪🇸 Español</option>
+                  <option value="fr">Français</option>
+                  <option value="en">English</option>
+                  <option value="es">Español</option>
                 </select>
               </div>
 
@@ -613,7 +613,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">♿ Options d'accessibilité</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Options d'accessibilité</h2>
               <p className="text-gray-600">Adapte l'interface à tes besoins d'accessibilité</p>
             </div>
             <div className="space-y-3">
@@ -685,7 +685,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">🧠 Préférences d'apprentissage</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Préférences d'apprentissage</h2>
               <p className="text-gray-600">Personnalise ton expérience d'apprentissage</p>
             </div>
             <div className="space-y-6">
@@ -698,10 +698,10 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
                   onChange={(e) => updateSetting('learning', 'difficulty', e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="easy">🟢 Facile - Débutant</option>
-                  <option value="medium">🟡 Moyen - Intermédiaire</option>
-                  <option value="hard">🔴 Difficile - Avancé</option>
-                  <option value="adaptive">🎯 Adaptatif - S'ajuste automatiquement</option>
+                  <option value="easy">Facile - Débutant</option>
+                  <option value="medium">Moyen - Intermédiaire</option>
+                  <option value="hard">Difficile - Avancé</option>
+                  <option value="adaptive">Adaptatif - S'ajuste automatiquement</option>
                 </select>
               </div>
 
@@ -757,7 +757,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">⚡ Optimisation des performances</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Optimisation des performances</h2>
               <p className="text-gray-600">Configure les paramètres de performance de l'application</p>
             </div>
             <div className="space-y-3">
