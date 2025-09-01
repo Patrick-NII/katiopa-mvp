@@ -174,6 +174,7 @@ export default function DashboardPage() {
             chatLoading={chatLoading}
             chatHistory={chatHistory}
             onLoadChatHistory={loadChatHistory}
+            subscriptionType={user?.subscriptionType || 'FREE'}
           />
         );
       case 'statistics':
@@ -209,6 +210,7 @@ export default function DashboardPage() {
             chatLoading={chatLoading}
             chatHistory={chatHistory}
             onLoadChatHistory={loadChatHistory}
+            subscriptionType={user?.subscriptionType || 'FREE'}
           />
         );
     }
@@ -242,7 +244,7 @@ export default function DashboardPage() {
       </main>
 
       {/* Chatbot */}
-      <ChatbotWrapper />
+      <ChatbotWrapper subscriptionType={user?.subscriptionType || 'FREE'} />
     </div>
   );
 } 

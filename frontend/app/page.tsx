@@ -839,7 +839,7 @@ export default function HomePage() {
       </footer>
 
       {/* Bulle de chat flottante */}
-              <ChatbotWrapper />
+              <ChatbotWrapper subscriptionType={user?.subscriptionType || 'FREE'} />
     </div>
   )
 }
