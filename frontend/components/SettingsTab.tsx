@@ -30,80 +30,23 @@ import {
   Unlock,
   Heart,
   Brain,
-  Target
+  Target,
+  RotateCcw
 } from 'lucide-react'
 import AvatarSelector from './AvatarSelector'
-import { authAPI } from '@/lib/api'
 import { useAvatar } from '@/contexts/AvatarContext'
+import { settingsAPI, UserSettings as APIUserSettings } from '@/lib/api/settings'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface SettingsTabProps {
   userType: 'CHILD' | 'PARENT' | 'TEACHER' | 'ADMIN'
 }
 
-interface UserSettings {
-  avatarPath: string
-  notifications: {
-    email: boolean
-    push: boolean
-    daily: boolean
-    weekly: boolean
-    achievements: boolean
-    reminders: boolean
-    social: boolean
-  }
-  privacy: {
-    profileVisible: boolean
-    activityVisible: boolean
-    allowMessages: boolean
-    showProgress: boolean
-    shareStats: boolean
-    allowFriendRequests: boolean
-  }
-  appearance: {
-    theme: 'light' | 'dark' | 'auto'
-    language: 'fr' | 'en' | 'es'
-    fontSize: 'small' | 'medium' | 'large'
-    colorBlind: boolean
-    highContrast: boolean
-    reduceAnimations: boolean
-    compactMode: boolean
-  }
-  accessibility: {
-    screenReader: boolean
-    keyboardNavigation: boolean
-    voiceCommands: boolean
-    textToSpeech: boolean
-    audioDescriptions: boolean
-    focusIndicators: boolean
-    motionReduction: boolean
-    colorBlindSupport: boolean
-    dyslexiaFriendly: boolean
-    largeCursors: boolean
-  }
-  learning: {
-    difficulty: 'easy' | 'medium' | 'hard' | 'adaptive'
-    autoSave: boolean
-    hints: boolean
-    explanations: boolean
-    practiceMode: boolean
-    timeLimit: boolean
-    soundEffects: boolean
-    backgroundMusic: boolean
-  }
-  performance: {
-    autoOptimize: boolean
-    cacheData: boolean
-    preloadContent: boolean
-    lowBandwidth: boolean
-    offlineMode: boolean
-  }
-}
-
 export default function SettingsTab({ userType }: SettingsTabProps) {
   const { selectedAvatar, updateAvatarFromSettings } = useAvatar()
+  const { user } = useAuth()
   
-  const [settings, setSettings] = useState<UserSettings>({
-    avatarPath: '',
+  const [settings, setSettings] = useState<APIUserSettings>({
     notifications: {
       email: true,
       push: true,
@@ -163,19 +106,32 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
   const [isLoading, setIsLoading] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [isInitialized, setIsInitialized] = useState(false)
 
-  // Charger les réglages depuis le localStorage
+  // Charger les réglages depuis l'API au démarrage
   useEffect(() => {
-    const savedSettings = localStorage.getItem('userSettings')
-    if (savedSettings) {
+    const loadSettings = async () => {
+      if (!user?.sessionId || isInitialized) return
+      
       try {
-        const parsed = JSON.parse(savedSettings)
-        setSettings(prev => ({ ...prev, ...parsed }))
+        setIsLoading(true)
+        const apiSettings = await settingsAPI.getSettings(user.sessionId)
+        setSettings(apiSettings)
+        setIsInitialized(true)
+        
+        // Appliquer les réglages chargés
+        applySettings(apiSettings)
       } catch (error) {
         console.error('Erreur lors du chargement des réglages:', error)
+        // Utiliser les réglages par défaut en cas d'erreur
+        setIsInitialized(true)
+      } finally {
+        setIsLoading(false)
       }
     }
-  }, [])
+
+    loadSettings()
+  }, [user?.sessionId, isInitialized])
 
   // Synchroniser l'avatar avec le contexte global
   useEffect(() => {
@@ -186,22 +142,56 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
   // Sauvegarder les réglages
   const saveSettings = async () => {
+    if (!user?.sessionId) return
+    
     setIsLoading(true)
     setSaveStatus('saving')
 
     try {
-      // Simuler une sauvegarde API
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Sauvegarder via l'API
+      const updatedSettings = await settingsAPI.updateSettings(user.sessionId, settings)
       
-      // Sauvegarder dans le localStorage
-      localStorage.setItem('userSettings', JSON.stringify(settings))
+      // Sauvegarder aussi dans le localStorage comme backup
+      localStorage.setItem('userSettings', JSON.stringify(updatedSettings))
       
       // Appliquer les réglages en temps réel
-      applySettings(settings)
+      applySettings(updatedSettings)
       
       setSaveStatus('saved')
       setTimeout(() => setSaveStatus('idle'), 2000)
     } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error)
+      setSaveStatus('error')
+      setTimeout(() => setSaveStatus('idle'), 3000)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Réinitialiser les réglages
+  const resetSettings = async () => {
+    if (!user?.sessionId) return
+    
+    if (!confirm('Êtes-vous sûr de vouloir réinitialiser tous vos réglages ?')) {
+      return
+    }
+    
+    setIsLoading(true)
+    
+    try {
+      const defaultSettings = await settingsAPI.resetSettings(user.sessionId)
+      setSettings(defaultSettings)
+      
+      // Sauvegarder dans le localStorage
+      localStorage.setItem('userSettings', JSON.stringify(defaultSettings))
+      
+      // Appliquer les réglages par défaut
+      applySettings(defaultSettings)
+      
+      setSaveStatus('saved')
+      setTimeout(() => setSaveStatus('idle'), 2000)
+    } catch (error) {
+      console.error('Erreur lors de la réinitialisation:', error)
       setSaveStatus('error')
       setTimeout(() => setSaveStatus('idle'), 3000)
     } finally {
@@ -210,7 +200,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
   }
 
   // Appliquer les réglages en temps réel
-  const applySettings = (newSettings: UserSettings) => {
+  const applySettings = (newSettings: APIUserSettings) => {
     // Appliquer le thème
     if (newSettings.appearance.theme === 'dark') {
       document.documentElement.classList.add('dark')
@@ -239,6 +229,34 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
     } else {
       document.documentElement.classList.remove('reduce-motion')
     }
+
+    // Appliquer le mode daltonien
+    if (newSettings.appearance.colorBlind) {
+      document.documentElement.classList.add('color-blind-mode')
+    } else {
+      document.documentElement.classList.remove('color-blind-mode')
+    }
+
+    // Appliquer le mode dyslexie
+    if (newSettings.accessibility.dyslexiaFriendly) {
+      document.documentElement.classList.add('dyslexia-friendly')
+    } else {
+      document.documentElement.classList.remove('dyslexia-friendly')
+    }
+
+    // Appliquer les curseurs agrandis
+    if (newSettings.accessibility.largeCursors) {
+      document.documentElement.classList.add('large-cursors')
+    } else {
+      document.documentElement.classList.remove('large-cursors')
+    }
+
+    // Appliquer le mode compact
+    if (newSettings.appearance.compactMode) {
+      document.documentElement.classList.add('compact-mode')
+    } else {
+      document.documentElement.classList.remove('compact-mode')
+    }
   }
 
   // Gérer le changement d'avatar
@@ -251,7 +269,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
   }
 
   // Gérer les changements de réglages
-  const updateSetting = (category: keyof UserSettings, key: string, value: any) => {
+  const updateSetting = (category: keyof APIUserSettings, key: string, value: any) => {
     setSettings(prev => ({
       ...prev,
       [category]: {
@@ -340,6 +358,17 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
   const colors = getUserTypeColors()
 
+  if (isLoading && !isInitialized) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600">Chargement des réglages...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
       {/* En-tête des réglages */}
@@ -356,8 +385,8 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
         </p>
       </div>
 
-      {/* Bouton de sauvegarde */}
-      <div className="flex justify-center mb-8">
+      {/* Boutons d'action */}
+      <div className="flex justify-center gap-4 mb-8">
         <button
           onClick={saveSettings}
           disabled={isLoading}
@@ -375,9 +404,18 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
              saveStatus === 'error' ? 'Erreur' : 'Sauvegarder les réglages'}
           </span>
         </button>
+
+        <button
+          onClick={resetSettings}
+          disabled={isLoading}
+          className="px-6 py-3 bg-gray-500 text-white rounded-2xl font-medium hover:bg-gray-600 transition-all duration-200 flex items-center space-x-2"
+        >
+          <RotateCcw className="w-5 h-5" />
+          <span>Réinitialiser</span>
+        </button>
       </div>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+      <div className="max-w-8xl mx-auto grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
         {/* Section Avatar */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center space-x-3 mb-6">
@@ -402,7 +440,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
             <h2 className="text-2xl font-bold text-gray-900">Notifications</h2>
           </div>
 
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <Switch
               checked={settings.notifications.email}
               onChange={(checked) => updateSetting('notifications', 'email', checked)}
@@ -457,7 +495,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
             <h2 className="text-2xl font-bold text-gray-900">Confidentialité</h2>
           </div>
 
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <Switch
               checked={settings.privacy.profileVisible}
               onChange={(checked) => updateSetting('privacy', 'profileVisible', checked)}
@@ -548,63 +586,65 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Langue
-              </label>
-              <select
-                value={settings.appearance.language}
-                onChange={(e) => updateSetting('appearance', 'language', e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="fr">🇫🇷 Français</option>
-                <option value="en">🇬🇧 English</option>
-                <option value="es">🇪🇸 Español</option>
-              </select>
-            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Langue
+                </label>
+                <select
+                  value={settings.appearance.language}
+                  onChange={(e) => updateSetting('appearance', 'language', e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="fr">🇫🇷 Français</option>
+                  <option value="en">🇬🇧 English</option>
+                  <option value="es">🇪🇸 Español</option>
+                </select>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Taille de police
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => updateSetting('appearance', 'fontSize', 'small')}
-                  className={`p-3 rounded-lg border-2 transition-all ${
-                    settings.appearance.fontSize === 'small'
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <Type className="w-4 h-4 mx-auto mb-1" />
-                  <span className="text-xs">Petite</span>
-                </button>
-                <button
-                  onClick={() => updateSetting('appearance', 'fontSize', 'medium')}
-                  className={`p-3 rounded-lg border-2 transition-all ${
-                    settings.appearance.fontSize === 'medium'
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <Type className="w-5 h-5 mx-auto mb-1" />
-                  <span className="text-xs">Moyenne</span>
-                </button>
-                <button
-                  onClick={() => updateSetting('appearance', 'fontSize', 'large')}
-                  className={`p-3 rounded-lg border-2 transition-all ${
-                    settings.appearance.fontSize === 'large'
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <Type className="w-6 h-6 mx-auto mb-1" />
-                  <span className="text-xs">Grande</span>
-                </button>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Taille de police
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => updateSetting('appearance', 'fontSize', 'small')}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      settings.appearance.fontSize === 'small'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <Type className="w-4 h-4 mx-auto mb-1" />
+                    <span className="text-xs">Petite</span>
+                  </button>
+                  <button
+                    onClick={() => updateSetting('appearance', 'fontSize', 'medium')}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      settings.appearance.fontSize === 'medium'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <Type className="w-5 h-5 mx-auto mb-1" />
+                    <span className="text-xs">Moyenne</span>
+                  </button>
+                  <button
+                    onClick={() => updateSetting('appearance', 'fontSize', 'large')}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      settings.appearance.fontSize === 'large'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <Type className="w-6 h-6 mx-auto mb-1" />
+                    <span className="text-xs">Grande</span>
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               <Switch
                 checked={settings.appearance.colorBlind}
                 onChange={(checked) => updateSetting('appearance', 'colorBlind', checked)}
@@ -642,7 +682,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
             <h2 className="text-2xl font-bold text-gray-900">Accessibilité</h2>
           </div>
 
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <Switch
               checked={settings.accessibility.screenReader}
               onChange={(checked) => updateSetting('accessibility', 'screenReader', checked)}
@@ -732,7 +772,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
               </select>
             </div>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               <Switch
                 checked={settings.learning.autoSave}
                 onChange={(checked) => updateSetting('learning', 'autoSave', checked)}
@@ -788,7 +828,7 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
             <h2 className="text-2xl font-bold text-gray-900">Performance</h2>
           </div>
 
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <Switch
               checked={settings.performance.autoOptimize}
               onChange={(checked) => updateSetting('performance', 'autoOptimize', checked)}
