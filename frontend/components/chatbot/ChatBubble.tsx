@@ -265,7 +265,7 @@ export default function ChatBubble(){
   function fromIntent(intent: string): { text: string, actions?: LinkAction[] } | null {
     switch(intent){
       case 'greeting':
-        return { text: "Bonjour, je suis l’assistant Katiopa. Dites ce que vous cherchez: inscription, tarifs, matières, sécurité, vision, blague, histoire, mini-leçon." }
+        return { text: "Bonjour, je suis l’assistant IA CubeAI. Dites ce que vous cherchez: inscription, tarifs, matières, sécurité, vision, blague, histoire, mini-leçon." }
       case 'signup':
         return { text: say(persona, "Inscription rapide. Créez votre compte, ajoutez votre enfant, choisissez un parcours 5–7 ans.",
                                    "Pour commencer, clique sur « Commencer gratuitement ».") ,
@@ -419,7 +419,7 @@ export default function ChatBubble(){
                     <Bot size={22} />
                   </div>
                   <div className="leading-tight">
-                    <div className="font-semibold">Bubix — Assistant Katiopa</div>
+                    <div className="font-semibold">Bubix — Assistant IA CubeAI</div>
                     <div className="text-[11px] text-blue-100">Disponible • Mémoire activée • Mode {persona === 'kid' ? 'enfant' : 'parent/pro'}</div>
                   </div>
                 </div>
