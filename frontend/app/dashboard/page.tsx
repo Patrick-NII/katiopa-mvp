@@ -13,7 +13,17 @@ import CubeAIExperiencesTab from '@/components/CubeAIExperiencesTab';
 import ChatbotWrapper from '@/components/chatbot/ChatbotWrapper';
 import KidsGamesTab from '@/components/kids/KidsGamesTab';
 import KidsSettingsTab from '@/components/kids/KidsSettingsTab';
+import UserHeader from '@/components/UserHeader';
+import SettingsTab from '@/components/SettingsTab';
 import { authAPI, statsAPI } from '@/lib/api';
+
+// Import des nouvelles pages des cubes
+import MathCubePage from './mathcube/page';
+import CodeCubePage from './codecube/page';
+import PlayCubePage from './playcube/page';
+import ScienceCubePage from './sciencecube/page';
+import DreamCubePage from './dreamcube/page';
+import ComCubePage from './comcube/page';
 
 interface User {
   id: string;
@@ -155,96 +165,93 @@ export default function DashboardPage() {
     { id: 'billing', label: 'Facturation', icon: '🧾' },
   ];
 
+  // Fonction pour rendre le contenu des onglets
   const renderTabContent = () => {
+    if (!user) return null;
+
     switch (activeTab) {
       case 'dashboard':
-        return (
-          <DashboardTab
-            user={user}
-            activities={[]}
-            summary={summary as any}
-            llmResponse={null}
-            loading={false}
-            focus={''}
-            onFocusChange={() => {}}
-            onEvaluateLLM={() => {}}
-            onExerciseSelect={() => {}}
-            onSendChatMessage={sendChatMessage}
-            chatResponse={chatResponse}
-            chatLoading={chatLoading}
-            chatHistory={chatHistory}
-            onLoadChatHistory={loadChatHistory}
-            subscriptionType={user?.subscriptionType || 'FREE'}
-          />
-        );
-      case 'statistics':
-        return <StatisticsTab user={user} activities={[]} summary={summary} />;
-      case 'jeux':
-        return <KidsGamesTab user={user} />;
-      case 'reglages':
-        return <KidsSettingsTab user={user} />;
-      case 'profile':
-        return <ProfileTab user={user} />;
-      case 'subscription':
-        return <SubscriptionTab user={user} />;
-      case 'billing':
-        return <BillingTab user={user} />;
-      case 'family-members':
-        return <FamilyMembersTab />;
+        return <DashboardTab user={user} summary={summary} />;
+      case 'statistiques':
+        return <StatisticsTab user={user} summary={summary} />;
       case 'experiences':
-        return <CubeAIExperiencesTab />;
+        return <CubeAIExperiencesTab
+          userType={user?.userType || 'PARENT'}
+          userSubscriptionType={user?.subscriptionType || 'FREE'}
+          firstName={user?.firstName || ''}
+          lastName={user?.lastName || ''}
+        />;
+      case 'mathcube':
+        return <MathCubePage />;
+      case 'codecube':
+        return <CodeCubePage />;
+      case 'playcube':
+        return <PlayCubePage />;
+      case 'sciencecube':
+        return <ScienceCubePage />;
+      case 'dreamcube':
+        return <DreamCubePage />;
+      case 'comcube':
+        return <ComCubePage />;
+      case 'informations':
+        return <ProfileTab user={user} />;
+      case 'abonnements':
+        return <SubscriptionTab user={user} />;
+      case 'family-members':
+        return <FamilyMembersTab user={user} />;
+      case 'facturation':
+        return <BillingTab user={user} />;
+      case 'reglages':
+        return <SettingsTab userType={user.userType as any} />;
+      case 'aide':
+        return <div className="p-6">Page d'aide et support</div>;
       default:
-        return (
-          <DashboardTab
-            user={user}
-            activities={[]}
-            summary={summary as any}
-            llmResponse={null}
-            loading={false}
-            focus={''}
-            onFocusChange={() => {}}
-            onEvaluateLLM={() => {}}
-            onExerciseSelect={() => {}}
-            onSendChatMessage={sendChatMessage}
-            chatResponse={chatResponse}
-            chatLoading={chatLoading}
-            chatHistory={chatHistory}
-            onLoadChatHistory={loadChatHistory}
-            subscriptionType={user?.subscriptionType || 'FREE'}
-          />
-        );
+        return <DashboardTab user={user} summary={summary} />;
     }
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Navigation latérale */}
+    <div className="min-h-screen bg-gray-50">
+      {/* En-tête utilisateur avec avatar */}
+      <UserHeader 
+        userType={user?.userType as any}
+        subscriptionType={user?.subscriptionType}
+      />
+
+      {/* Sidebar de navigation */}
       <SidebarNavigation
         activeTab={activeTab as any}
-        onTabChange={setActiveTab as any}
-        userSubscriptionType={user.subscriptionType}
-        userType={user.userType as any}
+        onTabChange={setActiveTab}
+        userSubscriptionType={user?.subscriptionType || 'FREE'}
+        userType={user?.userType as any}
         collapsed={sidebarCollapsed}
         onCollapsedChange={setSidebarCollapsed}
       />
 
       {/* Contenu principal */}
-      <main className={`flex-1 ${sidebarCollapsed ? 'ml-16' : 'ml-64'} p-6 min-h-screen transition-[margin] duration-300`}>
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
-          className="h-full"
-        >
-          <div className="max-w-7xl mx-auto">
-            {renderTabContent()}
-          </div>
-        </motion.div>
-      </main>
+      <div className={`transition-all duration-300 ${
+        sidebarCollapsed ? 'ml-20' : 'ml-64'
+      }`}>
+        <main className="p-6">
+          {ready ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              {renderTabContent()}
+            </motion.div>
+          ) : (
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <span className="ml-3 text-gray-600">Chargement...</span>
+            </div>
+          )}
+        </main>
+      </div>
 
-      {/* Chatbot */}
-      <ChatbotWrapper subscriptionType={user?.subscriptionType || 'FREE'} />
+      {/* Chatbot flottant */}
+      <ChatbotWrapper />
     </div>
   );
 } 

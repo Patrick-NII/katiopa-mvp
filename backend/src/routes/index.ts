@@ -5,6 +5,7 @@ import activityRoutes from './activity';
 import statsRoutes from './stats';
 import sessionsRoutes from './sessions';
 import trackingRoutes from './tracking';
+import experiencesRoutes from './experiences';
 
 const router = express.Router();
 
@@ -26,6 +27,9 @@ router.use('/sessions', sessionsRoutes);
 // Routes de tracking
 router.use('/tracking', trackingRoutes);
 
+// Nouvelles routes d'expériences CubeAI
+router.use('/experiences', experiencesRoutes);
+
 // Route de test de l'API
 router.get('/test', (req, res) => {
   res.json({
@@ -39,7 +43,8 @@ router.get('/test', (req, res) => {
       activities: '/api/activities',
       stats: '/api/stats',
       sessions: '/api/sessions',
-      tracking: '/api/tracking'
+      tracking: '/api/tracking',
+      experiences: '/api/experiences'
     }
   });
 });

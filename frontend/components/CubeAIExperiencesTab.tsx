@@ -1,350 +1,511 @@
 'use client'
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+import React, { useState, useEffect } from 'react'
 import { 
-  BookOpen, 
+  Trophy, 
+  Target, 
+  Calendar, 
+  Star, 
   Clock, 
-  CheckCircle, 
-  Play, 
-  Pause, 
-  Target,
-  Calendar,
-  TrendingUp,
-  Award,
-  Timer
+  TrendingUp, 
+  Sparkles,
+  BookOpen,
+  Gamepad2,
+  Lightbulb,
+  ChevronRight,
+  Users,
+  BarChart3,
+  Zap
 } from 'lucide-react'
+import { 
+  gamesAPI, 
+  exercisesAPI, 
+  scheduleAPI, 
+  welcomeMessageAPI, 
+  recommendationsAPI, 
+  statsAPI,
+  formatDuration,
+  formatScore,
+  getDifficultyColor,
+  getGameTypeIcon
+} from '@/lib/api/experiences'
 
-interface Exercise {
-  id: string
-  title: string
-  domain: string
-  difficulty: 'facile' | 'moyen' | 'difficile'
-  estimatedTime: number // en minutes
-  status: 'en_cours' | 'termine' | 'en_attente' | 'non_commence'
-  submittedAt?: Date
-  completedAt?: Date
-  score?: number
+interface CubeAIExperiencesTabProps {
+  userType: 'CHILD' | 'PARENT'
+  userSubscriptionType: string
+  firstName: string
+  lastName: string
 }
 
-interface WeeklySchedule {
-  day: string
-  date: string
-  activities: Array<{
-    time: string
-    title: string
-    type: 'cours' | 'exercice' | 'projet' | 'revision'
-    duration: number
-    status: 'planifie' | 'en_cours' | 'termine'
-  }>
-}
+export default function CubeAIExperiencesTab({ 
+  userType, 
+  userSubscriptionType, 
+  firstName, 
+  lastName 
+}: CubeAIExperiencesTabProps) {
+  const [isLoading, setIsLoading] = useState(true)
+  const [games, setGames] = useState<any[]>([])
+  const [exercises, setExercises] = useState<any[]>([])
+  const [schedule, setSchedule] = useState<any[]>([])
+  const [welcomeMessage, setWelcomeMessage] = useState<any>(null)
+  const [recommendations, setRecommendations] = useState<any[]>([])
+  const [activityStats, setActivityStats] = useState<any>(null)
 
-export default function CubeAIExperiencesTab() {
-  const [currentTime] = useState(new Date())
-  
-  // Données simulées pour les exercices
-  const exercises: Exercise[] = [
-    {
-      id: '1',
-      title: 'Addition avec retenue',
-      domain: 'Mathématiques',
-      difficulty: 'facile',
-      estimatedTime: 15,
-      status: 'en_cours',
-      submittedAt: new Date(Date.now() - 16 * 60 * 1000), // 16 minutes ago
-      score: 85
-    },
-    {
-      id: '2',
-      title: 'Problèmes de logique',
-      domain: 'Mathématiques',
-      difficulty: 'moyen',
-      estimatedTime: 20,
-      status: 'en_attente',
-      submittedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 heures ago
-    },
-    {
-      id: '3',
-      title: 'Lecture de texte court',
-      domain: 'Français',
-      difficulty: 'facile',
-      estimatedTime: 10,
-      status: 'termine',
-      completedAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
-      score: 92
-    },
-    {
-      id: '4',
-      title: 'Introduction à l\'IA',
-      domain: 'Sciences',
-      difficulty: 'difficile',
-      estimatedTime: 25,
-      status: 'non_commence'
-    }
-  ]
+  useEffect(() => {
+    loadData()
+  }, [])
 
-  // Planning hebdomadaire simulé
-  const weeklySchedule: WeeklySchedule[] = [
-    {
-      day: 'Lundi',
-      date: '25 août',
-      activities: [
-        { time: '09:00', title: 'Objectifs de la semaine', type: 'cours', duration: 15, status: 'termine' },
-        { time: '10:15', title: 'Cours Mathématiques', type: 'cours', duration: 45, status: 'termine' },
-        { time: '11:15', title: 'Dojo Addition', type: 'exercice', duration: 30, status: 'termine' },
-        { time: '14:00', title: 'Projet Calcul', type: 'projet', duration: 60, status: 'en_cours' }
-      ]
-    },
-    {
-      day: 'Mardi',
-      date: '26 août',
-      activities: [
-        { time: '09:00', title: 'Week 13: IA & Logique', type: 'cours', duration: 45, status: 'planifie' },
-        { time: '09:15', title: 'Live Coding', type: 'exercice', duration: 30, status: 'planifie' },
-        { time: '10:15', title: 'Support individuel', type: 'cours', duration: 30, status: 'planifie' },
-        { time: '11:15', title: 'Quêtes Mathématiques', type: 'exercice', duration: 45, status: 'planifie' },
-        { time: '14:00', title: 'Projet IA', type: 'projet', duration: 90, status: 'planifie' }
-      ]
-    },
-    {
-      day: 'Mercredi',
-      date: '27 août',
-      activities: [
-        { time: '09:00', title: 'Stand Up', type: 'cours', duration: 15, status: 'planifie' },
-        { time: '09:15', title: 'Support individuel', type: 'cours', duration: 30, status: 'planifie' },
-        { time: '11:11', title: 'Quêtes Français', type: 'exercice', duration: 45, status: 'planifie' },
-        { time: '14:00', title: 'Travail autonome', type: 'revision', duration: 120, status: 'planifie' }
-      ]
-    },
-    {
-      day: 'Jeudi',
-      date: '28 août',
-      activities: [
-        { time: '09:00', title: 'Stand Up', type: 'cours', duration: 15, status: 'planifie' },
-        { time: '09:15', title: 'Dojo Logique', type: 'exercice', duration: 30, status: 'planifie' },
-        { time: '11:11', title: 'Quêtes Sciences', type: 'exercice', duration: 45, status: 'planifie' },
-        { time: '14:00', title: 'Projet Final', type: 'projet', duration: 120, status: 'planifie' }
-      ]
-    },
-    {
-      day: 'Vendredi',
-      date: '29 août',
-      activities: [
-        { time: '09:00', title: 'Dojo Final', type: 'exercice', duration: 45, status: 'planifie' },
-        { time: '11:00', title: 'Veille technologique', type: 'cours', duration: 30, status: 'planifie' },
-        { time: '15:00', title: 'Rétrospective', type: 'cours', duration: 45, status: 'planifie' },
-        { time: '16:00', title: 'Quiz de fin de semaine', type: 'exercice', duration: 30, status: 'planifie' }
-      ]
-    }
-  ]
+  const loadData = async () => {
+    try {
+      setIsLoading(true)
+      
+      // Charger les données en parallèle
+      const [gamesData, exercisesData, scheduleData, welcomeData, recommendationsData, statsData] = await Promise.allSettled([
+        gamesAPI.getAll(),
+        exercisesAPI.getAll(),
+        scheduleAPI.getUserSchedule(),
+        welcomeMessageAPI.getPersonalized(),
+        recommendationsAPI.getPersonalized(),
+        statsAPI.getActivityStats()
+      ])
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'en_cours':
-        return 'bg-blue-100 text-blue-800 border-blue-200'
-      case 'termine':
-        return 'bg-green-100 text-green-800 border-green-200'
-      case 'en_attente':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'planifie':
-        return 'bg-gray-100 text-gray-800 border-gray-200'
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+      setGames(gamesData.status === 'fulfilled' ? gamesData.value : [])
+      setExercises(exercisesData.status === 'fulfilled' ? exercisesData.value : [])
+      setSchedule(scheduleData.status === 'fulfilled' ? scheduleData.value : [])
+      setWelcomeMessage(welcomeData.status === 'fulfilled' ? welcomeData.value : null)
+      setRecommendations(recommendationsData.status === 'fulfilled' ? recommendationsData.value : [])
+      setActivityStats(statsData.status === 'fulfilled' ? statsData.value : null)
+    } catch (error) {
+      console.error('Erreur lors du chargement des données:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'facile':
-        return 'bg-green-100 text-green-800'
-      case 'moyen':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'difficile':
-        return 'bg-red-100 text-red-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
-  }
-
-  const getTimeAgo = (date: Date) => {
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / (1000 * 60))
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+  const calculateTotalRanking = () => {
+    if (!activityStats) return []
     
-    if (diffMins < 60) {
-      return `depuis ${diffMins} minute${diffMins > 1 ? 's' : ''}`
-    } else {
-      return `depuis ${diffHours} heure${diffHours > 1 ? 's' : ''}`
+    const domains = ['Mathématiques', 'Français', 'Sciences', 'Programmation']
+    return domains.map(domain => ({
+      domain,
+      score: Math.floor(Math.random() * 100) + 50, // Simulation pour l'instant
+      rank: Math.floor(Math.random() * 10) + 1
+    })).sort((a, b) => a.rank - b.rank)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+          <p className="text-gray-600 font-medium">Chargement de vos expériences...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (userType === 'PARENT') {
+    return <ParentInterface 
+      firstName={firstName}
+      lastName={lastName}
+      userSubscriptionType={userSubscriptionType}
+      activityStats={activityStats}
+      recommendations={recommendations}
+      schedule={schedule}
+    />
+  }
+
+  return <ChildInterface 
+    firstName={firstName}
+    userSubscriptionType={userSubscriptionType}
+    welcomeMessage={welcomeMessage}
+    topExercises={exercises.slice(0, 5)}
+    topGames={games.slice(0, 5)}
+    ranking={calculateTotalRanking()}
+  />
+}
+
+// Interface Parents - Design épuré et moderne
+function ParentInterface({ 
+  firstName, 
+  lastName, 
+  userSubscriptionType,
+  activityStats, 
+  recommendations, 
+  schedule 
+}: any) {
+  const getSubscriptionColors = () => {
+    switch (userSubscriptionType) {
+      case 'PRO':
+        return { primary: 'from-blue-500 to-indigo-600', secondary: 'bg-blue-50', accent: 'text-blue-600' }
+      case 'PREMIUM':
+        return { primary: 'from-fuchsia-500 to-violet-600', secondary: 'bg-fuchsia-50', accent: 'text-fuchsia-600' }
+      case 'ENTERPRISE':
+        return { primary: 'from-purple-500 to-pink-600', secondary: 'bg-purple-50', accent: 'text-purple-600' }
+      default:
+        return { primary: 'from-blue-500 to-violet-600', secondary: 'bg-blue-50', accent: 'text-blue-600' }
     }
   }
+
+  const colors = getSubscriptionColors()
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="space-y-8"
-    >
-      {/* En-tête des expériences CubeAI */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-xl">
-        <h1 className="text-3xl font-bold mb-2">🚀 CubeAI Experiences</h1>
-        <p className="text-blue-100 text-lg">
-          Découvrez toutes les fonctionnalités CubeAI et commencez votre apprentissage intelligent
+    <div className="space-y-8 p-6">
+      {/* En-tête personnalisé */}
+      <div className="text-center space-y-4">
+        <div className={`inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r ${colors.primary} text-white shadow-lg`}>
+          <Sparkles className="w-5 h-5 mr-2" />
+          <span className="font-semibold">Tableau de bord Parent</span>
+        </div>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Bonjour {firstName} {lastName} 👋
+        </h1>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          Suivez les progrès de votre enfant et découvrez des recommandations personnalisées
         </p>
-        <div className="mt-4 flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Target size={20} />
-            <span>Objectifs de la semaine: {weeklySchedule[0].activities.length} activités</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Calendar size={20} />
-            <span>Lundi 25 août 2025 → Dimanche 31 août 2025</span>
-          </div>
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Planning hebdomadaire - 2 colonnes */}
-        <div className="lg:col-span-2">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-              <Calendar size={20} />
-              Planning hebdomadaire
-            </h3>
-            
-            <div className="space-y-4">
-              {weeklySchedule.map((day, dayIndex) => (
-                <motion.div 
-                  key={day.day}
-                  className="border border-gray-200 rounded-lg overflow-hidden"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: dayIndex * 0.1 }}
-                >
-                  {/* En-tête du jour */}
-                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                    <h4 className="font-semibold text-gray-900">{day.day} {day.date}</h4>
-                  </div>
-                  
-                  {/* Activités du jour */}
-                  <div className="divide-y divide-gray-100">
-                    {day.activities.map((activity, activityIndex) => (
-                      <div key={activityIndex} className="px-4 py-3 hover:bg-gray-50 transition-colors">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-16 text-sm font-mono text-gray-600">
-                              {activity.time}
-                            </div>
-                            <div className="flex-1">
-                              <div className="font-medium text-gray-900">{activity.title}</div>
-                              <div className="text-sm text-gray-500">
-                                {activity.type} • {activity.duration} min
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <div className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(activity.status)}`}>
-                            {activity.status === 'en_cours' ? 'En cours' :
-                             activity.status === 'termine' ? 'Terminé' :
-                             activity.status === 'en_attente' ? 'En attente' : 'Planifié'}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              ))}
+      {/* Statistiques d'activité */}
+      {activityStats && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Temps total</p>
+                <p className="text-2xl font-bold text-gray-900">{formatDuration(activityStats.totalTime)}</p>
+              </div>
+              <div className={`p-3 rounded-full ${colors.secondary}`}>
+                <Clock className={`w-6 h-6 ${colors.accent}`} />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Jeux joués</p>
+                <p className="text-2xl font-bold text-gray-900">{activityStats.gamesPlayed}</p>
+              </div>
+              <div className={`p-3 rounded-full ${colors.secondary}`}>
+                <Gamepad2 className={`w-6 h-6 ${colors.accent}`} />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Exercices</p>
+                <p className="text-2xl font-bold text-gray-900">{activityStats.exercisesCompleted}</p>
+              </div>
+              <div className={`p-3 rounded-full ${colors.secondary}`}>
+                <BookOpen className={`w-6 h-6 ${colors.accent}`} />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Score moyen</p>
+                <p className="text-2xl font-bold text-gray-900">{formatScore(activityStats.averageGameScore)}</p>
+              </div>
+              <div className={`p-3 rounded-full ${colors.secondary}`}>
+                <Trophy className={`w-6 h-6 ${colors.accent}`} />
+              </div>
             </div>
           </div>
         </div>
+      )}
 
-        {/* Exercices en cours et statuts - 1 colonne */}
+      {/* Recommandations IA */}
+      {recommendations.length > 0 && (
         <div className="space-y-6">
-          {/* Exercices en attente de correction */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Clock size={18} />
-              En attente de correction
-            </h4>
-            
-            <div className="space-y-3">
-              {exercises.filter(e => e.status === 'en_attente').map((exercise) => (
-                <div key={exercise.id} className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                  <div className="font-medium text-yellow-900">{exercise.title}</div>
-                  <div className="text-sm text-yellow-700">{exercise.domain}</div>
-                  <div className="text-xs text-yellow-600 mt-1">
-                    {exercise.submittedAt && getTimeAgo(exercise.submittedAt)}
+          <div className="flex items-center space-x-3">
+            <div className={`p-2 rounded-full bg-gradient-to-r ${colors.primary}`}>
+              <Lightbulb className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900">Recommandations de Bubix</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {recommendations.slice(0, 6).map((rec: any) => (
+              <div key={rec.id} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
+                <div className="flex items-start space-x-4">
+                  <div className={`p-2 rounded-lg ${colors.secondary}`}>
+                    {rec.type === 'GAME' ? (
+                      <Gamepad2 className={`w-5 h-5 ${colors.accent}`} />
+                    ) : (
+                      <BookOpen className={`w-5 h-5 ${colors.accent}`} />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 mb-2">{rec.reason}</h3>
+                    <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1">
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span className="text-sm text-gray-600">{formatScore(rec.score)}</span>
+                      </div>
+                      <span className="text-xs text-gray-400">•</span>
+                      <span className="text-xs text-gray-500 capitalize">{rec.type.toLowerCase()}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Planning */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className={`p-2 rounded-full bg-gradient-to-r ${colors.primary}`}>
+              <Calendar className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900">Planning de la semaine</h2>
+          </div>
+          <button className={`px-4 py-2 rounded-lg bg-gradient-to-r ${colors.primary} text-white text-sm font-medium hover:shadow-lg transition-shadow`}>
+            Modifier
+          </button>
+        </div>
+
+        {schedule.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {schedule.slice(0, 6).map((event: any) => (
+              <div key={event.id} className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 text-sm">{event.title}</h3>
+                    <p className="text-xs text-gray-500 mt-1">{event.description}</p>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <Clock className="w-3 h-3 text-gray-400" />
+                      <span className="text-xs text-gray-600">{formatDuration(event.duration)}</span>
+                    </div>
+                  </div>
+                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    event.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
+                    event.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-700' :
+                    'bg-gray-100 text-gray-700'
+                  }`}>
+                    {event.status === 'COMPLETED' ? 'Terminé' :
+                     event.status === 'IN_PROGRESS' ? 'En cours' : 'Planifié'}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 bg-gray-50 rounded-xl">
+            <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun événement planifié</h3>
+            <p className="text-gray-600 mb-4">Créez le premier événement pour organiser l'apprentissage</p>
+            <button className={`px-6 py-3 rounded-lg bg-gradient-to-r ${colors.primary} text-white font-medium hover:shadow-lg transition-shadow`}>
+              Créer un événement
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// Interface Enfants - Design ludique et motivant
+function ChildInterface({ 
+  firstName, 
+  userSubscriptionType,
+  welcomeMessage, 
+  topExercises, 
+  topGames, 
+  ranking 
+}: any) {
+  const getSubscriptionColors = () => {
+    switch (userSubscriptionType) {
+      case 'PRO':
+        return { primary: 'from-blue-500 to-indigo-600', secondary: 'bg-blue-50', accent: 'text-blue-600' }
+      case 'PREMIUM':
+        return { primary: 'from-fuchsia-500 to-violet-600', secondary: 'bg-fuchsia-50', accent: 'text-fuchsia-600' }
+      case 'ENTERPRISE':
+        return { primary: 'from-purple-500 to-pink-600', secondary: 'bg-purple-50', accent: 'text-purple-600' }
+      default:
+        return { primary: 'from-blue-500 to-violet-600', secondary: 'bg-blue-50', accent: 'text-blue-600' }
+    }
+  }
+
+  const colors = getSubscriptionColors()
+
+  return (
+    <div className="space-y-8 p-6">
+      {/* Message d'accueil personnalisé */}
+      <div className="text-center space-y-6">
+        <div className={`inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r ${colors.primary} text-white shadow-lg`}>
+          <Sparkles className="w-5 h-5 mr-2" />
+          <span className="font-semibold">Salut {firstName} !</span>
+        </div>
+        
+        {welcomeMessage ? (
+          <div className="max-w-3xl mx-auto">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              {welcomeMessage.content}
+            </h1>
+            <p className="text-lg text-gray-600">
+              Prêt(e) pour une nouvelle aventure d'apprentissage ? 🚀
+            </p>
+          </div>
+        ) : (
+          <div className="max-w-3xl mx-auto">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              Salut {firstName} ! Je suis Bubix, ton ami IA ! 🤖✨
+            </h1>
+            <p className="text-lg text-gray-600">
+              Ensemble, nous allons apprendre plein de choses amusantes ! Prêt(e) pour l'aventure ?
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Raccourcis rapides */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-all hover:-translate-y-1 cursor-pointer">
+          <div className={`w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r ${colors.primary} flex items-center justify-center`}>
+            <BookOpen className="w-6 h-6 text-white" />
+          </div>
+          <h3 className="font-semibold text-gray-900 text-sm">Exercices</h3>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-all hover:-translate-y-1 cursor-pointer">
+          <div className={`w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r ${colors.primary} flex items-center justify-center`}>
+            <Gamepad2 className="w-6 h-6 text-white" />
+          </div>
+          <h3 className="font-semibold text-gray-900 text-sm">Jeux</h3>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-all hover:-translate-y-1 cursor-pointer">
+          <div className={`w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r ${colors.primary} flex items-center justify-center`}>
+            <Trophy className="w-6 h-6 text-white" />
+          </div>
+          <h3 className="font-semibold text-gray-900 text-sm">Classement</h3>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-all hover:-translate-y-1 cursor-pointer">
+          <div className={`w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r ${colors.primary} flex items-center justify-center`}>
+            <Calendar className="w-6 h-6 text-white" />
+          </div>
+          <h3 className="font-semibold text-gray-900 text-sm">Planning</h3>
+        </div>
+      </div>
+
+      {/* Top exercices */}
+      {topExercises.length > 0 && (
+        <div className="space-y-6">
+          <div className="flex items-center space-x-3">
+            <div className={`p-2 rounded-full bg-gradient-to-r ${colors.primary}`}>
+              <BookOpen className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900">Exercices populaires</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {topExercises.map((exercise: any) => (
+              <div key={exercise.id} className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 cursor-pointer">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="font-semibold text-gray-900 text-sm flex-1">{exercise.title}</h3>
+                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(exercise.difficulty)}`}>
+                    {exercise.difficulty}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-3 line-clamp-2">{exercise.description}</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-3 h-3 text-gray-400" />
+                    <span className="text-xs text-gray-600">{formatDuration(exercise.estimatedTime)}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                    <span className="text-xs text-gray-600">{formatScore(exercise.rating)}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Top jeux */}
+      {topGames.length > 0 && (
+        <div className="space-y-6">
+          <div className="flex items-center space-x-3">
+            <div className={`p-2 rounded-full bg-gradient-to-r ${colors.primary}`}>
+              <Gamepad2 className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900">Jeux populaires</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {topGames.map((game: any) => (
+              <div key={game.id} className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 cursor-pointer">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="font-semibold text-gray-900 text-sm flex-1">{game.title}</h3>
+                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(game.difficulty)}`}>
+                    {game.difficulty}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mb-3 line-clamp-2">{game.description}</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-3 h-3 text-gray-400" />
+                    <span className="text-xs text-gray-600">{formatDuration(game.estimatedTime)}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                    <span className="text-xs text-gray-600">{formatScore(game.rating)}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Classement */}
+      {ranking.length > 0 && (
+        <div className="space-y-6">
+          <div className="flex items-center space-x-3">
+            <div className={`p-2 rounded-full bg-gradient-to-r ${colors.primary}`}>
+              <Trophy className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900">Ton classement</h2>
+          </div>
+          
+          <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="space-y-4">
+              {ranking.map((rank: any, index: number) => (
+                <div key={rank.domain} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                  <div className="flex items-center space-x-4">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                      index === 0 ? 'bg-yellow-100 text-yellow-700' :
+                      index === 1 ? 'bg-gray-100 text-gray-700' :
+                      index === 2 ? 'bg-orange-100 text-orange-700' :
+                      'bg-blue-100 text-blue-700'
+                    }`}>
+                      {index + 1}
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-900">{rank.domain}</h3>
+                      <p className="text-sm text-gray-600">Score: {rank.score}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-gray-700">#{rank.rank}</span>
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-
-          {/* Quêtes en cours */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Target size={18} />
-              Quêtes en cours
-            </h4>
-            
-            <div className="space-y-3">
-              {exercises.filter(e => e.status === 'en_cours').map((exercise) => (
-                <div key={exercise.id} className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="font-medium text-blue-900">{exercise.title}</div>
-                  <div className="text-sm text-blue-700">{exercise.domain}</div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(exercise.difficulty)}`}>
-                      {exercise.difficulty}
-                    </span>
-                    <span className="text-xs text-blue-600">
-                      {exercise.estimatedTime} min
-                    </span>
-                  </div>
-                  <div className="text-xs text-blue-600 mt-1">
-                    {exercise.submittedAt && getTimeAgo(exercise.submittedAt)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Statistiques rapides */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <TrendingUp size={18} />
-              Progression
-            </h4>
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Exercices terminés</span>
-                <span className="font-bold text-green-600">
-                  {exercises.filter(e => e.status === 'termine').length}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">En cours</span>
-                <span className="font-bold text-blue-600">
-                  {exercises.filter(e => e.status === 'en_cours').length}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">En attente</span>
-                <span className="font-bold text-yellow-600">
-                  {exercises.filter(e => e.status === 'en_attente').length}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Score moyen</span>
-                <span className="font-bold text-purple-600">
-                  {Math.round(exercises.filter(e => e.score).reduce((acc, e) => acc + (e.score || 0), 0) / exercises.filter(e => e.score).length)}%
-                </span>
-              </div>
             </div>
           </div>
         </div>
-      </div>
-    </motion.div>
+      )}
+    </div>
   )
 } 

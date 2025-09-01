@@ -45,7 +45,7 @@ export interface StatsSummary {
 }
 
 // Configuration fetch avec cookies
-const apiFetch = async (url: string, options: RequestInit = {}) => {
+export const apiFetch = async (url: string, options: RequestInit = {}) => {
   const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
   
   const defaultOptions: RequestInit = {

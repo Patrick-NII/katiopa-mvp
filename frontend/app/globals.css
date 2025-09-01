@@ -279,6 +279,17 @@ label, input, textarea, select {
   }
 }
 
+/* Désactivation locale des animations pour le logo quand demandé */
+.logo-no-anim span {
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+.logo-no-anim span:hover {
+  animation: none !important;
+  transform: none !important;
+}
+
 /*
   Fredoka global scope (applied to all pages except homepage)
   - Sets Fredoka as the main font
@@ -354,5 +365,4 @@ label, input, textarea, select {
   transform: translateY(-1px) scale(1.1);
   filter: brightness(1.2);
 }
-
 
