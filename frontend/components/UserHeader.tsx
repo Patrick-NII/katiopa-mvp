@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { authAPI } from '@/lib/api'
+import { useAvatar } from '@/contexts/AvatarContext'
 
 interface UserHeaderProps {
   userType?: 'CHILD' | 'PARENT' | 'TEACHER' | 'ADMIN'
@@ -21,6 +22,7 @@ interface UserInfo {
 export default function UserHeader({ userType, subscriptionType }: UserHeaderProps) {
   const [user, setUser] = useState<UserInfo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const { selectedAvatar } = useAvatar()
 
   // Charger les informations utilisateur
   useEffect(() => {
@@ -112,7 +114,9 @@ export default function UserHeader({ userType, subscriptionType }: UserHeaderPro
   }
 
   const colors = getSubscriptionColors()
-  const avatarPath = user.avatarPath || getDefaultAvatar(user.userType)
+  
+  // Priorité : 1. Avatar sélectionné dans les réglages, 2. Avatar par défaut
+  const avatarPath = selectedAvatar || user.avatarPath || getDefaultAvatar(user.userType)
 
   return (
     <div className="fixed top-4 right-4 z-50">
