@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@prisma/client": "^6.15.0",
     "@types/jsonwebtoken": "^9.0.10",
     "framer-motion": "^12.23.12",
     "jsonwebtoken": "^9.0.2",
