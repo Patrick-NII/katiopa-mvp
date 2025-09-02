@@ -15,6 +15,7 @@ import {
   Play,
   Users
 } from 'lucide-react'
+import DecorativeCubes from '@/components/DecorativeCubes';
 
 export default function PlayCubePage() {
   const [currentLevel, setCurrentLevel] = useState(1)
@@ -22,7 +23,8 @@ export default function PlayCubePage() {
   const [streak, setStreak] = useState(0)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-6 relative overflow-hidden">
+      <DecorativeCubes variant="default" />
       {/* En-tête PlayCube */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg mb-4">

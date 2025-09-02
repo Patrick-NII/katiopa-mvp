@@ -20,6 +20,7 @@ import {
   Lightbulb,
   Calendar
 } from 'lucide-react'
+import DecorativeCubes from '@/components/DecorativeCubes';
 
 export default function ComCubePage() {
   const [currentLevel, setCurrentLevel] = useState(1)
@@ -27,7 +28,8 @@ export default function ComCubePage() {
   const [streak, setStreak] = useState(0)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-6 relative overflow-hidden">
+      <DecorativeCubes variant="default" />
       {/* En-tête ComCube */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg mb-4">

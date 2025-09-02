@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { User, Lock, Eye, EyeOff, ArrowRight, User as UserIcon, LogOut } from 'lucide-react';
 import { authAPI } from '@/lib/api';
 import Navbar from '@/components/Navbar';
-import Link from 'next/link';
+import DecorativeCubes from '@/components/DecorativeCubes';
 
 export default function LoginPage() {
   const [sessionId, setSessionId] = useState('');
@@ -50,7 +50,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+      <DecorativeCubes variant="minimal" />
       {/* Navigation */}
       <Navbar />
 

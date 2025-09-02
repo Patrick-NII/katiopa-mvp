@@ -16,6 +16,7 @@ import {
   BookOpen,
   Globe
 } from 'lucide-react'
+import DecorativeCubes from '@/components/DecorativeCubes';
 
 export default function ScienceCubePage() {
   const [currentLevel, setCurrentLevel] = useState(1)
@@ -23,7 +24,8 @@ export default function ScienceCubePage() {
   const [streak, setStreak] = useState(0)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-100 p-6 relative overflow-hidden">
+      <DecorativeCubes variant="default" />
       {/* En-tête ScienceCube */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg mb-4">
