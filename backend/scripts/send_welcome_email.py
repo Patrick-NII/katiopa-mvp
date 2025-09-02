@@ -11,11 +11,11 @@ Usage:
     --plan STARTER
 
 Environment variables (recommended):
-  SMTP_USERNAME   = hello@cube-ai.fr (default)
-  SMTP_PASSWORD   = <SMTP password>
-  SMTP_HOST       = smtp.ionos.fr (default)
-  SMTP_PORT       = 465 (implicit TLS; default)
-  APP_BASE_URL    = https://cube-ai.fr (used for CTA links)
+  HELLO_EMAIL_USER      = hello@cube-ai.fr (communication générale)
+  HELLO_EMAIL_PASSWORD  = <SMTP password>
+  HELLO_SMTP_SERVER     = smtp.ionos.fr
+  HELLO_SMTP_PORT       = 465 (implicit TLS)
+  APP_BASE_URL          = https://cube-ai.fr (used for CTA links)
 
 Note: Network sending is not executed here; this script prepares and sends via
 standard SMTP using TLS. Ensure the credentials are valid in your environment.
@@ -35,6 +35,63 @@ try:
 except Exception:
     pass
 
+# Configuration des emails par type
+EMAIL_CONFIG = {
+    "hello": {
+        "user": os.getenv("HELLO_EMAIL_USER", "hello@cube-ai.fr"),
+        "password": os.getenv("HELLO_EMAIL_PASSWORD"),
+        "smtp_server": os.getenv("HELLO_SMTP_SERVER", "smtp.ionos.fr"),
+        "smtp_port": int(os.getenv("HELLO_SMTP_PORT", "465")),
+        "from_name": "CubeAI - Équipe"
+    },
+    "support": {
+        "user": os.getenv("SUPPORT_EMAIL_USER", "support@cube-ai.fr"),
+        "password": os.getenv("SUPPORT_EMAIL_PASSWORD"),
+        "smtp_server": os.getenv("SUPPORT_SMTP_SERVER", "smtp.ionos.fr"),
+        "smtp_port": int(os.getenv("SUPPORT_SMTP_PORT", "465")),
+        "from_name": "CubeAI - Support"
+    },
+    "noreply": {
+        "user": os.getenv("NOREPLY_EMAIL_USER", "noreply@cube-ai.fr"),
+        "password": os.getenv("NOREPLY_EMAIL_PASSWORD"),
+        "smtp_server": os.getenv("NOREPLY_SMTP_SERVER", "smtp.ionos.fr"),
+        "smtp_port": int(os.getenv("NOREPLY_SMTP_PORT", "465")),
+        "from_name": "CubeAI"
+    }
+}
+
+def get_email_config(email_type: str = "hello"):
+    """
+    Récupère la configuration email selon le type d'email
+    
+    Args:
+        email_type: "hello" (communication générale), "support" (assistance), "noreply" (automatique)
+    
+    Returns:
+        dict: Configuration SMTP pour le type d'email spécifié
+    """
+    if email_type not in EMAIL_CONFIG:
+        raise ValueError(f"Type d'email invalide: {email_type}. Types valides: {list(EMAIL_CONFIG.keys())}")
+    
+    config = EMAIL_CONFIG[email_type]
+    
+    if not config["password"]:
+        raise ValueError(f"Mot de passe manquant pour {email_type}@cube-ai.fr")
+    
+    return config
+
+def get_from_address(email_type: str = "hello"):
+    """
+    Récupère l'adresse d'expédition formatée selon le type d'email
+    
+    Args:
+        email_type: Type d'email (hello, support, noreply)
+    
+    Returns:
+        str: Adresse d'expédition formatée
+    """
+    config = get_email_config(email_type)
+    return f"{config['from_name']} <{config['user']}>"
 
 PLANS: Dict[str, Dict[str, object]] = {
     "STARTER": {
@@ -170,7 +227,7 @@ def build_email_html(
         <div style=\"text-align:center;margin:24px 0;\">\n          <a href=\"{login_url}\"\n             style=\"display:inline-block;background:linear-gradient(90deg,#2563eb,#7c3aed);color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:700;\">\n            Se connecter à CubeAI\n          </a>\n        </div>
 
         <p style=\"margin:0 0 8px 0;color:#374151;\">Besoin d'aide ? Répondez à ce message ou contactez notre support.</p>
-        <p style=\"margin:0;color:#6b7280;font-size:12px;\">Cet email a été envoyé par CubeAI Bonjour 😊 &lt;hello@cube-ai.fr&gt;.</p>
+        <p style=\"margin:0;color:#6b7280;font-size:12px;\">Cet email a été envoyé par CubeAI - Équipe &lt;hello@cube-ai.fr&gt;.</p>
       </div>
 
       <p style=\"text-align:center;color:#9ca3af;font-size:12px;margin-top:12px;\">© 2024 CubeAI — Tous droits réservés.</p>
@@ -234,7 +291,7 @@ def build_email_text(
         "",
         "Besoin d'aide ? Répondez à ce message ou contactez notre support.",
         "",
-        "— CubeAI Bonjour 😊",
+        "— CubeAI - Équipe",
     ]
     return "\n".join(lines)
 
@@ -246,20 +303,19 @@ def send_email(
     account_password: str,
     plan: str,
     *,
-    smtp_username: str,
-    smtp_password: str,
-    smtp_host: str = "smtp.ionos.fr",
-    smtp_port: int = 465,
+    email_type: str = "hello",
     app_base_url: str = "https://cube-ai.fr",
     members: List[Dict[str, str]] | None = None,
+    registration_id: str | None = None,
 ):
     subject = "Bienvenue sur CubeAI — Vos accès et avantages"
 
+    # Récupérer la configuration email
+    email_config = get_email_config(email_type)
+
     # Build message
     msg = EmailMessage()
-    from_display = "CubeAI Bonjour 😊"
-    from_email = smtp_username or "hello@cube-ai.fr"
-    msg["From"] = f"{from_display} <{from_email}>"
+    msg["From"] = get_from_address(email_type)
     msg["To"] = f"{to_name} <{to_email}>"
     msg["Subject"] = subject
 
@@ -273,19 +329,21 @@ def send_email(
 
     # Prefer implicit TLS (465). If fails, fallback to STARTTLS (587)
     try:
-        with smtplib.SMTP_SSL(smtp_host, smtp_port, context=context) as server:
-            server.login(smtp_username, smtp_password)
+        with smtplib.SMTP_SSL(email_config["smtp_server"], email_config["smtp_port"], context=context) as server:
+            server.login(email_config["user"], email_config["password"])
             server.send_message(msg)
+            print(f"📧 Email de bienvenue envoyé avec succès depuis {email_config['user']}")
             return
     except Exception as e:
         # Fallback: try STARTTLS on 587
         try:
-            with smtplib.SMTP(smtp_host, 587) as server:
+            with smtplib.SMTP(email_config["smtp_server"], 587) as server:
                 server.ehlo()
                 server.starttls(context=context)
                 server.ehlo()
-                server.login(smtp_username, smtp_password)
+                server.login(email_config["user"], email_config["password"])
                 server.send_message(msg)
+                print(f"📧 Email de bienvenue envoyé avec succès depuis {email_config['user']}")
                 return
         except Exception as e2:
             raise RuntimeError(f"SMTP sending failed (SSL:{e}) and (STARTTLS:{e2})")
@@ -300,18 +358,12 @@ def main():
     parser.add_argument("--plan", choices=["STARTER", "PRO", "PREMIUM"], required=True, help="Selected plan")
     parser.add_argument("--members-json", help="JSON array of members with firstName,lastName,sessionId/username,password,userType")
     parser.add_argument("--registration-id", help="Registration identifier to include in the email")
+    parser.add_argument("--email-type", choices=["hello", "support", "noreply"], default="hello", help="Type d'email à utiliser")
 
     # Optional overrides
-    parser.add_argument("--smtp-username", default=os.getenv("SMTP_USERNAME", "hello@cube-ai.fr"))
-    parser.add_argument("--smtp-password", default=os.getenv("SMTP_PASSWORD"))
-    parser.add_argument("--smtp-host", default=os.getenv("SMTP_HOST", "smtp.ionos.fr"))
-    parser.add_argument("--smtp-port", type=int, default=int(os.getenv("SMTP_PORT", "465")))
     parser.add_argument("--app-base-url", default=os.getenv("APP_BASE_URL", "https://cube-ai.fr"))
 
     args = parser.parse_args()
-
-    if not args.smtp_password:
-        raise SystemExit("Missing SMTP password. Set SMTP_PASSWORD env or --smtp-password.")
 
     members = None
     if args.members_json:
@@ -329,10 +381,7 @@ def main():
         account_username=args.account_username,
         account_password=args.account_password,
         plan=args.plan,
-        smtp_username=args.smtp_username,
-        smtp_password=args.smtp_password,
-        smtp_host=args.smtp_host,
-        smtp_port=args.smtp_port,
+        email_type=args.email_type,
         app_base_url=args.app_base_url,
         members=members,
         registration_id=args.registration_id,

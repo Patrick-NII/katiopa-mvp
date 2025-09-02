@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { getEmailConfig, getFromAddress } from '../config/emailConfig';
 
 interface PasswordResetEmailData {
   toEmail: string;
@@ -9,21 +10,19 @@ interface PasswordResetEmailData {
 export async function sendPasswordResetEmail(data: PasswordResetEmailData) {
   const { toEmail, toName, resetLink } = data;
 
-  // Transport
-  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-  const port = parseInt(process.env.SMTP_PORT || '587');
-  const secure = process.env.SMTP_SECURE ? process.env.SMTP_SECURE === 'true' : port === 465;
-  const smtpUser = process.env.SMTP_USERNAME || process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASSWORD || process.env.SMTP_PASS;
-
+  // Configuration du transporteur email - Utilise noreply pour les emails automatiques
+  const emailConfig = getEmailConfig("noreply");
+  
   const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure,
-    auth: smtpUser && smtpPass ? { user: smtpUser, pass: smtpPass } : undefined,
+    host: emailConfig.smtpServer,
+    port: emailConfig.smtpPort,
+    secure: emailConfig.smtpPort === 465, // 465 => TLS
+    auth: { 
+      user: emailConfig.user, 
+      pass: emailConfig.password 
+    },
   });
 
-  const fromAddress = process.env.SMTP_FROM || smtpUser || 'no-reply@localhost';
   const html = `
   <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background: linear-gradient(135deg,#3b82f6,#8b5cf6); color:#fff; padding:24px; border-radius:12px 12px 0 0;">
@@ -41,10 +40,16 @@ export async function sendPasswordResetEmail(data: PasswordResetEmailData) {
   </div>`;
 
   const info = await transporter.sendMail({
-    from: `"CubeAI" <${fromAddress}>`,
+    from: getFromAddress("noreply"),
     to: toEmail,
     subject: 'Réinitialisation de mot de passe',
     html,
+  });
+
+  console.log('📧 Email de réinitialisation envoyé avec succès:', {
+    messageId: info.messageId,
+    to: toEmail,
+    from: emailConfig.user
   });
 
   return { success: true, messageId: info.messageId };
