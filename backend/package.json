@@ -13,7 +13,8 @@
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "seed": "tsx src/seed.ts",
-    "migrate:email": "tsx scripts/run-email-migration.ts"
+    "migrate:email": "tsx scripts/run-email-migration.ts",
+    "migrate:daily-reports": "tsx scripts/run-daily-reports-migration.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.16.1",
