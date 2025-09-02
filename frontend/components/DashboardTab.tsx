@@ -113,11 +113,11 @@ export default function DashboardTab({
 
   // Initialisation du tracking
   const { trackPrompt, trackMetric } = useTracking({
-    trackClicks: true,
-    trackInputs: true,
-    trackNavigation: true,
-    trackPerformance: true,
-    trackPrompts: true
+    trackClicks: false,
+    trackInputs: false,
+    trackNavigation: false,
+    trackPerformance: false,
+    trackPrompts: false
   });
 
   // Récupération des vraies données depuis l'API

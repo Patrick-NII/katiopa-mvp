@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Navbar from '@/components/Navbar';
+import Navbar from '@/components/NavBar';
 import CubeMatch from '@/components/CubeMatch';
 import DecorativeCubes from '@/components/DecorativeCubes';
 import { ArrowLeft, ChevronRight } from 'lucide-react';

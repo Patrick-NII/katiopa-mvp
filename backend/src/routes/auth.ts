@@ -182,6 +182,48 @@ router.post('/register', async (req, res) => {
     // Création des sessions utilisateur pour tous les membres de la famille
     const createdSessions = [];
     
+    // Créer d'abord la session parent avec le mot de passe principal
+    const parentPassword = await bcrypt.hash(password, 12);
+    const mainParentSession = await prisma.userSession.create({
+      data: {
+        accountId: account.id,
+        sessionId: `${firstName.toLowerCase()}_parent`,
+        password: parentPassword,
+        firstName,
+        lastName,
+        gender: 'UNKNOWN',
+        userType: 'PARENT',
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    });
+    
+    createdSessions.push(mainParentSession);
+    console.log(`✅ Session parent créée: ${mainParentSession.sessionId}`);
+    
+    // Création du profil parent
+    if (parentPrompts) {
+      await prisma.userProfile.create({
+        data: {
+          userSessionId: mainParentSession.id,
+          learningGoals: parentPrompts.objectives ? [parentPrompts.objectives] : [],
+          preferredSubjects: [],
+          learningStyle: parentPrompts.preferences || null,
+          difficulty: null,
+          sessionPreferences: parentPrompts,
+          interests: [],
+          specialNeeds: parentPrompts.concerns ? [parentPrompts.concerns] : [],
+          customNotes: parentPrompts.additionalInfo || null,
+          parentWishes: parentPrompts.needs || null,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      });
+      console.log(`✅ Profil parent créé pour ${firstName} ${lastName}`);
+    }
+    
+    // Créer les sessions pour les membres de la famille
     for (let index = 0; index < familyMembers.length; index++) {
       const member = familyMembers[index];
       const {
@@ -331,7 +373,14 @@ router.post('/register', async (req, res) => {
           maxSessions: account.maxSessions,
           createdAt: account.createdAt
         },
-        sessions: createdSessions,
+        sessions: createdSessions.map(session => ({
+          id: session.id,
+          sessionId: session.sessionId,
+          firstName: session.firstName,
+          lastName: session.lastName,
+          userType: session.userType,
+          createdAt: session.createdAt
+        })),
         totalMembers: createdSessions.length
       }
     };

@@ -64,7 +64,7 @@ export default function DashboardPage() {
     try {
       // Récupération de l'utilisateur connecté
       const userResponse = await authAPI.verify();
-      if (userResponse.success) {
+      if (userResponse.success && userResponse.user) {
         setUser(userResponse.user);
         if (userResponse.user.userType === 'CHILD') {
           setActiveTab('experiences');

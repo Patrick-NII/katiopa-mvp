@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 import { trackingAPI } from '@/lib/api';
 
 interface TrackingConfig {
@@ -12,6 +12,7 @@ interface TrackingConfig {
 
 export const useTracking = (config: TrackingConfig = {}) => {
   const router = useRouter();
+  const pathname = usePathname();
   const navigationSessionId = useRef<string | null>(null);
   const sessionStartTime = useRef<number>(Date.now());
 
@@ -28,7 +29,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
     if (trackNavigation) {
       try {
         const session = await trackingAPI.startNavigationSession({
-          initialPage: router.asPath,
+          initialPage: pathname,
           sessionData: {
             userAgent: navigator.userAgent,
             screenSize: `${window.screen.width}x${window.screen.height}`,
@@ -42,7 +43,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
         console.warn('Erreur lors du démarrage de la session de navigation:', error);
       }
     }
-  }, [trackNavigation, router.asPath]);
+  }, [trackNavigation, pathname]);
 
   // Terminer la session de navigation
   const endNavigationSession = useCallback(async () => {
@@ -61,7 +62,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
     if (!trackClicks) return;
 
     const target = event.target as HTMLElement;
-    const elementId = target.id || target.getAttribute('data-id');
+    const elementId = target.id || target.getAttribute('data-id') || undefined;
     const elementName = target.tagName.toLowerCase();
     const elementValue = target.textContent?.trim() || target.getAttribute('value') || '';
 
@@ -71,7 +72,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
       elementId,
       elementName,
       elementValue,
-      pageUrl: router.asPath,
+      pageUrl: pathname,
       pageTitle: document.title,
       sessionDuration: Date.now() - sessionStartTime.current,
       metadata: {
@@ -80,14 +81,14 @@ export const useTracking = (config: TrackingConfig = {}) => {
         button: event.button
       }
     });
-  }, [trackClicks, router.asPath]);
+  }, [trackClicks, pathname]);
 
   // Tracker un input
   const trackInput = useCallback((event: Event) => {
     if (!trackInputs) return;
 
     const target = event.target as HTMLInputElement | HTMLTextAreaElement;
-    const elementId = target.id || target.getAttribute('data-id');
+    const elementId = target.id || target.getAttribute('data-id') || undefined;
     const elementName = target.tagName.toLowerCase();
     const elementValue = target.value;
 
@@ -97,7 +98,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
       elementId,
       elementName,
       elementValue,
-      pageUrl: router.asPath,
+      pageUrl: pathname,
       pageTitle: document.title,
       sessionDuration: Date.now() - sessionStartTime.current,
       metadata: {
@@ -105,7 +106,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
         maxLength: target.maxLength
       }
     });
-  }, [trackInputs, router.asPath]);
+  }, [trackInputs, pathname]);
 
   // Tracker un prompt
   const trackPrompt = useCallback((data: {
@@ -189,7 +190,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
             metricType: 'LOAD_TIME',
             value: loadTime,
             unit: 'ms',
-            context: { page: router.asPath }
+            context: { page: pathname }
           });
         });
 
@@ -213,7 +214,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
               metricType: 'ERROR_RATE',
               value: 1,
               unit: 'count',
-              context: { url: args[0], error: error.message }
+              context: { url: args[0], error: (error as Error).message }
             });
             throw error;
           }
@@ -238,15 +239,15 @@ export const useTracking = (config: TrackingConfig = {}) => {
   useEffect(() => {
     if (trackNavigation && navigationSessionId.current) {
       trackingAPI.updateNavigationSession(navigationSessionId.current, {
-        pageUrl: router.asPath,
+        pageUrl: pathname,
         actionPerformed: true,
         sessionData: {
-          currentPage: router.asPath,
+          currentPage: pathname,
           timestamp: new Date().toISOString()
         }
       });
     }
-  }, [router.asPath, trackNavigation]);
+  }, [pathname, trackNavigation]);
 
   // Tracker la fermeture de la page
   useEffect(() => {

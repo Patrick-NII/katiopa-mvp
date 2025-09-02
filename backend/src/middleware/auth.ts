@@ -25,9 +25,14 @@ declare global {
 export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // PRIORITÉ 1: Cookie HttpOnly sécurisé
-    let token = req.cookies?.katiopa_at;
+    let token = req.cookies?.authToken;
     
-    // FALLBACK temporaire: Authorization header (à supprimer après migration complète)
+    // PRIORITÉ 2: Cookie non-HttpOnly (pour le debug)
+    if (!token) {
+      token = req.cookies?.authToken;
+    }
+    
+    // PRIORITÉ 3: Authorization header (fallback)
     if (!token && req.headers.authorization?.startsWith('Bearer ')) {
       console.warn('⚠️ Utilisation du header Authorization (déprécié)');
       token = req.headers.authorization.substring(7);

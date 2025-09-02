@@ -170,7 +170,7 @@ const DecorativeCubes: React.FC<DecorativeCubesProps> = ({
               ...cube.style,
               top: `${cube.top}px`,
               left: cube.left,
-              '--rotation': `${Math.random() * 360}deg`,
+              ['--rotation' as string]: `${Math.random() * 360}deg`,
             } as React.CSSProperties}
           />
         ))}

@@ -69,7 +69,8 @@ export const cubematchAPI = {
   getTopScores: async (limit: number = 10): Promise<CubeMatchScore[]> => {
     try {
       const response = await apiFetch(`/api/cubematch/scores?limit=${limit}`);
-      return response || [];
+      const data = await response.json();
+      return data || [];
     } catch (error) {
       console.error('Erreur lors de la récupération des scores:', error);
       return [];
@@ -80,7 +81,8 @@ export const cubematchAPI = {
   getStats: async (): Promise<CubeMatchStats | null> => {
     try {
       const response = await apiFetch('/api/cubematch/stats');
-      return response;
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error('Erreur lors de la récupération des statistiques:', error);
       return null;
@@ -91,7 +93,8 @@ export const cubematchAPI = {
   getLeaderboard: async (limit: number = 10): Promise<CubeMatchLeaderboardEntry[]> => {
     try {
       const response = await apiFetch(`/api/cubematch/leaderboard?limit=${limit}`);
-      return response || [];
+      const data = await response.json();
+      return data || [];
     } catch (error) {
       console.error('Erreur lors de la récupération du classement:', error);
       return [];
@@ -133,7 +136,8 @@ export const cubematchAPI = {
   getUserScores: async (limit: number = 10): Promise<CubeMatchScore[]> => {
     try {
       const response = await apiFetch(`/api/cubematch/user-scores?limit=${limit}`);
-      return response || [];
+      const data = await response.json();
+      return data || [];
     } catch (error) {
       console.error('Erreur lors de la récupération des scores utilisateur:', error);
       return [];
@@ -144,7 +148,8 @@ export const cubematchAPI = {
   getUserStats: async (): Promise<CubeMatchUserStats | null> => {
     try {
       const response = await apiFetch('/api/cubematch/user-stats');
-      return response;
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error('Erreur lors de la récupération des statistiques utilisateur:', error);
       return null;
