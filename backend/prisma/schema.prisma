@@ -28,6 +28,7 @@ model Account {
   navigationSessions NavigationSession[]
   performanceMetrics PerformanceMetric[]
   passwordResetTokens PasswordResetToken[]
+  reportPreferences ReportPreference?
 }
 
 // Session utilisateur (connexion avec ID/mot de passe)
@@ -449,6 +450,126 @@ enum BounceType {
   HARD
   SOFT
   COMPLAINT
+}
+
+// Modèles pour les comptes rendus quotidiens
+model UserSession {
+  id              String   @id @default(cuid())
+  accountId       String   @map("account_id")
+  childNickname   String   @map("child_nickname")
+  childAge        Int      @map("child_age")
+  parentEmail     String   @map("parent_email")
+  goals           Json     @default("{}")
+  consentEmail    Boolean  @default(true) @map("consent_email")
+  emailFrequency  String   @default("daily") @map("email_frequency")
+  emailTime       String   @default("19:30:00") @map("email_time")
+  emailDomains    String[] @default(["maths", "programmation", "playcube"]) @map("email_domains")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  account         Account  @relation(fields: [accountId], references: [id])
+  learningEvents  LearningEvent[]
+  quizResults     QuizResult[]
+  sessionStats    SessionStatsDaily[]
+  dailyReports    DailyReport[]
+
+  @@map("user_sessions")
+}
+
+model LearningEvent {
+  id           String   @id @default(cuid())
+  sessionId    String   @map("session_id")
+  ts           DateTime @default(now())
+  domain       String
+  activity     String
+  durationSec  Int      @map("duration_sec")
+  successRatio Float?   @map("success_ratio")
+  metadata     Json     @default("{}")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  session      UserSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("learning_events")
+}
+
+model QuizResult {
+  id        String   @id @default(cuid())
+  sessionId String   @map("session_id")
+  ts        DateTime @default(now())
+  module    String
+  score     Float
+  attempts  Int      @default(1)
+  timeSec   Int      @map("time_sec")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  session   UserSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("quiz_results")
+}
+
+model SessionStatsDaily {
+  sessionId        String   @map("session_id")
+  date             DateTime @db.Date
+  totalTimeMin     Int      @default(0) @map("total_time_min")
+  kpiAssiduite     Float    @default(0) @map("kpi_assiduite")
+  kpiComprehension Float    @default(0) @map("kpi_comprehension")
+  kpiProgression   Float    @default(0) @map("kpi_progression")
+  sessionsCount    Int      @default(0) @map("sessions_count")
+  bestModule       String?  @map("best_module")
+  needsHelp        String?  @map("needs_help")
+  consecutiveDays  Int      @default(0) @map("consecutive_days")
+  focusScore       Float    @default(0) @map("focus_score")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  session          UserSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@id([sessionId, date])
+  @@map("session_stats_daily")
+}
+
+model DailyReport {
+  id           String   @id @default(cuid())
+  sessionId    String   @map("session_id")
+  date         DateTime @db.Date
+  subject      String
+  htmlContent  String   @map("html_content")
+  textContent  String   @map("text_content")
+  modelUsed    String   @map("model_used")
+  promptUsed   String?  @map("prompt_used")
+  kpisSnapshot Json     @map("kpis_snapshot")
+  sentAt       DateTime @default(now()) @map("sent_at")
+  parentEmail  String   @map("parent_email")
+  status       String   @default("sent")
+  errorMessage String?  @map("error_message")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  session      UserSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("daily_reports")
+}
+
+model ReportPreference {
+  id           String   @id @default(cuid())
+  accountId    String   @unique @map("account_id")
+  frequency    String   @default("daily")
+  preferredTime String  @default("19:30:00") @map("preferred_time")
+  domains      String[] @default(["maths", "programmation", "playcube"])
+  includeGoals Boolean  @default(true) @map("include_goals")
+  includeAdvice Boolean @default(true) @map("include_advice")
+  includeStats Boolean  @default(true) @map("include_stats")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  account      Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("report_preferences")
 }
 
 // Enums existants
