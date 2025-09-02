@@ -7,7 +7,7 @@ const router = express.Router();
 // Route pour récupérer les sessions actives d'un compte
 router.get("/active", requireAuth, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       return res.status(401).json({
         error: 'Utilisateur non authentifié',
@@ -104,7 +104,7 @@ router.get("/active", requireAuth, async (req, res) => {
 // Route pour récupérer toutes les sessions d'un utilisateur
 router.get("/user", requireAuth, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       return res.status(401).json({
         error: 'Utilisateur non authentifié',
@@ -191,7 +191,7 @@ router.get("/user", requireAuth, async (req, res) => {
 // Route pour mettre à jour le temps de connexion
 router.post("/update-time", requireAuth, async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       return res.status(401).json({
         error: 'Utilisateur non authentifié',

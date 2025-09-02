@@ -131,16 +131,7 @@ router.get('/incoming', requireAuth, async (req, res) => {
       where,
       orderBy: { createdAt: 'desc' },
       take: parseInt(limit as string),
-      skip: parseInt(offset as string),
-      include: {
-        assignedUser: {
-          select: {
-            firstName: true,
-            lastName: true,
-            sessionId: true
-          }
-        }
-      }
+      skip: parseInt(offset as string)
     });
 
     const total = await prisma.incomingEmail.count({ where });

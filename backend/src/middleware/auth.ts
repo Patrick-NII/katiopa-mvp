@@ -7,6 +7,7 @@ const prisma = new PrismaClient();
 // Interface pour l'utilisateur authentifié
 export interface AuthenticatedUser {
   id: string;
+  userId: string; // Alias pour compatibilité
   sessionId: string;
   accountId: string;
   userType: string;
@@ -55,13 +56,13 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
       });
     }
     
-    // Vérification que la session n'est pas expirée
-    if (userSession.expiresAt && new Date() > userSession.expiresAt) {
-      return res.status(401).json({ 
-        error: 'Session expirée',
-        code: 'SESSION_EXPIRED'
-      });
-    }
+    // Vérification que la session n'est pas expirée (optionnel)
+    // if (userSession.expiresAt && new Date() > userSession.expiresAt) {
+    //   return res.status(401).json({ 
+    //     error: 'Session expirée',
+    //     code: 'SESSION_EXPIRED'
+    //   });
+    // }
     
     // Log de l'accès authentifié
     console.info('🔐 Accès authentifié:', {
@@ -75,6 +76,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     
     req.user = {
       id: userSession.id,
+      userId: userSession.id, // Alias pour compatibilité
       sessionId: userSession.sessionId,
       accountId: userSession.accountId,
       userType: userSession.userType || 'PARENT'

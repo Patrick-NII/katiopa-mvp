@@ -32,7 +32,7 @@ async function main() {
     await prisma.planSeat.create({
       data: {
         accountId: testAccount.id,
-        maxChildren: 2
+        seatNumber: 2
       }
     });
 

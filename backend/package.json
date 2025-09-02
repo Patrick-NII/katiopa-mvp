@@ -1,10 +1,9 @@
 {
   "name": "katiopa-backend",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "tsx src/index.ts",
-    "dev:api": "tsx src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "db:generate": "prisma generate",
@@ -13,16 +12,10 @@
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "seed": "tsx src/seed.ts",
-    "migrate:email": "tsx scripts/run-email-migration.ts",
-    "migrate:email-simple": "tsx scripts/run-email-migration-simple.ts",
-    "migrate:daily-reports": "tsx scripts/run-daily-reports-migration.ts",
-    "migrate:daily-reports-simple": "tsx scripts/run-daily-reports-migration-simple.ts",
-    "newsletter:test": "tsx scripts/newsletter-test.ts",
-    "newsletter:test-single": "tsx scripts/newsletter-test.ts test",
-    "newsletter:stats": "tsx scripts/newsletter-test.ts stats",
-    "newsletter:test-simple": "tsx scripts/newsletter-test-simple.ts",
-    "newsletter:test-simple-single": "tsx scripts/newsletter-test-simple.ts test",
-    "deploy": "./deploy.sh"
+    "deploy": "./deploy.sh",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@prisma/client": "^5.16.1",
@@ -37,7 +30,9 @@
     "express-rate-limit": "^8.0.1",
     "helmet": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
+    "mjml": "^4.15.3",
     "morgan": "^1.10.0",
+    "mustache": "^4.2.0",
     "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.6",
     "openai": "^4.60.0",
@@ -50,10 +45,19 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.6",
+    "@types/mjml": "^4.7.4",
     "@types/morgan": "^1.9.7",
+    "@types/mustache": "^4.2.6",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.1",
     "ts-node": "^10.9.2",
     "tslib": "^2.6.3",
     "tsx": "^4.16.2",
     "typescript": "^5.5.4"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }
