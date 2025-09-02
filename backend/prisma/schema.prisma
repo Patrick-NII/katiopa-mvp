@@ -314,6 +314,143 @@ enum MetricType {
   OTHER
 }
 
+// Modèles pour le système de logging des emails
+model EmailLog {
+  id            Int       @id @default(autoincrement())
+  emailType     EmailType
+  fromEmail     String    @map("from_email")
+  toEmail       String    @map("to_email")
+  subject       String
+  htmlContent   String?   @map("html_content")
+  textContent   String?   @map("text_content")
+  status        EmailStatus @default(PENDING)
+  messageId     String?   @map("message_id")
+  smtpResponse  String?   @map("smtp_response")
+  errorMessage  String?   @map("error_message")
+  retryCount    Int       @default(0) @map("retry_count")
+  scheduledAt   DateTime  @default(now()) @map("scheduled_at")
+  sentAt        DateTime? @map("sent_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  bounces       EmailBounce[]
+
+  @@map("email_logs")
+}
+
+model IncomingEmail {
+  id          Int           @id @default(autoincrement())
+  fromEmail   String        @map("from_email")
+  toEmail     String        @map("to_email")
+  subject     String?
+  body        String?
+  headers     Json?
+  messageId   String?       @map("message_id")
+  emailType   IncomingEmailType @default(SUPPORT) @map("email_type")
+  priority    EmailPriority @default(NORMAL) @map("priority")
+  status      IncomingEmailStatus @default(NEW) @map("status")
+  assignedTo  String?        @map("assigned_to")
+  ticketId    String?        @map("ticket_id")
+  tags        String[]
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  assignedUser UserSession? @relation(fields: [assignedTo], references: [id])
+
+  @@map("incoming_emails")
+}
+
+model EmailTemplate {
+  id              Int       @id @default(autoincrement())
+  name            String    @unique
+  emailType       EmailType @map("email_type")
+  subjectTemplate String    @map("subject_template")
+  htmlTemplate    String    @map("html_template")
+  textTemplate    String?   @map("text_template")
+  variables       Json      @default("{}")
+  isActive        Boolean   @default(true) @map("is_active")
+  version         Int       @default(1)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("email_templates")
+}
+
+model EmailStatistics {
+  id              Int       @id @default(autoincrement())
+  emailType       EmailType @map("email_type")
+  date            DateTime  @db.Date
+  sentCount       Int       @default(0) @map("sent_count")
+  deliveredCount  Int       @default(0) @map("delivered_count")
+  failedCount     Int       @default(0) @map("failed_count")
+  bouncedCount    Int       @default(0) @map("bounced_count")
+  openedCount     Int       @default(0) @map("opened_count")
+  clickedCount    Int       @default(0) @map("clicked_count")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@unique([emailType, date])
+  @@map("email_statistics")
+}
+
+model EmailBounce {
+  id           Int         @id @default(autoincrement())
+  emailLogId   Int?        @map("email_log_id")
+  emailAddress String      @map("email_address")
+  bounceType   BounceType  @map("bounce_type")
+  reason       String?
+  smtpResponse String?     @map("smtp_response")
+  receivedAt   DateTime    @default(now()) @map("received_at")
+
+  // Relations
+  emailLog     EmailLog?   @relation(fields: [emailLogId], references: [id])
+
+  @@map("email_bounces")
+}
+
+// Enums pour les emails
+enum EmailType {
+  HELLO
+  SUPPORT
+  NOREPLY
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+  BOUNCED
+}
+
+enum IncomingEmailType {
+  SUPPORT
+  HELLO
+  GENERAL
+}
+
+enum EmailPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum IncomingEmailStatus {
+  NEW
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum BounceType {
+  HARD
+  SOFT
+  COMPLAINT
+}
+
 // Enums existants
 enum SubscriptionType {
   FREE
