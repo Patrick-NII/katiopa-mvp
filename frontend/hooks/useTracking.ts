@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { trackingAPI } from '@/lib/api';
 
 interface TrackingConfig {
@@ -11,20 +11,7 @@ interface TrackingConfig {
 }
 
 export const useTracking = (config: TrackingConfig = {}) => {
-  // Désactiver le tracking en développement pour éviter les erreurs
-  if (process.env.NODE_ENV === 'development') {
-    return {
-      trackClick: () => {},
-      trackInput: () => {},
-      trackPrompt: () => {},
-      trackMetric: () => {},
-      startNavigationSession: () => Promise.resolve(),
-      endNavigationSession: () => Promise.resolve()
-    };
-  }
-
   const router = useRouter();
-  const pathname = usePathname();
   const navigationSessionId = useRef<string | null>(null);
   const sessionStartTime = useRef<number>(Date.now());
 
@@ -36,12 +23,12 @@ export const useTracking = (config: TrackingConfig = {}) => {
     trackPrompts = true
   } = config;
 
-    // Démarrer une session de navigation
+  // Démarrer une session de navigation
   const startNavigationSession = useCallback(async () => {
     if (trackNavigation) {
       try {
         const session = await trackingAPI.startNavigationSession({
-          initialPage: pathname,
+          initialPage: router.asPath,
           sessionData: {
             userAgent: navigator.userAgent,
             screenSize: `${window.screen.width}x${window.screen.height}`,
@@ -55,7 +42,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
         console.warn('Erreur lors du démarrage de la session de navigation:', error);
       }
     }
-  }, [trackNavigation, pathname]);
+  }, [trackNavigation, router.asPath]);
 
   // Terminer la session de navigation
   const endNavigationSession = useCallback(async () => {
@@ -81,10 +68,10 @@ export const useTracking = (config: TrackingConfig = {}) => {
     trackingAPI.trackInteraction({
       interactionType: 'CLICK',
       elementType: getElementType(target),
-      elementId: elementId || undefined,
+      elementId,
       elementName,
       elementValue,
-      pageUrl: pathname,
+      pageUrl: router.asPath,
       pageTitle: document.title,
       sessionDuration: Date.now() - sessionStartTime.current,
       metadata: {
@@ -93,7 +80,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
         button: event.button
       }
     });
-  }, [trackClicks, pathname]);
+  }, [trackClicks, router.asPath]);
 
   // Tracker un input
   const trackInput = useCallback((event: Event) => {
@@ -107,10 +94,10 @@ export const useTracking = (config: TrackingConfig = {}) => {
     trackingAPI.trackInteraction({
       interactionType: 'INPUT',
       elementType: getElementType(target),
-      elementId: elementId || undefined,
+      elementId,
       elementName,
       elementValue,
-      pageUrl: pathname,
+      pageUrl: router.asPath,
       pageTitle: document.title,
       sessionDuration: Date.now() - sessionStartTime.current,
       metadata: {
@@ -118,7 +105,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
         maxLength: target.maxLength
       }
     });
-  }, [trackInputs, pathname]);
+  }, [trackInputs, router.asPath]);
 
   // Tracker un prompt
   const trackPrompt = useCallback((data: {
@@ -194,17 +181,17 @@ export const useTracking = (config: TrackingConfig = {}) => {
 
     // Tracker les métriques de performance
     if (trackPerformance) {
-              // Temps de chargement de la page
-        if (typeof window !== 'undefined') {
-          window.addEventListener('load', () => {
-            const loadTime = performance.now();
-            trackMetric({
-              metricType: 'LOAD_TIME',
-              value: loadTime,
-              unit: 'ms',
-              context: { page: pathname }
-            });
+      // Temps de chargement de la page
+      if (typeof window !== 'undefined') {
+        window.addEventListener('load', () => {
+          const loadTime = performance.now();
+          trackMetric({
+            metricType: 'LOAD_TIME',
+            value: loadTime,
+            unit: 'ms',
+            context: { page: router.asPath }
           });
+        });
 
         // Temps de réponse des requêtes
         const originalFetch = window.fetch;
@@ -226,7 +213,7 @@ export const useTracking = (config: TrackingConfig = {}) => {
               metricType: 'ERROR_RATE',
               value: 1,
               unit: 'count',
-              context: { url: args[0], error: error instanceof Error ? error.message : String(error) }
+              context: { url: args[0], error: error.message }
             });
             throw error;
           }
@@ -251,15 +238,15 @@ export const useTracking = (config: TrackingConfig = {}) => {
   useEffect(() => {
     if (trackNavigation && navigationSessionId.current) {
       trackingAPI.updateNavigationSession(navigationSessionId.current, {
-        pageUrl: pathname,
+        pageUrl: router.asPath,
         actionPerformed: true,
         sessionData: {
-          currentPage: pathname,
+          currentPage: router.asPath,
           timestamp: new Date().toISOString()
         }
       });
     }
-  }, [pathname, trackNavigation]);
+  }, [router.asPath, trackNavigation]);
 
   // Tracker la fermeture de la page
   useEffect(() => {
