@@ -1,4 +1,5 @@
 import { getEmailConfig, getFromAddress, EmailType } from '../config/emailConfig';
+import { EmailLoggingService } from './emailLoggingService';
 import nodemailer from 'nodemailer';
 
 /**
@@ -92,7 +93,7 @@ export class EmailService {
   }
 
   /**
-   * Méthode générique pour envoyer un email
+   * Méthode générique pour envoyer un email avec logging
    */
   private static async sendEmail(emailType: EmailType, options: {
     to: string;
@@ -100,38 +101,7 @@ export class EmailService {
     html: string;
     text?: string;
   }) {
-    const emailConfig = getEmailConfig(emailType);
-    
-    const transporter = nodemailer.createTransport({
-      host: emailConfig.smtpServer,
-      port: emailConfig.smtpPort,
-      secure: emailConfig.smtpPort === 465,
-      auth: {
-        user: emailConfig.user,
-        pass: emailConfig.password,
-      },
-    });
-
-    const mailOptions = {
-      from: getFromAddress(emailType),
-      to: options.to,
-      subject: options.subject,
-      html: options.html,
-      text: options.text,
-    };
-
-    try {
-      const info = await transporter.sendMail(mailOptions);
-      console.log(`📧 Email envoyé avec succès depuis ${emailConfig.user}:`, {
-        messageId: info.messageId,
-        to: options.to,
-        type: emailType,
-      });
-      return { success: true, messageId: info.messageId };
-    } catch (error) {
-      console.error(`❌ Erreur lors de l'envoi d'email depuis ${emailConfig.user}:`, error);
-      throw error;
-    }
+    return EmailLoggingService.sendAndLogEmail(emailType, options);
   }
 
   /**
