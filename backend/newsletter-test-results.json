@@ -1,0 +1,25 @@
+{
+  "date": "2025-09-02T15:41:40.146Z",
+  "totalContacts": 7,
+  "successCount": 3,
+  "errorCount": 4,
+  "successRate": 42.857142857142854,
+  "errors": [
+    {
+      "email": "test@example.com",
+      "error": "Can't send mail - all recipients were rejected: 556-Requested action not taken: domain does not accept mail\n556 invalid DNS MX or A/AAAA resource record 1MBV6n-1ukzkN3jZP-002TVB"
+    },
+    {
+      "email": "test-1756662172566@example.com",
+      "error": "Can't send mail - all recipients were rejected: 556-Requested action not taken: domain does not accept mail\n556 invalid DNS MX or A/AAAA resource record 1N9L64-1uNncb0R2C-00yU7G"
+    },
+    {
+      "email": "test-complete-1756662342397@example.com",
+      "error": "Can't send mail - all recipients were rejected: 556-Requested action not taken: domain does not accept mail\n556 invalid DNS MX or A/AAAA resource record 1MOzfO-1v7pgz1T3s-00XfDx"
+    },
+    {
+      "email": "urimwiza@yahho.com",
+      "error": "Can't send mail - all recipients were rejected: 556-Requested action not taken: domain does not accept mail\n556 invalid DNS MX or A/AAAA resource record 1N1gWU-1uVWKS0fLk-00usaU"
+    }
+  ]
+}

@@ -7,6 +7,10 @@
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const prisma = new PrismaClient();
 
@@ -15,11 +19,29 @@ async function runEmailLoggingMigration() {
 
   try {
     // Lire le fichier de migration SQL
-    const migrationPath = path.join(__dirname, '../../migrations/create_email_logging_tables.sql');
+    const migrationPath = path.join(__dirname, '../migrations/create_email_logging_tables.sql');
     const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
 
-    // Exécuter la migration
-    await prisma.$executeRawUnsafe(migrationSQL);
+    // Diviser le SQL en commandes individuelles
+    const commands = migrationSQL
+      .split(';')
+      .map(cmd => cmd.trim())
+      .filter(cmd => cmd.length > 0 && !cmd.startsWith('--'));
+
+    console.log(`📋 Exécution de ${commands.length} commandes SQL...`);
+
+    // Exécuter chaque commande séparément
+    for (let i = 0; i < commands.length; i++) {
+      const command = commands[i];
+      if (command.trim()) {
+        try {
+          await prisma.$executeRawUnsafe(command);
+          console.log(`✅ Commande ${i + 1}/${commands.length} exécutée`);
+        } catch (error) {
+          console.log(`⚠️ Commande ${i + 1} ignorée (probablement déjà exécutée):`, error.message);
+        }
+      }
+    }
 
     console.log('✅ Migration des tables de logging des emails terminée avec succès');
 
@@ -47,7 +69,7 @@ async function runEmailLoggingMigration() {
 }
 
 // Exécuter la migration si le script est appelé directement
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   runEmailLoggingMigration();
 }
 

@@ -14,7 +14,15 @@
     "db:studio": "prisma studio",
     "seed": "tsx src/seed.ts",
     "migrate:email": "tsx scripts/run-email-migration.ts",
-    "migrate:daily-reports": "tsx scripts/run-daily-reports-migration.ts"
+    "migrate:email-simple": "tsx scripts/run-email-migration-simple.ts",
+    "migrate:daily-reports": "tsx scripts/run-daily-reports-migration.ts",
+    "migrate:daily-reports-simple": "tsx scripts/run-daily-reports-migration-simple.ts",
+    "newsletter:test": "tsx scripts/newsletter-test.ts",
+    "newsletter:test-single": "tsx scripts/newsletter-test.ts test",
+    "newsletter:stats": "tsx scripts/newsletter-test.ts stats",
+    "newsletter:test-simple": "tsx scripts/newsletter-test-simple.ts",
+    "newsletter:test-simple-single": "tsx scripts/newsletter-test-simple.ts test",
+    "deploy": "./deploy.sh"
   },
   "dependencies": {
     "@prisma/client": "^5.16.1",
