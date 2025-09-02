@@ -1,0 +1,24 @@
+
+Confirmation d'abonnement
+02&#x2F;09&#x2F;2025
+
+Bonjour Mme Martin, votre abonnement Pro Famille est actif. Prochain prélèvement le 02&#x2F;10&#x2F;2025.
+
+INFORMATIONS DESTINATAIRE
+Email : parent.martin@example.com
+Type de compte : Familial
+ID compte : ACC-9F27A3
+
+DÉTAILS
+Offre : Pro Famille
+Montant TTC : 14.90 EUR
+Mode de paiement : CB •• 4213
+Prochain prélèvement : 02&#x2F;10&#x2F;2025
+Facture : INV-2025-0915
+
+Gérer mon abonnement : https:&#x2F;&#x2F;app.cube-ai.fr&#x2F;billing&#x2F;portal?account&#x3D;ACC-9F27A3
+
+© 2025 CubeAI — Tous droits réservés
+Mentions légales : https:&#x2F;&#x2F;cube-ai.fr&#x2F;mentions-legales
+Confidentialité : https:&#x2F;&#x2F;cube-ai.fr&#x2F;confidentialite
+    

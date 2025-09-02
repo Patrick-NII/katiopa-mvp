@@ -127,8 +127,8 @@ router.post('/register', async (req, res) => {
         const base = (m.username || '').trim();
         return base ? base.toLowerCase() : `__auto__${i}`; // auto ignorés pour la vérif inter-membres
       });
-      const filtered = requestedUsernames.filter(u => !u.startsWith('__auto__'));
-      const dupUser = filtered.find((u, i) => filtered.indexOf(u) !== i);
+      const filtered = requestedUsernames.filter((u: string) => !u.startsWith('__auto__'));
+      const dupUser = filtered.find((u: string, i: number) => filtered.indexOf(u) !== i);
       if (dupUser) {
         return res.status(400).json({ error: 'Identifiants de session en double', code: 'DUPLICATE_SESSION_ID' });
       }
@@ -274,7 +274,7 @@ router.post('/register', async (req, res) => {
     await prisma.planSeat.create({
       data: {
         accountId: account.id,
-        maxChildren: maxSessions
+        seatNumber: maxSessions
       }
     });
 
@@ -732,7 +732,13 @@ router.post('/forgot-password', async (req, res) => {
 
     const token = randomUUID();
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
-    await prisma.passwordResetToken.create({ data: { accountId: account.id, userSessionId: userSession.id, token, expiresAt } });
+    await prisma.passwordResetToken.create({ 
+      data: { 
+        userSessionId: userSession.id, 
+        token: token as string, 
+        expiresAt 
+      } as any
+    });
 
     const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${encodeURIComponent(token)}`;
     try {
@@ -755,12 +761,12 @@ router.post('/reset-password', async (req, res) => {
       return res.status(400).json({ error: 'Token et nouveau mot de passe requis', code: 'MISSING_FIELDS' });
     }
     const entry = await prisma.passwordResetToken.findUnique({ where: { token } });
-    if (!entry || entry.usedAt || entry.expiresAt < new Date()) {
+    if (!entry || entry.expiresAt < new Date()) {
       return res.status(400).json({ error: 'Token invalide ou expiré', code: 'TOKEN_INVALID' });
     }
     const hashed = await bcrypt.hash(newPassword, 12);
     await prisma.userSession.update({ where: { id: entry.userSessionId }, data: { password: hashed } });
-    await prisma.passwordResetToken.update({ where: { id: entry.id }, data: { usedAt: new Date() } });
+    await prisma.passwordResetToken.delete({ where: { id: entry.id } });
     return res.json({ success: true });
   } catch (error) {
     console.error('❌ Erreur reset-password:', error);

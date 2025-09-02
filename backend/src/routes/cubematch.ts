@@ -206,7 +206,7 @@ router.post('/scores', requireAuth, async (req, res) => {
 
     // Récupérer les informations de l'utilisateur
     const user = await prisma.userSession.findUnique({
-      where: { id: req.user.userId },
+      where: { id: req.user!.userId },
       select: { firstName: true, lastName: true }
     });
 
@@ -224,7 +224,7 @@ router.post('/scores', requireAuth, async (req, res) => {
         max_size, spawn_rate_min, spawn_rate_max, tick_ms, combo_max,
         cells_cleared, hints_used, game_duration_seconds
       ) VALUES (
-        ${req.user.userId}, ${username}, ${score}, ${level}, ${timePlayedMs},
+        ${req.user!.userId}, ${username}, ${score}, ${level}, ${timePlayedMs},
         ${operator}, ${target}, ${allowDiagonals}, ${gridSizeRows}, ${gridSizeCols},
         ${maxSize}, ${spawnRateMin}, ${spawnRateMax}, ${tickMs}, ${comboMax},
         ${cellsCleared}, ${hintsUsed}, ${gameDurationSeconds}
@@ -259,7 +259,7 @@ router.get('/user-scores', requireAuth, async (req, res) => {
         cs.game_duration_seconds as "gameDurationSeconds",
         cs.created_at as "createdAt"
       FROM cubematch_scores cs
-      WHERE cs.user_id = ${req.user.userId}
+      WHERE cs.user_id = ${req.user!.userId}
       ORDER BY cs.score DESC, cs.created_at DESC
       LIMIT ${limit}
     `;
@@ -289,7 +289,7 @@ router.get('/user-stats', requireAuth, async (req, res) => {
         favorite_operator as "favoriteOperator",
         last_played as "lastPlayed"
       FROM cubematch_user_stats
-      WHERE user_id = ${req.user.userId}
+      WHERE user_id = ${req.user!.userId}
       LIMIT 1
     `;
     

@@ -1,0 +1,27 @@
+
+Bienvenue sur CubeAI
+02&#x2F;09&#x2F;2025
+
+Bonjour Mme Martin,
+
+Votre compte a bien été créé. Configurez vos sessions enfant, objectifs d'apprentissage et préférences d'email.
+
+INFORMATIONS DESTINATAIRE
+Email : parent.martin@example.com
+Type de compte : Familial
+ID compte : ACC-9F27A3
+Fuseau horaire : Europe&#x2F;Paris
+
+SESSIONS ENFANT
+- SESS-2F0C : Lina M. (6 ans)
+- SESS-7A11 : Yanis M. (5 ans)
+
+Ouvrir le tableau de bord parent : https:&#x2F;&#x2F;app.cube-ai.fr&#x2F;parents&#x2F;dashboard?account&#x3D;ACC-9F27A3
+
+Besoin d'aide ? support@cube-ai.fr
+
+© 2025 CubeAI — Tous droits réservés
+Mentions légales : https:&#x2F;&#x2F;cube-ai.fr&#x2F;mentions-legales
+Confidentialité : https:&#x2F;&#x2F;cube-ai.fr&#x2F;confidentialite
+Préférences emails : https:&#x2F;&#x2F;app.cube-ai.fr&#x2F;parents&#x2F;preferences?account&#x3D;ACC-9F27A3
+    

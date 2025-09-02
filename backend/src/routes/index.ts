@@ -9,6 +9,7 @@ import experiencesRoutes from './experiences';
 import cubematchRoutes from './cubematch';
 import emailRoutes from './emails';
 import reportRoutes from './reports';
+import transactionalEmailRoutes from './transactional-emails';
 
 const router = express.Router();
 
@@ -42,6 +43,9 @@ router.use('/emails', emailRoutes);
 // Routes de rapports quotidiens
 router.use('/reports', reportRoutes);
 
+// Routes d'emails transactionnels
+router.use('/transactional-emails', transactionalEmailRoutes);
+
 // Route de test de l'API
 router.get('/test', (req, res) => {
   res.json({
@@ -59,7 +63,8 @@ router.get('/test', (req, res) => {
       experiences: '/api/experiences',
       cubematch: '/api/cubematch',
       emails: '/api/emails',
-      reports: '/api/reports'
+      reports: '/api/reports',
+      transactionalEmails: '/api/transactional-emails'
     }
   });
 });

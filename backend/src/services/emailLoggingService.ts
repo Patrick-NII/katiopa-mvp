@@ -243,23 +243,24 @@ export class EmailLoggingService {
           from: getFromAddress(this.mapConfigEmailType(emailLog.emailType)),
           to: emailLog.toEmail,
           subject: emailLog.subject,
-          html: emailLog.htmlContent,
-          text: emailLog.textContent,
+          html: emailLog.htmlContent || undefined,
+          text: emailLog.textContent || undefined,
         };
 
         const info = await transporter.sendMail(mailOptions);
+        const messageInfo = await info;
 
         await prisma.emailLog.update({
           where: { id: emailLog.id },
           data: {
             status: 'SENT',
-            messageId: info.messageId,
+            messageId: messageInfo.messageId,
             smtpResponse: JSON.stringify(info),
             sentAt: new Date(),
           }
         });
 
-        console.log(`🔄 Email retry réussi:`, { logId: emailLog.id, messageId: info.messageId });
+        console.log(`🔄 Email retry réussi:`, { logId: emailLog.id, messageId: messageInfo.messageId });
       } catch (error) {
         await prisma.emailLog.update({
           where: { id: emailLog.id },
