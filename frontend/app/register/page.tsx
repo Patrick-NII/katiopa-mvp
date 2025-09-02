@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { authAPI } from '@/lib/api'
-import Navbar from '@/components/Navbar'
+import Navbar from '@/components/NavBar'
 import Image from 'next/image'
 import DecorativeCubes from '@/components/DecorativeCubes';
 

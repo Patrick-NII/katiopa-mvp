@@ -67,6 +67,12 @@ export const apiFetch = async (url: string, options: RequestInit = {}) => {
     err.status = response.status;
     err.code = errorData.code;
     err.details = errorData.details;
+    
+    // Ne pas afficher les erreurs 401 dans la console (authentification normale)
+    if (response.status !== 401) {
+      console.warn(`API Error ${response.status}:`, errorData.error || 'Unknown error');
+    }
+    
     throw err;
   }
 
@@ -130,7 +136,7 @@ export const authAPI = {
   },
 
   // Vérification du token (supporte /verify et fallback sur /me)
-  verify: async (): Promise<{ success: boolean; user: User }> => {
+  verify: async (): Promise<{ success: boolean; user?: User }> => {
     try {
       const res = await apiFetch('/api/auth/verify');
       const json = await res.json();
@@ -151,25 +157,38 @@ export const authAPI = {
         };
       }
       return json;
-    } catch (e) {
-      // Fallback si /verify n'existe pas (backend routes)
-      const res = await apiFetch('/api/auth/me');
-      const json = await res.json();
-      if (json?.data?.userSession) {
-        const u = json.data.userSession;
-        return {
-          success: true,
-          user: {
-            id: u.id,
-            sessionId: u.sessionId,
-            firstName: u.firstName,
-            lastName: u.lastName,
-            userType: u.userType,
-            subscriptionType: json.data.account?.subscriptionType || 'FREE',
-          },
-        };
+    } catch (e: any) {
+      // Si erreur 401 (non authentifié), c'est normal
+      if (e.status === 401) {
+        return { success: false };
       }
-      return json;
+      
+      try {
+        // Fallback si /verify n'existe pas (backend routes)
+        const res = await apiFetch('/api/auth/me');
+        const json = await res.json();
+        if (json?.data?.userSession) {
+          const u = json.data.userSession;
+          return {
+            success: true,
+            user: {
+              id: u.id,
+              sessionId: u.sessionId,
+              firstName: u.firstName,
+              lastName: u.lastName,
+              userType: u.userType,
+              subscriptionType: json.data.account?.subscriptionType || 'FREE',
+            },
+          };
+        }
+        return json;
+      } catch (fallbackError: any) {
+        // Si erreur 401 (non authentifié), c'est normal
+        if (fallbackError.status === 401) {
+          return { success: false };
+        }
+        throw fallbackError;
+      }
     }
   },
 
@@ -478,12 +497,11 @@ export const api = {
   getCurrentUser: async (): Promise<User | null> => {
     try {
       const response = await authAPI.verify();
-      return response.success ? response.user : null;
+      return response.success && response.user ? response.user : null;
     } catch (error) {
       return null;
     }
   },
 };
 
-// Export des types
-export type { LoginRequest, LoginResponse, User, StatsSummary };
+// Les types sont déjà exportés en haut du fichier

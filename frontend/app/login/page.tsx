@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { User, Lock, Eye, EyeOff, ArrowRight, User as UserIcon, LogOut } from 'lucide-react';
 import { authAPI } from '@/lib/api';
-import Navbar from '@/components/Navbar';
+import Navbar from '@/components/NavBar';
 import DecorativeCubes from '@/components/DecorativeCubes';
 
 export default function LoginPage() {

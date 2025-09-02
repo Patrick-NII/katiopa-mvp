@@ -20,13 +20,18 @@ export default function Navbar({ className = '' }: NavbarProps) {
     let mounted = true
     authAPI.verify().then(res => {
       if (mounted && res?.success) setNavUser(res.user)
-    }).catch(() => {})
+    }).catch(() => {
+      // Erreur silencieuse - utilisateur non connecté
+      if (mounted) setNavUser(null)
+    })
     
     const onStorage = (e: StorageEvent) => {
       if (e.key === 'cubeai:auth') {
         authAPI.verify().then(res => {
           if (mounted) setNavUser(res?.success ? res.user : null)
-        }).catch(() => { if (mounted) setNavUser(null) })
+        }).catch(() => { 
+          if (mounted) setNavUser(null) 
+        })
       }
     }
     window.addEventListener('storage', onStorage)

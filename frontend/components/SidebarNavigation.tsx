@@ -164,7 +164,7 @@ export default function SidebarNavigation({
       label: 'Expériences',
       icon: Sparkles,
       description: 'Tableau de bord central',
-      available: true
+      available: isChild // Seuls les enfants ont accès
     },
     {
       id: 'mathcube',
@@ -202,17 +202,17 @@ export default function SidebarNavigation({
       available: isChild
     },
     {
-      id: 'comcube',
-      label: 'ComCube',
-      icon: Globe,
-      description: 'Communauté et partage',
-      available: true // Visible parents/enfants
-    },
-    {
       id: 'dashboard',
       label: 'Dashboard',
       icon: LayoutDashboard,
       description: 'Suivi et statistiques',
+      available: !isChild // Seuls les parents ont accès
+    },
+    {
+      id: 'comcube',
+      label: 'ComCube',
+      icon: Globe,
+      description: 'Communauté et partage',
       available: !isChild // Seuls les parents ont accès
     },
     {

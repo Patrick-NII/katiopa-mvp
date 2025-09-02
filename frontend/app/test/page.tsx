@@ -1,7 +1,7 @@
 'use client'
 import { apiGet } from '@/lib/api'
 import { useState, useEffect } from 'react'
-import Navbar from '@/components/Navbar'
+import Navbar from '@/components/NavBar'
 
 export default function TestPage() {
   const [token, setToken] = useState<string | null>(null)

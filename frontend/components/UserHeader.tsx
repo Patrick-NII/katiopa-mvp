@@ -29,7 +29,7 @@ export default function UserHeader({ userType, subscriptionType }: UserHeaderPro
     const loadUserInfo = async () => {
       try {
         const response = await authAPI.verify()
-        if (response.success) {
+        if (response.success && response.user) {
           setUser(response.user)
         }
       } catch (error) {
