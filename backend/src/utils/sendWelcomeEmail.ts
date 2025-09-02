@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { getEmailConfig, getFromAddress } from '../config/emailConfig';
 
 interface WelcomeEmailData {
   toEmail: string;
@@ -12,20 +13,17 @@ interface WelcomeEmailData {
 export async function sendWelcomeEmail(data: WelcomeEmailData) {
   const { toEmail, toName, subscriptionType, familyMembers, createdSessions, registrationId } = data;
 
-  // Configuration du transporteur email
-  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-  const port = parseInt(process.env.SMTP_PORT || '587');
-  const secure = process.env.SMTP_SECURE
-    ? process.env.SMTP_SECURE === 'true'
-    : port === 465; // 465 => TLS
-  const smtpUser = process.env.SMTP_USERNAME || process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASSWORD || process.env.SMTP_PASS;
-
+  // Configuration du transporteur email - Utilise noreply pour les emails automatiques
+  const emailConfig = getEmailConfig("noreply");
+  
   const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure,
-    auth: smtpUser && smtpPass ? { user: smtpUser, pass: smtpPass } : undefined,
+    host: emailConfig.smtpServer,
+    port: emailConfig.smtpPort,
+    secure: emailConfig.smtpPort === 465, // 465 => TLS
+    auth: { 
+      user: emailConfig.user, 
+      pass: emailConfig.password 
+    },
   });
 
   // Déterminer le plan d'abonnement
@@ -228,7 +226,7 @@ export async function sendWelcomeEmail(data: WelcomeEmailData) {
             <div class="section-title">📞 Besoin d'aide ?</div>
             <p>Notre équipe est là pour vous accompagner :</p>
             <ul style="margin: 0; padding-left: 20px;">
-                <li>📧 Support par email : support@cubeai.com</li>
+                <li>📧 Support par email : support@cube-ai.fr</li>
                 <li>💬 Chat en ligne : Disponible sur la plateforme</li>
                 <li>📖 Guide d'utilisation : Accessible depuis votre tableau de bord</li>
             </ul>
@@ -244,9 +242,8 @@ export async function sendWelcomeEmail(data: WelcomeEmailData) {
   `;
 
   // Options de l'email
-  const fromAddress = process.env.SMTP_FROM || smtpUser || 'no-reply@localhost';
   const mailOptions = {
-    from: `"CubeAI" <${fromAddress}>`,
+    from: getFromAddress("noreply"),
     to: toEmail,
     subject: `Bienvenue chez CubeAI ! Votre compte a été créé (${registrationId})`,
     html: emailContent,
@@ -258,7 +255,8 @@ export async function sendWelcomeEmail(data: WelcomeEmailData) {
       messageId: info.messageId,
       to: toEmail,
       registrationId,
-      membersCount: credentials.length
+      membersCount: credentials.length,
+      from: emailConfig.user
     });
     return { success: true, messageId: info.messageId };
   } catch (error) {

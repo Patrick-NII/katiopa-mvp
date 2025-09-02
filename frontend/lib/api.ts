@@ -484,3 +484,6 @@ export const api = {
     }
   },
 };
+
+// Export des types
+export type { LoginRequest, LoginResponse, User, StatsSummary };
