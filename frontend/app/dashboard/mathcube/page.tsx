@@ -16,6 +16,7 @@ import {
   Play
 } from 'lucide-react'
 import Link from 'next/link'
+import DecorativeCubes from '@/components/DecorativeCubes';
 
 export default function MathCubePage() {
   const [currentLevel, setCurrentLevel] = useState(1)
@@ -24,35 +25,7 @@ export default function MathCubePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 relative overflow-hidden">
-      {/* Cubes flottants colorés */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Cube rouge */}
-        <div className="absolute top-20 left-10 w-16 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-lg transform rotate-12 animate-pulse opacity-60"></div>
-        
-        {/* Cube orange */}
-        <div className="absolute top-40 right-20 w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg transform -rotate-12 animate-bounce opacity-70"></div>
-        
-        {/* Cube jaune */}
-        <div className="absolute top-60 left-1/4 w-14 h-14 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg transform rotate-45 animate-pulse opacity-50"></div>
-        
-        {/* Cube vert */}
-        <div className="absolute top-80 right-1/3 w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-lg transform -rotate-45 animate-bounce opacity-80"></div>
-        
-        {/* Cube bleu */}
-        <div className="absolute top-32 left-1/2 w-18 h-18 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg transform rotate-30 animate-pulse opacity-65"></div>
-        
-        {/* Cube violet */}
-        <div className="absolute top-100 right-10 w-13 h-13 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg transform -rotate-30 animate-bounce opacity-55"></div>
-        
-        {/* Cube rose */}
-        <div className="absolute top-120 left-1/3 w-11 h-11 bg-gradient-to-br from-pink-400 to-pink-600 rounded-lg transform rotate-60 animate-pulse opacity-75"></div>
-        
-        {/* Cube cyan */}
-        <div className="absolute top-140 right-1/4 w-15 h-15 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-lg transform -rotate-60 animate-bounce opacity-60"></div>
-        
-        {/* Cube indigo */}
-        <div className="absolute top-160 left-20 w-12 h-12 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-lg transform rotate-15 animate-pulse opacity-70"></div>
-      </div>
+      <DecorativeCubes variant="default" />
 
       {/* Espacement */}
       <div className="mb-20"></div>

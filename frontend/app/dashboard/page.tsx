@@ -16,6 +16,7 @@ import KidsSettingsTab from '@/components/kids/KidsSettingsTab';
 import UserHeader from '@/components/UserHeader';
 import SettingsTab from '@/components/SettingsTab';
 import { authAPI, statsAPI } from '@/lib/api';
+import DecorativeCubes from '@/components/DecorativeCubes';
 import { AvatarProvider } from '@/contexts/AvatarContext';
 
 // Import des nouvelles pages des cubes
@@ -245,7 +246,8 @@ export default function DashboardPage() {
 
   return (
     <AvatarProvider>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 relative overflow-hidden">
+        <DecorativeCubes variant="default" />
         {/* En-tête utilisateur avec avatar */}
         <UserHeader 
           userType={user?.userType as any}
