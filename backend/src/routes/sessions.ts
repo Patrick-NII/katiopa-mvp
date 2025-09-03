@@ -1,6 +1,7 @@
 import express from 'express';
 import { requireAuth } from '../middleware/requireAuth';
 import { prisma } from '../prisma';
+import { PedagogicalAnalysisService } from '../services/pedagogicalAnalysis.js';
 
 const router = express.Router();
 
@@ -243,6 +244,1130 @@ router.post("/update-time", requireAuth, async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Erreur lors de la mise à jour du temps de connexion:', error);
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// ===== NOUVELLES ROUTES POUR L'ANALYSE GLOBALE ET LES PRÉFÉRENCES =====
+
+// Récupérer l'analyse globale d'une session enfant
+router.post('/:sessionId/global-analysis', requireAuth, async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const userId = req.user?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Utilisateur non authentifié',
+        code: 'UNAUTHORIZED'
+      });
+    }
+
+    // Vérifier que la session appartient au parent
+    const parentSession = await prisma.userSession.findUnique({
+      where: { id: userId },
+      include: {
+        account: true
+      }
+    });
+
+    if (!parentSession || parentSession.userType !== 'PARENT') {
+      return res.status(403).json({
+        error: 'Accès réservé aux parents',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    const childSession = await prisma.userSession.findFirst({
+      where: {
+        sessionId: sessionId,
+        accountId: parentSession.accountId,
+        userType: 'CHILD'
+      },
+      include: {
+        childActivities: {
+          orderBy: { completedAt: 'desc' }
+        },
+        learningSessions: {
+          orderBy: { startTime: 'desc' }
+        },
+        parentPreferences: true
+      }
+    });
+
+    if (!childSession) {
+      return res.status(404).json({
+        error: 'Session non trouvée',
+        code: 'SESSION_NOT_FOUND'
+      });
+    }
+
+    // Construire le contexte d'apprentissage
+    const learningContext = await buildLearningContext(childSession);
+    
+    // Générer l'analyse IA globale
+    const globalAnalysis = await generateGlobalAnalysis(childSession, learningContext);
+
+    res.json({
+      sessionId,
+      childName: `${childSession.firstName} ${childSession.lastName}`,
+      context: learningContext,
+      analysis: globalAnalysis,
+      recommendations: generateTimeRecommendations(learningContext)
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur lors de l\'analyse globale:', error);
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// Sauvegarder les préférences parentales
+router.post('/:sessionId/preferences', requireAuth, async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const {
+      childStrengths,
+      focusAreas,
+      learningGoals,
+      concerns,
+      preferredSchedule,
+      studyDuration,
+      breakFrequency,
+      learningStyle,
+      motivationFactors
+    } = req.body;
+    
+    const userId = req.user?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Utilisateur non authentifié',
+        code: 'UNAUTHORIZED'
+      });
+    }
+
+    // Vérifier que la session appartient au parent
+    const parentSession = await prisma.userSession.findUnique({
+      where: { id: userId },
+      include: {
+        account: true
+      }
+    });
+
+    if (!parentSession || parentSession.userType !== 'PARENT') {
+      return res.status(403).json({
+        error: 'Accès réservé aux parents',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    const childSession = await prisma.userSession.findFirst({
+      where: {
+        sessionId: sessionId,
+        accountId: parentSession.accountId,
+        userType: 'CHILD'
+      }
+    });
+
+    if (!childSession) {
+      return res.status(404).json({
+        error: 'Session non trouvée',
+        code: 'SESSION_NOT_FOUND'
+      });
+    }
+
+    // Créer ou mettre à jour les préférences
+    const preferences = await prisma.parentPreferences.upsert({
+      where: {
+        userSessionId: childSession.id
+      },
+      update: {
+        childStrengths,
+        focusAreas,
+        learningGoals,
+        concerns,
+        preferredSchedule,
+        studyDuration,
+        breakFrequency,
+        learningStyle,
+        motivationFactors
+      },
+      create: {
+        userSessionId: childSession.id,
+        childStrengths,
+        focusAreas,
+        learningGoals,
+        concerns,
+        preferredSchedule,
+        studyDuration,
+        breakFrequency,
+        learningStyle,
+        motivationFactors
+      }
+    });
+
+    res.json({
+      success: true,
+      preferences
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur lors de la sauvegarde des préférences:', error);
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// Récupérer les préférences parentales
+router.get('/:sessionId/preferences', requireAuth, async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const userId = req.user?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Utilisateur non authentifié',
+        code: 'UNAUTHORIZED'
+      });
+    }
+
+    // Vérifier que la session appartient au parent
+    const parentSession = await prisma.userSession.findUnique({
+      where: { id: userId },
+      include: {
+        account: true
+      }
+    });
+
+    if (!parentSession || parentSession.userType !== 'PARENT') {
+      return res.status(403).json({
+        error: 'Accès réservé aux parents',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    const childSession = await prisma.userSession.findFirst({
+      where: {
+        sessionId: sessionId,
+        accountId: parentSession.accountId,
+        userType: 'CHILD'
+      },
+      include: {
+        parentPreferences: true
+      }
+    });
+
+    if (!childSession) {
+      return res.status(404).json({
+        error: 'Session non trouvée',
+        code: 'SESSION_NOT_FOUND'
+      });
+    }
+
+    res.json({
+      preferences: childSession.parentPreferences
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur lors de la récupération des préférences:', error);
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// Fonctions utilitaires pour l'analyse globale
+async function buildLearningContext(childSession: any) {
+  const now = new Date();
+  const registrationDate = childSession.createdAt;
+  const daysSinceRegistration = Math.floor((now.getTime() - registrationDate.getTime()) / (1000 * 60 * 60 * 24));
+  
+  // Calculer les statistiques temporelles
+  const totalLearningTime = childSession.childActivities.reduce((sum: number, activity: any) => sum + activity.duration, 0);
+  const averageSessionDuration = childSession.learningSessions.length > 0 
+    ? childSession.learningSessions.reduce((sum: number, session: any) => sum + session.duration, 0) / childSession.learningSessions.length
+    : 0;
+  
+  // Analyser les patterns d'apprentissage
+  const sessionPatterns = analyzeSessionPatterns(childSession.learningSessions);
+  const learningFrequency = determineLearningFrequency(childSession.learningSessions, daysSinceRegistration);
+  
+  // Analyser les préférences temporelles
+  const preferredTimeSlots = analyzePreferredTimeSlots(childSession.learningSessions);
+  
+  return {
+    daysSinceRegistration,
+    totalLearningTime,
+    averageSessionDuration,
+    learningFrequency,
+    sessionPatterns,
+    preferredTimeSlots,
+    age: childSession.age,
+    grade: childSession.grade,
+    totalActivities: childSession.childActivities.length,
+    averageScore: childSession.childActivities.length > 0 
+      ? childSession.childActivities.reduce((sum: number, activity: any) => sum + activity.score, 0) / childSession.childActivities.length
+      : 0
+  };
+}
+
+function analyzeSessionPatterns(sessions: any[]) {
+  const patterns = {
+    morning: 0,
+    afternoon: 0,
+    evening: 0
+  };
+  
+  sessions.forEach(session => {
+    const hour = new Date(session.startTime).getHours();
+    if (hour >= 6 && hour < 12) patterns.morning++;
+    else if (hour >= 12 && hour < 18) patterns.afternoon++;
+    else patterns.evening++;
+  });
+  
+  return patterns;
+}
+
+function determineLearningFrequency(sessions: any[], daysSinceRegistration: number) {
+  if (daysSinceRegistration === 0) return 'nouveau';
+  if (daysSinceRegistration <= 7) return 'quotidien';
+  if (sessions.length / daysSinceRegistration >= 0.7) return 'régulier';
+  if (sessions.length / daysSinceRegistration >= 0.3) return 'modéré';
+  return 'irrégulier';
+}
+
+function analyzePreferredTimeSlots(sessions: any[]) {
+  const slots = {
+    morning: 0,
+    afternoon: 0,
+    evening: 0
+  };
+  
+  sessions.forEach(session => {
+    const hour = new Date(session.startTime).getHours();
+    if (hour >= 6 && hour < 12) slots.morning++;
+    else if (hour >= 12 && hour < 18) slots.afternoon++;
+    else slots.evening++;
+  });
+  
+  const maxSlot = Object.entries(slots).reduce((a, b) => slots[a[0] as keyof typeof slots] > slots[b[0] as keyof typeof slots] ? a : b);
+  return maxSlot[0];
+}
+
+async function generateGlobalAnalysis(childSession: any, context: any) {
+  try {
+    // Construire le contexte pédagogique
+    const pedagogicalContext = {
+      childName: `${childSession.firstName} ${childSession.lastName}`,
+      age: childSession.age || 8,
+      grade: childSession.grade || 'CE2',
+      daysSinceRegistration: context.daysSinceRegistration,
+      totalLearningTime: context.totalLearningTime,
+      averageSessionDuration: context.averageSessionDuration,
+      learningFrequency: context.learningFrequency,
+      sessionPatterns: context.sessionPatterns,
+      preferredTimeSlots: context.preferredTimeSlots,
+      totalActivities: context.totalActivities,
+      averageScore: context.averageScore,
+      recentActivities: childSession.childActivities.slice(0, 10).map((activity: any) => ({
+        type: activity.type,
+        title: activity.title,
+        score: activity.score,
+        duration: activity.duration,
+        completedAt: activity.completedAt
+      })),
+      parentPreferences: childSession.parentPreferences ? {
+        childStrengths: childSession.parentPreferences.childStrengths,
+        focusAreas: childSession.parentPreferences.focusAreas,
+        learningGoals: childSession.parentPreferences.learningGoals,
+        concerns: childSession.parentPreferences.concerns,
+        studyDuration: childSession.parentPreferences.studyDuration,
+        learningStyle: childSession.parentPreferences.learningStyle || undefined
+      } : undefined
+    };
+
+    // Générer l'analyse avec l'IA
+    const aiAnalysis = await PedagogicalAnalysisService.generateGlobalAnalysis(pedagogicalContext);
+
+    return {
+      engagement: context.totalLearningTime > 60 ? 'excellent' : context.totalLearningTime > 30 ? 'bon' : 'à améliorer',
+      progression: context.averageScore > 80 ? 'remarquable' : context.averageScore > 60 ? 'satisfaisante' : 'à renforcer',
+      rythme: context.learningFrequency === 'quotidien' ? 'excellent' : context.learningFrequency === 'régulier' ? 'bon' : 'à optimiser',
+      recommandations: generateRecommendations(context, childSession),
+      aiAnalysis: aiAnalysis
+    };
+  } catch (error) {
+    console.error('Erreur lors de l\'analyse globale IA:', error);
+    return {
+      engagement: 'à améliorer',
+      progression: 'à renforcer',
+      rythme: 'à optimiser',
+      recommandations: [],
+      aiAnalysis: "Erreur lors de l'analyse. Veuillez réessayer."
+    };
+  }
+}
+
+function generateRecommendations(context: any, childSession: any) {
+  const recommendations = [];
+  
+  // Recommandations basées sur le temps depuis l'inscription
+  if (context.daysSinceRegistration <= 7) {
+    recommendations.push({
+      type: 'nouveau_inscrit',
+      message: `Excellent début ! ${childSession.firstName} s'est inscrit(e) il y a ${context.daysSinceRegistration} jour(s) et a déjà passé ${context.totalLearningTime} minutes à apprendre.`,
+      action: 'Maintenir cette dynamique avec des sessions courtes et régulières.'
+    });
+  }
+  
+  // Recommandations basées sur la durée des sessions
+  if (context.averageSessionDuration > 45) {
+    recommendations.push({
+      type: 'sessions_longues',
+      message: 'Les sessions sont un peu longues pour son âge.',
+      action: 'Diviser en sessions de 20-25 minutes avec des pauses de 10 minutes.'
+    });
+  }
+  
+  // Recommandations basées sur les scores
+  if (context.averageScore < 70) {
+    recommendations.push({
+      type: 'scores_faibles',
+      message: `Le score moyen de ${context.averageScore.toFixed(1)}% indique quelques difficultés.`,
+      action: 'Revoir les concepts de base et proposer des exercices plus simples.'
+    });
+  }
+  
+  return recommendations;
+}
+
+function generateTimeRecommendations(context: any) {
+  const recommendations = [];
+  
+  // Recommandations temporelles
+  if (context.preferredTimeSlots === 'morning') {
+    recommendations.push({
+      type: 'horaire_optimal',
+      message: `${context.preferredTimeSlots} semble être le moment optimal pour l'apprentissage.`,
+      action: 'Planifier les sessions importantes le matin.'
+    });
+  }
+  
+  if (context.learningFrequency === 'irrégulier') {
+    recommendations.push({
+      type: 'rythme',
+      message: 'L\'apprentissage est irrégulier.',
+      action: 'Établir une routine quotidienne de 15-20 minutes.'
+    });
+  }
+  
+  return recommendations;
+}
+
+// ===== ROUTES EXISTANTES POUR LES SESSIONS ENFANTS =====
+
+// Types pour les sessions enfants
+interface ChildSession {
+  id: string
+  sessionId: string
+  name: string
+  emoji: string
+  isOnline: boolean
+  lastActivity: Date
+  totalTime: number
+  userType: 'CHILD'
+}
+
+interface ChildActivity {
+  id: string
+  sessionId: string
+  type: 'MATH' | 'READING' | 'SCIENCE' | 'CODING' | 'GAME'
+  title: string
+  score: number
+  duration: number
+  completedAt: Date
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD'
+}
+
+// Route pour mettre à jour le statut en temps réel
+router.post('/status', requireAuth, async (req, res) => {
+  try {
+    const { sessionId, isOnline } = req.body;
+    const userId = req.user?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Utilisateur non authentifié',
+        code: 'UNAUTHORIZED'
+      });
+    }
+
+    // Vérifier que la session appartient au parent
+    const parentSession = await prisma.userSession.findUnique({
+      where: { id: userId },
+      include: { account: true }
+    });
+
+    if (!parentSession || parentSession.userType !== 'PARENT') {
+      return res.status(403).json({
+        error: 'Accès réservé aux parents',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    // Chercher la session enfant
+    const childSession = await prisma.userSession.findFirst({
+      where: {
+        sessionId: sessionId,
+        accountId: parentSession.accountId,
+        userType: 'CHILD'
+      }
+    });
+
+    if (!childSession) {
+      return res.status(404).json({
+        error: 'Session non trouvée',
+        code: 'SESSION_NOT_FOUND'
+      });
+    }
+
+    const now = new Date();
+    let updateData: any = {
+      lastLoginAt: now
+    };
+
+    if (isOnline) {
+      // Si l'enfant se connecte
+      if (!childSession.currentSessionStartTime) {
+        updateData.currentSessionStartTime = now;
+        console.log(`🟢 Session ${sessionId} connectée à ${now.toISOString()}`);
+      }
+    } else {
+      // Si l'enfant se déconnecte
+      if (childSession.currentSessionStartTime) {
+        const sessionStart = new Date(childSession.currentSessionStartTime);
+        const sessionDuration = now.getTime() - sessionStart.getTime();
+        const currentTotalMs = Number(childSession.totalConnectionDurationMs || 0);
+        
+        updateData.currentSessionStartTime = null;
+        updateData.totalConnectionDurationMs = currentTotalMs + sessionDuration;
+        console.log(`🔴 Session ${sessionId} déconnectée à ${now.toISOString()}, durée: ${Math.floor(sessionDuration / 1000)}s`);
+      }
+    }
+
+    // Mettre à jour la session
+    const updatedSession = await prisma.userSession.update({
+      where: { id: childSession.id },
+      data: updateData
+    });
+
+    // Calculer le temps total mis à jour
+    let totalTimeMs = Number(updatedSession.totalConnectionDurationMs || 0);
+    if (updatedSession.currentSessionStartTime) {
+      const sessionStart = new Date(updatedSession.currentSessionStartTime);
+      const currentSessionTime = now.getTime() - sessionStart.getTime();
+      totalTimeMs += currentSessionTime;
+    }
+
+    res.json({
+      success: true,
+      sessionId,
+      isOnline: !!updatedSession.currentSessionStartTime,
+      totalTime: Math.floor(totalTimeMs / (1000 * 60)),
+      lastActivity: updatedSession.lastLoginAt
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur lors de la mise à jour du statut:', error);
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// Route pour nettoyer les sessions orphelines (sessions en ligne depuis trop longtemps)
+router.post('/cleanup-orphaned-sessions', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Utilisateur non authentifié',
+        code: 'UNAUTHORIZED'
+      });
+    }
+
+    // Vérifier que c'est un parent
+    const parentSession = await prisma.userSession.findUnique({
+      where: { id: userId },
+      include: { account: true }
+    });
+
+    if (!parentSession || parentSession.userType !== 'PARENT') {
+      return res.status(403).json({
+        error: 'Accès réservé aux parents',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    const now = new Date();
+    const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000); // 30 minutes
+
+    // Trouver les sessions enfants qui sont "en ligne" depuis plus de 30 minutes
+    const orphanedSessions = await prisma.userSession.findMany({
+      where: {
+        accountId: parentSession.accountId,
+        userType: 'CHILD',
+        currentSessionStartTime: {
+          lt: thirtyMinutesAgo
+        }
+      }
+    });
+
+    let cleanedCount = 0;
+
+    for (const session of orphanedSessions) {
+      if (session.currentSessionStartTime) {
+        const sessionStart = new Date(session.currentSessionStartTime);
+        const sessionDuration = now.getTime() - sessionStart.getTime();
+        const currentTotalMs = Number(session.totalConnectionDurationMs || 0);
+
+        await prisma.userSession.update({
+          where: { id: session.id },
+          data: {
+            currentSessionStartTime: null,
+            totalConnectionDurationMs: currentTotalMs + sessionDuration,
+            lastLoginAt: now
+          }
+        });
+
+        cleanedCount++;
+        console.log(`🧹 Session orpheline ${session.sessionId} nettoyée`);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `${cleanedCount} session(s) orpheline(s) nettoyée(s)`,
+      cleanedCount
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur lors du nettoyage des sessions orphelines:', error);
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// Récupérer toutes les sessions enfants d'un parent
+router.get('/children', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Utilisateur non authentifié',
+        code: 'UNAUTHORIZED'
+      });
+    }
+
+    // Récupérer le compte de l'utilisateur connecté
+    const userSession = await prisma.userSession.findUnique({
+      where: { id: userId },
+      include: {
+        account: true
+      }
+    });
+
+    if (!userSession || userSession.userType !== 'PARENT') {
+      return res.status(403).json({
+        error: 'Accès réservé aux parents',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    // Récupérer toutes les sessions enfants liées à ce parent
+    const childSessions = await prisma.userSession.findMany({
+      where: {
+        accountId: userSession.accountId,
+        userType: 'CHILD'
+      },
+      include: {
+        childActivities: {
+          orderBy: {
+            completedAt: 'desc'
+          },
+          take: 10 // Dernières 10 activités
+        }
+      }
+    });
+
+    // Transformer les données
+    const sessions: ChildSession[] = childSessions.map(session => ({
+      id: session.id,
+      sessionId: session.sessionId,
+      name: `${session.firstName} ${session.lastName}`,
+      emoji: '👶', // Emoji par défaut
+      isOnline: !!session.currentSessionStartTime,
+      lastActivity: session.lastLoginAt || session.createdAt,
+      totalTime: Math.floor(Number(session.totalConnectionDurationMs || 0) / (1000 * 60)),
+      userType: 'CHILD'
+    }));
+
+    res.json(sessions);
+  } catch (error) {
+    console.error('❌ Erreur lors de la récupération des sessions enfants:', error);
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// Récupérer les activités d'une session
+router.get('/:sessionId/activities', requireAuth, async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const userId = req.user?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Utilisateur non authentifié',
+        code: 'UNAUTHORIZED'
+      });
+    }
+
+    // Vérifier que la session appartient au parent
+    const parentSession = await prisma.userSession.findUnique({
+      where: { id: userId },
+      include: {
+        account: true
+      }
+    });
+
+    if (!parentSession || parentSession.userType !== 'PARENT') {
+      return res.status(403).json({
+        error: 'Accès réservé aux parents',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    // Chercher par sessionId (pas par id interne)
+    const childSession = await prisma.userSession.findFirst({
+      where: {
+        sessionId: sessionId, // Utiliser sessionId ici
+        accountId: parentSession.accountId,
+        userType: 'CHILD'
+      }
+    });
+
+    if (!childSession) {
+      return res.status(404).json({
+        error: 'Session non trouvée',
+        code: 'SESSION_NOT_FOUND'
+      });
+    }
+
+    // Récupérer les activités
+    const activities = await prisma.childActivity.findMany({
+      where: {
+        sessionId: childSession.id // Utiliser l'ID interne ici
+      },
+      orderBy: {
+        completedAt: 'desc'
+      }
+    });
+
+    res.json(activities);
+  } catch (error) {
+    console.error('❌ Erreur lors de la récupération des activités:', error);
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// Analyser les performances d'une session
+router.post('/:sessionId/analyze', requireAuth, async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const userId = req.user?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Utilisateur non authentifié',
+        code: 'UNAUTHORIZED'
+      });
+    }
+
+    // Vérifier que la session appartient au parent
+    const parentSession = await prisma.userSession.findUnique({
+      where: { id: userId },
+      include: {
+        account: true
+      }
+    });
+
+    if (!parentSession || parentSession.userType !== 'PARENT') {
+      return res.status(403).json({
+        error: 'Accès réservé aux parents',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    // Chercher par sessionId (pas par id interne)
+    const childSession = await prisma.userSession.findFirst({
+      where: {
+        sessionId: sessionId, // Utiliser sessionId ici
+        accountId: parentSession.accountId,
+        userType: 'CHILD'
+      },
+      include: {
+        childActivities: {
+          orderBy: { completedAt: 'desc' },
+          take: 20
+        },
+        parentPreferences: true
+      }
+    });
+
+    if (!childSession) {
+      return res.status(404).json({
+        error: 'Session non trouvée',
+        code: 'SESSION_NOT_FOUND'
+      });
+    }
+
+    // Construire le contexte pédagogique
+    const pedagogicalContext = {
+      childName: `${childSession.firstName} ${childSession.lastName}`,
+      age: childSession.age || 8,
+      grade: childSession.grade || 'CE2',
+      daysSinceRegistration: Math.floor((new Date().getTime() - childSession.createdAt.getTime()) / (1000 * 60 * 60 * 24)),
+      totalLearningTime: childSession.childActivities.reduce((sum: number, act: any) => sum + act.duration, 0),
+      averageSessionDuration: 0, // À calculer si on a des LearningSession
+      learningFrequency: 'régulier',
+      sessionPatterns: { morning: 0, afternoon: 0, evening: 0 },
+      preferredTimeSlots: 'matin',
+      totalActivities: childSession.childActivities.length,
+      averageScore: childSession.childActivities.length > 0 
+        ? childSession.childActivities.reduce((sum: number, act: any) => sum + act.score, 0) / childSession.childActivities.length
+        : 0,
+      recentActivities: childSession.childActivities.slice(0, 10).map((activity: any) => ({
+        type: activity.type,
+        title: activity.title,
+        score: activity.score,
+        duration: activity.duration,
+        completedAt: activity.completedAt
+      })),
+      parentPreferences: childSession.parentPreferences ? {
+        childStrengths: childSession.parentPreferences.childStrengths,
+        focusAreas: childSession.parentPreferences.focusAreas,
+        learningGoals: childSession.parentPreferences.learningGoals,
+        concerns: childSession.parentPreferences.concerns,
+        studyDuration: childSession.parentPreferences.studyDuration,
+        learningStyle: childSession.parentPreferences.learningStyle || undefined
+      } : undefined
+    };
+
+    // Générer l'analyse avec l'IA
+    const aiAnalysis = await PedagogicalAnalysisService.analyzeProgress(pedagogicalContext);
+
+    // Stocker l'analyse en base de données
+    await prisma.aIAnalysis.create({
+      data: {
+        userSessionId: childSession.id,
+        analysisType: 'progress',
+        content: aiAnalysis,
+        prompt: PedagogicalAnalysisService.PROGRESS_ANALYSIS_PROMPT,
+        context: pedagogicalContext,
+        metadata: {
+          childAge: childSession.age,
+          totalActivities: childSession.childActivities.length,
+          averageScore: pedagogicalContext.averageScore,
+          analysisDate: new Date().toISOString()
+        }
+      }
+    });
+
+    res.json({
+      sessionId,
+      analysis: aiAnalysis
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur lors de l\'analyse de session:', error);
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// Générer un nouvel exercice recommandé
+router.post('/:sessionId/exercise', requireAuth, async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const userId = req.user?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Utilisateur non authentifié',
+        code: 'UNAUTHORIZED'
+      });
+    }
+
+    // Vérifier que la session appartient au parent
+    const parentSession = await prisma.userSession.findUnique({
+      where: { id: userId },
+      include: {
+        account: true
+      }
+    });
+
+    if (!parentSession || parentSession.userType !== 'PARENT') {
+      return res.status(403).json({
+        error: 'Accès réservé aux parents',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    // Chercher par sessionId (pas par id interne)
+    const childSession = await prisma.userSession.findFirst({
+      where: {
+        sessionId: sessionId, // Utiliser sessionId ici
+        accountId: parentSession.accountId,
+        userType: 'CHILD'
+      },
+      include: {
+        childActivities: {
+          orderBy: { completedAt: 'desc' },
+          take: 20
+        },
+        parentPreferences: true
+      }
+    });
+
+    if (!childSession) {
+      return res.status(404).json({
+        error: 'Session non trouvée',
+        code: 'SESSION_NOT_FOUND'
+      });
+    }
+
+    // Construire le contexte pédagogique
+    const pedagogicalContext = {
+      childName: `${childSession.firstName} ${childSession.lastName}`,
+      age: childSession.age || 8,
+      grade: childSession.grade || 'CE2',
+      daysSinceRegistration: Math.floor((new Date().getTime() - childSession.createdAt.getTime()) / (1000 * 60 * 60 * 24)),
+      totalLearningTime: childSession.childActivities.reduce((sum: number, act: any) => sum + act.duration, 0),
+      averageSessionDuration: 0,
+      learningFrequency: 'régulier',
+      sessionPatterns: { morning: 0, afternoon: 0, evening: 0 },
+      preferredTimeSlots: 'matin',
+      totalActivities: childSession.childActivities.length,
+      averageScore: childSession.childActivities.length > 0 
+        ? childSession.childActivities.reduce((sum: number, act: any) => sum + act.score, 0) / childSession.childActivities.length
+        : 0,
+      recentActivities: childSession.childActivities.slice(0, 10).map((activity: any) => ({
+        type: activity.type,
+        title: activity.title,
+        score: activity.score,
+        duration: activity.duration,
+        completedAt: activity.completedAt
+      })),
+      parentPreferences: childSession.parentPreferences ? {
+        childStrengths: childSession.parentPreferences.childStrengths,
+        focusAreas: childSession.parentPreferences.focusAreas,
+        learningGoals: childSession.parentPreferences.learningGoals,
+        concerns: childSession.parentPreferences.concerns,
+        studyDuration: childSession.parentPreferences.studyDuration,
+        learningStyle: childSession.parentPreferences.learningStyle || undefined
+      } : undefined
+    };
+
+    // Générer l'exercice avec l'IA
+    const aiExercise = await PedagogicalAnalysisService.generateExercise(pedagogicalContext);
+
+    // Stocker l'exercice en base de données
+    await prisma.aIAnalysis.create({
+      data: {
+        userSessionId: childSession.id,
+        analysisType: 'exercise',
+        content: aiExercise,
+        prompt: PedagogicalAnalysisService.EXERCISE_GENERATION_PROMPT,
+        context: pedagogicalContext,
+        metadata: {
+          childAge: childSession.age,
+          totalActivities: childSession.childActivities.length,
+          averageScore: pedagogicalContext.averageScore,
+          exerciseDate: new Date().toISOString()
+        }
+      }
+    });
+
+    res.json({
+      sessionId,
+      exercise: aiExercise
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur lors de la génération d\'exercice:', error);
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// Enregistrer une nouvelle activité
+router.post('/:sessionId/activities', requireAuth, async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { type, title, score, duration, difficulty } = req.body;
+    const userId = req.user?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Utilisateur non authentifié',
+        code: 'UNAUTHORIZED'
+      });
+    }
+
+    // Vérifier que la session appartient au parent
+    const parentSession = await prisma.userSession.findUnique({
+      where: { id: userId },
+      include: {
+        account: true
+      }
+    });
+
+    if (!parentSession || parentSession.userType !== 'PARENT') {
+      return res.status(403).json({
+        error: 'Accès réservé aux parents',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    // Chercher par sessionId (pas par id interne)
+    const childSession = await prisma.userSession.findFirst({
+      where: {
+        sessionId: sessionId, // Utiliser sessionId ici
+        accountId: parentSession.accountId,
+        userType: 'CHILD'
+      }
+    });
+
+    if (!childSession) {
+      return res.status(404).json({
+        error: 'Session non trouvée',
+        code: 'SESSION_NOT_FOUND'
+      });
+    }
+
+    // Créer l'activité
+    const activity = await prisma.childActivity.create({
+      data: {
+        sessionId: childSession.id, // Utiliser l'ID interne ici
+        type,
+        title,
+        score,
+        duration,
+        difficulty,
+        completedAt: new Date()
+      }
+    });
+
+    // Mettre à jour le temps total de la session
+    await prisma.userSession.update({
+      where: { id: childSession.id },
+      data: {
+        totalConnectionDurationMs: BigInt(Number(childSession.totalConnectionDurationMs || 0) + (duration * 60 * 1000)),
+        lastLoginAt: new Date()
+      }
+    });
+
+    res.json(activity);
+  } catch (error) {
+    console.error('❌ Erreur lors de l\'enregistrement d\'activité:', error);
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// Mettre à jour le statut en ligne/hors ligne
+router.patch('/:sessionId/status', requireAuth, async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { isOnline } = req.body;
+    const userId = req.user?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Utilisateur non authentifié',
+        code: 'UNAUTHORIZED'
+      });
+    }
+
+    // Vérifier que la session appartient au parent
+    const parentSession = await prisma.userSession.findUnique({
+      where: { id: userId },
+      include: {
+        account: true
+      }
+    });
+
+    if (!parentSession || parentSession.userType !== 'PARENT') {
+      return res.status(403).json({
+        error: 'Accès réservé aux parents',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    // Chercher par sessionId (pas par id interne)
+    const childSession = await prisma.userSession.findFirst({
+      where: {
+        sessionId: sessionId, // Utiliser sessionId ici
+        accountId: parentSession.accountId,
+        userType: 'CHILD'
+      }
+    });
+
+    if (!childSession) {
+      return res.status(404).json({
+        error: 'Session non trouvée',
+        code: 'SESSION_NOT_FOUND'
+      });
+    }
+
+    // Mettre à jour le statut
+    await prisma.userSession.update({
+      where: { id: childSession.id },
+      data: {
+        currentSessionStartTime: isOnline ? new Date() : null,
+        lastLoginAt: new Date()
+      }
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('❌ Erreur lors de la mise à jour du statut:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_ERROR'

@@ -44,6 +44,25 @@ export default function Navbar({ className = '' }: NavbarProps) {
 
   const handleLogout = async () => {
     try {
+      // Signaler la déconnexion avant de se déconnecter
+      if (navUser?.sessionId) {
+        try {
+          await fetch('/api/sessions/status', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              sessionId: navUser.sessionId,
+              isOnline: false
+            })
+          })
+        } catch (error) {
+          console.warn('Erreur lors de la mise à jour du statut de déconnexion:', error)
+        }
+      }
+      
       await authAPI.logout()
       localStorage.setItem('cubeai:auth', 'logged_out:' + Date.now())
       setNavUser(null)

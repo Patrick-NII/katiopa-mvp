@@ -52,6 +52,9 @@ model UserSession {
   // Relations
   account         Account     @relation(fields: [accountId], references: [id])
   activities      Activity[]
+  childActivities ChildActivity[]
+  learningSessions LearningSession[]
+  parentPreferences ParentPreferences?
   conversations   Conversation[]
   profile         UserProfile?
   userInteractions UserInteraction[]
@@ -59,6 +62,7 @@ model UserSession {
   navigationSessions NavigationSession[]
   performanceMetrics PerformanceMetric[]
   passwordResetTokens PasswordResetToken[]
+  aiAnalyses      AIAnalysis[]
 }
 
 // Profil détaillé de l'utilisateur
@@ -94,6 +98,60 @@ model Activity {
   
   // Relations
   userSession UserSession @relation(fields: [userSessionId], references: [id])
+}
+
+// Activités détaillées des enfants
+model ChildActivity {
+  id          String      @id @default(cuid())
+  sessionId   String      // Référence à UserSession.id
+  type        String      // MATH, READING, SCIENCE, CODING, GAME
+  title       String
+  score       Int
+  duration    Int         // en minutes
+  difficulty  String      // EASY, MEDIUM, HARD
+  completedAt DateTime    @default(now())
+  learningSessionId String? // Référence à LearningSession.id
+  
+  // Relations
+  userSession     UserSession @relation(fields: [sessionId], references: [id])
+  learningSession LearningSession? @relation(fields: [learningSessionId], references: [id])
+}
+
+// Sessions d'apprentissage détaillées
+model LearningSession {
+  id              String      @id @default(cuid())
+  userSessionId   String
+  startTime       DateTime    @default(now())
+  endTime         DateTime?
+  duration        Int         // en minutes
+  breaks          Int         @default(0)
+  completionRate  Float       @default(100.0)
+  mood            String?     // "motivé", "fatigué", "concentré", "distrait"
+  notes           String?     // Notes du parent ou de l'IA
+  
+  // Relations
+  userSession     UserSession @relation(fields: [userSessionId], references: [id])
+  activities      ChildActivity[]
+}
+
+// Préférences parentales pour l'apprentissage
+model ParentPreferences {
+  id                String      @id @default(cuid())
+  userSessionId     String      @unique
+  childStrengths    String[]    // ["maths", "logique", "créativité"]
+  focusAreas        String[]    // ["lecture", "concentration", "patience"]
+  learningGoals     String[]    // ["améliorer la lecture", "développer la logique"]
+  concerns          String[]    // ["difficulté de concentration", "lenteur en lecture"]
+  preferredSchedule Json        // {morning: true, afternoon: false, evening: true}
+  studyDuration     Int         @default(30) // durée recommandée en minutes
+  breakFrequency    Int         @default(15) // pause toutes les X minutes
+  learningStyle     String?     // "visuel", "auditif", "kinesthésique"
+  motivationFactors String[]    // ["récompenses", "jeux", "défis"]
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  
+  // Relations
+  userSession       UserSession @relation(fields: [userSessionId], references: [id])
 }
 
 // Conversations avec l'IA
@@ -198,6 +256,22 @@ model PerformanceMetric {
   metricType      String
   value           Float
   timestamp       DateTime @default(now())
+  
+  // Relations
+  userSession     UserSession @relation(fields: [userSessionId], references: [id])
+}
+
+// Analyses IA stockées
+model AIAnalysis {
+  id              String      @id @default(cuid())
+  userSessionId   String
+  analysisType    String      // "progress", "exercise", "global"
+  content         String      // Contenu de l'analyse IA
+  prompt          String      // Prompt utilisé
+  context         Json        // Contexte envoyé à l'IA
+  metadata        Json?       // Métadonnées supplémentaires
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
   
   // Relations
   userSession     UserSession @relation(fields: [userSessionId], references: [id])
