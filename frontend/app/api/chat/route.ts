@@ -774,10 +774,106 @@ async function saveParentPrompt(
   }
 }
 
-// Fonction pour détecter le type de prompt basé sur le contenu
+// Fonction pour analyser et extraire les informations des prompts parents
+function analyzeParentPrompt(userQuery: string, aiResponse: string, promptType: string) {
+  const analysis = {
+    promptType,
+    extractedInfo: {
+      wishes: [] as string[],
+      concerns: [] as string[],
+      goals: [] as string[],
+      needs: [] as string[],
+      strengths: [] as string[],
+      weaknesses: [] as string[],
+      preferences: [] as string[],
+      personality: [] as string[]
+    },
+    targetChild: null as string | null,
+    priority: 'medium' as 'high' | 'medium' | 'low',
+    actionable: false
+  };
+
+  const query = userQuery.toLowerCase();
+  const response = aiResponse.toLowerCase();
+
+  // Extraire le nom de l'enfant mentionné
+  const childNames = ['lucas', 'emma', 'enfant', 'fille', 'garçon'];
+  for (const name of childNames) {
+    if (query.includes(name) || response.includes(name)) {
+      analysis.targetChild = name;
+      break;
+    }
+  }
+
+  // Analyser selon le type de prompt
+  switch (promptType) {
+    case 'PARENT_WISHES':
+      analysis.extractedInfo.wishes.push(userQuery);
+      analysis.priority = 'high';
+      analysis.actionable = true;
+      break;
+      
+    case 'CAREER_PLANNING':
+      analysis.extractedInfo.goals.push(userQuery);
+      analysis.priority = 'high';
+      analysis.actionable = true;
+      break;
+      
+    case 'WEAKNESS_IDENTIFICATION':
+      analysis.extractedInfo.weaknesses.push(userQuery);
+      analysis.priority = 'high';
+      analysis.actionable = true;
+      break;
+      
+    case 'IMPROVEMENT_GOALS':
+      analysis.extractedInfo.goals.push(userQuery);
+      analysis.priority = 'medium';
+      analysis.actionable = true;
+      break;
+      
+    case 'SPECIFIC_NEEDS':
+      analysis.extractedInfo.needs.push(userQuery);
+      analysis.priority = 'high';
+      analysis.actionable = true;
+      break;
+      
+    case 'LEARNING_PREFERENCES':
+      analysis.extractedInfo.preferences.push(userQuery);
+      analysis.priority = 'medium';
+      analysis.actionable = true;
+      break;
+      
+    case 'LEARNING_OBJECTIVES':
+      analysis.extractedInfo.goals.push(userQuery);
+      analysis.priority = 'high';
+      analysis.actionable = true;
+      break;
+      
+    case 'PARENT_CONCERNS':
+      analysis.extractedInfo.concerns.push(userQuery);
+      analysis.priority = 'high';
+      analysis.actionable = true;
+      break;
+      
+    case 'STRENGTH_IDENTIFICATION':
+      analysis.extractedInfo.strengths.push(userQuery);
+      analysis.priority = 'medium';
+      analysis.actionable = false;
+      break;
+      
+    case 'PERSONALITY_INSIGHTS':
+      analysis.extractedInfo.personality.push(userQuery);
+      analysis.priority = 'medium';
+      analysis.actionable = false;
+      break;
+  }
+
+  return analysis;
+}
 function detectPromptType(userQuery: string): string {
   const query = userQuery.toLowerCase();
   
+  // Types de base
   if (query.includes('difficulté') || query.includes('problème') || query.includes('aide')) {
     return 'LEARNING_DIFFICULTY';
   }
@@ -795,6 +891,38 @@ function detectPromptType(userQuery: string): string {
   }
   if (query.includes('progrès') || query.includes('amélioration') || query.includes('évolution')) {
     return 'PROGRESS_UPDATE';
+  }
+  
+  // Nouveaux types pour les préférences et attentes
+  if (query.includes('souhait') || query.includes('vouloir') || query.includes('aimerait') || query.includes('espère')) {
+    return 'PARENT_WISHES';
+  }
+  if (query.includes('plan') || query.includes('carrière') || query.includes('avenir') || query.includes('orientation')) {
+    return 'CAREER_PLANNING';
+  }
+  if (query.includes('lacune') || query.includes('faiblesse') || query.includes('point faible') || query.includes('manque')) {
+    return 'WEAKNESS_IDENTIFICATION';
+  }
+  if (query.includes('amélioration') || query.includes('développer') || query.includes('renforcer') || query.includes('travailler')) {
+    return 'IMPROVEMENT_GOALS';
+  }
+  if (query.includes('besoin') || query.includes('nécessite') || query.includes('requiert') || query.includes('demande')) {
+    return 'SPECIFIC_NEEDS';
+  }
+  if (query.includes('préférence') || query.includes('style') || query.includes('méthode') || query.includes('approche')) {
+    return 'LEARNING_PREFERENCES';
+  }
+  if (query.includes('objectif') || query.includes('but') || query.includes('cible') || query.includes('ambition')) {
+    return 'LEARNING_OBJECTIVES';
+  }
+  if (query.includes('inquiétude') || query.includes('inquiet') || query.includes('préoccupation') || query.includes('souci')) {
+    return 'PARENT_CONCERNS';
+  }
+  if (query.includes('force') || query.includes('talent') || query.includes('don') || query.includes('aptitude')) {
+    return 'STRENGTH_IDENTIFICATION';
+  }
+  if (query.includes('personnalité') || query.includes('caractère') || query.includes('comportement') || query.includes('attitude')) {
+    return 'PERSONALITY_INSIGHTS';
   }
   
   return 'GENERAL_QUERY';
@@ -870,27 +998,57 @@ async function getParentPromptsAndPreferences(parentAccountId: string) {
   }
 }
 
-// Fonction pour formater les prompts parents pour le RAG
+// Fonction pour formater les prompts parents pour le RAG avec analyse enrichie
 function formatParentPromptsForRAG(parentData: any) {
   const { parentPrompts, parentPreferences, childrenProfiles } = parentData;
   
   let ragContent = '';
   
-  // 1. Prompts des parents
+  // 1. Prompts des parents avec analyse
   if (parentPrompts.length > 0) {
-    ragContent += '**PROMPTS ET DEMANDES DES PARENTS:**\n\n';
+    ragContent += '**PROMPTS ET DEMANDES DES PARENTS (ANALYSÉS):**\n\n';
     
-    parentPrompts.forEach((prompt: any, index: number) => {
-      ragContent += `${index + 1}. **Prompt de ${prompt.parentSession.firstName} pour ${prompt.childSession.firstName}:**\n`;
-      ragContent += `   - Contenu original: "${prompt.content}"\n`;
-      if (prompt.processedContent) {
-        ragContent += `   - Traité par l'IA: "${prompt.processedContent}"\n`;
+    // Grouper par type de prompt
+    const promptsByType = parentPrompts.reduce((acc: any, prompt: any) => {
+      if (!acc[prompt.promptType]) {
+        acc[prompt.promptType] = [];
       }
-      if (prompt.aiResponse) {
-        ragContent += `   - Réponse IA: "${prompt.aiResponse}"\n`;
-      }
-      ragContent += `   - Type: ${prompt.promptType}\n`;
-      ragContent += `   - Date: ${new Date(prompt.createdAt).toLocaleDateString('fr-FR')}\n\n`;
+      acc[prompt.promptType].push(prompt);
+      return acc;
+    }, {});
+    
+    // Afficher par catégorie
+    Object.entries(promptsByType).forEach(([type, prompts]: [string, any]) => {
+      const typeLabels = {
+        'PARENT_WISHES': '🎯 SOUHAITS ET VOLONTÉS',
+        'CAREER_PLANNING': '🚀 PLANIFICATION DE CARRIÈRE',
+        'WEAKNESS_IDENTIFICATION': '⚠️ LACUNES ET DIFFICULTÉS',
+        'IMPROVEMENT_GOALS': '📈 OBJECTIFS D\'AMÉLIORATION',
+        'SPECIFIC_NEEDS': '🔧 BESOINS SPÉCIFIQUES',
+        'LEARNING_PREFERENCES': '🎨 PRÉFÉRENCES D\'APPRENTISSAGE',
+        'LEARNING_OBJECTIVES': '🎯 OBJECTIFS D\'APPRENTISSAGE',
+        'PARENT_CONCERNS': '😰 PRÉOCCUPATIONS PARENTALES',
+        'STRENGTH_IDENTIFICATION': '💪 FORCES ET TALENTS',
+        'PERSONALITY_INSIGHTS': '👤 INSIGHTS PERSONNALITÉ',
+        'PERFORMANCE_QUERY': '📊 QUESTIONS DE PERFORMANCE',
+        'CONNECTION_STATUS': '🔗 STATUT DE CONNEXION',
+        'TIME_QUERY': '⏰ QUESTIONS TEMPORELLES',
+        'RECOMMENDATION_REQUEST': '💡 DEMANDES DE RECOMMANDATIONS',
+        'PROGRESS_UPDATE': '📈 MISE À JOUR PROGRÈS',
+        'LEARNING_DIFFICULTY': '🎓 DIFFICULTÉS D\'APPRENTISSAGE'
+      };
+      
+      ragContent += `**${typeLabels[type] || type}:**\n`;
+      prompts.forEach((prompt: any, index: number) => {
+        const analysis = analyzeParentPrompt(prompt.content, prompt.aiResponse || '', prompt.promptType);
+        ragContent += `${index + 1}. **${prompt.parentSession.firstName} → ${prompt.childSession.firstName}:**\n`;
+        ragContent += `   - Question: "${prompt.content}"\n`;
+        ragContent += `   - Réponse: "${prompt.aiResponse || 'Pas de réponse sauvegardée'}"\n`;
+        ragContent += `   - Enfant cible: ${analysis.targetChild || 'Non spécifié'}\n`;
+        ragContent += `   - Priorité: ${analysis.priority.toUpperCase()}\n`;
+        ragContent += `   - Actionnable: ${analysis.actionable ? 'Oui' : 'Non'}\n`;
+        ragContent += `   - Date: ${new Date(prompt.createdAt).toLocaleDateString('fr-FR')}\n\n`;
+      });
     });
   }
 
@@ -903,11 +1061,14 @@ function formatParentPromptsForRAG(parentData: any) {
       
       if (parent.parentPreferences) {
         const prefs = parent.parentPreferences;
-        ragContent += `- Objectifs d'apprentissage: ${prefs.objectives || 'Non définis'}\n`;
-        ragContent += `- Préférences pédagogiques: ${prefs.preferences || 'Non définies'}\n`;
-        ragContent += `- Préoccupations: ${prefs.concerns || 'Aucune'}\n`;
-        ragContent += `- Informations supplémentaires: ${prefs.additionalInfo || 'Aucune'}\n`;
-        ragContent += `- Besoins spécifiques: ${prefs.needs || 'Aucun'}\n\n`;
+        ragContent += `- Points forts des enfants: ${prefs.childStrengths.join(', ')}\n`;
+        ragContent += `- Domaines de focus: ${prefs.focusAreas.join(', ')}\n`;
+        ragContent += `- Objectifs d'apprentissage: ${prefs.learningGoals.join(', ')}\n`;
+        ragContent += `- Préoccupations: ${prefs.concerns.join(', ')}\n`;
+        ragContent += `- Style d'apprentissage: ${prefs.learningStyle}\n`;
+        ragContent += `- Facteurs de motivation: ${prefs.motivationFactors.join(', ')}\n`;
+        ragContent += `- Durée d'étude recommandée: ${prefs.studyDuration} minutes\n`;
+        ragContent += `- Fréquence des pauses: toutes les ${prefs.breakFrequency} minutes\n\n`;
       }
     });
   }
@@ -921,14 +1082,14 @@ function formatParentPromptsForRAG(parentData: any) {
       
       if (child.profile) {
         const profile = child.profile;
-        ragContent += `- Objectifs d'apprentissage: ${profile.learningGoals.join(', ') || 'Non définis'}\n`;
-        ragContent += `- Matières préférées: ${profile.preferredSubjects.join(', ') || 'Non définies'}\n`;
-        ragContent += `- Style d'apprentissage: ${profile.learningStyle || 'Non défini'}\n`;
-        ragContent += `- Difficulté: ${profile.difficulty || 'Non définie'}\n`;
-        ragContent += `- Centres d'intérêt: ${profile.interests.join(', ') || 'Non définis'}\n`;
-        ragContent += `- Besoins particuliers: ${profile.specialNeeds.join(', ') || 'Aucun'}\n`;
-        ragContent += `- Notes personnalisées: ${profile.customNotes || 'Aucune'}\n`;
-        ragContent += `- Souhaits des parents: ${profile.parentWishes || 'Aucun'}\n\n`;
+        ragContent += `- Objectifs d'apprentissage: ${profile.learningGoals.join(', ')}\n`;
+        ragContent += `- Matières préférées: ${profile.preferredSubjects.join(', ')}\n`;
+        ragContent += `- Style d'apprentissage: ${profile.learningStyle}\n`;
+        ragContent += `- Difficulté: ${profile.difficulty}\n`;
+        ragContent += `- Centres d'intérêt: ${profile.interests.join(', ')}\n`;
+        ragContent += `- Besoins particuliers: ${profile.specialNeeds.join(', ')}\n`;
+        ragContent += `- Notes personnalisées: ${profile.customNotes}\n`;
+        ragContent += `- Souhaits des parents: ${profile.parentWishes}\n\n`;
       }
     });
   }
