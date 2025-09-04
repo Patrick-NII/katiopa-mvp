@@ -136,7 +136,7 @@ async function getCubeMatchData(childId: string): Promise<any> {
     console.log(`🎮 Récupération données CubeMatch pour enfant ${childId}...`);
     
     // Récupérer les scores CubeMatch
-    const cubeMatchScores = await prisma.cubeMatchScore.findMany({
+    const cubeMatchScores = await prisma.CubeMatchScore.findMany({
       where: {
         user_id: childId
       },
@@ -152,7 +152,7 @@ async function getCubeMatchData(childId: string): Promise<any> {
     }
 
     // Récupérer les stats utilisateur
-    const userStats = await prisma.cubeMatchUserStats.findUnique({
+    const userStats = await prisma.CubeMatchUserStats.findUnique({
       where: {
         user_id: childId
       }
@@ -601,6 +601,51 @@ function buildPrompts({
   dataInsights?: string
 }) {
   
+  // Générer le message d'accueil personnalisé
+  const generateWelcomeMessage = () => {
+    if (role === 'parent' && user && childSessions && childSessions.length > 0) {
+      const childrenNames = childSessions.map(child => child.firstName).join(' et ');
+      const childrenCount = childSessions.length;
+      
+      return `Bonjour ${user.firstName} ! 👋
+
+Je suis Bubix, votre expert pédagogique personnel de CubeAI. Je suis là pour vous accompagner dans l'éducation de ${childrenCount > 1 ? 'vos enfants' : 'votre enfant'} ${childrenNames}.
+
+🎯 **Ce que je peux faire pour vous :**
+• Analyser les performances de ${childrenCount > 1 ? 'vos enfants' : 'votre enfant'}
+• Proposer des méthodes d'apprentissage adaptées
+• Suivre les progrès en temps réel
+• Répondre à vos questions éducatives
+
+💡 **N'hésitez pas à me poser des questions sur :**
+- Les difficultés d'apprentissage
+- Les méthodes pédagogiques
+- Le suivi des progrès
+- Les recommandations personnalisées
+
+Comment puis-je vous aider aujourd'hui ?`;
+    } else if (role === 'child' && user) {
+      return `Salut ${user.firstName} ! 🌟
+
+Je suis Bubix, ton assistant d'apprentissage préféré ! Je suis là pour t'aider à apprendre en s'amusant.
+
+🎮 **Ce qu'on peut faire ensemble :**
+• Résoudre des problèmes de maths
+• Apprendre de nouvelles choses
+• Jouer avec les mots
+• Découvrir le monde des sciences
+
+💫 **Dis-moi ce que tu veux faire aujourd'hui !**
+Tu peux me poser n'importe quelle question ou me demander de t'aider avec tes devoirs.`;
+    } else {
+      return `Bonjour ! 👋
+
+Je suis Bubix, l'assistant IA intelligent de CubeAI. Je suis là pour vous aider avec vos questions éducatives.
+
+Comment puis-je vous aider aujourd'hui ?`;
+    }
+  };
+
   const system = `
 Tu es Bubix, l'assistant IA intelligent de CubeAI.
 
@@ -613,6 +658,9 @@ ${childSessions && childSessions.length > 0 ? `
 - Enfants: ${childSessions.map(child => `${child.firstName} ${child.lastName} (${child.userType})`).join(', ')}
 ` : ''}
 ` : '- Utilisateur non connecté'}
+
+MESSAGE D'ACCUEIL PERSONNALISÉ:
+${generateWelcomeMessage()}
 
 ${role === 'child' ? `
 MODE ENFANT (5-7 ans):
@@ -1094,7 +1142,7 @@ async function saveParentPrompt(
   try {
     console.log('💾 Sauvegarde du prompt parent...');
     
-    const savedPrompt = await prisma.parentPrompt.create({
+    const savedPrompt = await prisma.ParentPrompt.create({
       data: {
         content: userQuery,
         processedContent: userQuery, // Pour simplifier, on garde le contenu original
@@ -1273,7 +1321,7 @@ async function getParentPromptsAndPreferences(parentAccountId: string) {
     console.log('🔍 Récupération des prompts et préférences parents...');
     
     // Récupérer tous les prompts des parents
-    const parentPrompts = await prisma.parentPrompt.findMany({
+    const parentPrompts = await prisma.ParentPrompt.findMany({
       where: {
         accountId: parentAccountId,
         status: 'PROCESSED' // Seulement les prompts traités

@@ -78,10 +78,33 @@ export default function PublicBubix() {
 
   // ---------- Conversations: load/save ----------
   const createNewConversation = () => {
+    const welcomeMessage: Message = {
+      id: `welcome_${Date.now()}`,
+      text: `Bonjour ! 👋
+
+Je suis Bubix, l'assistant IA intelligent de CubeAI. Je suis là pour vous faire découvrir les possibilités de l'apprentissage personnalisé.
+
+🌟 **Découvrez CubeAI :**
+• Assistant pédagogique intelligent
+• Méthodes d'apprentissage adaptées
+• Suivi des progrès en temps réel
+• Support pour parents et enfants
+
+💡 **Posez-moi vos questions sur :**
+- L'éducation et l'apprentissage
+- Les méthodes pédagogiques
+- Les défis éducatifs
+- Comment CubeAI peut vous aider
+
+Comment puis-je vous aider à découvrir CubeAI ?`,
+      sender: 'bot',
+      timestamp: Date.now()
+    };
+
     const newConversation: Conversation = {
       id: `conv_${Date.now()}`,
       title: 'Nouvelle conversation',
-      messages: [],
+      messages: [welcomeMessage],
       createdAt: Date.now(),
       lastUpdated: Date.now()
     }
