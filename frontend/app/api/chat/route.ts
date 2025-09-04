@@ -554,8 +554,8 @@ MODE ENFANT (5-7 ans):
 - Pose des questions pour vérifier la compréhension
 - Utilise des exemples concrets et familiers
 ` : `
-MODE PARENT - CONSULTATION BASE DE DONNÉES:
-Tu as accès à TOUTES les données des enfants du parent connecté. Tu peux :
+MODE PARENT - CONSULTATION BASE DE DONNÉES AVEC RAG:
+Tu as accès à TOUTES les données des enfants du parent connecté ET à l'historique des demandes des parents. Tu peux :
 
 📊 **ANALYSER LES PERFORMANCES :**
 - Scores moyens par domaine (maths, coding, etc.)
@@ -584,6 +584,9 @@ Tu as accès à TOUTES les données des enfants du parent connecté. Tu peux :
 - "Que recommandes-tu pour améliorer ses résultats ?"
 - "Combien de temps passe-t-il sur CubeAI ?"
 - "Quels exercices lui plaisent le plus ?"
+
+💡 **CONTEXTE RAG - HISTORIQUE DES DEMANDES PARENTALES :**
+${rag.length > 0 ? rag.join('\n\n') : 'Aucun historique de demandes parentales disponible.'}
 
 ${childrenData && childrenData.length > 0 ? `
 DONNÉES DISPONIBLES POUR ${childrenData.length} ENFANT(S):
@@ -977,13 +980,46 @@ export async function POST(request: NextRequest) {
     // Récupérer les snippets RAG
     const ragSnippets = getRAGSnippets(intent, userQuery)
     
+    // Récupérer les prompts parents pour le RAG si c'est un parent
+    let parentRAGSnippets: string[] = []
+    if (userContext.role === 'parent' && userInfo.userType === 'PARENT') {
+      try {
+        console.log('🔍 Récupération des prompts parents pour le RAG...')
+        
+        // Récupérer l'accountId du parent
+        const parentSession = await prisma.userSession.findUnique({
+          where: { id: userInfo.id },
+          include: { account: true }
+        })
+        
+        if (parentSession && parentSession.account) {
+          const parentData = await getParentPromptsAndPreferences(parentSession.account.id)
+          const parentRAGContent = formatParentPromptsForRAG(parentData)
+          
+          if (parentRAGContent && parentRAGContent !== 'Aucune donnée parentale disponible.') {
+            parentRAGSnippets = [parentRAGContent]
+            console.log('✅ Prompts parents intégrés dans le RAG')
+          } else {
+            console.log('ℹ️ Aucun prompt parent disponible pour le RAG')
+          }
+        } else {
+          console.log('❌ Impossible de récupérer l\'accountId du parent')
+        }
+      } catch (error) {
+        console.error('❌ Erreur récupération prompts parents RAG:', error)
+      }
+    }
+    
+    // Combiner les snippets RAG généraux et les prompts parents
+    const allRAGSnippets = [...ragSnippets, ...parentRAGSnippets]
+    
     // Construire les prompts avec le contexte utilisateur enrichi
     const { messages } = buildPrompts({
       persona,
       role: userContext.role,
       lang,
       context: userContext.displayName,
-      rag: ragSnippets,
+      rag: allRAGSnippets,
       history: body.messages,
       userQuery,
       intent,
