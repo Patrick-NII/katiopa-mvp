@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import * as jwt from 'jsonwebtoken'
 import { PrismaClient } from '@prisma/client'
 import OpenAI from 'openai'
+import { buildPrompts } from './buildPrompts'
 
 const prisma = new PrismaClient()
 
@@ -573,8 +574,8 @@ function getRAGSnippets(intent: string, userQuery: string): string[] {
   return snippets
 }
 
-// Fonction pour construire les prompts selon le workflow
-function buildPrompts({
+// Fonction pour construire les prompts selon le workflow (maintenant dans buildPrompts.ts)
+function buildPromptsOld({
   persona,
   role,
   lang,
@@ -588,8 +589,8 @@ function buildPrompts({
   childrenData,
   dataInsights
 }: {
-  persona: 'kid' | 'pro'
-  role: 'child' | 'parent'
+  persona: 'kid' | 'pro' | 'public'
+  role: 'child' | 'parent' | 'public'
   lang: 'fr' | 'en'
   context: string
   rag: string[]
@@ -601,6 +602,16 @@ function buildPrompts({
   childrenData?: any[]
   dataInsights?: string
 }) {
+  
+  // Obtenir la persona appropriée
+  const userType = role === 'child' ? 'CHILD' : role === 'parent' ? 'PARENT' : 'PUBLIC';
+  const bubixPersona = getBubixPersona(userType, user?.age);
+  
+  // Déterminer le sous-profil selon le domaine d'apprentissage
+  const subProfile = getSubProfile(userQuery + ' ' + intent, user?.age);
+  
+  // Méthodes CubeAI disponibles selon le contexte
+  const availableMethods = Object.values(BubixPersonas.cubeaiMethods);
   
   // Générer le message d'accueil personnalisé
   const generateWelcomeMessage = () => {
@@ -641,16 +652,18 @@ Tu peux me poser n'importe quelle question ou me demander de t'aider avec tes de
     } else {
       return `Bonjour ! 👋
 
-Je suis Bubix, l'assistant IA intelligent de CubeAI. Je suis là pour vous aider avec vos questions éducatives.
+Je suis Bubix, l'assistant IA intelligent de CubeAI. Je suis là pour vous faire découvrir les possibilités de l'apprentissage personnalisé.
 
 Comment puis-je vous aider aujourd'hui ?`;
     }
   };
 
-  const system = `
-Tu es Bubix, l'assistant IA intelligent de CubeAI.
+  // Construire le prompt système dynamique avec la persona
+  const dynamicSystemPrompt = buildDynamicSystemPrompt(bubixPersona, subProfile, availableMethods);
+  
+  const system = `${dynamicSystemPrompt}
 
-CONTEXTE UTILISATEUR:
+## 📊 CONTEXTE UTILISATEUR
 ${user ? `
 - Nom: ${user.firstName} ${user.lastName}
 - Type: ${user.userType}
@@ -660,21 +673,19 @@ ${childSessions && childSessions.length > 0 ? `
 ` : ''}
 ` : '- Utilisateur non connecté'}
 
-MESSAGE D'ACCUEIL PERSONNALISÉ:
+## 💬 MESSAGE D'ACCUEIL PERSONNALISÉ
 ${generateWelcomeMessage()}
 
+## 🎯 RÈGLES DE COMPORTEMENT SPÉCIFIQUES
 ${role === 'child' ? `
-MODE ENFANT (5-7 ans):
-- Tu es un assistant d'apprentissage amical et patient
-- Utilise un langage simple, des phrases courtes
-- Encourage et félicite les efforts
-- Propose des exercices adaptés au niveau
-- Explique les concepts de manière ludique
-- Aide avec les mathématiques, la lecture, les sciences
-- Pose des questions pour vérifier la compréhension
-- Utilise des exemples concrets et familiers
+**MODE ENFANT - COMPORTEMENT OBLIGATOIRE :**
+- Utilise le ton et le vocabulaire de la persona ${bubixPersona.name}
+- Applique les phrases caractéristiques : ${bubixPersona.voice.catchphrases.join(', ')}
+- Suis le système d'émotions : ${JSON.stringify(bubixPersona.pedagogy.emotionSystem)}
+- Utilise les modes d'apprentissage : ${bubixPersona.pedagogy.learningModes?.join(', ')}
+${subProfile ? `- Incarne le profil spécialisé : ${subProfile.title} (${subProfile.domain})` : ''}
 ` : `
-MODE PARENT - EXPERT PÉDAGOGIQUE CUBEAI:
+**MODE PARENT - EXPERT PÉDAGOGIQUE CUBEAI:**
 
 ## 🎯 IDENTITÉ PROFESSIONNELLE
 Tu es un **EXPERT PÉDAGOGIQUE SENIOR** de CubeAI, avec 15+ ans d'expérience dans l'éducation innovante. Tu es spécialisé dans les méthodes d'apprentissage éprouvées utilisées dans les plus grandes écoles internationales (Montessori, Freinet, Steiner, écoles privées d'élite).

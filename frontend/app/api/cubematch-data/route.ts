@@ -80,12 +80,13 @@ function generateCubeMatchSummary(cubeMatchData: any): string {
   if (operatorStats.length > 0) {
     summary += `**Performance par opération :**\n`;
     operatorStats.forEach((op: any) => {
-      const operatorName = {
+      const operatorNameMap: Record<string, string> = {
         'ADD': 'Addition',
         'SUB': 'Soustraction',
         'MUL': 'Multiplication',
         'DIV': 'Division'
-      }[op.operator] || op.operator;
+      };
+      const operatorName = operatorNameMap[op.operator] || op.operator;
 
       summary += `• ${operatorName} : ${op.games} parties, score moyen ${Math.round(op.averageScore)}, précision ${op.averageAccuracy.toFixed(1)}%\n`;
     });
