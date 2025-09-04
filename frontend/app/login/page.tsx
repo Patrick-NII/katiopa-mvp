@@ -170,15 +170,6 @@ export default function LoginPage() {
               </a>
             </div>
 
-            {/* Bouton Bubix */}
-            <div className="text-center pt-4">
-              <button
-                onClick={() => setShowBubix(true)}
-                className="font-button bg-white/80 backdrop-blur-sm hover:bg-white text-gray-700 border border-gray-300 hover:border-gray-400 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                💬 Tester Bubix
-              </button>
-            </div>
           </div>
 
           {/* Notes importantes */}
