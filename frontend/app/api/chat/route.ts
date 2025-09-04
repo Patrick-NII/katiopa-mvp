@@ -741,7 +741,64 @@ function postProcessResponse(text: string, persona: 'kid' | 'pro', intent: strin
   return { text: processedText, actions }
 }
 
-// Fonction pour récupérer les prompts et préférences des parents pour le RAG
+// Fonction pour sauvegarder automatiquement les prompts des parents
+async function saveParentPrompt(
+  parentSessionId: string,
+  childSessionId: string,
+  accountId: string,
+  userQuery: string,
+  aiResponse: string,
+  promptType: string = 'GENERAL_QUERY'
+) {
+  try {
+    console.log('💾 Sauvegarde du prompt parent...');
+    
+    const savedPrompt = await prisma.parentPrompt.create({
+      data: {
+        content: userQuery,
+        processedContent: userQuery, // Pour simplifier, on garde le contenu original
+        aiResponse: aiResponse,
+        promptType: promptType,
+        status: 'PROCESSED',
+        parentSessionId: parentSessionId,
+        childSessionId: childSessionId,
+        accountId: accountId
+      }
+    });
+
+    console.log(`✅ Prompt sauvegardé avec ID: ${savedPrompt.id}`);
+    return savedPrompt;
+  } catch (error) {
+    console.error('❌ Erreur sauvegarde prompt parent:', error);
+    return null;
+  }
+}
+
+// Fonction pour détecter le type de prompt basé sur le contenu
+function detectPromptType(userQuery: string): string {
+  const query = userQuery.toLowerCase();
+  
+  if (query.includes('difficulté') || query.includes('problème') || query.includes('aide')) {
+    return 'LEARNING_DIFFICULTY';
+  }
+  if (query.includes('connecté') || query.includes('en ligne') || query.includes('actuellement')) {
+    return 'CONNECTION_STATUS';
+  }
+  if (query.includes('score') || query.includes('performance') || query.includes('meilleur')) {
+    return 'PERFORMANCE_QUERY';
+  }
+  if (query.includes('temps') || query.includes('durée') || query.includes('depuis')) {
+    return 'TIME_QUERY';
+  }
+  if (query.includes('recommand') || query.includes('conseil') || query.includes('suggestion')) {
+    return 'RECOMMENDATION_REQUEST';
+  }
+  if (query.includes('progrès') || query.includes('amélioration') || query.includes('évolution')) {
+    return 'PROGRESS_UPDATE';
+  }
+  
+  return 'GENERAL_QUERY';
+}
 async function getParentPromptsAndPreferences(parentAccountId: string) {
   try {
     console.log('🔍 Récupération des prompts et préférences parents...');
@@ -1099,6 +1156,47 @@ export async function POST(request: NextRequest) {
 
     // Post-traiter la réponse
     const { text, actions } = postProcessResponse(rawText, persona, intent)
+
+    // Sauvegarder automatiquement le prompt si c'est un parent
+    if (userContext.role === 'parent' && userInfo.userType === 'PARENT') {
+      try {
+        console.log('💾 Sauvegarde automatique du prompt parent...');
+        
+        // Récupérer l'accountId et un enfant de référence
+        const parentSession = await prisma.userSession.findUnique({
+          where: { id: userInfo.id },
+          include: { 
+            account: true
+          }
+        });
+        
+        if (parentSession && parentSession.account) {
+          // Récupérer un enfant du même compte
+          const childSession = await prisma.userSession.findFirst({
+            where: {
+              accountId: parentSession.accountId,
+              userType: 'CHILD'
+            }
+          });
+          
+          const promptType = detectPromptType(userQuery);
+          const childSessionId = childSession?.id || parentSession.id; // Fallback sur le parent si pas d'enfant
+          
+          await saveParentPrompt(
+            parentSession.id,
+            childSessionId,
+            parentSession.account.id,
+            userQuery,
+            text,
+            promptType
+          );
+          
+          console.log('✅ Prompt parent sauvegardé automatiquement');
+        }
+      } catch (error) {
+        console.error('❌ Erreur sauvegarde automatique prompt parent:', error);
+      }
+    }
 
     return NextResponse.json({
       text,
