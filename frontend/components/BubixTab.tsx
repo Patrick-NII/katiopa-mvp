@@ -40,6 +40,36 @@ export default function BubixTab({ user, childSessions, userType, subscriptionTy
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch] = useState(false)
 
+  // États pour les limites de caractères
+  const [characterLimits, setCharacterLimits] = useState({
+    max: 2000,
+    current: 0,
+    remaining: 2000,
+    subscriptionType: subscriptionType
+  })
+
+  // Fonction pour obtenir la limite de caractères selon l'abonnement
+  const getMaxCharactersForSubscription = (subscriptionType: string): number => {
+    switch (subscriptionType) {
+      case 'FREE':
+        return 500
+      case 'PRO':
+        return 2000 // Bubix Pro - limite généreuse
+      case 'PRO_PLUS':
+        return 4000
+      case 'ENTERPRISE':
+        return 6000
+      default:
+        return 500
+    }
+  }
+
+  // Fonction pour calculer les caractères restants
+  const calculateRemainingCharacters = (text: string): number => {
+    const maxChars = getMaxCharactersForSubscription(subscriptionType)
+    return Math.max(0, maxChars - text.length)
+  }
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const messagesScrollRef = useRef<HTMLDivElement>(null)
@@ -109,6 +139,20 @@ export default function BubixTab({ user, childSessions, userType, subscriptionTy
   useEffect(() => {
     autoResize()
   }, [inputValue, autoResize])
+
+  // ---------- 3) Mise à jour des limites de caractères ----------
+  useEffect(() => {
+    const maxChars = getMaxCharactersForSubscription(subscriptionType)
+    const currentChars = inputValue.length
+    const remainingChars = calculateRemainingCharacters(inputValue)
+    
+    setCharacterLimits({
+      max: maxChars,
+      current: currentChars,
+      remaining: remainingChars,
+      subscriptionType: subscriptionType
+    })
+  }, [inputValue, subscriptionType])
 
   // ---------- 3) Conversations: load/save ----------
   const createNewConversation = () => {
@@ -209,6 +253,12 @@ export default function BubixTab({ user, childSessions, userType, subscriptionTy
       if (!response.ok) throw new Error('Erreur lors de la communication avec Bubix')
 
       const data = await response.json()
+      
+      // Mettre à jour les limites de caractères depuis la réponse
+      if (data.characterLimits) {
+        setCharacterLimits(data.characterLimits)
+      }
+      
       const botMessage: Message = {
         id: `msg_${Date.now() + 1}`,
         text: data.text,
@@ -685,27 +735,47 @@ export default function BubixTab({ user, childSessions, userType, subscriptionTy
         <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200/50 p-4 flex-shrink-0">
           <div className="max-w-4xl mx-auto">
             <div className="flex gap-3 items-end">
-              <textarea
-                ref={inputRef}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={userType === 'CHILD' ? 'Pose ta question à Bubix...' : 'Posez votre question à Bubix...'}
-                className="flex-1 resize-none border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm leading-5 bg-white/50 backdrop-blur-sm"
-                rows={1}
-                disabled={isLoading}
-              />
+              <div className="flex-1 relative">
+                <textarea
+                  ref={inputRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={userType === 'CHILD' ? 'Pose ta question à Bubix...' : 'Posez votre question à Bubix...'}
+                  className="w-full resize-none border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm leading-5 bg-white/50 backdrop-blur-sm"
+                  rows={1}
+                  disabled={isLoading}
+                  maxLength={characterLimits.max}
+                />
+                {/* Compteur de caractères */}
+                <div className="absolute bottom-2 right-3 flex items-center gap-1 text-xs">
+                  <span className={`${
+                    characterLimits.remaining < 100 ? 'text-red-500' : 
+                    characterLimits.remaining < 300 ? 'text-orange-500' : 'text-gray-400'
+                  }`}>
+                    {characterLimits.current}/{characterLimits.max}
+                  </span>
+                  {characterLimits.remaining < 100 && (
+                    <span className="text-red-500">⚠️</span>
+                  )}
+                </div>
+              </div>
               <button
                 onClick={sendMessage}
-                disabled={!inputValue.trim() || isLoading}
+                disabled={!inputValue.trim() || isLoading || characterLimits.remaining < 0}
                 className="px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <Send size={18} />
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-2 text-center">
-              Entrée pour envoyer • Shift+Entrée pour une nouvelle ligne
-            </p>
+            <div className="flex justify-between items-center mt-2">
+              <p className="text-xs text-gray-500">
+                Entrée pour envoyer • Shift+Entrée pour une nouvelle ligne
+              </p>
+              <p className="text-xs text-gray-500">
+                Limite: {characterLimits.max} caractères ({subscriptionType})
+              </p>
+            </div>
           </div>
         </footer>
       </section>
