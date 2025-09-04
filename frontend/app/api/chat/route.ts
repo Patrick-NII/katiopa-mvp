@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 import { PrismaClient } from '@prisma/client'
+import OpenAI from 'openai'
 
 const prisma = new PrismaClient()
 
@@ -154,41 +155,96 @@ async function getChildrenData(accountId: string): Promise<any[]> {
       console.log(`👶 Enfant ${index + 1}: ${child.firstName} ${child.lastName} (${child.activities.length} activités)`)
     })
 
-    return children.map(child => ({
-      id: child.id,
-      sessionId: child.sessionId,
-      firstName: child.firstName,
-      lastName: child.lastName,
-      age: child.age,
-      grade: child.grade,
-      gender: child.gender,
-      createdAt: child.createdAt,
-      lastLoginAt: child.lastLoginAt,
-      totalConnectionDurationMs: child.totalConnectionDurationMs,
-      
-      // Profil d'apprentissage
-      profile: child.profile ? {
-        learningGoals: child.profile.learningGoals,
-        preferredSubjects: child.profile.preferredSubjects,
-        learningStyle: child.profile.learningStyle,
-        difficulty: child.profile.difficulty,
-        interests: child.profile.interests,
-        specialNeeds: child.profile.specialNeeds,
-        customNotes: child.profile.customNotes,
-        parentWishes: child.profile.parentWishes
-      } : null,
-      
-      // Activités récentes
-      activities: child.activities.map(activity => ({
-        id: activity.id,
-        domain: activity.domain,
-        nodeKey: activity.nodeKey,
-        score: activity.score,
-        attempts: activity.attempts,
-        durationMs: activity.durationMs,
-        createdAt: activity.createdAt
-      }))
-    }))
+    // Enrichir avec les données CubeMatch
+    const enrichedChildren = await Promise.all(children.map(async (child) => {
+      try {
+        // Récupérer les données CubeMatch
+        const cubeMatchData = await getCubeMatchData(child.id);
+        
+        return {
+          id: child.id,
+          sessionId: child.sessionId,
+          firstName: child.firstName,
+          lastName: child.lastName,
+          age: child.age,
+          grade: child.grade,
+          gender: child.gender,
+          createdAt: child.createdAt,
+          lastLoginAt: child.lastLoginAt,
+          totalConnectionDurationMs: child.totalConnectionDurationMs,
+          
+          // Profil d'apprentissage
+          profile: child.profile ? {
+            learningGoals: child.profile.learningGoals,
+            preferredSubjects: child.profile.preferredSubjects,
+            learningStyle: child.profile.learningStyle,
+            difficulty: child.profile.difficulty,
+            interests: child.profile.interests,
+            specialNeeds: child.profile.specialNeeds,
+            customNotes: child.profile.customNotes,
+            parentWishes: child.profile.parentWishes
+          } : null,
+          
+          // Activités récentes
+          activities: child.activities.map(activity => ({
+            id: activity.id,
+            domain: activity.domain,
+            nodeKey: activity.nodeKey,
+            score: activity.score,
+            attempts: activity.attempts,
+            durationMs: activity.durationMs,
+            createdAt: activity.createdAt
+          })),
+          
+          // Données CubeMatch
+          cubeMatchData: cubeMatchData,
+          cubeMatchSummary: cubeMatchData ? generateCubeMatchSummary(cubeMatchData) : "Aucune donnée CubeMatch disponible."
+        }
+      } catch (error) {
+        console.error(`❌ Erreur récupération données CubeMatch pour ${child.firstName}:`, error);
+        return {
+          id: child.id,
+          sessionId: child.sessionId,
+          firstName: child.firstName,
+          lastName: child.lastName,
+          age: child.age,
+          grade: child.grade,
+          gender: child.gender,
+          createdAt: child.createdAt,
+          lastLoginAt: child.lastLoginAt,
+          totalConnectionDurationMs: child.totalConnectionDurationMs,
+          
+          // Profil d'apprentissage
+          profile: child.profile ? {
+            learningGoals: child.profile.learningGoals,
+            preferredSubjects: child.profile.preferredSubjects,
+            learningStyle: child.profile.learningStyle,
+            difficulty: child.profile.difficulty,
+            interests: child.profile.interests,
+            specialNeeds: child.profile.specialNeeds,
+            customNotes: child.profile.customNotes,
+            parentWishes: child.profile.parentWishes
+          } : null,
+          
+          // Activités récentes
+          activities: child.activities.map(activity => ({
+            id: activity.id,
+            domain: activity.domain,
+            nodeKey: activity.nodeKey,
+            score: activity.score,
+            attempts: activity.attempts,
+            durationMs: activity.durationMs,
+            createdAt: activity.createdAt
+          })),
+          
+          // Données CubeMatch (en cas d'erreur)
+          cubeMatchData: null,
+          cubeMatchSummary: "Erreur lors de la récupération des données CubeMatch."
+        }
+      }
+    }));
+    
+    return enrichedChildren;
   } catch (error) {
     console.error('❌ Erreur récupération données enfants:', error)
     return []
@@ -223,6 +279,23 @@ function generateDataInsights(childrenData: any[]): string {
     insights += `• ${totalActivities} activités réalisées\n`
     insights += `• ${totalSessions} sessions d'apprentissage\n`
     insights += `• Score moyen: ${avgScore}/100\n`
+    
+    // Données CubeMatch si disponibles
+    if (child.cubeMatchData && child.cubeMatchData.globalStats) {
+      const cm = child.cubeMatchData.globalStats;
+      insights += `• **CubeMatch** : ${cm.totalGames} parties, score total ${cm.totalScore.toLocaleString()}, niveau max ${cm.highestLevel}\n`
+      
+      // Statistiques par opération
+      if (child.cubeMatchData.operatorStats && child.cubeMatchData.operatorStats.length > 0) {
+        insights += `• **Opérations** : `
+        child.cubeMatchData.operatorStats.forEach((op: any, i: number) => {
+          const opName = { 'ADD': 'Add', 'SUB': 'Sous', 'MUL': 'Mult', 'DIV': 'Div' }[op.operator] || op.operator;
+          insights += `${opName}(${op.games} parties, ${op.averageAccuracy.toFixed(1)}% précision)`
+          if (i < child.cubeMatchData.operatorStats.length - 1) insights += ', ';
+        });
+        insights += '\n';
+      }
+    }
     
     // Domaines les plus pratiqués
     const domainStats = child.activities.reduce((acc: any, activity: any) => {
