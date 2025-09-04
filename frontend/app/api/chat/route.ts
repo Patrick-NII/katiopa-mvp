@@ -590,14 +590,78 @@ ${rag.length > 0 ? rag.join('\n\n') : 'Aucun historique de demandes parentales d
 
 ${childrenData && childrenData.length > 0 ? `
 DONNÉES DISPONIBLES POUR ${childrenData.length} ENFANT(S):
+
 ${childrenData.map((child, index) => `
-**${child.firstName} ${child.lastName}** (${child.age || 'N/A'} ans):
-- ${child.activities.length} activités réalisées
-- Score moyen: ${child.activities.length > 0 ? Math.round(child.activities.reduce((sum: number, a: any) => sum + (a.score || 0), 0) / child.activities.length) : 0}/100
+👶 **${child.firstName} ${child.lastName}** (${child.age || 'N/A'} ans):
+
+📊 **PERFORMANCES GÉNÉRALES:**
+- Score moyen global: ${child.activities.length > 0 ? Math.round(child.activities.reduce((sum: number, a: any) => sum + (a.score || 0), 0) / child.activities.length) : 0}/100
+- Activités totales: ${child.activities.length}
 - Dernière connexion: ${child.lastLoginAt ? new Date(child.lastLoginAt).toLocaleDateString('fr-FR') : 'Jamais'}
-- Profil: ${child.profile ? 'Complété' : 'À compléter'}
-- Dernières activités: ${child.activities.slice(0, 3).map(a => `${a.domain} (${a.score}/100)`).join(', ')}
-`).join('\n')}
+
+🎯 **ACTIVITÉS RÉCENTES (5 dernières):**
+${child.activities.slice(0, 5).map(activity => `- ${activity.domain}: ${activity.score}/100 (${new Date(activity.createdAt).toLocaleDateString('fr-FR')})`).join('\n')}
+${child.activities.length > 5 ? `... et ${child.activities.length - 5} autres activités` : ''}
+
+📈 **ANALYSE PAR DOMAINE:**
+${(() => {
+  const domainStats = child.activities.reduce((acc: any, activity: any) => {
+    if (!acc[activity.domain]) {
+      acc[activity.domain] = { total: 0, count: 0, scores: [] };
+    }
+    acc[activity.domain].total += activity.score || 0;
+    acc[activity.domain].count += 1;
+    acc[activity.domain].scores.push(activity.score || 0);
+    return acc;
+  }, {});
+  
+  return Object.entries(domainStats).map(([domain, stats]: [string, any]) => {
+    const avgScore = Math.round(stats.total / stats.count);
+    const bestScore = Math.max(...stats.scores);
+    const trend = stats.scores.length > 1 ? 
+      (stats.scores[stats.scores.length - 1] > stats.scores[0] ? '📈 Amélioration' : '📉 À surveiller') : '🔄 Stable';
+    
+    return `- ${domain}: ${avgScore}/100 (meilleur: ${bestScore}/100) - ${trend}`;
+  }).join('\n');
+})()}
+
+🎮 **CUBEMATCH (si disponible):**
+${child.cubeMatchData ? `
+- Niveau actuel: ${child.cubeMatchData.currentLevel || 'N/A'}
+- Meilleur score: ${child.cubeMatchData.bestScore || 'N/A'}
+- Parties jouées: ${child.cubeMatchData.totalGames || 'N/A'}
+- Temps total: ${child.cubeMatchData.totalTimeMs ? Math.round(child.cubeMatchData.totalTimeMs / 60000) : 'N/A'} minutes
+- Opérateur préféré: ${child.cubeMatchData.favoriteOperator || 'N/A'}
+- Dernière partie: ${child.cubeMatchData.lastPlayed ? new Date(child.cubeMatchData.lastPlayed).toLocaleDateString('fr-FR') : 'N/A'}
+` : '- Aucune donnée CubeMatch disponible'}
+
+👤 **PROFIL D'APPRENTISSAGE:**
+- Niveau général: ${child.level || 'N/A'}/100
+- Points forts: ${child.strengths?.join(', ') || 'Non définis'}
+- Difficultés: ${child.weaknesses?.join(', ') || 'Aucune identifiée'}
+- Préférences: ${child.preferences?.join(', ') || 'Non définies'}
+- Objectifs: ${child.profile?.learningGoals?.join(', ') || 'Non définis'}
+- Style d'apprentissage: ${child.profile?.learningStyle || 'Non défini'}
+
+💡 **RECOMMANDATIONS PERSONNALISÉES:**
+${(() => {
+  const avgScore = child.activities.length > 0 ? Math.round(child.activities.reduce((sum: number, a: any) => sum + (a.score || 0), 0) / child.activities.length) : 0;
+  const recentActivities = child.activities.slice(0, 3);
+  const recommendations = [];
+  
+  if (avgScore < 70) {
+    recommendations.push('- Besoin de soutien supplémentaire dans les domaines difficiles');
+  }
+  if (recentActivities.length === 0) {
+    recommendations.push('- Encourager la reprise des activités d\'apprentissage');
+  }
+  if (child.activities.length < 10) {
+    recommendations.push('- Augmenter la fréquence des sessions d\'apprentissage');
+  }
+  
+  return recommendations.length > 0 ? recommendations.join('\n') : '- Continuer sur la bonne voie !';
+})()}
+`).join('\n\n')}
 ` : 'AUCUNE DONNÉE D\'ENFANT DISPONIBLE'}
 
 ${dataInsights ? `
@@ -605,7 +669,27 @@ ANALYSE AUTOMATIQUE:
 ${dataInsights}
 ` : ''}
 
-IMPORTANT: Utilise ces données pour donner des réponses précises et personnalisées. Cite des chiffres concrets, des dates, des domaines spécifiques.
+IMPORTANT: Utilise ces données pour donner des réponses précises et personnalisées. 
+
+🎯 **RÈGLES DE CONTEXTUALISATION:**
+- Cite des chiffres concrets des performances de l'enfant
+- Mentionne les domaines spécifiques où il excelle ou a des difficultés
+- Réfère-toi aux activités récentes et aux tendances
+- Utilise les données CubeMatch si disponibles
+- Prends en compte l'historique des demandes parentales
+- Propose des actions concrètes basées sur les données
+
+📊 **EXEMPLES DE RÉPONSES CONTEXTUALISÉES:**
+- "Emma a un score moyen de 75/100 en mathématiques, avec une tendance à l'amélioration"
+- "Basé sur ses 12 activités récentes, Lucas préfère les additions (85/100) aux soustractions (65/100)"
+- "Emma a joué 8 parties de CubeMatch cette semaine, atteignant le niveau 15"
+- "Selon vos demandes précédentes, Emma a besoin d'encouragement en soustraction"
+
+💡 **QUAND UN PARENT DEMANDE:**
+- "Comment va mon enfant ?" → Cite les scores moyens et tendances
+- "Que recommandes-tu ?" → Utilise les recommandations personnalisées
+- "Quels exercices ?" → Base-toi sur les domaines difficiles et préférences
+- "Temps passé ?" → Utilise les données de connexion et CubeMatch
 `}
 
 Langue: ${lang}.
