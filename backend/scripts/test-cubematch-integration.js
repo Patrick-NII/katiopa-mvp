@@ -1,4 +1,4 @@
-// Test de l'intégration CubeMatch dans Bubix
+// Test de l'intégration CubeMatch dans Bubix avec debug
 import fetch from 'node-fetch';
 
 async function testCubeMatchIntegration() {
@@ -58,8 +58,8 @@ async function testCubeMatchIntegration() {
     }
     
     const chatData = await chatResponse.json();
-    console.log('📝 Réponse Bubix:');
-    console.log(chatData.response);
+    console.log('📝 Réponse complète:', JSON.stringify(chatData, null, 2));
+          console.log('📝 Réponse Bubix:', chatData.text);
     
     // 3. Tester une question spécifique sur les opérations
     console.log('\n🔢 Test question sur les opérations...');
@@ -85,35 +85,8 @@ async function testCubeMatchIntegration() {
     }
     
     const chatData2 = await chatResponse2.json();
-    console.log('📝 Réponse Bubix:');
-    console.log(chatData2.response);
-    
-    // 4. Tester une question sur les recommandations
-    console.log('\n💡 Test question sur les recommandations...');
-    
-    const chatResponse3 = await fetch('http://localhost:3000/api/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Cookie': `authToken=${authToken}`
-      },
-      body: JSON.stringify({
-        messages: [{
-          id: '3',
-          text: 'Que recommandes-tu pour améliorer les performances en mathématiques ?',
-          sender: 'user',
-          timestamp: Date.now()
-        }]
-      })
-    });
-    
-    if (!chatResponse3.ok) {
-      throw new Error(`Erreur chat: ${chatResponse3.status}`);
-    }
-    
-    const chatData3 = await chatResponse3.json();
-    console.log('📝 Réponse Bubix:');
-    console.log(chatData3.response);
+    console.log('📝 Réponse complète 2:', JSON.stringify(chatData2, null, 2));
+          console.log('📝 Réponse Bubix 2:', chatData2.text);
     
     console.log('\n✅ Test d\'intégration CubeMatch terminé avec succès !');
     

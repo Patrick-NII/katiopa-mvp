@@ -9,158 +9,160 @@ datasource db {
 
 // Compte principal (une adresse email = un compte)
 model Account {
-  id                String        @id @default(cuid())
-  email             String        @unique
-  subscriptionType  SubscriptionType @default(FREE)
-  maxSessions       Int           @default(2)
-  isActive          Boolean       @default(true)
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  totalAccountConnectionDurationMs BigInt @default(0)
-  
+  id                               String           @id @default(cuid())
+  email                            String           @unique
+  subscriptionType                 SubscriptionType @default(FREE)
+  maxSessions                      Int              @default(2)
+  isActive                         Boolean          @default(true)
+  createdAt                        DateTime         @default(now())
+  updatedAt                        DateTime         @updatedAt
+  totalAccountConnectionDurationMs BigInt           @default(0)
+
   // Relations
-  userSessions      UserSession[]
-  conversations     Conversation[]
-  billingHistory    BillingRecord[]
-  planSeat          PlanSeat?
-  userInteractions  UserInteraction[]
-  userPrompts       UserPrompt[]
-  navigationSessions NavigationSession[]
-  performanceMetrics PerformanceMetric[]
+  userSessions        UserSession[]
+  conversations       Conversation[]
+  billingHistory      BillingRecord[]
+  planSeat            PlanSeat?
+  userInteractions    UserInteraction[]
+  userPrompts         UserPrompt[]
+  navigationSessions  NavigationSession[]
+  performanceMetrics  PerformanceMetric[]
   passwordResetTokens PasswordResetToken[]
 }
 
 // Session utilisateur (connexion avec ID/mot de passe)
 model UserSession {
-  id              String      @id @default(cuid())
-  accountId       String
-  sessionId       String      @unique
-  password        String
-  firstName       String
-  lastName        String
-  gender          Gender      @default(UNKNOWN)
-  userType        UserType    @default(CHILD)
-  age             Int?
-  grade           String?
-  country         String?
-  timezone        String?
-  preferences     Json?
-  isActive        Boolean     @default(true)
-  lastLoginAt     DateTime?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  totalConnectionDurationMs BigInt @default(0)
-  currentSessionStartTime DateTime?
-  
+  id                        String    @id @default(cuid())
+  accountId                 String
+  sessionId                 String    @unique
+  password                  String
+  firstName                 String
+  lastName                  String
+  gender                    Gender    @default(UNKNOWN)
+  userType                  UserType  @default(CHILD)
+  age                       Int?
+  grade                     String?
+  country                   String?
+  timezone                  String?
+  preferences               Json?
+  isActive                  Boolean   @default(true)
+  lastLoginAt               DateTime?
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+  totalConnectionDurationMs BigInt    @default(0)
+  currentSessionStartTime   DateTime?
+
   // Relations
-  account         Account     @relation(fields: [accountId], references: [id])
-  activities      Activity[]
-  conversations   Conversation[]
-  profile         UserProfile?
-  userInteractions UserInteraction[]
-  userPrompts     UserPrompt[]
-  navigationSessions NavigationSession[]
-  performanceMetrics PerformanceMetric[]
+  account             Account              @relation(fields: [accountId], references: [id])
+  activities          Activity[]
+  conversations       Conversation[]
+  profile             UserProfile?
+  userInteractions    UserInteraction[]
+  userPrompts         UserPrompt[]
+  navigationSessions  NavigationSession[]
+  performanceMetrics  PerformanceMetric[]
   passwordResetTokens PasswordResetToken[]
+  CubeMatchScore      CubeMatchScore[]
+  CubeMatchUserStats  CubeMatchUserStats?
 }
 
 // Profil détaillé de l'utilisateur
 model UserProfile {
-  id                    String      @id @default(cuid())
-  userSessionId         String      @unique
-  learningGoals         String[]
-  preferredSubjects     String[]
-  learningStyle         String?
-  difficulty            String?
-  sessionPreferences    Json?
-  interests            String[]
-  specialNeeds         String[]
-  customNotes          String?
-  parentWishes         String?
-  createdAt            DateTime     @default(now())
-  updatedAt            DateTime     @default(now())
-  
+  id                 String   @id @default(cuid())
+  userSessionId      String   @unique
+  learningGoals      String[]
+  preferredSubjects  String[]
+  learningStyle      String?
+  difficulty         String?
+  sessionPreferences Json?
+  interests          String[]
+  specialNeeds       String[]
+  customNotes        String?
+  parentWishes       String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now())
+
   // Relations
-  userSession          UserSession  @relation(fields: [userSessionId], references: [id])
+  userSession UserSession @relation(fields: [userSessionId], references: [id])
 }
 
 // Activités d'apprentissage
 model Activity {
-  id         String      @id @default(cuid())
+  id            String   @id @default(cuid())
   userSessionId String
-  domain     String
-  nodeKey    String
-  score      Int?
-  attempts   Int         @default(1)
-  durationMs Int?
-  createdAt  DateTime    @default(now())
-  
+  domain        String
+  nodeKey       String
+  score         Int?
+  attempts      Int      @default(1)
+  durationMs    Int?
+  createdAt     DateTime @default(now())
+
   // Relations
   userSession UserSession @relation(fields: [userSessionId], references: [id])
 }
 
 // Conversations avec l'IA
 model Conversation {
-  id              String      @id @default(cuid())
-  userSessionId   String
-  accountId       String
-  message         String
-  response        String
-  focus           String?
-  context         Json?
-  metadata        Json?
-  createdAt       DateTime    @default(now())
-  
+  id            String   @id @default(cuid())
+  userSessionId String
+  accountId     String
+  message       String
+  response      String
+  focus         String?
+  context       Json?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
   // Relations
-  userSession     UserSession @relation(fields: [userSessionId], references: [id])
-  account         Account     @relation(fields: [accountId], references: [id])
+  userSession UserSession @relation(fields: [userSessionId], references: [id])
+  account     Account     @relation(fields: [accountId], references: [id])
 }
 
 // Réinitialisation de mot de passe
 model PasswordResetToken {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   accountId     String
   userSessionId String
-  token         String   @unique
+  token         String    @unique
   expiresAt     DateTime
   usedAt        DateTime?
-  createdAt     DateTime @default(now())
+  createdAt     DateTime  @default(now())
 
   // Relations
-  account       Account     @relation(fields: [accountId], references: [id])
-  userSession   UserSession @relation(fields: [userSessionId], references: [id])
+  account     Account     @relation(fields: [accountId], references: [id])
+  userSession UserSession @relation(fields: [userSessionId], references: [id])
 }
 
 // Historique de facturation
 model BillingRecord {
-  id          String      @id @default(cuid())
+  id          String        @id @default(cuid())
   accountId   String
   amount      Float
-  currency    String      @default("EUR")
+  currency    String        @default("EUR")
   description String
   status      BillingStatus @default(PENDING)
-  billingDate DateTime    @default(now())
+  billingDate DateTime      @default(now())
   dueDate     DateTime
   paidAt      DateTime?
-  createdAt   DateTime    @default(now())
-  
+  createdAt   DateTime      @default(now())
+
   // Relations
-  account     Account     @relation(fields: [accountId], references: [id])
+  account Account @relation(fields: [accountId], references: [id])
 }
 
 // Limites du plan par compte (1-1)
 model PlanSeat {
-  id          String   @id @default(cuid())
-  accountId   String   @unique
+  id          String @id @default(cuid())
+  accountId   String @unique
   maxChildren Int
 
   // Relation vers le compte
-  account     Account  @relation(fields: [accountId], references: [id])
+  account Account @relation(fields: [accountId], references: [id])
 }
 
 // Interactions utilisateur (clicks, inputs, navigation)
 model UserInteraction {
-  id              String      @id @default(cuid())
+  id              String          @id @default(cuid())
   userSessionId   String
   accountId       String
   interactionType InteractionType
@@ -170,67 +172,129 @@ model UserInteraction {
   elementValue    String?
   pageUrl         String?
   pageTitle       String?
-  timestamp       DateTime    @default(now())
+  timestamp       DateTime        @default(now())
   metadata        Json?
-  sessionDuration Int?        // Durée de session en ms au moment de l'interaction
-  
+  sessionDuration Int? // Durée de session en ms au moment de l'interaction
+
   // Relations
-  userSession     UserSession @relation(fields: [userSessionId], references: [id])
-  account         Account     @relation(fields: [accountId], references: [id])
+  userSession UserSession @relation(fields: [userSessionId], references: [id])
+  account     Account     @relation(fields: [accountId], references: [id])
 }
 
 // Prompts et inputs utilisateur
 model UserPrompt {
-  id              String      @id @default(cuid())
-  userSessionId   String
-  accountId       String
-  promptType      PromptType
-  content         String
-  context         Json?
-  response        String?
-  responseTime    Int?        // Temps de réponse en ms
-  tokensUsed      Int?
-  modelUsed       String?
-  success         Boolean     @default(true)
-  errorMessage    String?
-  timestamp       DateTime    @default(now())
-  
+  id            String     @id @default(cuid())
+  userSessionId String
+  accountId     String
+  promptType    PromptType
+  content       String
+  context       Json?
+  response      String?
+  responseTime  Int? // Temps de réponse en ms
+  tokensUsed    Int?
+  modelUsed     String?
+  success       Boolean    @default(true)
+  errorMessage  String?
+  timestamp     DateTime   @default(now())
+
   // Relations
-  userSession     UserSession @relation(fields: [userSessionId], references: [id])
-  account         Account     @relation(fields: [accountId], references: [id])
+  userSession UserSession @relation(fields: [userSessionId], references: [id])
+  account     Account     @relation(fields: [accountId], references: [id])
 }
 
 // Sessions de navigation
 model NavigationSession {
-  id              String      @id @default(cuid())
-  userSessionId   String
-  accountId       String
-  startTime       DateTime    @default(now())
-  endTime         DateTime?
-  duration        Int?        // Durée en ms
-  pagesVisited    String[]    // URLs visitées
-  actionsPerformed Int        @default(0)
-  sessionData     Json?
-  
+  id               String    @id @default(cuid())
+  userSessionId    String
+  accountId        String
+  startTime        DateTime  @default(now())
+  endTime          DateTime?
+  duration         Int? // Durée en ms
+  pagesVisited     String[] // URLs visitées
+  actionsPerformed Int       @default(0)
+  sessionData      Json?
+
   // Relations
-  userSession     UserSession @relation(fields: [userSessionId], references: [id])
-  account         Account     @relation(fields: [accountId], references: [id])
+  userSession UserSession @relation(fields: [userSessionId], references: [id])
+  account     Account     @relation(fields: [accountId], references: [id])
 }
 
 // Métriques de performance
 model PerformanceMetric {
-  id              String      @id @default(cuid())
-  userSessionId   String
-  accountId       String
-  metricType      MetricType
-  value           Float
-  unit            String?
-  context         Json?
-  timestamp       DateTime    @default(now())
-  
+  id            String     @id @default(cuid())
+  userSessionId String
+  accountId     String
+  metricType    MetricType
+  value         Float
+  unit          String?
+  context       Json?
+  timestamp     DateTime   @default(now())
+
   // Relations
-  userSession     UserSession @relation(fields: [userSessionId], references: [id])
-  account         Account     @relation(fields: [accountId], references: [id])
+  userSession UserSession @relation(fields: [userSessionId], references: [id])
+  account     Account     @relation(fields: [accountId], references: [id])
+}
+
+// Modèles CubeMatch pour les données de jeu
+model CubeMatchScore {
+  id              String   @id @default(uuid())
+  user_id         String   @map("user_id")
+  username        String   @db.VarChar(255)
+  score           Int
+  level           Int
+  time_played_ms  BigInt   @map("time_played_ms")
+  operator        String   @db.VarChar(10)
+  target          Int
+  allow_diagonals Boolean  @default(false) @map("allow_diagonals")
+  created_at      DateTime @default(now()) @map("created_at")
+  updated_at      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  userSession UserSession @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("cubematch_scores")
+}
+
+model CubeMatchStats {
+  id                  String   @id @default(uuid())
+  total_games         BigInt   @default(0)
+  total_score         BigInt   @default(0)
+  average_score       Decimal  @default(0) @db.Decimal(10, 2)
+  best_score          Int      @default(0)
+  total_time_played   BigInt   @default(0)
+  average_time_played Decimal  @default(0) @db.Decimal(10, 2)
+  highest_level       Int      @default(1)
+  last_updated        DateTime @default(now())
+  total_players       Int      @default(0)
+  average_level       Decimal  @default(1) @db.Decimal(5, 2)
+  most_used_operator  String   @default("ADD") @db.VarChar(10)
+
+  @@map("cubematch_stats")
+}
+
+model CubeMatchUserStats {
+  id                  String   @id @default(uuid())
+  user_id             String   @unique @map("user_id")
+  username            String   @db.VarChar(255)
+  total_games         Int      @default(0)
+  total_score         BigInt   @default(0)
+  best_score          Int      @default(0)
+  average_score       Decimal  @default(0) @db.Decimal(10, 2)
+  highest_level       Int      @default(1)
+  total_time_played   BigInt   @default(0)
+  average_time_played Decimal  @default(0) @db.Decimal(10, 2)
+  total_combo_max     Int      @default(0)
+  total_cells_cleared Int      @default(0)
+  total_hints_used    Int      @default(0)
+  favorite_operator   String   @default("ADD") @db.VarChar(10)
+  last_played         DateTime @default(now())
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  // Relations
+  userSession UserSession @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("cubematch_user_stats")
 }
 
 // Enums pour les nouveaux modèles

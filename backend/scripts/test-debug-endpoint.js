@@ -1,8 +1,7 @@
-// Test direct de l'authentification en mode développement
 import fetch from 'node-fetch';
 
-async function testDirectAuth() {
-  console.log('🔍 Test direct de l\'authentification...\n');
+async function testDebugEndpoint() {
+  console.log('🔍 Test de l\'endpoint de debug...\n');
 
   // 1. Connexion pour obtenir un token
   console.log('🔐 Connexion pour obtenir un token...');
@@ -37,47 +36,24 @@ async function testDirectAuth() {
   console.log('🔑 Token extrait:', token ? token.substring(0, 50) + '...' : 'Aucun token');
   console.log('');
 
-  // 2. Test direct avec l'API frontend
-  console.log('💬 Test direct de l\'API frontend...');
+  // 2. Test de l'endpoint de debug
+  console.log('🔍 Test de l\'endpoint /api/test-auth...');
   
-  // Test avec Authorization header seulement
-  const response = await fetch('http://localhost:3000/api/chat', {
+  const response = await fetch('http://localhost:3000/api/test-auth', {
     method: 'POST',
     headers: { 
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    body: JSON.stringify({
-      messages: [{ id: '1', text: 'Qui suis-je exactement ?', sender: 'user', timestamp: Date.now() }],
-      persona: 'kid',
-      lang: 'fr'
-    })
+    body: JSON.stringify({})
   });
 
   const data = await response.json();
-  console.log('📝 Réponse complète:', JSON.stringify(data, null, 2));
-  console.log('');
-
-  // 3. Test avec un token invalide pour comparaison
-  console.log('🔍 Test avec token invalide pour comparaison...');
-  const invalidResponse = await fetch('http://localhost:3000/api/chat', {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer invalid_token'
-    },
-    body: JSON.stringify({
-      messages: [{ id: '1', text: 'Test avec token invalide', sender: 'user', timestamp: Date.now() }],
-      persona: 'kid',
-      lang: 'fr'
-    })
-  });
-
-  const invalidData = await invalidResponse.json();
-  console.log('📝 Réponse avec token invalide:', invalidData.text.substring(0, 100) + '...');
+  console.log('📝 Réponse de debug:', JSON.stringify(data, null, 2));
   console.log('');
 
   console.log('✅ Test terminé !');
 }
 
-testDirectAuth().catch(console.error);
+testDebugEndpoint().catch(console.error);
+
