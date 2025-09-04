@@ -1118,7 +1118,6 @@ async function getParentPromptsAndPreferences(parentAccountId: string) {
         userType: 'PARENT'
       },
       include: {
-        parentPreferences: true,
         profile: true
       }
     });
