@@ -38,10 +38,10 @@ export default function HelpChatButton() {
 
   const quickActions = [
     {
-      title: 'Comment utiliser Katiopa ?',
+              title: 'Comment utiliser CubeAI ?',
       description: 'Guide d\'utilisation de base',
       icon: BookOpen,
-      action: () => handleQuickAction('Comment utiliser Katiopa ?')
+              action: () => handleQuickAction('Comment utiliser CubeAI ?')
     },
     {
       title: 'Problème technique',
@@ -103,7 +103,7 @@ export default function HelpChatButton() {
     const lowerQuestion = question.toLowerCase()
     
     if (lowerQuestion.includes('utiliser') || lowerQuestion.includes('comment')) {
-      return `Voici comment utiliser Katiopa efficacement :
+      return `Voici comment utiliser CubeAI efficacement :
 
 1. **Dashboard** : Consultez vos statistiques et progression
 2. **Exercices** : Choisissez votre matière et commencez à pratiquer
@@ -135,7 +135,7 @@ Vos modifications seront automatiquement prises en compte par l'IA Coach !`
     }
     
     if (lowerQuestion.includes('premium') || lowerQuestion.includes('fonctionnalités')) {
-      return `Le compte Premium Katiopa vous offre :
+      return `Le compte Premium CubeAI vous offre :
 
 ✨ **Graphiques avancés** : Analyses détaillées de performance
 🎯 **Plan personnalisé** : Révision espacée et planning intelligent
@@ -160,7 +160,7 @@ L'IA Coach vous recommandera les exercices les plus adaptés !`
     return `Merci pour votre question ! Je vais vous aider au mieux.
 
 Pour une réponse plus précise, pourriez-vous reformuler ou préciser votre demande ? Je peux vous aider sur :
-• L'utilisation de Katiopa
+• L'utilisation de CubeAI
 • Les fonctionnalités disponibles
 • La résolution de problèmes
 • Votre progression et statistiques`
@@ -216,7 +216,7 @@ Pour une réponse plus précise, pourriez-vous reformuler ou préciser votre dem
                     <HelpCircle size={20} />
                   </motion.div>
                   <div>
-                    <h3 className="font-semibold">Assistant Katiopa</h3>
+                    <h3 className="font-semibold">Assistant CubeAI</h3>
                     <p className="text-blue-100 text-sm">Comment puis-je vous aider ?</p>
                   </div>
                 </div>

@@ -15,8 +15,17 @@ const ChatBubble = dynamic(() => import('./ChatBubble'), {
 
 interface ChatbotWrapperProps {
   subscriptionType?: 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE'
+  user?: {
+    id: string;
+    sessionId: string;
+    firstName: string;
+    lastName: string;
+    userType: string;
+    subscriptionType: string;
+  } | null;
+  childSessions?: any[];
 }
 
-export default function ChatbotWrapper({ subscriptionType = 'FREE' }: ChatbotWrapperProps) {
-  return <ChatBubble subscriptionType={subscriptionType} />
+export default function ChatbotWrapper({ subscriptionType = 'FREE', user, childSessions }: ChatbotWrapperProps) {
+  return <ChatBubble subscriptionType={subscriptionType} user={user} childSessions={childSessions} />
 }

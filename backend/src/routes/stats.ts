@@ -2,6 +2,26 @@ import express from 'express';
 import { requireAuth } from '../middleware/requireAuth';
 import { prisma } from '../prisma';
 
+// Fonction pour formater la durée en format lisible
+function formatDuration(minutes: number): string {
+  if (minutes < 60) {
+    return `${minutes} min`;
+  } else if (minutes < 1440) { // moins de 24h
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}min` : `${hours}h`;
+  } else {
+    const days = Math.floor(minutes / 1440);
+    const remainingHours = Math.floor((minutes % 1440) / 60);
+    const remainingMinutes = minutes % 60;
+    if (remainingHours > 0) {
+      return remainingMinutes > 0 ? `${days}j ${remainingHours}h ${remainingMinutes}min` : `${days}j ${remainingHours}h`;
+    } else {
+      return remainingMinutes > 0 ? `${days}j ${remainingMinutes}min` : `${days}j`;
+    }
+  }
+}
+
 const router = express.Router();
 
 // Route pour récupérer les statistiques des activités
@@ -159,7 +179,16 @@ router.get("/summary", requireAuth, async (req, res) => {
         averageScore,
         totalTime: totalTimeMinutes,
         domains: domainsWithAvg,
-        totalSessions: userSession.account.userSessions.length
+        totalSessions: userSession.account.userSessions.length,
+        // Ajouter le temps total depuis l'inscription
+        totalTimeSinceRegistration: {
+          totalMs: totalConnectionTimeMs,
+          totalMinutes: totalTimeMinutes,
+          totalHours: Math.floor(totalTimeMinutes / 60),
+          totalDays: Math.floor(totalTimeMinutes / (60 * 24)),
+          formatted: formatDuration(totalTimeMinutes)
+        },
+        accountCreatedAt: userSession.account.createdAt
       }
     });
   } catch (error) {

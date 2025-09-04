@@ -10,7 +10,6 @@ import {
   Shield, 
   Palette, 
   Globe,
-  Save,
   CheckCircle,
   Eye,
   EyeOff,
@@ -37,6 +36,7 @@ import {
 import AvatarSelector from './AvatarSelector'
 import { authAPI } from '@/lib/api'
 import { useAvatar } from '@/contexts/AvatarContext'
+import { useTheme } from '@/contexts/ThemeContext'
 
 interface SettingsTabProps {
   userType: 'CHILD' | 'PARENT' | 'TEACHER' | 'ADMIN'
@@ -105,7 +105,9 @@ type SettingsTabType = 'personalisation' | 'notifications' | 'privacy' | 'appear
 
 export default function SettingsTab({ userType }: SettingsTabProps) {
   const { selectedAvatar, updateAvatarFromSettings } = useAvatar()
+  const { theme, setTheme } = useTheme()
   const [activeTab, setActiveTab] = useState<SettingsTabType>('personalisation')
+  const [isMobile, setIsMobile] = useState(false)
   
   const [settings, setSettings] = useState<UserSettings>({
     avatarPath: '',
@@ -166,9 +168,6 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
     }
   })
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
-
   // Charger les réglages depuis le localStorage
   useEffect(() => {
     const savedSettings = localStorage.getItem('userSettings')
@@ -185,36 +184,30 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
   // Synchroniser l'avatar avec le contexte global
   useEffect(() => {
     if (selectedAvatar && selectedAvatar !== settings.avatarPath) {
-      setSettings(prev => ({ ...prev, avatarPath: selectedAvatar }))
+      setSettings(prev => {
+        const newSettings = { ...prev, avatarPath: selectedAvatar }
+        // Sauvegarder automatiquement
+        localStorage.setItem('userSettings', JSON.stringify(newSettings))
+        return newSettings
+      })
+      // Mettre à jour le contexte global immédiatement
+      updateAvatarFromSettings(selectedAvatar)
     }
   }, [selectedAvatar, settings.avatarPath])
 
-  // Sauvegarder les réglages
-  const saveSettings = async () => {
-    setIsLoading(true)
-    setSaveStatus('saving')
-
-    try {
-      // Simuler une sauvegarde API
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Sauvegarder dans le localStorage
-      localStorage.setItem('userSettings', JSON.stringify(settings))
-      
-      // Appliquer les réglages en temps réel
-      applySettings(settings)
-      
-      setSaveStatus('saved')
-      setTimeout(() => setSaveStatus('idle'), 2000)
-    } catch (error) {
-      setSaveStatus('error')
-      setTimeout(() => setSaveStatus('idle'), 3000)
-    } finally {
-      setIsLoading(false)
+  // Détecter si on est sur mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
     }
-  }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
-  // Appliquer les réglages en temps réel
+    // Appliquer les réglages en temps réel
   const applySettings = (newSettings: UserSettings) => {
     // Appliquer le thème
     if (newSettings.appearance.theme === 'dark') {
@@ -249,7 +242,12 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
   // Gérer le changement d'avatar
   const handleAvatarChange = (avatarPath: string) => {
     if (avatarPath && avatarPath.trim() !== '') {
-      setSettings(prev => ({ ...prev, avatarPath }))
+      setSettings(prev => {
+        const newSettings = { ...prev, avatarPath }
+        // Sauvegarder automatiquement
+        localStorage.setItem('userSettings', JSON.stringify(newSettings))
+        return newSettings
+      })
       // Mettre à jour le contexte global immédiatement
       updateAvatarFromSettings(avatarPath)
     }
@@ -259,17 +257,25 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
   const updateSetting = (category: keyof UserSettings, key: string, value: any) => {
     setSettings(prev => {
       const currentCategory = prev[category] as Record<string, any>
-      return {
+      const newSettings = {
         ...prev,
         [category]: {
           ...currentCategory,
           [key]: value
         }
       }
+      
+      // Sauvegarder automatiquement dans le localStorage
+      localStorage.setItem('userSettings', JSON.stringify(newSettings))
+      
+      // Appliquer les réglages en temps réel
+      applySettings(newSettings)
+      
+      return newSettings
     })
   }
 
-  // Composant Switch personnalisé
+  // Composant Switch personnalisé optimisé pour mobile
   const Switch = ({ 
     checked, 
     onChange, 
@@ -281,24 +287,24 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
     label: string
     description?: string
   }) => (
-    <div className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 transition-colors">
-      <div className="flex-1">
-        <label className="text-sm font-medium text-gray-900 cursor-pointer">
+    <div className="flex items-center justify-between p-3 md:p-4 rounded-lg hover:bg-gray-50 transition-colors">
+      <div className="flex-1 min-w-0">
+        <label className="text-sm md:text-base font-medium text-gray-900 cursor-pointer block">
           {label}
         </label>
         {description && (
-          <p className="text-xs text-gray-500 mt-1">{description}</p>
+          <p className="text-xs md:text-sm text-gray-500 mt-1 leading-relaxed">{description}</p>
         )}
       </div>
       <button
         onClick={() => onChange(!checked)}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+        className={`relative inline-flex h-8 w-14 md:h-6 md:w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex-shrink-0 ${
           checked ? 'bg-blue-600' : 'bg-gray-200'
         }`}
       >
         <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-            checked ? 'translate-x-6' : 'translate-x-1'
+          className={`inline-block h-6 w-6 md:h-4 md:w-4 transform rounded-full bg-white transition-transform shadow-sm ${
+            checked ? 'translate-x-7 md:translate-x-6' : 'translate-x-1'
           }`}
         />
       </button>
@@ -364,7 +370,11 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
     switch (activeTab) {
       case 'personalisation':
         return (
-          <div className="space-y-3">
+          <div className="space-y-4 md:space-y-6">
+            <div className="text-center md:text-left">
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Avatar et Personnalisation</h3>
+              <p className="text-sm md:text-base text-gray-600 mb-6">Personnalise ton avatar et tes préférences</p>
+            </div>
             <AvatarSelector
               currentAvatar={settings.avatarPath}
               onAvatarChange={handleAvatarChange}
@@ -375,8 +385,12 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
       case 'notifications':
         return (
-          <div className="space-y-3">
-            <div className="space-y-2">
+          <div className="space-y-4 md:space-y-6">
+            <div className="text-center md:text-left">
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Gestion des Notifications</h3>
+              <p className="text-sm md:text-base text-gray-600 mb-6">Configure tes préférences de notifications</p>
+            </div>
+            <div className="space-y-3 md:space-y-4">
               <Switch
                 checked={settings.notifications.email}
                 onChange={(checked) => updateSetting('notifications', 'email', checked)}
@@ -425,8 +439,12 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
       case 'privacy':
         return (
-          <div className="space-y-3">
-            <div className="space-y-2">
+          <div className="space-y-4 md:space-y-6">
+            <div className="text-center md:text-left">
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Confidentialité et Sécurité</h3>
+              <p className="text-sm md:text-base text-gray-600 mb-6">Gère tes paramètres de confidentialité</p>
+            </div>
+            <div className="space-y-3 md:space-y-4">
               <Switch
                 checked={settings.privacy.profileVisible}
                 onChange={(checked) => updateSetting('privacy', 'profileVisible', checked)}
@@ -469,57 +487,61 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
       case 'appearance':
         return (
-          <div className="space-y-3">
-            <div className="space-y-4">
+          <div className="space-y-4 md:space-y-6">
+            <div className="text-center md:text-left">
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Apparence et Interface</h3>
+              <p className="text-sm md:text-base text-gray-600 mb-6">Personnalise l'apparence de l'application</p>
+            </div>
+            <div className="space-y-4 md:space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm md:text-base font-medium text-gray-700 mb-3">
                   Thème
                 </label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-2 md:gap-3">
                   <button
-                    onClick={() => updateSetting('appearance', 'theme', 'light')}
-                    className={`p-4 rounded-xl border-2 transition-all ${
-                      settings.appearance.theme === 'light'
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-gray-300'
+                    onClick={() => setTheme('light')}
+                    className={`p-3 md:p-4 rounded-xl border-2 transition-all ${
+                      theme === 'light'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-400'
+                        : 'border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500 dark:bg-gray-800 dark:text-gray-300'
                     }`}
                   >
-                    <Sun className="w-6 h-6 mx-auto mb-2" />
-                    <span className="text-sm font-medium">Clair</span>
+                    <Sun className="w-5 h-5 md:w-6 md:h-6 mx-auto mb-2" />
+                    <span className="text-xs md:text-sm font-medium">Clair</span>
                   </button>
                   <button
-                    onClick={() => updateSetting('appearance', 'theme', 'dark')}
-                    className={`p-4 rounded-xl border-2 transition-all ${
-                      settings.appearance.theme === 'dark'
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-gray-300'
+                    onClick={() => setTheme('dark')}
+                    className={`p-3 md:p-4 rounded-xl border-2 transition-all ${
+                      theme === 'dark'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-400'
+                        : 'border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500 dark:bg-gray-800 dark:text-gray-300'
                     }`}
                   >
-                    <Moon className="w-6 h-6 mx-auto mb-2" />
-                    <span className="text-sm font-medium">Sombre</span>
+                    <Moon className="w-5 h-5 md:w-6 md:h-6 mx-auto mb-2" />
+                    <span className="text-xs md:text-sm font-medium">Sombre</span>
                   </button>
                   <button
-                    onClick={() => updateSetting('appearance', 'theme', 'auto')}
-                    className={`p-4 rounded-xl border-2 transition-all ${
-                      settings.appearance.theme === 'auto'
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-gray-300'
+                    onClick={() => setTheme('auto')}
+                    className={`p-3 md:p-4 rounded-xl border-2 transition-all ${
+                      theme === 'auto'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-400'
+                        : 'border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500 dark:bg-gray-800 dark:text-gray-300'
                     }`}
                   >
-                    <Monitor className="w-6 h-6 mx-auto mb-2" />
-                    <span className="text-sm font-medium">Auto</span>
+                    <Monitor className="w-5 h-5 md:w-6 md:h-6 mx-auto mb-2" />
+                    <span className="text-xs md:text-sm font-medium">Auto</span>
                   </button>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm md:text-base font-medium text-gray-700 mb-3">
                   Langue
                 </label>
                 <select
                   value={settings.appearance.language}
                   onChange={(e) => updateSetting('appearance', 'language', e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base"
                 >
                   <option value="fr">Français</option>
                   <option value="en">English</option>
@@ -528,42 +550,42 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm md:text-base font-medium text-gray-700 mb-3">
                   Taille de police
                 </label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-2 md:gap-3">
                   <button
                     onClick={() => updateSetting('appearance', 'fontSize', 'small')}
-                    className={`p-4 rounded-xl border-2 transition-all ${
+                    className={`p-3 md:p-4 rounded-xl border-2 transition-all ${
                       settings.appearance.fontSize === 'small'
                         ? 'border-blue-500 bg-blue-50 text-blue-700'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <Type className="w-5 h-5 mx-auto mb-2" />
-                    <span className="text-sm font-medium">Petite</span>
+                    <Type className="w-4 h-4 md:w-5 md:h-5 mx-auto mb-2" />
+                    <span className="text-xs md:text-sm font-medium">Petite</span>
                   </button>
                   <button
                     onClick={() => updateSetting('appearance', 'fontSize', 'medium')}
-                    className={`p-4 rounded-xl border-2 transition-all ${
+                    className={`p-3 md:p-4 rounded-xl border-2 transition-all ${
                       settings.appearance.fontSize === 'medium'
                         ? 'border-blue-500 bg-blue-50 text-blue-700'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <Type className="w-6 h-6 mx-auto mb-2" />
-                    <span className="text-sm font-medium">Moyenne</span>
+                    <Type className="w-5 h-5 md:w-6 md:h-6 mx-auto mb-2" />
+                    <span className="text-xs md:text-sm font-medium">Moyenne</span>
                   </button>
                   <button
                     onClick={() => updateSetting('appearance', 'fontSize', 'large')}
-                    className={`p-4 rounded-xl border-2 transition-all ${
+                    className={`p-3 md:p-4 rounded-xl border-2 transition-all ${
                       settings.appearance.fontSize === 'large'
                         ? 'border-blue-500 bg-blue-50 text-blue-700'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <Type className="w-7 h-7 mx-auto mb-2" />
-                    <span className="text-sm font-medium">Grande</span>
+                    <Type className="w-6 h-6 md:w-7 md:h-7 mx-auto mb-2" />
+                    <span className="text-xs md:text-sm font-medium">Grande</span>
                   </button>
                 </div>
               </div>
@@ -600,8 +622,12 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
       case 'accessibility':
         return (
-          <div className="space-y-3">
-            <div className="space-y-2">
+          <div className="space-y-4 md:space-y-6">
+            <div className="text-center md:text-left">
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Accessibilité</h3>
+              <p className="text-sm md:text-base text-gray-600 mb-6">Adapte l'interface à tes besoins</p>
+            </div>
+            <div className="space-y-3 md:space-y-4">
               <Switch
                 checked={settings.accessibility.screenReader}
                 onChange={(checked) => updateSetting('accessibility', 'screenReader', checked)}
@@ -668,16 +694,20 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
       case 'learning':
         return (
-          <div className="space-y-3">
-            <div className="space-y-4">
+          <div className="space-y-4 md:space-y-6">
+            <div className="text-center md:text-left">
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Préférences d'Apprentissage</h3>
+              <p className="text-sm md:text-base text-gray-600 mb-6">Configure ton expérience d'apprentissage</p>
+            </div>
+            <div className="space-y-4 md:space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm md:text-base font-medium text-gray-700 mb-3">
                   Niveau de difficulté
                 </label>
                 <select
                   value={settings.learning.difficulty}
                   onChange={(e) => updateSetting('learning', 'difficulty', e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-3 md:p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base"
                 >
                   <option value="easy">Facile - Débutant</option>
                   <option value="medium">Moyen - Intermédiaire</option>
@@ -736,8 +766,12 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
 
       case 'performance':
         return (
-          <div className="space-y-3">
-            <div className="space-y-2">
+          <div className="space-y-4 md:space-y-6">
+            <div className="text-center md:text-left">
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Performance et Optimisation</h3>
+              <p className="text-sm md:text-base text-gray-600 mb-6">Optimise les performances de l'application</p>
+            </div>
+            <div className="space-y-3 md:space-y-4">
               <Switch
                 checked={settings.performance.autoOptimize}
                 onChange={(checked) => updateSetting('performance', 'autoOptimize', checked)}
@@ -778,74 +812,75 @@ export default function SettingsTab({ userType }: SettingsTabProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-2 md:p-6">
       
       {/* Padding haut */}
-      <div className="h-24"></div>
+      <div className="h-16 md:h-24"></div>
 
-      {/* Navigation par onglets */}
-      <div className="max-w-8xl mx-auto mb-8">
-        <div className="flex flex-wrap justify-center gap-2">
-          {tabs.map((tab) => {
-            const Icon = tab.icon
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as SettingsTabType)}
-                className={`flex items-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? `bg-gradient-to-r ${tab.color} text-white shadow-lg transform scale-105`
-                    : 'bg-white/80 text-gray-700 hover:bg-white hover:shadow-md'
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span>{tab.label}</span>
-              </button>
-            )
-          })}
-        </div>
+      {/* Navigation par onglets - Mobile: vertical, Desktop: horizontal */}
+      <div className="max-w-8xl mx-auto mb-4 md:mb-8">
+        {isMobile ? (
+          // Navigation mobile: sélecteur déroulant
+          <div className="px-4">
+            <select
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value as SettingsTabType)}
+              className="w-full p-4 bg-white rounded-xl border border-gray-200 shadow-sm text-lg font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              {tabs.map((tab) => {
+                const Icon = tab.icon
+                return (
+                  <option key={tab.id} value={tab.id} className="flex items-center space-x-2">
+                    <Icon className="w-5 h-5" />
+                    {tab.label}
+                  </option>
+                )
+              })}
+            </select>
+          </div>
+        ) : (
+          // Navigation desktop: onglets horizontaux
+          <div className="flex flex-wrap justify-center gap-2">
+            {tabs.map((tab) => {
+              const Icon = tab.icon
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as SettingsTabType)}
+                  className={`flex items-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                    activeTab === tab.id
+                      ? `bg-gradient-to-r ${tab.color} text-white shadow-lg transform scale-105`
+                      : 'bg-white/80 text-gray-700 hover:bg-white hover:shadow-md'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span>{tab.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
 
-      {/* Bouton de sauvegarde */}
-      <div className="flex justify-center mb-8">
-        <button
-          onClick={saveSettings}
-          disabled={isLoading}
-          className={`px-8 py-3 bg-gradient-to-r ${colors.gradient} text-white rounded-2xl font-medium hover:shadow-lg transition-all duration-200 flex items-center space-x-2 ${
-            isLoading ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-        >
-          {saveStatus === 'saving' && <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-          {saveStatus === 'saved' && <CheckCircle className="w-5 h-5" />}
-          {saveStatus === 'error' && <div className="w-5 h-5">⚠️</div>}
-          {saveStatus === 'idle' && <Save className="w-5 h-5" />}
-          <span>
-            {saveStatus === 'saving' ? 'Sauvegarde...' :
-             saveStatus === 'saved' ? 'Sauvegardé !' :
-             saveStatus === 'error' ? 'Erreur' : 'Sauvegarder les réglages'}
-          </span>
-        </button>
-      </div>
-
-      {/* Contenu de l'onglet actif avec espaces réduits */}
-      <div className="max-w-6xl mx-auto px-8 space-y-3">
+      {/* Contenu de l'onglet actif */}
+      <div className="max-w-6xl mx-auto px-2 md:px-8 space-y-3">
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="p-4 rounded-2xl"
+          className="p-3 md:p-4 rounded-2xl bg-white/80 backdrop-blur-sm"
         >
           {renderTabContent()}
         </motion.div>
       </div>
 
       {/* Informations sur la sauvegarde */}
-      <div className="mt-8 text-center">
-        <div className={`inline-flex items-center px-4 py-2 rounded-full ${colors.bg} ${colors.border}`}>
+      <div className="mt-6 md:mt-8 text-center px-4">
+        <div className={`inline-flex items-center px-3 md:px-4 py-2 rounded-full ${colors.bg} ${colors.border}`}>
           <CheckCircle className={`w-4 h-4 ${colors.text} mr-2`} />
-          <span className={`text-sm ${colors.text}`}>
-            Tous les réglages sont sauvegardés automatiquement et appliqués en temps réel
+          <span className={`text-xs md:text-sm ${colors.text}`}>
+            ✓ Tous les réglages sont sauvegardés automatiquement et appliqués en temps réel
           </span>
         </div>
       </div>

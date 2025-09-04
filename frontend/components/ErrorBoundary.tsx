@@ -132,7 +132,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </p>
               <div className="flex justify-center space-x-4">
                 <a
-                  href="mailto:support@katiopa.com"
+                  href="mailto:support@cubeai.com"
                   className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                 >
                   Contacter le support

@@ -75,7 +75,7 @@ export default function PersonalizedWelcome({
     if (!age) return null
     
     if (age >= 5 && age <= 7) {
-      return "Tu es dans la tranche d'âge parfaite pour apprendre avec Katiopa !"
+      return "Tu es dans la tranche d'âge parfaite pour apprendre avec CubeAI !"
     } else if (age < 5) {
       return "Tu commences tôt l'apprentissage, c'est excellent !"
     } else if (age > 7) {
@@ -119,7 +119,7 @@ export default function PersonalizedWelcome({
 
   const getMembershipMessage = () => {
     if (daysSinceRegistration === 0) {
-      return "Bienvenue ! C'est ton premier jour avec Katiopa ! 🎉"
+      return "Bienvenue ! C'est ton premier jour avec CubeAI ! 🎉"
     } else if (daysSinceRegistration === 1) {
       return "Tu es membre depuis hier, bienvenue ! 👋"
     } else if (daysSinceRegistration < 7) {

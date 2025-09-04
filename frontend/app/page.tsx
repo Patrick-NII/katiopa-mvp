@@ -3,15 +3,18 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import { Sun, Moon, Monitor } from 'lucide-react'
 import { MulticolorText, CubeAILogo, AnimatedMulticolorText } from '@/components/MulticolorText'
 import ChatbotWrapper from '@/components/chatbot/ChatbotWrapper'
 import AnimatedIcon from '@/components/AnimatedIcons'
 import { authAPI } from '@/lib/api'
 import DecorativeCubes from '@/components/DecorativeCubes';
+import { useTheme } from '@/contexts/ThemeContext'
 
 export default function HomePage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
+  const { theme, setTheme } = useTheme()
   useEffect(() => {
     let mounted = true
     authAPI.verify().then(res => {
@@ -93,22 +96,41 @@ export default function HomePage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
       <DecorativeCubes variant="minimal" />
       {/* Navigation */}
-      <nav className="bg-white/20 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
+      <nav className="bg-white/20 dark:bg-gray-900/20 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="font-title text-white text-2xl">C</span>
-                </div>
-              <CubeAILogo className="text-4xl" />
+            <div className="flex items-center space-x-2 md:space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <span className="font-title text-white text-2xl">C</span>
+              </div>
+              <CubeAILogo className="text-2xl md:text-4xl" />
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 md:space-x-4">
+              {/* Bouton de mode nuit */}
+              <button
+                onClick={() => {
+                  if (theme === 'light') {
+                    setTheme('dark')
+                  } else if (theme === 'dark') {
+                    setTheme('auto')
+                  } else {
+                    setTheme('light')
+                  }
+                }}
+                className="p-2 rounded-lg text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                title={`Thème actuel: ${theme === 'light' ? 'Clair' : theme === 'dark' ? 'Sombre' : 'Auto'}`}
+              >
+                {theme === 'light' && <Sun className="w-5 h-5" />}
+                {theme === 'dark' && <Moon className="w-5 h-5" />}
+                {theme === 'auto' && <Monitor className="w-5 h-5" />}
+              </button>
+
               {user ? (
                 <>
-                  <div className="flex items-center gap-2 text-sm font-medium">
+                  <div className="hidden md:flex items-center gap-2 text-sm font-medium">
                     <div className="flex items-center">
                       <span className="font-title text-xl font-bold multicolor-id">
                         {user.sessionId.split('').map((char: string, index: number) => (
@@ -132,7 +154,7 @@ export default function HomePage() {
                       <span className="inline-block w-2 h-2 rounded-full bg-green-500 ml-2"></span>
                     </div>
                   </div>
-                  <a href="/dashboard" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 py-2 rounded-lg text-sm font-medium">Espace personnel</a>
+                  <a href="/dashboard" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-3 md:px-5 py-2 rounded-lg text-xs md:text-sm font-medium">Espace personnel</a>
 
                   <button
                     onClick={async () => { try { await authAPI.logout(); localStorage.setItem('cubeai:auth', 'logged_out:' + Date.now()); router.push('/login'); } catch {} }}
@@ -140,8 +162,6 @@ export default function HomePage() {
                     aria-label="Se déconnecter"
                     className="p-2 rounded-lg text-gray-700 hover:text-red-600 transition-all duration-300 hover:bg-red-50 hover:scale-110"
                   >
-                    
-                    {/* Icône de déconnexion moderne */}
                     <svg 
                       className="w-5 h-5" 
                       fill="none" 
@@ -160,15 +180,14 @@ export default function HomePage() {
                 </>
               ) : (
                 <>
-                <div className="flex items-center space-x-4">
-              <Link href="/login" className="font-body text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100">
-                Connexion
-              </Link>
-              <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
-                Commencer gratuitement
-              </Link>
-            </div>
-                  
+                  <div className="flex items-center space-x-2 md:space-x-4">
+                    <Link href="/login" className="font-body text-gray-600 hover:text-gray-900 px-2 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors hover:bg-gray-100">
+                      Connexion
+                    </Link>
+                    <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-3 md:px-6 py-2 rounded-lg text-xs md:text-sm font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                      Commencer
+                    </Link>
+                  </div>
                 </>
               )}
             </div>
@@ -180,18 +199,18 @@ export default function HomePage() {
       <section className="relative overflow-hidden">
         {/* Éléments décoratifs supprimés - effets de brillance retirés */}
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 lg:py-32 relative z-10">
           <div className="text-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="mb-8"
+              className="mb-6 md:mb-8"
             >
               <AnimatedMulticolorText 
                 text="Apprendre en s'amusant" 
                 variant="h1" 
-                className="leading-tight"
+                className="leading-tight text-3xl md:text-5xl lg:text-6xl"
                 staggerDelay={0.1}
               />
             </motion.div>
@@ -200,13 +219,13 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-subtitle-xl text-gray-600 mb-12 max-w-3xl mx-auto"
+              className="font-subtitle-xl text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto"
             >
-              Découvrez <strong className="text-blue-700">CubeAI</strong>, la première plateforme 
-              d'<strong className="text-blue-700">apprentissage intelligent</strong> qui révolutionne 
-              l'<strong className="text-blue-700">éducation des enfants de 5 à 7 ans</strong>. 
-              Notre technologie d'<strong className="text-blue-700">intelligence artificielle adaptative</strong> 
-              crée des <strong className="text-blue-700">parcours personnalisés</strong> qui s'ajustent 
+              Découvrez <strong className="text-blue-700 dark:text-blue-400">CubeAI</strong>, la première plateforme 
+              d'<strong className="text-blue-700 dark:text-blue-400">apprentissage intelligent</strong> qui révolutionne 
+              l'<strong className="text-blue-700 dark:text-blue-400">éducation des enfants de 5 à 7 ans</strong>. 
+              Notre technologie d'<strong className="text-blue-700 dark:text-blue-400">intelligence artificielle adaptative</strong> 
+              crée des <strong className="text-blue-700 dark:text-blue-400">parcours personnalisés</strong> qui s'ajustent 
               aux besoins de chaque enfant.
             </motion.p>
 
@@ -214,7 +233,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-body-lg text-gray-600 mb-12 max-w-4xl mx-auto"
+              className="font-body-lg text-gray-600 dark:text-gray-300 mb-12 max-w-4xl mx-auto"
             >
               <strong>Mathématiques fondamentales, lecture et écriture, sciences naturelles, développement de la créativité</strong> - 
               chaque domaine est abordé avec une approche <strong>ludique et progressive</strong>. Les parents suivent les progrès 
@@ -235,7 +254,7 @@ export default function HomePage() {
       </section>
 
       {/* Section des plans */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <motion.div
@@ -245,7 +264,7 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="mb-6"
             >
-              <h2 className="text-xl font-subtitle text-center text-gray-800 mb-6">
+              <h2 className="text-xl font-subtitle text-center text-gray-800 dark:text-gray-200 mb-6">
                 Choisissez votre plan d'abonnement
               </h2>
             </motion.div>
@@ -254,7 +273,7 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="font-subtitle-lg text-gray-600 max-w-2xl mx-auto"
+              className="font-subtitle-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
             >
               Des options flexibles et transparentes pour tous les budgets et toutes les tailles de famille. 
               Commencez gratuitement et évoluez selon vos besoins.

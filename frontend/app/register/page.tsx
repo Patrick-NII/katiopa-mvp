@@ -851,7 +851,7 @@ const SummarySidebar = () => {
                   </motion.div>
                 )}
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 items-stretch max-w-7xl mx-auto">
                   {subscriptionPlans.map((plan, index) => {
                     const IconComponent = plan.icon
                     const isSelected = formData.subscriptionType === plan.id
@@ -861,10 +861,10 @@ const SummarySidebar = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: index * 0.07 }}
-                        className={`relative rounded-3xl p-6 lg:p-7 border-2 flex flex-col h-full cursor-pointer transition-all duration-300 transform hover:-translate-y-0.5 ${
+                        className={`relative rounded-3xl p-4 md:p-6 lg:p-7 border-2 flex flex-col h-full cursor-pointer transition-all duration-300 transform hover:-translate-y-0.5 ${
                           isSelected
                             ? `${plan.selected.container} ${plan.selected.glow} text-white -translate-y-1 ring-4 ${plan.selected.ring} ring-offset-0`
-                            : 'border-gray-200 hover:border-gray-300 bg-white shadow-xl hover:shadow-2xl'
+                            : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 bg-white dark:bg-gray-800 shadow-xl hover:shadow-2xl'
                         } ${plan.cardClass}`}
                         onClick={() => handleInputChange('subscriptionType', plan.id)}
                       >
@@ -876,43 +876,43 @@ const SummarySidebar = () => {
                           </div>
                         )}
 
-                        <div className="text-center mb-6">
-                          <div className={`w-14 h-14 lg:w-16 lg:h-16 bg-gradient-to-r ${plan.color} rounded-2xl flex items-center justify-center mx-auto mb-3`}>
-                            <IconComponent className="w-7 h-7 lg:w-8 lg:h-8 text-white" />
+                        <div className="text-center mb-4 md:mb-6">
+                          <div className={`w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-gradient-to-r ${plan.color} rounded-2xl flex items-center justify-center mx-auto mb-3`}>
+                            <IconComponent className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-white" />
                           </div>
 
-                          <h3 className={`text-xl lg:text-2xl font-bold mb-2 ${isSelected ? 'text-white' : 'text-gray-100'}`}>
+                          <h3 className={`text-lg md:text-xl lg:text-2xl font-bold mb-2 ${isSelected ? 'text-white' : 'text-gray-900 dark:text-gray-100'}`}>
                             {plan.name}
                           </h3>
 
                           <div className="mb-2">
-                            <span className={`text-3xl lg:text-4xl font-bold ${isSelected ? 'text-white' : 'text-gray-100'}`}>
+                            <span className={`text-2xl md:text-3xl lg:text-4xl font-bold ${isSelected ? 'text-white' : 'text-gray-900 dark:text-gray-100'}`}>
                               {plan.price}
                             </span>
-                            <span className={`text-base lg:text-lg ml-2 ${isSelected ? 'text-white/80' : 'text-gray-100'}`}>
+                            <span className={`text-sm md:text-base lg:text-lg ml-2 ${isSelected ? 'text-white/80' : 'text-gray-600 dark:text-gray-300'}`}>
                               {plan.period}
                             </span>
                           </div>
 
-                          <p className={`${isSelected ? 'text-white/90' : 'text-gray-100'} mb-3 lg:mb-4 text-base lg:text-lg`}>
+                          <p className={`${isSelected ? 'text-white/90' : 'text-gray-600 dark:text-gray-300'} mb-3 lg:mb-4 text-sm md:text-base lg:text-lg`}>
                             {plan.description}
                           </p>
 
                           {/* pill sessions — transparent si non sélectionné */}
-                          <div className={`${isSelected ? 'bg-white/15 ring-1 ring-white/20' : 'bg-transparent'} rounded-xl p-2.5 lg:p-3`}>
-                            <p className={`font-semibold text-sm lg:text-base ${isSelected ? 'text-white drop-shadow-sm' : 'text-gray-100'}`}>
+                          <div className={`${isSelected ? 'bg-white/15 ring-1 ring-white/20' : 'bg-transparent'} rounded-xl p-2 md:p-2.5 lg:p-3`}>
+                            <p className={`font-semibold text-xs md:text-sm lg:text-base ${isSelected ? 'text-white drop-shadow-sm' : 'text-gray-700 dark:text-gray-200'}`}>
                               {plan.maxMembers === 2 ? '2 sessions' : plan.maxMembers === 6 ? '6 sessions' : '1 session'} • {plan.maxMembers === 2 ? '1 parent + 1 enfant' : plan.maxMembers === 6 ? '1 parent + 5 enfants' : '1 parent'}
                             </p>
                           </div>
                         </div>
 
-                        <ul className="space-y-3 lg:space-y-4 mb-6 lg:mb-8 flex-grow">
+                        <ul className="space-y-2 md:space-y-3 lg:space-y-4 mb-4 md:mb-6 lg:mb-8 flex-grow">
                           {plan.features.map((feature, featureIndex) => (
-                            <li key={featureIndex} className="flex items-start space-x-3">
-                              <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${isSelected ? 'bg-white/20' : 'bg-green-100'}`}>
-                                <Check className={`w-3 h-3 ${isSelected ? 'text-white' : 'text-green-600'}`} />
+                            <li key={featureIndex} className="flex items-start space-x-2 md:space-x-3">
+                              <div className={`w-4 h-4 md:w-5 md:h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${isSelected ? 'bg-white/20' : 'bg-green-100 dark:bg-green-900/30'}`}>
+                                <Check className={`w-2.5 h-2.5 md:w-3 md:h-3 ${isSelected ? 'text-white' : 'text-green-600 dark:text-green-400'}`} />
                               </div>
-                              <span className={`${isSelected ? 'text-white' : 'text-gray-100'} text-sm lg:text-base`}>
+                              <span className={`${isSelected ? 'text-white' : 'text-gray-700 dark:text-gray-200'} text-xs md:text-sm lg:text-base`}>
                                 {feature}
                               </span>
                             </li>
@@ -935,28 +935,28 @@ const SummarySidebar = () => {
                   })}
                 </div>
 
-                <div className="mt-10 lg:mt-12">
-                  <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 max-w-4xl mx-auto">
+                <div className="mt-8 md:mt-10 lg:mt-12">
+                  <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 md:gap-6 max-w-4xl mx-auto">
                     {/* Champ Email à gauche */}
                     <div className="lg:w-1/2">
-                      <label className="block text-sm font-semibold text-gray-100 mb-3 text-left">
+                      <label className="block text-sm md:text-base font-semibold text-gray-700 dark:text-gray-200 mb-3 text-left">
                         
                       </label>
                       <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-100 w-5 h-5" />
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
                         <input
                           type="email"
                           value={formData.email}
                           onChange={(e) => handleInputChange('email', e.target.value)}
-                          className="w-full pl-12 pr-4 py-4 border-b-2 border-gray-300 focus:border-b-blue-500 transition-all bg-transparent"
+                          className="w-full pl-12 pr-4 py-3 md:py-4 border-b-2 border-gray-300 dark:border-gray-600 focus:border-b-blue-500 dark:focus:border-b-blue-400 transition-all bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                           placeholder="Email de contact  *"
                         />
                         {emailStatus !== 'idle' && (
                           <div className="mt-2">
                             <p className={
-                              emailStatus === 'available' ? 'text-emerald-600 text-sm' :
-                              emailStatus === 'checking' ? 'text-gray-600 text-sm' :
-                              'text-red-600 text-sm'
+                              emailStatus === 'available' ? 'text-emerald-600 dark:text-emerald-400 text-sm' :
+                              emailStatus === 'checking' ? 'text-gray-600 dark:text-gray-400 text-sm' :
+                              'text-red-600 dark:text-red-400 text-sm'
                             }>
                               {emailHelper}
                             </p>
@@ -965,7 +965,7 @@ const SummarySidebar = () => {
                                 <button
                                   type="button"
                                   onClick={() => router.push('/login')}
-                                  className="text-sm font-semibold text-blue-600 hover:text-blue-800"
+                                  className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                                 >
                                   Se connecter →
                                 </button>
@@ -982,13 +982,13 @@ const SummarySidebar = () => {
                     onClick={handleNext}
                         whileHover={{ scale: 1.04 }}
                         whileTap={{ scale: 0.96 }}
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-12 lg:px-16 py-3.5 lg:py-4 rounded-2xl text-lg lg:text-xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl"
+                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 md:px-12 lg:px-16 py-3 md:py-3.5 lg:py-4 rounded-2xl text-base md:text-lg lg:text-xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl"
                   >
                     Continuer
                   </motion.button>
                     </div>
                   </div>
-                  <p className="mt-4 text-sm text-gray-600 text-center">
+                  <p className="mt-4 text-xs md:text-sm text-gray-600 dark:text-gray-300 text-center">
                     3 mois offerts sur Starter. Mettez à niveau quand vous voulez — vos progrès sont conservés.
                   </p>
                 </div>

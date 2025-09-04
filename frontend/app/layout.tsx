@@ -5,6 +5,7 @@ import './globals.css'
 // Import des polices Google Fonts pour la charte typographique CubeAI
 import { Sniglet, Fredoka, Roboto } from 'next/font/google'
 import ClientRouteWrapper from '@/components/ClientRouteWrapper'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 
 // Configuration de Sniglet ExtraBold 800 pour les gros titres
 const sniglet = Sniglet({
@@ -45,9 +46,11 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${inter.className} ${sniglet.variable} ${fredoka.variable} ${roboto.variable}`}>
-        <ClientRouteWrapper>
-          {children}
-        </ClientRouteWrapper>
+        <ThemeProvider>
+          <ClientRouteWrapper>
+            {children}
+          </ClientRouteWrapper>
+        </ThemeProvider>
       </body>
     </html>
   )

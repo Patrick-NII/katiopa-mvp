@@ -12,6 +12,8 @@ type ReqBody = {
   messages: Array<{ id:string; text:string; sender:'user'|'bot'; timestamp:number }>;
   persona?: 'kid' | 'pro';
   lang?: 'fr' | 'en';
+  user?: any;
+  childSessions?: any[];
 }
 
 // Interface pour les informations utilisateur
@@ -226,7 +228,9 @@ function buildPrompts({
   rag,
   history,
   userQuery,
-  intent
+  intent,
+  user,
+  childSessions
 }: {
   persona: 'kid' | 'pro'
   role: 'child' | 'parent'
@@ -236,12 +240,45 @@ function buildPrompts({
   history: any[]
   userQuery: string
   intent: string
+  user?: any
+  childSessions?: any[]
 }) {
   
   const system = `
-Tu es Bubix, l'assistant IA de CubeAI.
+Tu es Bubix, l'assistant IA intelligent de CubeAI.
 
-Public: ${role === 'child' ? 'enfant 5–7 ans' : 'parent'}.
+CONTEXTE UTILISATEUR:
+${user ? `
+- Nom: ${user.firstName} ${user.lastName}
+- Type: ${user.userType}
+- Abonnement: ${user.subscriptionType}
+${childSessions && childSessions.length > 0 ? `
+- Enfants: ${childSessions.map(child => `${child.firstName} ${child.lastName} (${child.userType})`).join(', ')}
+` : ''}
+` : '- Utilisateur non connecté'}
+
+${role === 'child' ? `
+MODE ENFANT (5-7 ans):
+- Tu es un assistant d'apprentissage amical et patient
+- Utilise un langage simple, des phrases courtes
+- Encourage et félicite les efforts
+- Propose des exercices adaptés au niveau
+- Explique les concepts de manière ludique
+- Aide avec les mathématiques, la lecture, les sciences
+- Pose des questions pour vérifier la compréhension
+- Utilise des exemples concrets et familiers
+` : `
+MODE PARENT:
+- Tu es un assistant parental spécialisé dans l'éducation
+- Fournis des conseils pédagogiques et des analyses
+- Aide à comprendre les progrès des enfants
+- Propose des stratégies d'apprentissage
+- Réponds aux questions sur l'utilisation de la plateforme
+- Donne des recommandations personnalisées
+- Analyse les données de performance des enfants
+- Suggère des activités complémentaires
+`}
+
 Langue: ${lang}.
 Ton: ${persona === 'kid' ? 'bienveillant, simple, ludique' : 'clair, concis, orienté actions'}.
 
@@ -309,14 +346,16 @@ function getModelForSubscription(subscriptionType: string): string {
 
 // Fonction pour vérifier si le LLM est activé
 function isLLMEnabled(subscriptionType: string): boolean {
-  return subscriptionType !== 'FREE'
+  // Bubix est accessible à tous les utilisateurs connectés
+  // Les fonctionnalités avancées sont limitées selon l'abonnement
+  return true
 }
 
 // Fonction pour obtenir le nombre max de tokens
 function getMaxTokensForSubscription(subscriptionType: string): number {
   switch (subscriptionType) {
     case 'FREE':
-      return 0
+      return 200 // Limité pour les comptes gratuits
     case 'PRO':
       return 400
     case 'PRO_PLUS':
@@ -324,7 +363,7 @@ function getMaxTokensForSubscription(subscriptionType: string): number {
     case 'ENTERPRISE':
       return 1000
     default:
-      return 0
+      return 200
   }
 }
 
@@ -414,31 +453,28 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Utilisateur connecté - workflow complet
+    // Utilisateur connecté - workflow complet avec contexte utilisateur
     const intent = detectIntent(userQuery)
     
-    // Si l'utilisateur demande ses informations personnelles, les fournir directement
-    if (intent === 'personal_info') {
-      const profileInfo = `👤 **Profil Utilisateur :**
-📧 Email : ${userInfo.email || 'Non renseigné'}
-👨‍👩‍👧‍👦 Type : ${userInfo.userType === 'PARENT' ? 'Parent' : 'Enfant'}
-📋 Nom : ${userInfo.firstName} ${userInfo.lastName}
-🆔 Session ID : ${userInfo.sessionId}
-💎 Abonnement : ${userInfo.subscriptionType}
-✅ Statut : Actif`
-
-      return NextResponse.json({
-        text: `🔍 **Vos informations personnelles :**\n\n${profileInfo}\n\n💡 **Note :** Ces informations sont privées et ne sont visibles que par vous.`,
-        actions: [],
-        userInfo: {
-          email: userInfo.email,
-          sessionId: userInfo.sessionId,
-          name: `${userInfo.firstName} ${userInfo.lastName}`,
-          userType: userInfo.userType,
-          subscriptionType: userInfo.subscriptionType
-        }
-      })
-    }
+    // Construire le contexte utilisateur
+    const userContext = await getUserContext(userInfo)
+    
+    // Récupérer les snippets RAG
+    const ragSnippets = getRAGSnippets(intent, userQuery)
+    
+    // Construire les prompts avec le contexte utilisateur
+    const { messages } = buildPrompts({
+      persona,
+      role: userContext.role,
+      lang,
+      context: userContext.displayName,
+      rag: ragSnippets,
+      history: body.messages,
+      userQuery,
+      intent,
+      user: userInfo,
+      childSessions: body.childSessions
+    })
 
     // Vérifier si le LLM est activé pour cet abonnement
     if (!isLLMEnabled(userInfo.subscriptionType)) {
@@ -451,31 +487,6 @@ export async function POST(request: NextRequest) {
         error: 'LLM_NOT_AVAILABLE'
       })
     }
-
-    // Workflow complet : Récupérer le contexte utilisateur
-    const userContext = await getUserContext(userInfo)
-    
-    // Récupérer les extraits RAG
-    const ragSnippets = getRAGSnippets(intent, userQuery)
-    
-    // Construire le contexte
-    const context = `Utilisateur: ${userContext.displayName}
-Role: ${userContext.role}
-Objectifs: ${JSON.stringify(userContext.goals) || 'n/a'}
-Progression (3 derniers):
-${userContext.progress?.map(p => `- ${p.domain}: level ${p.level}, stats: ${JSON.stringify(p.stats)}`).join('\n') || 'n/a'}`
-
-    // Construire les prompts selon le workflow
-    const { messages } = buildPrompts({
-      persona,
-      role: userContext.role,
-      lang,
-      context,
-      rag: ragSnippets,
-      history: body.messages,
-      userQuery,
-      intent
-    })
 
     const key = process.env.OPENAI_API_KEY
     if (!key || key === 'sk-your-openai-api-key-here') {

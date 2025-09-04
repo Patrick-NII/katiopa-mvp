@@ -67,30 +67,15 @@ export function useRealTimeStatus({ childSessions, refreshInterval = 10000 }: Us
     }
   }, [childSessions])
 
-  // Polling automatique avec nettoyage des sessions orphelines
+  // Polling automatique
   useEffect(() => {
     fetchSessionStatuses()
-    
-    const interval = setInterval(async () => {
-      // Nettoyer les sessions orphelines avant de récupérer les statuts
-      try {
-        await fetch('/api/sessions/cleanup-orphaned-sessions', {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-      } catch (error) {
-        console.warn('Erreur lors du nettoyage des sessions orphelines:', error)
-      }
-      
-      fetchSessionStatuses()
-    }, refreshInterval)
-    
+
+    const interval = setInterval(fetchSessionStatuses, refreshInterval)
     return () => clearInterval(interval)
   }, [fetchSessionStatuses, refreshInterval])
 
+  // Mise à jour manuelle
   const refreshStatus = useCallback(() => {
     fetchSessionStatuses()
   }, [fetchSessionStatuses])
