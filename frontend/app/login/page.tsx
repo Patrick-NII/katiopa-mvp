@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { User, Lock, Eye, EyeOff, ArrowRight, User as UserIcon, LogOut } from 'lucide-react';
 import { authAPI } from '@/lib/api';
 import Navbar from '@/components/NavBar';
 import DecorativeCubes from '@/components/DecorativeCubes';
+import PublicBubix from '@/components/PublicBubix';
+import FloatingBubixButton from '@/components/FloatingBubixButton';
 
 export default function LoginPage() {
   const [sessionId, setSessionId] = useState('');
@@ -14,6 +16,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showBubix, setShowBubix] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -166,6 +169,16 @@ export default function LoginPage() {
                 <span>Mot de passe oublié ?</span>
               </a>
             </div>
+
+            {/* Bouton Bubix */}
+            <div className="text-center pt-4">
+              <button
+                onClick={() => setShowBubix(true)}
+                className="font-button bg-white/80 backdrop-blur-sm hover:bg-white text-gray-700 border border-gray-300 hover:border-gray-400 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                💬 Tester Bubix
+              </button>
+            </div>
           </div>
 
           {/* Notes importantes */}
@@ -179,6 +192,34 @@ export default function LoginPage() {
         </motion.div>
         </div>
       </div>
+
+      {/* Modal Bubix */}
+      <AnimatePresence>
+        {showBubix && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowBubix(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="absolute inset-4 bg-white rounded-2xl shadow-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="h-full">
+                <PublicBubix />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Pastille flottante Bubix */}
+      <FloatingBubixButton />
     </div>
   );
 }

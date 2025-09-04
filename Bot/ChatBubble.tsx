@@ -387,9 +387,9 @@ export default function ChatBubble(){
               <div className="space-y-3">
                 {messages.map(m => (
                   <motion.div key={m.id} className={`flex ${m.sender==='user'?'justify-end':'justify-start'}`} initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{duration:0.15}}>
-                    <div className={`max-w-[85%] p-3 rounded-2xl ${m.sender==='user' ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-gray-800 rounded-bl-md shadow-sm'}`}>
-                      <p className="text-[14px] whitespace-pre-wrap leading-relaxed">{m.text}</p>
-                      <p className={`text-[10px] mt-1 ${m.sender==='user'?'text-blue-100':'text-gray-500'}`}>
+                                          <div className={`max-w-[85%] p-3 rounded-2xl ${m.sender==='user' ? 'bg-blue-600 text-white rounded-br-md' : 'bg-white text-gray-900 rounded-bl-md shadow-sm'}`}>
+                        <p className="text-[14px] whitespace-pre-wrap leading-relaxed">{m.text}</p>
+                        <p className={`text-[10px] mt-1 ${m.sender==='user'?'text-white':'text-gray-500'}`}>
                         {new Date(m.timestamp).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}
                       </p>
                     </div>

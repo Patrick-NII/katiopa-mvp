@@ -274,11 +274,11 @@ export default function IACoachChat({ user, account, isOpen, onClose }: IACoachC
                     <div className={`rounded-2xl px-4 py-3 ${
                       message.type === 'user'
                         ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 text-gray-800'
+                        : 'bg-gray-100 text-gray-900'
                     }`}>
                       <p className="text-sm leading-relaxed">{message.content}</p>
                       <div className={`text-xs mt-2 ${
-                        message.type === 'user' ? 'text-blue-100' : 'text-gray-500'
+                        message.type === 'user' ? 'text-white' : 'text-gray-500'
                       }`}>
                         {message.timestamp.toLocaleTimeString('fr-FR', { 
                           hour: '2-digit', 

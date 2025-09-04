@@ -282,12 +282,12 @@ Pour une réponse plus précise, pourriez-vous reformuler ou préciser votre dem
                         className={`max-w-[80%] p-3 rounded-lg ${
                           message.type === 'user'
                             ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-800'
+                            : 'bg-gray-100 text-gray-900'
                         }`}
                       >
                         <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                         <p className={`text-xs mt-1 ${
-                          message.type === 'user' ? 'text-blue-100' : 'text-gray-500'
+                          message.type === 'user' ? 'text-white' : 'text-gray-500'
                         }`}>
                           {message.timestamp.toLocaleTimeString('fr-FR', { 
                             hour: '2-digit', 
