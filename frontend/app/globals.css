@@ -447,45 +447,67 @@ label, input, textarea, select {
     inset 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 
-/* Styles pour le mode sombre */
+/* Styles pour le mode sombre - Dégradé Indigo-Bleu Nuit */
 @layer base {
   /* Transitions fluides pour les changements de thème */
   * {
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
   
-  /* Mode sombre - Overrides des couleurs par défaut */
+  /* Mode sombre - Dégradé Indigo-Bleu Nuit */
   .dark {
     color-scheme: dark;
   }
   
   .dark body {
-    background-color: #0a0f1c;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
     color: #e2e8f0;
   }
   
+  /* Titres H1-H5 en gris clair */
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5 {
+    color: #f1f5f9 !important;
+    text-shadow: none !important;
+  }
+  
+  /* Paragraphes et texte en gris clair */
+  .dark p, .dark span, .dark div, .dark li {
+    color: #cbd5e0 !important;
+  }
+  
+  /* Suppression des ombres qui cassent le design */
+  .dark .shadow-sm,
+  .dark .shadow-md,
+  .dark .shadow-lg,
+  .dark .shadow-xl,
+  .dark .shadow-2xl {
+    box-shadow: none !important;
+  }
+  
+  /* Arrière-plans avec dégradé indigo-bleu nuit */
   .dark .bg-white {
-    background-color: #1a2332;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   }
   
   .dark .bg-gray-50 {
-    background-color: #0a0f1c;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   }
   
   .dark .bg-gray-100 {
-    background-color: #1a2332;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   }
   
   .dark .bg-gray-200 {
-    background-color: #2d3748;
+    background: linear-gradient(135deg, #334155 0%, #475569 100%);
   }
   
+  /* Textes avec contraste optimal */
   .dark .text-gray-900 {
-    color: #f7fafc;
+    color: #f8fafc;
   }
   
   .dark .text-gray-800 {
-    color: #edf2f7;
+    color: #f1f5f9;
   }
   
   .dark .text-gray-700 {
@@ -497,140 +519,87 @@ label, input, textarea, select {
   }
   
   .dark .text-gray-500 {
-    color: #a0aec0;
-  }
-  
-  .dark .border-gray-200 {
-    border-color: #2d3748;
-  }
-  
-  .dark .border-gray-300 {
-    border-color: #4a5568;
-  }
-  
-  .dark .hover\:bg-gray-50:hover {
-    background-color: #1a2332;
-  }
-  
-  .dark .hover\:bg-gray-100:hover {
-    background-color: #2d3748;
-  }
-  
-  /* Ombres adaptées pour le mode sombre - plus subtiles */
-  .dark .shadow-sm {
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
-  }
-  
-  .dark .shadow-md {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-  }
-  
-  .dark .shadow-lg {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-  }
-  
-  .dark .shadow-xl {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .dark .shadow-2xl {
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Styles spécifiques pour les boutons de thème */
-  .dark .bg-blue-50 {
-    background-color: #1e3a8a;
-  }
-  
-  .dark .text-blue-700 {
-    color: #93c5fd;
-  }
-  
-  .dark .border-blue-500 {
-    border-color: #3b82f6;
-  }
-  
-  .dark .hover\:border-gray-300:hover {
-    border-color: #475569;
-  }
-  
-  .dark .hover\:border-gray-500:hover {
-    border-color: #64748b;
-  }
-  
-  /* Styles pour les composants spécifiques */
-  .dark .bg-gradient-to-br {
-    background-image: linear-gradient(to bottom right, #0f172a, #1e293b);
-  }
-  
-  .dark .bg-gradient-to-r {
-    background-image: linear-gradient(to right, #1e293b, #334155);
-  }
-  
-  .dark .text-white {
-    color: #f1f5f9;
-  }
-  
-  .dark .text-gray-300 {
-    color: #cbd5e1;
-  }
-  
-  .dark .text-gray-400 {
     color: #94a3b8;
   }
   
-  /* Styles pour les boutons et interactions */
+  /* Bordures subtiles */
+  .dark .border-gray-200 {
+    border-color: #334155;
+  }
+  
+  .dark .border-gray-300 {
+    border-color: #475569;
+  }
+  
+  /* Hover states avec dégradé */
+  .dark .hover\:bg-gray-50:hover {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  }
+  
+  .dark .hover\:bg-gray-100:hover {
+    background: linear-gradient(135deg, #334155 0%, #475569 100%);
+  }
+  
+  /* Dégradés principaux */
+  .dark .bg-gradient-to-br {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  }
+  
+  .dark .bg-gradient-to-r {
+    background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #475569 100%);
+  }
+  
+  /* Texte blanc pour les éléments importants */
+  .dark .text-white {
+    color: #f8fafc;
+  }
+  
+  /* Exception pour les textes sur fonds colorés */
+  .dark .bg-blue-600 .text-white,
+  .dark .bg-purple-600 .text-white,
+  .dark .bg-gradient-to-r .text-white,
+  .dark [class*="bg-blue"] .text-white,
+  .dark [class*="bg-purple"] .text-white,
+  .dark [class*="bg-gradient"] .text-white {
+    color: #ffffff !important;
+  }
+  
+  /* Boutons et interactions */
   .dark .hover\:bg-white-100:hover {
-    background-color: #334155;
+    background: linear-gradient(135deg, #334155 0%, #475569 100%);
   }
   
   .dark .hover\:bg-white-50:hover {
-    background-color: #1e293b;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   }
   
   .dark .bg-white-100 {
-    background-color: #334155;
+    background: linear-gradient(135deg, #334155 0%, #475569 100%);
   }
   
   .dark .bg-white-50 {
-    background-color: #1e293b;
-  }
-  
-  .dark .text-gray-300 {
-    color: #cbd5e1;
-  }
-  
-  .dark .text-red-300 {
-    color: #fca5a5;
-  }
-  
-  .dark .text-red-700 {
-    color: #ef4444;
-  }
-  
-  .dark .bg-red-100 {
-    background-color: #7f1d1d;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   }
   
   /* Couleurs de branding CubeAI pour le mode sombre */
   .dark .bg-blue-600 {
-    background-color: #3b82f6;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   }
   
   .dark .bg-purple-600 {
-    background-color: #8b5cf6;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
   }
   
   .dark .bg-pink-600 {
-    background-color: #ec4899;
+    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
   }
   
   .dark .bg-green-600 {
-    background-color: #10b981;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   }
   
   .dark .bg-orange-600 {
-    background-color: #f59e0b;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   }
   
   /* Textes avec meilleur contraste */
@@ -654,7 +623,7 @@ label, input, textarea, select {
     color: #fbbf24;
   }
   
-  /* Bordures avec meilleur contraste */
+  /* Bordures colorées */
   .dark .border-blue-600 {
     border-color: #3b82f6;
   }
@@ -675,60 +644,97 @@ label, input, textarea, select {
     border-color: #f59e0b;
   }
   
-  /* Améliorations spécifiques pour la visibilité */
+  /* Textes gris clairs */
   .dark .text-gray-300 {
-    color: #e2e8f0;
-  }
-  
-  .dark .text-gray-400 {
     color: #cbd5e0;
   }
   
-  .dark .text-gray-500 {
-    color: #a0aec0;
+  .dark .text-gray-400 {
+    color: #94a3b8;
   }
   
-  /* Couleurs d'accent pour les éléments interactifs */
+  .dark .text-gray-500 {
+    color: #64748b;
+  }
+  
+  /* Couleurs de fond plus claires */
   .dark .bg-blue-500 {
-    background-color: #3b82f6;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   }
   
   .dark .bg-purple-500 {
-    background-color: #8b5cf6;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
   }
   
   .dark .bg-pink-500 {
-    background-color: #ec4899;
+    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
   }
   
   .dark .bg-green-500 {
-    background-color: #10b981;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   }
   
   .dark .bg-orange-500 {
-    background-color: #f59e0b;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   }
   
-  /* Hover states améliorés */
+  /* Hover states pour les couleurs */
   .dark .hover\:bg-blue-600:hover {
-    background-color: #2563eb;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   }
   
   .dark .hover\:bg-purple-600:hover {
-    background-color: #7c3aed;
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
   }
   
   .dark .hover\:bg-pink-600:hover {
-    background-color: #db2777;
+    background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
   }
   
   .dark .hover\:bg-green-600:hover {
-    background-color: #059669;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
   }
   
   .dark .hover\:bg-orange-600:hover {
-    background-color: #d97706;
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
   }
+  
+  /* Bordures hover */
+  .dark .hover\:border-gray-300:hover {
+    border-color: #475569;
+  }
+  
+  .dark .hover\:border-gray-500:hover {
+    border-color: #64748b;
+  }
+  
+  /* Couleurs d'erreur */
+  .dark .text-red-300 {
+    color: #fca5a5;
+  }
+  
+  .dark .text-red-700 {
+    color: #ef4444;
+  }
+  
+  .dark .bg-red-100 {
+    background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  }
+}
+
+/* Correction simple pour les couleurs de texte dans les chats */
+/* Forcer le texte blanc sur les fonds colorés */
+.bg-blue-600 .text-white,
+.bg-blue-500 .text-white,
+.bg-purple-600 .text-white,
+.bg-gradient-to-r .text-white {
+  color: #ffffff !important;
+}
+
+/* Forcer le texte sombre sur les fonds clairs */
+.bg-white .text-gray-900,
+.bg-gray-100 .text-gray-900 {
+  color: #111827 !important;
 }
 
 /* ================== EFFETS GLOSSY MÉTALLIQUES POUR CUBEMATCH ================== */

@@ -2,19 +2,21 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Sun, Moon, Monitor } from 'lucide-react'
 import { MulticolorText, CubeAILogo, AnimatedMulticolorText } from '@/components/MulticolorText'
-import ChatbotWrapper from '@/components/chatbot/ChatbotWrapper'
 import AnimatedIcon from '@/components/AnimatedIcons'
 import { authAPI } from '@/lib/api'
 import DecorativeCubes from '@/components/DecorativeCubes';
 import { useTheme } from '@/contexts/ThemeContext'
+import PublicBubix from '@/components/PublicBubix'
+import FloatingBubixButton from '@/components/FloatingBubixButton'
 
 export default function HomePage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const { theme, setTheme } = useTheme()
+  const [showBubix, setShowBubix] = useState(false)
   useEffect(() => {
     let mounted = true
     authAPI.verify().then(res => {
@@ -247,7 +249,15 @@ export default function HomePage() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
-              
+              <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 md:px-12 lg:px-16 py-3 md:py-3.5 lg:py-4 rounded-2xl text-base md:text-lg lg:text-xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105">
+                Commencer gratuitement
+              </Link>
+              <button
+                onClick={() => setShowBubix(true)}
+                className="font-button bg-white/80 backdrop-blur-sm hover:bg-white text-gray-700 border border-gray-300 hover:border-gray-400 px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                💬 Tester Bubix
+              </button>
             </motion.div>
           </div>
         </div>
@@ -859,8 +869,33 @@ export default function HomePage() {
         </div>
       </footer>
 
-      {/* Bulle de chat flottante */}
-              <ChatbotWrapper subscriptionType={user?.subscriptionType || 'FREE'} />
+      {/* Modal Bubix */}
+      <AnimatePresence>
+        {showBubix && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowBubix(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="absolute inset-4 bg-white rounded-2xl shadow-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="h-full">
+                <PublicBubix />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Pastille flottante Bubix */}
+      <FloatingBubixButton />
     </div>
   )
 }
