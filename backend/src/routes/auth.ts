@@ -612,12 +612,59 @@ router.post('/login', async (req, res) => {
 });
 
 // Déconnexion
-router.post('/logout', (req, res) => {
-  res.clearCookie('authToken');
-  res.json({
-    success: true,
-    message: 'Déconnexion réussie'
-  });
+router.post('/logout', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user?.userId;
+    
+    if (userId) {
+      // Mettre à jour le temps de connexion et marquer comme déconnecté
+      const userSession = await prisma.userSession.findUnique({
+        where: { id: userId }
+      });
+
+      if (userSession && userSession.currentSessionStartTime) {
+        // Calculer le temps de session actuelle
+        const now = new Date();
+        const sessionStart = new Date(userSession.currentSessionStartTime);
+        const currentSessionTimeMs = now.getTime() - sessionStart.getTime();
+
+        // Mettre à jour le temps total de connexion
+        await prisma.userSession.update({
+          where: { id: userId },
+          data: {
+            totalConnectionDurationMs: {
+              increment: BigInt(currentSessionTimeMs)
+            },
+            currentSessionStartTime: null // Marquer comme déconnecté
+          }
+        });
+
+        // Mettre à jour le temps total du compte
+        await prisma.account.update({
+          where: { id: userSession.accountId },
+          data: {
+            totalAccountConnectionDurationMs: {
+              increment: BigInt(currentSessionTimeMs)
+            }
+          }
+        });
+      }
+    }
+
+    res.clearCookie('authToken');
+    res.json({
+      success: true,
+      message: 'Déconnexion réussie'
+    });
+  } catch (error) {
+    console.error('❌ Erreur lors de la déconnexion:', error);
+    // Même en cas d'erreur, on déconnecte l'utilisateur
+    res.clearCookie('authToken');
+    res.json({
+      success: true,
+      message: 'Déconnexion réussie'
+    });
+  }
 });
 
 // Vérification de l'authentification (alias pour /me)

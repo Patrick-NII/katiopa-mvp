@@ -28,6 +28,15 @@ type Persona = 'kid' | 'pro'
 
 interface ChatBubbleProps {
   subscriptionType?: 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE'
+  user?: {
+    id: string;
+    sessionId: string;
+    firstName: string;
+    lastName: string;
+    userType: string;
+    subscriptionType: string;
+  } | null;
+  childSessions?: any[];
 }
 
 function now(){ return Date.now() }
@@ -63,14 +72,16 @@ function scoreKB(query: string, items: KBItem[]){
   }).sort((a,b)=>b.score-a.score)
 }
 
-async function askBackendLLM(history: Message[], userText: string, signal: AbortSignal, persona: Persona = 'pro'){
+async function askBackendLLM(history: Message[], userText: string, signal: AbortSignal, persona: Persona = 'pro', user?: any, childSessions?: any[]){
   try{
     const res = await fetch('/api/chat', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ 
         messages: history.concat({ id: uid(), text: userText, sender:'user', timestamp: now() }),
         persona: persona,
-        lang: 'fr'
+        lang: 'fr',
+        user: user,
+        childSessions: childSessions
       }),
       signal
     })
@@ -115,7 +126,7 @@ async function askBackendLLM(history: Message[], userText: string, signal: Abort
   }catch{ return null }
 }
 
-export default function ChatBubble({ subscriptionType = 'FREE' }: ChatBubbleProps){
+export default function ChatBubble({ subscriptionType = 'FREE', user, childSessions }: ChatBubbleProps){
   const [open, setOpen] = useState(false)
   const [maxi, setMaxi] = useState(false)
   const [persona, setPersona] = useState<Persona>('kid')
@@ -238,8 +249,8 @@ export default function ChatBubble({ subscriptionType = 'FREE' }: ChatBubbleProp
       return true
     }
     if(t === '/profile'){
-      // Utiliser l'API pour récupérer les informations du profil
-      const profileResponse = await askBackendLLM([], "montre-moi mon profil et mes informations personnelles", new AbortController().signal)
+      // Utiliser l'API pour récupérer les informations du profil avec contexte utilisateur
+      const profileResponse = await askBackendLLM([], "montre-moi mon profil et mes informations personnelles", new AbortController().signal, persona, user, childSessions)
       if (profileResponse && profileResponse.text) {
         pushBot(profileResponse.text)
       } else {
@@ -316,7 +327,7 @@ export default function ChatBubble({ subscriptionType = 'FREE' }: ChatBubbleProp
     const ctrl = new AbortController(); abortRef.current = ctrl
     
     const llm = await Promise.race([
-      askBackendLLM(messages, raw, ctrl.signal, persona),
+      askBackendLLM(messages, raw, ctrl.signal, persona, user, childSessions),
       (async()=>{ await sleep(3500); return null })(),
     ])
     setTyping(false)

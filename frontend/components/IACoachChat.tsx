@@ -88,14 +88,14 @@ export default function IACoachChat({ user, account, isOpen, onClose }: IACoachC
   // Messages de bienvenue selon le type
   function getWelcomeMessage(userType: string, subscriptionType: string) {
     if (userType === 'CHILD') {
-      return `Salut ! Je suis ton IA Coach Katiopa ! 🤖✨ Je suis là pour t'aider dans ton apprentissage. Tu peux me poser des questions sur tes exercices, me demander des conseils, ou juste discuter avec moi ! Que veux-tu faire aujourd'hui ?`
+      return `Salut ! Je suis ton IA Coach CubeAI ! 🤖✨ Je suis là pour t'aider dans ton apprentissage. Tu peux me poser des questions sur tes exercices, me demander des conseils, ou juste discuter avec moi ! Que veux-tu faire aujourd'hui ?`
     }
     
     if (userType === 'PARENT') {
-      return `Bonjour ! Je suis votre IA Coach Katiopa ! 🤖👨‍👩‍👧‍👦 Je dispose de toutes les données concernant vos enfants et peux vous donner des analyses détaillées, des recommandations personnalisées et répondre à toutes vos questions sur leur apprentissage. Comment puis-je vous aider aujourd'hui ?`
+      return `Bonjour ! Je suis votre IA Coach CubeAI ! 🤖👨‍👩‍👧‍👦 Je dispose de toutes les données concernant vos enfants et peux vous donner des analyses détaillées, des recommandations personnalisées et répondre à toutes vos questions sur leur apprentissage. Comment puis-je vous aider aujourd'hui ?`
     }
     
-    return `Bonjour ! Je suis votre IA Coach Katiopa ! 🤖✨ Je suis là pour vous accompagner dans l'apprentissage. Comment puis-je vous aider ?`
+    return `Bonjour ! Je suis votre IA Coach CubeAI ! 🤖✨ Je suis là pour vous accompagner dans l'apprentissage. Comment puis-je vous aider ?`
   }
 
   // Vérifier les limites selon l'abonnement
@@ -215,7 +215,7 @@ export default function IACoachChat({ user, account, isOpen, onClose }: IACoachC
                 <Bot size={24} />
               </div>
               <div>
-                <h2 className="text-xl font-bold">IA Coach Katiopa</h2>
+                <h2 className="text-xl font-bold">IA Coach CubeAI</h2>
                 <p className="text-blue-100 text-sm">
                   {isChild ? 'Ton professeur personnel 24h/24' : 'Votre coach éducatif intelligent'}
                 </p>

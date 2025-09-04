@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { 
@@ -24,23 +24,24 @@ import {
   Heart,
   Lightbulb,
   Globe,
-  Sparkles
+  Sparkles,
+  Brain,
+  MessageCircle,
+  Sun,
+  Moon,
+  Monitor
 } from 'lucide-react'
-import AnimatedIcon from './AnimatedIcons'
-import { CubeAILogo } from '@/components/MulticolorText'
+import { authAPI } from '@/lib/api'
+import { useAvatar } from '@/contexts/AvatarContext'
+import { useTheme } from '@/contexts/ThemeContext'
 
 export type NavigationTab = 
   | 'dashboard'
+  | 'bubix'
   | 'reglages'
   | 'facturation'
   | 'abonnements'
-  | 'informations'
-  | 'statistiques'
   | 'experiences'
-  | 'aide'
-  | 'communautes'
-  | 'photo'
-  | 'jeux'
   | 'family-members'
   | 'mathcube'
   | 'codecube'
@@ -56,6 +57,15 @@ interface SidebarNavigationProps {
   userType: 'CHILD' | 'PARENT' | 'TEACHER' | 'ADMIN'
   collapsed?: boolean
   onCollapsedChange?: (collapsed: boolean) => void
+}
+
+interface UserInfo {
+  sessionId: string
+  firstName: string
+  lastName: string
+  userType: string
+  subscriptionType: string
+  avatarPath?: string
 }
 
 interface TabItem {
@@ -95,6 +105,12 @@ export default function SidebarNavigation({
   onCollapsedChange
 }: SidebarNavigationProps) {
   const router = useRouter()
+  const { selectedAvatar } = useAvatar()
+  const { theme, setTheme, isDark } = useTheme()
+  const [user, setUser] = useState<UserInfo | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+  
   // Normaliser le type d'abonnement
   const normalizedType = userSubscriptionType?.toUpperCase() || 'FREE'
   
@@ -157,6 +173,99 @@ export default function SidebarNavigation({
 
   const colors = getSubscriptionColors()
 
+  // Charger les informations utilisateur
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      try {
+        const response = await authAPI.verify()
+        if (response.success && response.user) {
+          setUser(response.user)
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des informations utilisateur:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadUserInfo()
+  }, [])
+
+  // Détecter si on est sur mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Obtenir l'avatar par défaut basé sur le type d'utilisateur
+  const getDefaultAvatar = (userType: string) => {
+    const avatars = [
+      '/avatar/DF43E25C-2338-4B0A-B541-F3C9C6749C70_1_105_c.jpeg',
+      '/avatar/C680597F-C476-47A3-8AFD-5BF7480AB18F_1_105_c.jpeg',
+      '/avatar/9032E0D4-24CB-43FF-A828-D73BACF6A2CB_1_105_c.jpeg',
+      '/avatar/AFABF252-DC83-4CB8-96FD-F93E4848144F_1_105_c.jpeg',
+      '/avatar/630F3A22-5A32-4B9D-89F2-BE41C6D06047_1_105_c.jpeg',
+      '/avatar/B651627E-16E8-4B38-964C-52AC717EA8A6_1_105_c.jpeg',
+      '/avatar/4585039E-FE54-402B-967A-49505261DCCA_1_105_c.jpeg',
+      '/avatar/46634418-D597-4138-A12C-ED6DB610C8BD_1_105_c.jpeg',
+      '/avatar/1643C2A2-D991-4327-878E-6A5B94E0C320_1_105_c.jpeg',
+      '/avatar/17AF2653-1B7A-43F7-B376-0616FC6C0DBD_1_105_c.jpeg',
+      '/avatar/45840AC6-AFFE-46E0-9668-51CFD4C9740B_1_105_c.jpeg',
+      '/avatar/54E70A9E-8558-429D-87D6-52DECAAF983D_1_105_c.jpeg',
+      '/avatar/4456CAC7-32C6-4419-967E-291D37C9B368_1_105_c.jpeg',
+      '/avatar/358DF2B2-AE4E-4359-AB2E-DD45D240D78F_1_105_c.jpeg',
+      '/avatar/013BDBD7-230C-4ECD-B292-2C66159ACCBC_1_105_c.jpeg',
+      '/avatar/840CE97E-2237-41EE-9559-E3A152359D61_1_105_c.jpeg',
+      '/avatar/01A68700-5E6F-4EA5-A6B6-2E954AD53A0D_1_105_c.jpeg'
+    ]
+    
+    // Utiliser le hash du sessionId pour sélectionner un avatar de manière déterministe
+    if (user?.sessionId) {
+      const hash = user.sessionId.split('').reduce((a, b) => {
+        a = ((a << 5) - a) + b.charCodeAt(0)
+        return a & a
+      }, 0)
+      return avatars[Math.abs(hash) % avatars.length]
+    }
+    
+    return avatars[0]
+  }
+
+  // Obtenir les couleurs selon l'abonnement pour l'utilisateur
+  const getUserSubscriptionColors = () => {
+    const type = user?.subscriptionType?.toUpperCase() || 'FREE'
+    
+    switch (type) {
+      case 'PRO':
+        return {
+          gradient: 'from-blue-500 to-indigo-600',
+          text: 'text-blue-600'
+        }
+      case 'PREMIUM':
+      case 'PRO_PLUS':
+        return {
+          gradient: 'from-fuchsia-500 to-violet-600',
+          text: 'text-fuchsia-600'
+        }
+      case 'ENTERPRISE':
+        return {
+          gradient: 'from-purple-500 to-pink-600',
+          text: 'text-purple-600'
+        }
+      default:
+        return {
+          gradient: 'from-blue-500 to-violet-600',
+          text: 'text-blue-600'
+        }
+    }
+  }
+
   // Définir les onglets de navigation
   let tabs: TabItem[] = [
     {
@@ -216,20 +325,6 @@ export default function SidebarNavigation({
       available: !isChild // Seuls les parents ont accès
     },
     {
-      id: 'statistiques',
-      label: 'Statistiques',
-      icon: BarChart3,
-      description: 'Graphiques et analyses détaillées',
-      available: !isChild && !isFree // Parents + comptes Pro et supérieurs
-    },
-    {
-      id: 'informations',
-      label: 'Profil & Préférences',
-      icon: User,
-      description: 'Informations personnelles et objectifs',
-      available: !isChild // Seuls les parents ont accès au profil
-    },
-    {
       id: 'abonnements',
       label: 'Abonnements',
       icon: Crown,
@@ -252,49 +347,84 @@ export default function SidebarNavigation({
       available: !isChild && !isFree // Parents + comptes Pro et supérieurs
     },
     {
+      id: 'bubix',
+      label: 'Bubix',
+      icon: MessageCircle,
+      description: 'Assistant IA intelligent',
+      available: true
+    },
+    {
       id: 'reglages',
       label: 'Réglages',
       icon: Settings,
       description: 'Configuration et sécurité',
       available: true
-    },
-    {
-      id: 'aide',
-      label: 'Aide & Support',
-      icon: HelpCircle,
-      description: 'Documentation et assistance',
-      available: true
     }
   ]
 
-  // Espace enfant: Expériences + tous les cubes + communauté + réglages + aide
+  // Espace enfant: Expériences + tous les cubes + communauté + bubix + réglages
   if (isChild) {
-    const keep: NavigationTab[] = ['experiences', 'mathcube', 'codecube', 'playcube', 'sciencecube', 'dreamcube', 'comcube', 'reglages', 'aide']
+    const keep: NavigationTab[] = ['experiences', 'mathcube', 'codecube', 'playcube', 'sciencecube', 'dreamcube', 'comcube', 'bubix', 'reglages']
     tabs = tabs.filter(t => keep.includes(t.id))
   }
 
   return (
-    <motion.div 
-      className={"fixed left-0 top-0 h-screen bg-white shadow-2xl z-50 flex flex-col overflow-hidden"}
-      initial={{ width: collapsed ? 74 : 256 }}
-      animate={{ width: collapsed ? 75 : 256 }}
-      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-    >
+    <>
+      {/* Menu hamburger pour mobile */}
+      {isMobile && (
+        <button
+          onClick={toggleCollapsed}
+          className="fixed top-4 left-4 z-50 p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700"
+          aria-label="Menu"
+        >
+          <div className="w-6 h-6 flex flex-col justify-center items-center">
+            <div className={`w-5 h-1 bg-gray-600 dark:bg-gray-300 rounded-full transition-all duration-300 ${!collapsed ? 'rotate-45 translate-y-1.5' : ''}`}></div>
+            <div className={`w-5 h-1 bg-gray-600 dark:bg-gray-300 rounded-full transition-all duration-300 mt-1 ${!collapsed ? 'opacity-0' : ''}`}></div>
+            <div className={`w-5 h-1 bg-gray-600 dark:bg-gray-300 rounded-full transition-all duration-300 mt-1 ${!collapsed ? '-rotate-45 -translate-y-1.5' : ''}`}></div>
+          </div>
+        </button>
+      )}
+
+      {/* Overlay sombre pour mobile */}
+      {isMobile && !collapsed && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={toggleCollapsed}
+        />
+      )}
+
+      {/* Sidebar */}
+      <motion.div 
+        className={`fixed left-0 top-0 h-screen bg-white dark:bg-gray-900 shadow-2xl z-50 flex flex-col overflow-hidden ${
+          isMobile && collapsed ? 'w-0' : ''
+        }`}
+        initial={{ 
+          width: isMobile ? (collapsed ? 0 : 280) : (collapsed ? (isMobile ? 64 : 74) : 256),
+          x: isMobile && collapsed ? -280 : 0
+        }}
+        animate={{ 
+          width: isMobile ? (collapsed ? 0 : 280) : (collapsed ? (isMobile ? 64 : 75) : 256),
+          x: isMobile && collapsed ? -280 : 0
+        }}
+        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+      >
       {/* En-tête de la sidebar — branding unifié */}
-      <div className="relative h-16 px-3 pr-10 border-b border-gray-200 flex items-center">
+      <div className="relative h-16 px-3 pr-10 border-b border-gray-200 dark:border-gray-700 flex items-center">
         <div className="flex items-center gap-3 w-full">
-                      <div className={`w-10 h-10 bg-gradient-to-r ${colors.gradient} rounded-lg flex items-center justify-center shadow-lg flex-shrink-0`}>
+          <div className={`w-10 h-10 bg-gradient-to-r ${colors.gradient} rounded-lg flex items-center justify-center shadow-lg flex-shrink-0`}>
             <span className="font-title text-white text-2xl leading-none">C</span>
           </div>
           {!collapsed && (
-            <div className="min-w-0">
-              <CubeAILogo className="text-4xl" />
+            <div className="min-w-0 hidden md:block">
+              <div className="logo-multicolor text-4xl">
+                <span>C</span><span>u</span><span>b</span><span>e</span><span>A</span><span>I</span>
+              </div>
             </div>
           )}
           {/* Bouton rétractable aligné au logo */}
           <button 
             onClick={toggleCollapsed} 
-            className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-gray-100 text-gray-600"
+            className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
             aria-label={collapsed ? 'Déplier la navigation' : 'Replier la navigation'}
             aria-expanded={!collapsed}
             title={collapsed ? 'Déplier' : 'Replier'}
@@ -315,19 +445,31 @@ export default function SidebarNavigation({
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
                 className={`
-                  group relative w-full flex items-center gap-2 px-2 py-2 rounded-lg text-sm font-semibold
+                  group relative w-full flex items-center gap-3 px-2 py-1 rounded-lg text-sm font-semibold
                   ${activeTab === tab.id
-                    ? `bg-gradient-to-r ${colors.gradient} text-white shadow-lg`
-                    : 'text-gray-700'
+                    ? tab.id === 'bubix'
+                      ? 'bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 text-blue-50 shadow-lg animate-metallic'
+                      : `bg-gradient-to-r ${colors.gradient} text-white shadow-lg`
+                    : tab.id === 'bubix'
+                      ? 'text-blue-600 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 dark:text-blue-400 dark:bg-gray-800 dark:hover:bg-gray-700'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }
                 `}
                 title={tab.label}
                 aria-label={tab.label}
               >
-                <div className={`${activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-10 text-gray-800'} w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0`}>
-                                  {tab.icon === Cube3DIcon ? (
-                  <Cube3DIcon size={20} colors={colors} />
-                ) : (
+                <div className={`${
+                  activeTab === tab.id 
+                    ? tab.id === 'bubix'
+                      ? 'bg-blue-100/40 text-blue-50 animate-metallic'
+                      : 'bg-white/20 text-white'
+                    : tab.id === 'bubix'
+                      ? 'bg-gradient-to-r from-blue-400 to-indigo-400 text-blue-50 shadow-lg dark:bg-gray-700 dark:text-blue-400'
+                      : 'bg-gray-10 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                } w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0`}>
+                  {tab.icon === Cube3DIcon ? (
+                    <Cube3DIcon size={20} colors={colors} />
+                  ) : (
                     <tab.icon size={20} />
                   )}
                 </div>
@@ -357,12 +499,91 @@ export default function SidebarNavigation({
                   </span>
                 )}
                 {activeTab === tab.id && (
-                  <div className={`${collapsed ? 'hidden' : ''} w-2 h-2 bg-white rounded-full`} />
+                  <div className={`${collapsed ? 'hidden' : ''} w-2 h-2 bg-blue-200 rounded-full ${tab.id === 'bubix' ? 'animate-metallic' : ''}`} />
                 )}
               </button>
             )
           ))}
         </nav>
+      </div>
+
+      {/* En-tête utilisateur */}
+      {!isLoading && user && (
+        <div className={`${collapsed ? 'px-2' : 'px-3'} py-4 border-t border-gray-200 dark:border-gray-700`}>
+          <motion.div
+            className={`${collapsed ? 'flex justify-center' : 'flex items-center space-x-3'} p-3`}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            {/* Avatar */}
+            <div className="relative">
+              <img
+                src={selectedAvatar || user.avatarPath || getDefaultAvatar(user.userType)}
+                alt={`Avatar de ${user.firstName}`}
+                className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md"
+              />
+              {/* Indicateur de statut en ligne */}
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+            </div>
+
+            {/* Informations utilisateur - visible seulement en mode expanded */}
+            {!collapsed && (
+              <div className="text-left hidden md:block">
+                <div className="flex items-center space-x-2">
+                  <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                    {user.firstName} {user.lastName}
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">ID:</span>
+                  <span className={`text-xs font-mono ${getUserSubscriptionColors().text} font-semibold multicolor-id`}>
+                    {user.sessionId}
+                  </span>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </div>
+      )}
+
+      {/* Bouton de basculement du thème */}
+      <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-700">
+        <button
+          onClick={() => {
+            if (theme === 'light') {
+              setTheme('dark')
+            } else if (theme === 'dark') {
+              setTheme('auto')
+            } else {
+              setTheme('light')
+            }
+          }}
+          className={`
+            group relative w-full flex items-center gap-3 px-3 py-3
+            rounded-lg text-sm font-semibold bg-gray-50 hover:bg-gray-100 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition
+          `}
+          title={`Thème actuel: ${theme === 'light' ? 'Clair' : theme === 'dark' ? 'Sombre' : 'Auto'}`}
+        >
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-300">
+            {theme === 'light' && <Sun size={20} />}
+            {theme === 'dark' && <Moon size={20} />}
+            {theme === 'auto' && <Monitor size={20} />}
+          </div>
+          {!collapsed && (
+            <span className="hidden md:block">
+              {theme === 'light' ? 'Mode Clair' : theme === 'dark' ? 'Mode Sombre' : 'Mode Auto'}
+            </span>
+          )}
+          {collapsed && (
+            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 pointer-events-none opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-150 delay-150">
+              <div className="relative px-2 py-1 rounded-md bg-gray-900 text-white text-xs shadow-lg whitespace-nowrap">
+                <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45 shadow-md"></div>
+                {theme === 'light' ? 'Mode Clair' : theme === 'dark' ? 'Mode Sombre' : 'Mode Auto'}
+              </div>
+            </div>
+          )}
+        </button>
       </div>
 
       {/* Actions rapides: Accueil + Déconnexion */}
@@ -371,15 +592,15 @@ export default function SidebarNavigation({
           onClick={() => router.push('/')}
           className={`
             group relative w-full flex items-center gap-3 px-3 py-3
-            rounded-lg text-sm font-semibold bg-white-100 hover:bg-gray-200 text-gray-300 transition
+            rounded-lg text-sm font-semibold bg-white-100 hover:bg-gray-200 text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition
           `}
           title="Accueil"
           aria-label=""
         >
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-gray-700 shadow-sm">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-300">
             <Home size={20} />
           </div>
-          {!collapsed && <span>Accueil</span>}
+          {!collapsed && <span className="hidden md:block">Accueil</span>}
           {collapsed && (
             <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 pointer-events-none opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-150 delay-150">
               <div className="relative px-2 py-1 rounded-md bg-gray-900 text-white text-xs shadow-lg whitespace-nowrap">
@@ -393,15 +614,15 @@ export default function SidebarNavigation({
           onClick={async () => { try { await (await import('@/lib/api')).authAPI.logout(); router.push('/login'); } catch (e) {} }}
           className={`
             group relative w-full flex items-center gap-3 px-3 py-3
-            rounded-lg text-sm font-semibold bg-white-50 hover:bg-red-100 text-red-300 transition
+            rounded-lg text-sm font-semibold bg-white-50 hover:bg-red-100 text-red-300 dark:bg-gray-800 dark:hover:bg-red-900/20 dark:text-red-400 transition
           `}
           title="Déconnexion"
           aria-label=""
         >
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-red-700 shadow-sm">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-red-700 shadow-sm dark:bg-gray-700 dark:text-red-400">
             <LogOut size={20} />
           </div>
-          {!collapsed && <span>Déconnexion</span>}
+          {!collapsed && <span className="hidden md:block">Déconnexion</span>}
           {collapsed && (
             <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 pointer-events-none opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-150 delay-150">
               <div className="relative px-2 py-1 rounded-md bg-gray-900 text-white text-xs shadow-lg whitespace-nowrap">
@@ -414,14 +635,26 @@ export default function SidebarNavigation({
       </div>
 
       {/* Footer de la sidebar */}
-      <div className="p-3 border-t border-gray-200">
+      <div className="p-3 border-t border-gray-200 dark:border-gray-700">
         {!collapsed && (
-          <div className="text-xs text-gray-700 text-center font-medium">
+          <div className="text-xs text-gray-700 dark:text-gray-300 text-center font-medium hidden md:block">
             <p>Version 1.0.0</p>
             <p>© 2025 CubeAI</p>
+            <div className="flex items-center justify-center gap-2 mt-2">
+              <span className="text-xs text-gray-500 dark:text-gray-400">Thème:</span>
+              <div className="flex items-center gap-1">
+                {theme === 'light' && <Sun className="w-3 h-3 text-yellow-500" />}
+                {theme === 'dark' && <Moon className="w-3 h-3 text-blue-400" />}
+                {theme === 'auto' && <Monitor className="w-3 h-3 text-gray-500 dark:text-gray-400" />}
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {theme === 'light' ? 'Clair' : theme === 'dark' ? 'Sombre' : 'Auto'}
+                </span>
+              </div>
+            </div>
           </div>
         )}
       </div>
     </motion.div>
+    </>
   )
 } 

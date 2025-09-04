@@ -5,8 +5,192 @@ import { PedagogicalAnalysisService } from '../services/pedagogicalAnalysis.js';
 
 const router = express.Router();
 
-// Route pour récupérer les sessions actives d'un compte
-router.get("/active", requireAuth, async (req, res) => {
+// Route pour sauvegarder un prompt parent
+router.post("/parent-prompts", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user?.userId;
+    const { content, childSessionId, promptType = 'PARENT_NOTES' } = req.body;
+
+    if (!userId || !content || !childSessionId) {
+      return res.status(400).json({
+        error: 'Données manquantes',
+        code: 'MISSING_DATA'
+      });
+    }
+
+    // Vérifier que l'utilisateur est un parent
+    const userSession = await prisma.userSession.findUnique({
+      where: { id: userId },
+      include: { account: true }
+    });
+
+    if (!userSession || userSession.userType !== 'PARENT') {
+      return res.status(403).json({
+        error: 'Accès réservé aux parents',
+        code: 'PARENT_ONLY'
+      });
+    }
+
+    // Vérifier que la session enfant appartient au même compte
+    const childSession = await prisma.userSession.findFirst({
+      where: {
+        id: childSessionId,
+        accountId: userSession.accountId,
+        userType: 'CHILD'
+      }
+    });
+
+    if (!childSession) {
+      return res.status(404).json({
+        error: 'Session enfant non trouvée',
+        code: 'CHILD_NOT_FOUND'
+      });
+    }
+
+    // Sauvegarder le prompt
+    const savedPrompt = await prisma.parentPrompt.create({
+      data: {
+        content,
+        promptType,
+        parentSessionId: userId,
+        childSessionId,
+        accountId: userSession.accountId,
+        status: 'PENDING',
+        processedContent: null,
+        aiResponse: null
+      }
+    });
+
+    // Traiter le prompt avec l'IA pour le clarifier et le contextualiser
+    try {
+      const processedPrompt = await PedagogicalAnalysisService.processParentPrompt({
+        content,
+        childName: `${childSession.firstName} ${childSession.lastName}`,
+        childAge: childSession.age || 0,
+        childLevel: childSession.level || 'BEGINNER',
+        context: {
+          accountType: userSession.account.subscriptionType,
+          childSessionId,
+          parentSessionId: userId
+        }
+      });
+
+      // Mettre à jour le prompt avec le contenu traité
+      await prisma.parentPrompt.update({
+        where: { id: savedPrompt.id },
+        data: {
+          processedContent: processedPrompt.processedContent,
+          aiResponse: processedPrompt.aiResponse,
+          status: 'PROCESSED'
+        }
+      });
+
+      res.json({
+        success: true,
+        data: {
+          promptId: savedPrompt.id,
+          processedContent: processedPrompt.processedContent,
+          aiResponse: processedPrompt.aiResponse,
+          status: 'PROCESSED'
+        }
+      });
+
+    } catch (processingError) {
+      console.error('❌ Erreur lors du traitement du prompt:', processingError);
+      
+      // Mettre à jour le statut en cas d'erreur
+      await prisma.parentPrompt.update({
+        where: { id: savedPrompt.id },
+        data: { status: 'ERROR' }
+      });
+
+      res.json({
+        success: true,
+        data: {
+          promptId: savedPrompt.id,
+          status: 'ERROR',
+          message: 'Prompt sauvegardé mais traitement en attente'
+        }
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ Erreur lors de la sauvegarde du prompt parent:', error);
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// Route pour récupérer les prompts d'un enfant
+router.get("/child/:childSessionId/prompts", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user?.userId;
+    const { childSessionId } = req.params;
+
+    if (!userId || !childSessionId) {
+      return res.status(400).json({
+        error: 'Données manquantes',
+        code: 'MISSING_DATA'
+      });
+    }
+
+    // Vérifier les permissions
+    const userSession = await prisma.userSession.findUnique({
+      where: { id: userId },
+      include: { account: true }
+    });
+
+    if (!userSession) {
+      return res.status(404).json({
+        error: 'Session utilisateur non trouvée',
+        code: 'USER_NOT_FOUND'
+      });
+    }
+
+    // Récupérer les prompts pour cet enfant
+    const prompts = await prisma.parentPrompt.findMany({
+      where: {
+        childSessionId,
+        accountId: userSession.accountId,
+        status: 'PROCESSED'
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      select: {
+        id: true,
+        content: true,
+        processedContent: true,
+        aiResponse: true,
+        promptType: true,
+        createdAt: true,
+        parentSession: {
+          select: {
+            firstName: true,
+            lastName: true
+          }
+        }
+      }
+    });
+
+    res.json({
+      success: true,
+      data: prompts
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur lors de la récupération des prompts:', error);
+    res.status(500).json({
+      error: 'Erreur interne du serveur',
+      code: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// Route pour récupérer les sessions enfants
+router.get('/children', requireAuth, async (req, res) => {
   try {
     const userId = req.user?.userId;
     if (!userId) {
@@ -83,15 +267,14 @@ router.get("/active", requireAuth, async (req, res) => {
     // Filtrer les sessions actives (avec currentSessionStartTime)
     const activeSessions = sessionsWithTime.filter(session => session.isCurrentlyActive);
 
-    res.json({
-      success: true,
-      data: activeSessions,
-      accountInfo: {
-        accountId: userSession.accountId,
-        subscriptionType: userSession.account.subscriptionType,
-        maxSessions: userSession.account.maxSessions
-      }
-    });
+    // Pour les parents, retourner toutes les sessions enfants
+    if (userSession.userType === 'PARENT') {
+      const childSessions = sessionsWithTime.filter(session => session.userType === 'CHILD');
+      res.json(childSessions);
+    } else {
+      // Pour les autres, retourner les sessions actives
+      res.json(activeSessions);
+    }
 
   } catch (error) {
     console.error('❌ Erreur lors de la récupération des sessions actives:', error);
@@ -700,9 +883,10 @@ interface ChildActivity {
 }
 
 // Route pour mettre à jour le statut en temps réel
-router.post('/status', requireAuth, async (req, res) => {
+router.post('/:sessionId/status', requireAuth, async (req, res) => {
   try {
-    const { sessionId, isOnline } = req.body;
+    const { sessionId } = req.params;
+    const { isOnline } = req.body;
     const userId = req.user?.userId;
     
     if (!userId) {
@@ -750,7 +934,6 @@ router.post('/status', requireAuth, async (req, res) => {
       // Si l'enfant se connecte
       if (!childSession.currentSessionStartTime) {
         updateData.currentSessionStartTime = now;
-        console.log(`🟢 Session ${sessionId} connectée à ${now.toISOString()}`);
       }
     } else {
       // Si l'enfant se déconnecte
@@ -761,7 +944,6 @@ router.post('/status', requireAuth, async (req, res) => {
         
         updateData.currentSessionStartTime = null;
         updateData.totalConnectionDurationMs = currentTotalMs + sessionDuration;
-        console.log(`🔴 Session ${sessionId} déconnectée à ${now.toISOString()}, durée: ${Math.floor(sessionDuration / 1000)}s`);
       }
     }
 
@@ -789,146 +971,6 @@ router.post('/status', requireAuth, async (req, res) => {
 
   } catch (error) {
     console.error('❌ Erreur lors de la mise à jour du statut:', error);
-    res.status(500).json({
-      error: 'Erreur interne du serveur',
-      code: 'INTERNAL_ERROR'
-    });
-  }
-});
-
-// Route pour nettoyer les sessions orphelines (sessions en ligne depuis trop longtemps)
-router.post('/cleanup-orphaned-sessions', requireAuth, async (req, res) => {
-  try {
-    const userId = req.user?.userId;
-    
-    if (!userId) {
-      return res.status(401).json({
-        error: 'Utilisateur non authentifié',
-        code: 'UNAUTHORIZED'
-      });
-    }
-
-    // Vérifier que c'est un parent
-    const parentSession = await prisma.userSession.findUnique({
-      where: { id: userId },
-      include: { account: true }
-    });
-
-    if (!parentSession || parentSession.userType !== 'PARENT') {
-      return res.status(403).json({
-        error: 'Accès réservé aux parents',
-        code: 'FORBIDDEN'
-      });
-    }
-
-    const now = new Date();
-    const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000); // 30 minutes
-
-    // Trouver les sessions enfants qui sont "en ligne" depuis plus de 30 minutes
-    const orphanedSessions = await prisma.userSession.findMany({
-      where: {
-        accountId: parentSession.accountId,
-        userType: 'CHILD',
-        currentSessionStartTime: {
-          lt: thirtyMinutesAgo
-        }
-      }
-    });
-
-    let cleanedCount = 0;
-
-    for (const session of orphanedSessions) {
-      if (session.currentSessionStartTime) {
-        const sessionStart = new Date(session.currentSessionStartTime);
-        const sessionDuration = now.getTime() - sessionStart.getTime();
-        const currentTotalMs = Number(session.totalConnectionDurationMs || 0);
-
-        await prisma.userSession.update({
-          where: { id: session.id },
-          data: {
-            currentSessionStartTime: null,
-            totalConnectionDurationMs: currentTotalMs + sessionDuration,
-            lastLoginAt: now
-          }
-        });
-
-        cleanedCount++;
-        console.log(`🧹 Session orpheline ${session.sessionId} nettoyée`);
-      }
-    }
-
-    res.json({
-      success: true,
-      message: `${cleanedCount} session(s) orpheline(s) nettoyée(s)`,
-      cleanedCount
-    });
-
-  } catch (error) {
-    console.error('❌ Erreur lors du nettoyage des sessions orphelines:', error);
-    res.status(500).json({
-      error: 'Erreur interne du serveur',
-      code: 'INTERNAL_ERROR'
-    });
-  }
-});
-
-// Récupérer toutes les sessions enfants d'un parent
-router.get('/children', requireAuth, async (req, res) => {
-  try {
-    const userId = req.user?.userId;
-    if (!userId) {
-      return res.status(401).json({
-        error: 'Utilisateur non authentifié',
-        code: 'UNAUTHORIZED'
-      });
-    }
-
-    // Récupérer le compte de l'utilisateur connecté
-    const userSession = await prisma.userSession.findUnique({
-      where: { id: userId },
-      include: {
-        account: true
-      }
-    });
-
-    if (!userSession || userSession.userType !== 'PARENT') {
-      return res.status(403).json({
-        error: 'Accès réservé aux parents',
-        code: 'FORBIDDEN'
-      });
-    }
-
-    // Récupérer toutes les sessions enfants liées à ce parent
-    const childSessions = await prisma.userSession.findMany({
-      where: {
-        accountId: userSession.accountId,
-        userType: 'CHILD'
-      },
-      include: {
-        childActivities: {
-          orderBy: {
-            completedAt: 'desc'
-          },
-          take: 10 // Dernières 10 activités
-        }
-      }
-    });
-
-    // Transformer les données
-    const sessions: ChildSession[] = childSessions.map(session => ({
-      id: session.id,
-      sessionId: session.sessionId,
-      name: `${session.firstName} ${session.lastName}`,
-      emoji: '👶', // Emoji par défaut
-      isOnline: !!session.currentSessionStartTime,
-      lastActivity: session.lastLoginAt || session.createdAt,
-      totalTime: Math.floor(Number(session.totalConnectionDurationMs || 0) / (1000 * 60)),
-      userType: 'CHILD'
-    }));
-
-    res.json(sessions);
-  } catch (error) {
-    console.error('❌ Erreur lors de la récupération des sessions enfants:', error);
     res.status(500).json({
       error: 'Erreur interne du serveur',
       code: 'INTERNAL_ERROR'
@@ -1092,7 +1134,7 @@ router.post('/:sessionId/analyze', requireAuth, async (req, res) => {
         userSessionId: childSession.id,
         analysisType: 'progress',
         content: aiAnalysis,
-        prompt: PedagogicalAnalysisService.PROGRESS_ANALYSIS_PROMPT,
+        prompt: 'Fallback Analysis - Compte Rendu',
         context: pedagogicalContext,
         metadata: {
           childAge: childSession.age,
@@ -1209,7 +1251,7 @@ router.post('/:sessionId/exercise', requireAuth, async (req, res) => {
         userSessionId: childSession.id,
         analysisType: 'exercise',
         content: aiExercise,
-        prompt: PedagogicalAnalysisService.EXERCISE_GENERATION_PROMPT,
+        prompt: 'Fallback Analysis - Conseils et Exercices',
         context: pedagogicalContext,
         metadata: {
           childAge: childSession.age,

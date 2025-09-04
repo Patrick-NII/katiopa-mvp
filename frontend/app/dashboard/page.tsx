@@ -13,11 +13,11 @@ import CubeAIExperiencesTab from '@/components/CubeAIExperiencesTab';
 import ChatbotWrapper from '@/components/chatbot/ChatbotWrapper';
 import KidsGamesTab from '@/components/kids/KidsGamesTab';
 import KidsSettingsTab from '@/components/kids/KidsSettingsTab';
-import UserHeader from '@/components/UserHeader';
 import SettingsTab from '@/components/SettingsTab';
 import { authAPI, statsAPI } from '@/lib/api';
 import DecorativeCubes from '@/components/DecorativeCubes';
 import { AvatarProvider } from '@/contexts/AvatarContext';
+import BubixTab from '@/components/BubixTab';
 
 // Import des nouvelles pages des cubes
 import MathCubePage from './mathcube/page';
@@ -53,11 +53,9 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [ready, setReady] = useState(false);
-  const [chatMessage, setChatMessage] = useState('');
-  const [chatResponse, setChatResponse] = useState('');
-  const [chatLoading, setChatLoading] = useState(false);
-  const [chatHistory, setChatHistory] = useState<any[]>([]);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [childSessions, setChildSessions] = useState<any[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Chargement des données
   const loadData = async () => {
@@ -86,6 +84,22 @@ export default function DashboardPage() {
         });
       }
 
+      // Récupération des sessions enfants pour les parents
+      if (userResponse.user && userResponse.user.userType === 'PARENT') {
+        try {
+          const sessionsResponse = await fetch('/api/sessions/children', {
+            credentials: 'include'
+          });
+          if (sessionsResponse.ok) {
+            const sessionsData = await sessionsResponse.json();
+            setChildSessions(sessionsData);
+          }
+        } catch (error) {
+          console.warn('⚠️ Impossible de charger les sessions enfants:', error);
+          setChildSessions([]);
+        }
+      }
+
       setReady(true);
     } catch (error) {
       console.error('❌ Erreur lors du chargement des données:', error);
@@ -93,50 +107,25 @@ export default function DashboardPage() {
     }
   };
 
-  // Envoi d'un message chat
-  const sendChatMessage = async (message: string) => {
-    if (!message.trim()) return;
-
-    setChatLoading(true);
-    setChatResponse('');
-
-    try {
-      // TODO: Implémenter l'API de chat
-      // const response = await chatAPI.sendMessage(message);
-      // setChatResponse(response.message);
-      
-      // Simulation temporaire
-      setTimeout(() => {
-        setChatResponse('Fonctionnalité de chat en cours de développement...');
-        setChatLoading(false);
-      }, 1000);
-    } catch (error) {
-      console.error('❌ Erreur lors de l\'envoi du message:', error);
-      setChatResponse('Erreur lors de l\'envoi du message');
-      setChatLoading(false);
-    }
-  };
-
-  // Chargement de l'historique du chat
-  const loadChatHistory = async () => {
-    try {
-      // TODO: Implémenter l'API de récupération de l'historique
-      // const history = await chatAPI.getHistory();
-      // setChatHistory(history);
-    } catch (error) {
-      console.error('❌ Erreur lors du chargement de l\'historique:', error);
-    }
-  };
-
   useEffect(() => {
     loadData();
   }, []);
 
+  // Détecter si on est sur mobile
   useEffect(() => {
-    if (ready) {
-      loadChatHistory();
-    }
-  }, [ready]);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      // Sur mobile, la sidebar est fermée par défaut
+      if (window.innerWidth < 768) {
+        setSidebarCollapsed(true);
+      }
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   if (!ready) {
     return (
@@ -183,11 +172,6 @@ export default function DashboardPage() {
           onFocusChange={() => {}}
           onEvaluateLLM={() => {}}
           onExerciseSelect={() => {}}
-          onSendChatMessage={() => {}}
-          chatResponse=""
-          chatLoading={false}
-          chatHistory={[]}
-          onLoadChatHistory={() => {}}
           subscriptionType={(user?.subscriptionType as 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE') || 'FREE'}
         />;
       case 'statistiques':
@@ -219,10 +203,17 @@ export default function DashboardPage() {
         return <FamilyMembersTab />;
       case 'facturation':
         return <BillingTab user={user} />;
+      case 'bubix':
+        return <BubixTab 
+          user={user}
+          childSessions={childSessions}
+          userType={user.userType as 'CHILD' | 'PARENT'}
+          subscriptionType={user.subscriptionType}
+        />;
       case 'reglages':
         return <SettingsTab userType={user.userType as 'CHILD' | 'PARENT' | 'TEACHER' | 'ADMIN'} />;
       case 'aide':
-        return <div className="p-6">Page d'aide et support</div>;
+        return <div className="p-0">Page d'aide et support</div>;
       default:
         return <DashboardTab 
           user={user} 
@@ -234,11 +225,6 @@ export default function DashboardPage() {
           onFocusChange={() => {}}
           onEvaluateLLM={() => {}}
           onExerciseSelect={() => {}}
-          onSendChatMessage={() => {}}
-          chatResponse=""
-          chatLoading={false}
-          chatHistory={[]}
-          onLoadChatHistory={() => {}}
           subscriptionType={(user?.subscriptionType as 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE') || 'FREE'}
         />;
     }
@@ -246,14 +232,8 @@ export default function DashboardPage() {
 
   return (
     <AvatarProvider>
-      <div className="min-h-screen bg-gray-50 relative overflow-hidden">
+                    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
         <DecorativeCubes variant="default" />
-        {/* En-tête utilisateur avec avatar */}
-        <UserHeader 
-          userType={user?.userType as any}
-          subscriptionType={user?.subscriptionType}
-        />
-
         {/* Sidebar de navigation */}
         <SidebarNavigation
           activeTab={activeTab as any}
@@ -266,9 +246,9 @@ export default function DashboardPage() {
 
         {/* Contenu principal */}
         <div className={`transition-all duration-300 ${
-          sidebarCollapsed ? 'ml-20' : 'ml-64'
+          sidebarCollapsed ? 'ml-0 md:ml-20' : 'ml-0 md:ml-64'
         }`}>
-          <main className="p-6">
+          <main className="p-2 md:p-4 lg:p-6">
             {ready ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -279,15 +259,12 @@ export default function DashboardPage() {
               </motion.div>
             ) : (
               <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                <span className="ml-3 text-gray-600">Chargement...</span>
+                <div className="animate-spin rounded-full h-8 w-8 md:h-12 md:w-12 border-b-2 border-blue-600 dark:border-blue-400"></div>
+                <span className="ml-3 text-gray-600 dark:text-gray-300 text-sm md:text-base">Chargement...</span>
               </div>
             )}
           </main>
         </div>
-
-        {/* Chatbot flottant */}
-        <ChatbotWrapper />
       </div>
     </AvatarProvider>
   );

@@ -25,6 +25,7 @@ model Account {
   planSeat          PlanSeat?
   reportPreferences ReportPreference?
   dailyReportUserSessions DailyReportUserSession[]
+  parentPrompts     ParentPrompt[]
 }
 
 // Session utilisateur (connexion avec ID/mot de passe)
@@ -63,6 +64,8 @@ model UserSession {
   performanceMetrics PerformanceMetric[]
   passwordResetTokens PasswordResetToken[]
   aiAnalyses      AIAnalysis[]
+  parentPrompts   ParentPrompt[] @relation("ParentPrompts")
+  childPrompts    ParentPrompt[] @relation("ChildPrompts")
 }
 
 // Profil détaillé de l'utilisateur
@@ -558,4 +561,37 @@ enum BillingStatus {
   CANCELLED
   FAILED
   OVERDUE
+}
+
+// Nouveaux modèles pour les prompts parents et CubeAI
+
+// Prompts des parents pour les enfants
+model ParentPrompt {
+  id              String      @id @default(cuid())
+  content         String      // Contenu original du prompt
+  processedContent String?     // Contenu traité et clarifié par l'IA
+  aiResponse      String?     // Réponse de l'IA lors du traitement
+  promptType      String      @default("PARENT_NOTES") // Type de prompt
+  status          PromptStatus @default(PENDING)
+  
+  // Relations
+  parentSessionId String      @map("parent_session_id")
+  childSessionId  String      @map("child_session_id")
+  accountId       String      @map("account_id")
+  
+  parentSession   UserSession @relation("ParentPrompts", fields: [parentSessionId], references: [id], onDelete: Cascade)
+  childSession    UserSession @relation("ChildPrompts", fields: [childSessionId], references: [id], onDelete: Cascade)
+  account         Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  @@map("parent_prompts")
+}
+
+// Statut des prompts
+enum PromptStatus {
+  PENDING
+  PROCESSED
+  ERROR
 }

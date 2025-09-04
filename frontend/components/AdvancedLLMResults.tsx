@@ -161,7 +161,7 @@ export default function AdvancedLLMResults({
           >
             <Brain size={24} />
           </motion.div>
-          Évaluation IA Katiopa
+                        Évaluation IA CubeAI
         </h3>
         
         <div className="flex items-center gap-4">
