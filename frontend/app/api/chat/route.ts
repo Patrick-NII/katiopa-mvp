@@ -1,7 +1,7 @@
 // app/api/chat/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import jwt from 'jsonwebtoken'
+import * as jwt from 'jsonwebtoken'
 import { PrismaClient } from '@prisma/client'
 import OpenAI from 'openai'
 
@@ -136,7 +136,7 @@ async function getCubeMatchData(childId: string): Promise<any> {
     console.log(`🎮 Récupération données CubeMatch pour enfant ${childId}...`);
     
     // Récupérer les scores CubeMatch
-    const cubeMatchScores = await prisma.CubeMatchScore.findMany({
+    const cubeMatchScores = await prisma.cubeMatchScore.findMany({
       where: {
         user_id: childId
       },
@@ -152,7 +152,7 @@ async function getCubeMatchData(childId: string): Promise<any> {
     }
 
     // Récupérer les stats utilisateur
-    const userStats = await prisma.CubeMatchUserStats.findUnique({
+    const userStats = await prisma.cubeMatchUserStats.findUnique({
       where: {
         user_id: childId
       }
@@ -160,19 +160,19 @@ async function getCubeMatchData(childId: string): Promise<any> {
 
     // Calculer les statistiques
     const totalGames = cubeMatchScores.length;
-    const totalScore = cubeMatchScores.reduce((sum, score) => sum + score.score, 0);
-    const bestScore = Math.max(...cubeMatchScores.map(s => s.score));
-    const currentLevel = Math.max(...cubeMatchScores.map(s => s.level));
-    const totalTimeMs = cubeMatchScores.reduce((sum, score) => sum + Number(score.time_played_ms), 0);
+    const totalScore = cubeMatchScores.reduce((sum: number, score: any) => sum + score.score, 0);
+    const bestScore = Math.max(...cubeMatchScores.map((s: any) => s.score));
+    const currentLevel = Math.max(...cubeMatchScores.map((s: any) => s.level));
+    const totalTimeMs = cubeMatchScores.reduce((sum: number, score: any) => sum + Number(score.time_played_ms), 0);
     
     // Opérateur préféré
-    const operatorCounts = cubeMatchScores.reduce((acc, score) => {
+    const operatorCounts = cubeMatchScores.reduce((acc: Record<string, number>, score: any) => {
       acc[score.operator] = (acc[score.operator] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
     
     const favoriteOperator = Object.entries(operatorCounts)
-      .sort(([,a], [,b]) => b - a)[0]?.[0] || 'ADD';
+      .sort(([,a], [,b]) => (b as number) - (a as number))[0]?.[0] || 'ADD';
 
     const lastPlayed = cubeMatchScores[0]?.created_at;
 
@@ -360,7 +360,8 @@ function generateDataInsights(childrenData: any[]): string {
       if (child.cubeMatchData.operatorStats && child.cubeMatchData.operatorStats.length > 0) {
         insights += `• **Opérations** : `
         child.cubeMatchData.operatorStats.forEach((op: any, i: number) => {
-          const opName = { 'ADD': 'Add', 'SUB': 'Sous', 'MUL': 'Mult', 'DIV': 'Div' }[op.operator] || op.operator;
+          const opNameMap: Record<string, string> = { 'ADD': 'Add', 'SUB': 'Sous', 'MUL': 'Mult', 'DIV': 'Div' };
+          const opName = opNameMap[op.operator] || op.operator;
           insights += `${opName}(${op.games} parties, ${op.averageAccuracy.toFixed(1)}% précision)`
           if (i < child.cubeMatchData.operatorStats.length - 1) insights += ', ';
         });
@@ -882,7 +883,7 @@ ${childrenData.map((child, index) => `
 - Dernière connexion: ${child.lastLoginAt ? new Date(child.lastLoginAt).toLocaleDateString('fr-FR') : 'Jamais'}
 
 🎯 **ACTIVITÉS RÉCENTES (5 dernières):**
-${child.activities.slice(0, 5).map(activity => `- ${activity.domain}: ${activity.score}/100 (${new Date(activity.createdAt).toLocaleDateString('fr-FR')})`).join('\n')}
+${child.activities.slice(0, 5).map((activity: any) => `- ${activity.domain}: ${activity.score}/100 (${new Date(activity.createdAt).toLocaleDateString('fr-FR')})`).join('\n')}
 ${child.activities.length > 5 ? `... et ${child.activities.length - 5} autres activités` : ''}
 
 📈 **ANALYSE PAR DOMAINE:**
@@ -1142,7 +1143,7 @@ async function saveParentPrompt(
   try {
     console.log('💾 Sauvegarde du prompt parent...');
     
-    const savedPrompt = await prisma.ParentPrompt.create({
+    const savedPrompt = await prisma.parentPrompt.create({
       data: {
         content: userQuery,
         processedContent: userQuery, // Pour simplifier, on garde le contenu original
@@ -1321,7 +1322,7 @@ async function getParentPromptsAndPreferences(parentAccountId: string) {
     console.log('🔍 Récupération des prompts et préférences parents...');
     
     // Récupérer tous les prompts des parents
-    const parentPrompts = await prisma.ParentPrompt.findMany({
+    const parentPrompts = await prisma.parentPrompt.findMany({
       where: {
         accountId: parentAccountId,
         status: 'PROCESSED' // Seulement les prompts traités
@@ -1426,7 +1427,22 @@ function formatParentPromptsForRAG(parentData: any) {
         'LEARNING_DIFFICULTY': '🎓 DIFFICULTÉS D\'APPRENTISSAGE'
       };
       
-      ragContent += `**${typeLabels[type] || type}:**\n`;
+      const typeLabelsMap: Record<string, string> = {
+        'PARENT_WISHES': '🎯 SOUHAITS PARENTS',
+        'CAREER_PLANNING': '🚀 PLANIFICATION CARRIÈRE',
+        'WEAKNESS_IDENTIFICATION': '⚠️ IDENTIFICATION FAIBLESSES',
+        'IMPROVEMENT_GOALS': '🎯 OBJECTIFS AMÉLIORATION',
+        'SPECIFIC_NEEDS': '🔧 BESOINS SPÉCIFIQUES',
+        'LEARNING_PREFERENCES': '📚 PRÉFÉRENCES APPRENTISSAGE',
+        'LEARNING_OBJECTIVES': '🎯 OBJECTIFS APPRENTISSAGE',
+        'BEHAVIORAL_CONCERNS': '😟 PRÉOCCUPATIONS COMPORTEMENTALES',
+        'SOCIAL_SKILLS': '👥 COMPÉTENCES SOCIALES',
+        'MOTIVATION_ISSUES': '⚡ PROBLÈMES MOTIVATION',
+        'RECOMMENDATION_REQUEST': '💡 DEMANDES DE RECOMMANDATIONS',
+        'PROGRESS_UPDATE': '📈 MISE À JOUR PROGRÈS',
+        'LEARNING_DIFFICULTY': '🎓 DIFFICULTÉS D\'APPRENTISSAGE'
+      };
+      ragContent += `**${typeLabelsMap[type] || type}:**\n`;
       prompts.forEach((prompt: any, index: number) => {
         const analysis = analyzeParentPrompt(prompt.content, prompt.aiResponse || '', prompt.promptType);
         ragContent += `${index + 1}. **${prompt.parentSession.firstName} → ${prompt.childSession.firstName}:**\n`;
@@ -1768,12 +1784,12 @@ export async function POST(request: NextRequest) {
           console.log(`🔍 Parent session: ${!!parentSession}`);
           console.log(`🔍 Account: ${!!parentSession?.account}`);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ Erreur sauvegarde automatique prompt parent:', error);
         console.error('🔍 Détails de l\'erreur:', {
-          message: error.message,
-          stack: error.stack,
-          code: error.code
+          message: error?.message || 'Erreur inconnue',
+          stack: error?.stack || 'Pas de stack trace',
+          code: error?.code || 'Pas de code d\'erreur'
         });
       }
     } else {
