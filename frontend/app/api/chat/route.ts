@@ -867,14 +867,37 @@ function getMaxTokensForSubscription(subscriptionType: string): number {
     case 'FREE':
       return 200 // Limité pour les comptes gratuits
     case 'PRO':
-      return 400
-    case 'PRO_PLUS':
       return 800
+    case 'PRO_PLUS':
+      return 1500
     case 'ENTERPRISE':
-      return 1000
+      return 2000
     default:
       return 200
   }
+}
+
+// Fonction pour obtenir la limite de caractères par abonnement
+function getMaxCharactersForSubscription(subscriptionType: string): number {
+  switch (subscriptionType) {
+    case 'FREE':
+      return 500 // Limité pour les comptes gratuits
+    case 'PRO':
+      return 2000 // Bubix Pro - limite généreuse
+    case 'PRO_PLUS':
+      return 4000 // Très généreux
+    case 'ENTERPRISE':
+      return 6000 // Illimité virtuellement
+    default:
+      return 500
+  }
+}
+
+// Fonction pour obtenir le nombre de caractères restants
+function getRemainingCharacters(userQuery: string, subscriptionType: string): number {
+  const maxChars = getMaxCharactersForSubscription(subscriptionType);
+  const currentChars = userQuery.length;
+  return Math.max(0, maxChars - currentChars);
 }
 
 // Fonction pour post-traiter la réponse
@@ -1572,6 +1595,11 @@ export async function POST(request: NextRequest) {
       console.log(`🎫 userInfo.userType: ${userInfo.userType} (attendu: 'PARENT')`);
     }
 
+    // Calculer les limites de caractères
+    const maxCharacters = getMaxCharactersForSubscription(userInfo.subscriptionType)
+    const currentCharacters = userQuery.length
+    const remainingCharacters = getRemainingCharacters(userQuery, userInfo.subscriptionType)
+
     return NextResponse.json({
       text,
       actions,
@@ -1585,7 +1613,14 @@ export async function POST(request: NextRequest) {
         subscriptionType: userInfo.subscriptionType
       },
       intent,
-      persona
+      persona,
+      // Informations sur les limites de caractères
+      characterLimits: {
+        max: maxCharacters,
+        current: currentCharacters,
+        remaining: remainingCharacters,
+        subscriptionType: userInfo.subscriptionType
+      }
     })
   } catch (e: any) {
     console.error('❌ Erreur API chat:', e)
