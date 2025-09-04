@@ -130,7 +130,78 @@ async function verifyAuthServerSide(): Promise<UserInfo | null> {
   }
 }
 
-// Fonction pour récupérer toutes les données des enfants d'un parent
+// Fonction pour récupérer les données CubeMatch d'un enfant
+async function getCubeMatchData(childId: string): Promise<any> {
+  try {
+    console.log(`🎮 Récupération données CubeMatch pour enfant ${childId}...`);
+    
+    // Récupérer les scores CubeMatch
+    const cubeMatchScores = await prisma.cubeMatchScore.findMany({
+      where: {
+        user_id: childId
+      },
+      orderBy: {
+        created_at: 'desc'
+      },
+      take: 50 // Limiter aux 50 dernières parties
+    });
+
+    if (cubeMatchScores.length === 0) {
+      console.log('ℹ️ Aucune donnée CubeMatch trouvée');
+      return null;
+    }
+
+    // Récupérer les stats utilisateur
+    const userStats = await prisma.cubeMatchUserStats.findUnique({
+      where: {
+        user_id: childId
+      }
+    });
+
+    // Calculer les statistiques
+    const totalGames = cubeMatchScores.length;
+    const totalScore = cubeMatchScores.reduce((sum, score) => sum + score.score, 0);
+    const bestScore = Math.max(...cubeMatchScores.map(s => s.score));
+    const currentLevel = Math.max(...cubeMatchScores.map(s => s.level));
+    const totalTimeMs = cubeMatchScores.reduce((sum, score) => sum + Number(score.time_played_ms), 0);
+    
+    // Opérateur préféré
+    const operatorCounts = cubeMatchScores.reduce((acc, score) => {
+      acc[score.operator] = (acc[score.operator] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const favoriteOperator = Object.entries(operatorCounts)
+      .sort(([,a], [,b]) => b - a)[0]?.[0] || 'ADD';
+
+    const lastPlayed = cubeMatchScores[0]?.created_at;
+
+    console.log(`✅ Données CubeMatch récupérées: ${totalGames} parties, niveau ${currentLevel}`);
+
+    return {
+      totalGames,
+      totalScore,
+      bestScore,
+      currentLevel,
+      totalTimeMs,
+      favoriteOperator,
+      lastPlayed,
+      averageScore: Math.round(totalScore / totalGames),
+      userStats: userStats || null
+    };
+
+  } catch (error) {
+    console.error('❌ Erreur récupération données CubeMatch:', error);
+    return null;
+  }
+}
+
+// Fonction pour générer un résumé CubeMatch
+function generateCubeMatchSummary(cubeMatchData: any): string {
+  if (!cubeMatchData) return "Aucune donnée CubeMatch disponible.";
+  
+  return `CubeMatch: ${cubeMatchData.totalGames} parties jouées, niveau ${cubeMatchData.currentLevel}, meilleur score ${cubeMatchData.bestScore}, opérateur préféré ${cubeMatchData.favoriteOperator}`;
+}
 async function getChildrenData(accountId: string): Promise<any[]> {
   try {
     console.log('🔍 Recherche enfants pour accountId:', accountId)
@@ -729,16 +800,16 @@ INTENT
 ${intent}
 `.trim()
 
-  const messages = [
-    { role: 'system', content: system },
-    { role: 'system', content: developer },
-    { role: 'system', content: ctxBlock },
-    ...history.slice(-10).map(m => ({
-      role: m.sender === 'user' ? 'user' : 'assistant' as const,
-      content: m.text
-    })),
-    { role: 'user', content: userQuery }
-  ]
+      const messages = [
+      { role: 'system', content: system },
+      { role: 'system', content: developer },
+      { role: 'system', content: ctxBlock },
+      ...history.slice(-10).map(m => ({
+        role: m.sender === 'user' ? 'user' : 'assistant' as const,
+        content: m.text || '' // Ajouter une valeur par défaut
+      })),
+      { role: 'user', content: userQuery }
+    ]
   
   return { messages }
 }
