@@ -1319,6 +1319,12 @@ export async function POST(request: NextRequest) {
     const { text, actions } = postProcessResponse(rawText, persona, intent)
 
     // Sauvegarder automatiquement le prompt si c'est un parent
+    console.log('🔍 Vérification de la condition de sauvegarde...');
+    console.log(`👤 userContext.role: ${userContext.role}`);
+    console.log(`🎫 userInfo.userType: ${userInfo.userType}`);
+    console.log(`🔍 Condition: userContext.role === 'parent' && userInfo.userType === 'PARENT'`);
+    console.log(`✅ Résultat: ${userContext.role === 'parent' && userInfo.userType === 'PARENT'}`);
+    
     if (userContext.role === 'parent' && userInfo.userType === 'PARENT') {
       try {
         console.log('💾 Sauvegarde automatique du prompt parent...');
@@ -1331,6 +1337,9 @@ export async function POST(request: NextRequest) {
           }
         });
         
+        console.log(`🔍 Parent session trouvée: ${!!parentSession}`);
+        console.log(`🔍 Account trouvé: ${!!parentSession?.account}`);
+        
         if (parentSession && parentSession.account) {
           // Récupérer un enfant du même compte
           const childSession = await prisma.userSession.findFirst({
@@ -1340,10 +1349,18 @@ export async function POST(request: NextRequest) {
             }
           });
           
+          console.log(`🔍 Enfant trouvé: ${!!childSession}`);
+          if (childSession) {
+            console.log(`👶 Enfant: ${childSession.firstName} ${childSession.lastName}`);
+          }
+          
           const promptType = detectPromptType(userQuery);
           const childSessionId = childSession?.id || parentSession.id; // Fallback sur le parent si pas d'enfant
           
-          await saveParentPrompt(
+          console.log(`🎯 Type détecté: ${promptType}`);
+          console.log(`👶 Child Session ID: ${childSessionId}`);
+          
+          const savedPrompt = await saveParentPrompt(
             parentSession.id,
             childSessionId,
             parentSession.account.id,
@@ -1352,11 +1369,29 @@ export async function POST(request: NextRequest) {
             promptType
           );
           
-          console.log('✅ Prompt parent sauvegardé automatiquement');
+          if (savedPrompt) {
+            console.log('✅ Prompt parent sauvegardé automatiquement');
+            console.log(`🆔 ID du prompt sauvegardé: ${savedPrompt.id}`);
+          } else {
+            console.log('❌ Échec de la sauvegarde - saveParentPrompt a retourné null');
+          }
+        } else {
+          console.log('❌ Impossible de récupérer parent session ou account');
+          console.log(`🔍 Parent session: ${!!parentSession}`);
+          console.log(`🔍 Account: ${!!parentSession?.account}`);
         }
       } catch (error) {
         console.error('❌ Erreur sauvegarde automatique prompt parent:', error);
+        console.error('🔍 Détails de l\'erreur:', {
+          message: error.message,
+          stack: error.stack,
+          code: error.code
+        });
       }
+    } else {
+      console.log('❌ Condition de sauvegarde non remplie');
+      console.log(`👤 userContext.role: ${userContext.role} (attendu: 'parent')`);
+      console.log(`🎫 userInfo.userType: ${userInfo.userType} (attendu: 'PARENT')`);
     }
 
     return NextResponse.json({
