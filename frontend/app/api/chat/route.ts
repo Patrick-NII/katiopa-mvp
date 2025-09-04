@@ -738,6 +738,190 @@ function postProcessResponse(text: string, persona: 'kid' | 'pro', intent: strin
   return { text: processedText, actions }
 }
 
+// Fonction pour récupérer les prompts et préférences des parents pour le RAG
+async function getParentPromptsAndPreferences(parentAccountId: string) {
+  try {
+    console.log('🔍 Récupération des prompts et préférences parents...');
+    
+    // Récupérer tous les prompts des parents
+    const parentPrompts = await prisma.parentPrompt.findMany({
+      where: {
+        accountId: parentAccountId,
+        status: 'PROCESSED' // Seulement les prompts traités
+      },
+      include: {
+        parentSession: {
+          select: {
+            firstName: true,
+            lastName: true
+          }
+        },
+        childSession: {
+          select: {
+            firstName: true,
+            lastName: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    // Récupérer les préférences des parents
+    const parentPreferences = await prisma.userSession.findMany({
+      where: {
+        accountId: parentAccountId,
+        userType: 'PARENT'
+      },
+      include: {
+        parentPreferences: true,
+        profile: true
+      }
+    });
+
+    // Récupérer les profils des enfants avec les notes des parents
+    const childrenProfiles = await prisma.userSession.findMany({
+      where: {
+        accountId: parentAccountId,
+        userType: 'CHILD'
+      },
+      include: {
+        profile: true
+      }
+    });
+
+    console.log(`📝 ${parentPrompts.length} prompts parents trouvés`);
+    console.log(`👨‍👩‍👧‍👦 ${parentPreferences.length} parents avec préférences`);
+    console.log(`👶 ${childrenProfiles.length} enfants avec profils`);
+
+    return {
+      parentPrompts,
+      parentPreferences,
+      childrenProfiles
+    };
+  } catch (error) {
+    console.error('❌ Erreur récupération prompts parents:', error);
+    return {
+      parentPrompts: [],
+      parentPreferences: [],
+      childrenProfiles: []
+    };
+  }
+}
+
+// Fonction pour formater les prompts parents pour le RAG
+function formatParentPromptsForRAG(parentData: any) {
+  const { parentPrompts, parentPreferences, childrenProfiles } = parentData;
+  
+  let ragContent = '';
+  
+  // 1. Prompts des parents
+  if (parentPrompts.length > 0) {
+    ragContent += '**PROMPTS ET DEMANDES DES PARENTS:**\n\n';
+    
+    parentPrompts.forEach((prompt: any, index: number) => {
+      ragContent += `${index + 1}. **Prompt de ${prompt.parentSession.firstName} pour ${prompt.childSession.firstName}:**\n`;
+      ragContent += `   - Contenu original: "${prompt.content}"\n`;
+      if (prompt.processedContent) {
+        ragContent += `   - Traité par l'IA: "${prompt.processedContent}"\n`;
+      }
+      if (prompt.aiResponse) {
+        ragContent += `   - Réponse IA: "${prompt.aiResponse}"\n`;
+      }
+      ragContent += `   - Type: ${prompt.promptType}\n`;
+      ragContent += `   - Date: ${new Date(prompt.createdAt).toLocaleDateString('fr-FR')}\n\n`;
+    });
+  }
+
+  // 2. Préférences des parents
+  if (parentPreferences.length > 0) {
+    ragContent += '**PRÉFÉRENCES PÉDAGOGIQUES DES PARENTS:**\n\n';
+    
+    parentPreferences.forEach((parent: any) => {
+      ragContent += `**${parent.firstName} ${parent.lastName}:**\n`;
+      
+      if (parent.parentPreferences) {
+        const prefs = parent.parentPreferences;
+        ragContent += `- Objectifs d'apprentissage: ${prefs.objectives || 'Non définis'}\n`;
+        ragContent += `- Préférences pédagogiques: ${prefs.preferences || 'Non définies'}\n`;
+        ragContent += `- Préoccupations: ${prefs.concerns || 'Aucune'}\n`;
+        ragContent += `- Informations supplémentaires: ${prefs.additionalInfo || 'Aucune'}\n`;
+        ragContent += `- Besoins spécifiques: ${prefs.needs || 'Aucun'}\n\n`;
+      }
+    });
+  }
+
+  // 3. Profils des enfants avec notes des parents
+  if (childrenProfiles.length > 0) {
+    ragContent += '**PROFILS DES ENFANTS AVEC NOTES PARENTALES:**\n\n';
+    
+    childrenProfiles.forEach((child: any) => {
+      ragContent += `**${child.firstName} ${child.lastName}:**\n`;
+      
+      if (child.profile) {
+        const profile = child.profile;
+        ragContent += `- Objectifs d'apprentissage: ${profile.learningGoals.join(', ') || 'Non définis'}\n`;
+        ragContent += `- Matières préférées: ${profile.preferredSubjects.join(', ') || 'Non définies'}\n`;
+        ragContent += `- Style d'apprentissage: ${profile.learningStyle || 'Non défini'}\n`;
+        ragContent += `- Difficulté: ${profile.difficulty || 'Non définie'}\n`;
+        ragContent += `- Centres d'intérêt: ${profile.interests.join(', ') || 'Non définis'}\n`;
+        ragContent += `- Besoins particuliers: ${profile.specialNeeds.join(', ') || 'Aucun'}\n`;
+        ragContent += `- Notes personnalisées: ${profile.customNotes || 'Aucune'}\n`;
+        ragContent += `- Souhaits des parents: ${profile.parentWishes || 'Aucun'}\n\n`;
+      }
+    });
+  }
+
+  return ragContent || 'Aucune donnée parentale disponible.';
+}
+
+// Fonction pour générer des insights basés sur les prompts parents
+function generateParentInsights(parentData: any) {
+  const { parentPrompts, parentPreferences, childrenProfiles } = parentData;
+  
+  let insights = '';
+  
+  if (parentPrompts.length > 0) {
+    insights += '**ANALYSE DES PROMPTS PARENTS:**\n';
+    
+    // Analyser les types de prompts les plus fréquents
+    const promptTypes = parentPrompts.reduce((acc: any, prompt: any) => {
+      acc[prompt.promptType] = (acc[prompt.promptType] || 0) + 1;
+      return acc;
+    }, {});
+    
+    insights += `- Types de demandes: ${Object.entries(promptTypes).map(([type, count]) => `${type} (${count})`).join(', ')}\n`;
+    
+    // Analyser les préoccupations récurrentes
+    const concerns = parentPrompts
+      .filter((p: any) => p.content.toLowerCase().includes('difficulté') || p.content.toLowerCase().includes('problème'))
+      .length;
+    
+    if (concerns > 0) {
+      insights += `- Préoccupations détectées: ${concerns} prompts\n`;
+    }
+    
+    insights += '\n';
+  }
+
+  if (parentPreferences.length > 0) {
+    insights += '**PRÉFÉRENCES PÉDAGOGIQUES:**\n';
+    
+    const objectives = parentPreferences
+      .filter((p: any) => p.parentPreferences?.objectives)
+      .map((p: any) => p.parentPreferences.objectives);
+    
+    if (objectives.length > 0) {
+      insights += `- Objectifs principaux: ${objectives.join(', ')}\n`;
+    }
+    
+    insights += '\n';
+  }
+
+  return insights;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as ReqBody

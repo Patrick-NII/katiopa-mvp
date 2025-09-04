@@ -66,6 +66,8 @@ model UserSession {
   aiAnalyses      AIAnalysis[]
   parentPrompts   ParentPrompt[] @relation("ParentPrompts")
   childPrompts    ParentPrompt[] @relation("ChildPrompts")
+  cubeMatchScores CubeMatchScore[]
+  cubeMatchUserStats CubeMatchUserStats?
 }
 
 // Profil détaillé de l'utilisateur
@@ -594,4 +596,66 @@ enum PromptStatus {
   PENDING
   PROCESSED
   ERROR
+}
+
+// Modèles CubeMatch pour les données de jeu
+model CubeMatchScore {
+  id              String      @id @default(uuid())
+  user_id         String      @map("user_id")
+  username        String      @db.VarChar(255)
+  score           Int
+  level           Int
+  time_played_ms  BigInt      @map("time_played_ms")
+  operator        String      @db.VarChar(10)
+  target          Int
+  allow_diagonals Boolean     @default(false) @map("allow_diagonals")
+  created_at      DateTime    @default(now()) @map("created_at")
+  updated_at      DateTime    @updatedAt @map("updated_at")
+  
+  // Relations
+  userSession     UserSession @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@map("cubematch_scores")
+}
+
+model CubeMatchStats {
+  id                  String      @id @default(uuid())
+  total_games         BigInt      @default(0)
+  total_score         BigInt      @default(0)
+  average_score       Decimal     @default(0) @db.Decimal(10, 2)
+  best_score          Int         @default(0)
+  total_time_played   BigInt      @default(0)
+  average_time_played Decimal     @default(0) @db.Decimal(10, 2)
+  highest_level       Int         @default(1)
+  last_updated        DateTime    @default(now())
+  total_players       Int         @default(0)
+  average_level       Decimal     @default(1) @db.Decimal(5, 2)
+  most_used_operator  String      @default("ADD") @db.VarChar(10)
+  
+  @@map("cubematch_stats")
+}
+
+model CubeMatchUserStats {
+  id                  String      @id @default(uuid())
+  user_id             String      @unique @map("user_id")
+  username            String      @db.VarChar(255)
+  total_games         Int         @default(0)
+  total_score         BigInt      @default(0)
+  best_score          Int         @default(0)
+  average_score       Decimal     @default(0) @db.Decimal(10, 2)
+  highest_level       Int         @default(1)
+  total_time_played   BigInt      @default(0)
+  average_time_played Decimal     @default(0) @db.Decimal(10, 2)
+  total_combo_max     Int         @default(0)
+  total_cells_cleared Int         @default(0)
+  total_hints_used    Int         @default(0)
+  favorite_operator   String      @default("ADD") @db.VarChar(10)
+  last_played         DateTime    @default(now())
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  
+  // Relations
+  userSession         UserSession @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@map("cubematch_user_stats")
 }
