@@ -683,6 +683,109 @@ function postProcessResponse(text: string, persona: 'kid' | 'pro', intent: strin
   return { text: processedText, actions }
 }
 
+// Fonction pour sauvegarder une activité convenue entre parent et Bubix Pro
+async function saveAgreedActivity(
+  accountId: string,
+  childSessionId: string,
+  activityType: string,
+  activityTitle: string,
+  description: string,
+  parentRequest: string,
+  bubixResponse: string
+) {
+  try {
+    const agreedActivity = await prisma.agreedActivity.create({
+      data: {
+        accountId,
+        childSessionId,
+        activityType,
+        activityTitle,
+        description,
+        parentRequest,
+        bubixResponse,
+        status: 'PENDING'
+      }
+    })
+    
+    console.log('✅ Activité convenue sauvegardée:', agreedActivity.id)
+    return agreedActivity
+  } catch (error: any) {
+    console.error('❌ Erreur sauvegarde activité convenue:', error?.message)
+    return null
+  }
+}
+
+// Fonction pour récupérer les activités convenues pour un enfant
+async function getAgreedActivitiesForChild(childSessionId: string) {
+  try {
+    const activities = await prisma.agreedActivity.findMany({
+      where: {
+        childSessionId,
+        status: { in: ['PENDING', 'PROPOSED'] }
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+    
+    return activities
+  } catch (error: any) {
+    console.error('❌ Erreur récupération activités convenues:', error?.message)
+    return []
+  }
+}
+
+// Fonction pour détecter une activité convenue dans la conversation
+function detectAgreedActivity(userQuery: string, bubixResponse: string) {
+  const query = userQuery.toLowerCase()
+  const response = bubixResponse.toLowerCase()
+  
+  // Détecter les demandes d'implémentation d'activités
+  const implementationKeywords = [
+    'implémenter', 'mettre en place', 'activité', 'programme', 'exercice',
+    'je souhaite que tu', 'peux-tu faire', 'est-ce que tu peux'
+  ]
+  
+  const activityKeywords = [
+    'intelligence artificielle', 'ia', 'programmation', 'mathématiques', 'maths',
+    'sciences', 'lecture', 'écriture', 'langue', 'histoire', 'géographie'
+  ]
+  
+  const hasImplementationRequest = implementationKeywords.some(keyword => 
+    query.includes(keyword)
+  )
+  
+  const hasActivityMention = activityKeywords.some(keyword => 
+    query.includes(keyword) || response.includes(keyword)
+  )
+  
+  if (hasImplementationRequest && hasActivityMention) {
+    // Extraire le type d'activité
+    let activityType = 'GENERAL'
+    let activityTitle = 'Activité d\'apprentissage'
+    
+    if (query.includes('intelligence artificielle') || query.includes('ia')) {
+      activityType = 'IA'
+      activityTitle = 'Introduction à l\'Intelligence Artificielle'
+    } else if (query.includes('programmation') || query.includes('code')) {
+      activityType = 'PROGRAMMATION'
+      activityTitle = 'Initiation à la Programmation'
+    } else if (query.includes('mathématiques') || query.includes('maths')) {
+      activityType = 'MATHEMATIQUES'
+      activityTitle = 'Renforcement en Mathématiques'
+    } else if (query.includes('sciences')) {
+      activityType = 'SCIENCES'
+      activityTitle = 'Découverte des Sciences'
+    }
+    
+    return {
+      activityType,
+      activityTitle,
+      description: `Activité ${activityType.toLowerCase()} convenue avec le parent pour renforcer l'apprentissage de l'enfant.`
+    }
+  }
+  
+  return null
+}
+
 // Fonction pour sauvegarder automatiquement les prompts des parents
 async function saveParentPrompt(
   parentSessionId: string,
@@ -1187,6 +1290,18 @@ export async function POST(request: NextRequest) {
     // Combiner les snippets RAG généraux et les prompts parents
     const allRAGSnippets = [...ragSnippets, ...parentRAGSnippets]
     
+    // Récupérer les activités convenues si c'est un enfant
+    let agreedActivities: any[] = []
+    if (userContext.role === 'child' && userInfo.userType === 'CHILD') {
+      try {
+        console.log('🔍 Récupération des activités convenues pour l\'enfant...')
+        agreedActivities = await getAgreedActivitiesForChild(userInfo.id)
+        console.log('📋 Activités convenues trouvées:', agreedActivities.length)
+      } catch (error: any) {
+        console.error('❌ Erreur récupération activités convenues:', error?.message)
+      }
+    }
+
     // Construire les prompts avec le contexte utilisateur enrichi
     const { messages } = buildPrompts({
       persona,
@@ -1200,7 +1315,8 @@ export async function POST(request: NextRequest) {
       user: userInfo,
       childSessions: body.childSessions,
       childrenData: userContext.childrenData,
-      dataInsights: userContext.dataInsights
+      dataInsights: userContext.dataInsights,
+      agreedActivities
     })
     
     console.log('📝 Prompt construit avec:')
@@ -1330,6 +1446,26 @@ export async function POST(request: NextRequest) {
             console.log(`🆔 ID du prompt sauvegardé: ${savedPrompt.id}`);
           } else {
             console.log('❌ Échec de la sauvegarde - saveParentPrompt a retourné null');
+          }
+
+          // Détecter et sauvegarder les activités convenues
+          const activityMatch = detectAgreedActivity(userQuery, text);
+          if (activityMatch && childSession) {
+            console.log('🎯 Activité convenue détectée:', activityMatch.activityTitle);
+            
+            const savedActivity = await saveAgreedActivity(
+              parentSession.account.id,
+              childSession.id,
+              activityMatch.activityType,
+              activityMatch.activityTitle,
+              activityMatch.description,
+              userQuery,
+              text
+            );
+            
+            if (savedActivity) {
+              console.log('✅ Activité convenue sauvegardée:', savedActivity.id);
+            }
           }
         } else {
           console.log('❌ Impossible de récupérer parent session ou account');
