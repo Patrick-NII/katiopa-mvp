@@ -54,9 +54,9 @@ async function verifyAuthServerSide(): Promise<UserInfo | null> {
     console.log('🔍 Vérification auth - token trouvé:', token ? 'Oui' : 'Non')
     console.log('🔧 NODE_ENV:', process.env.NODE_ENV)
 
-    // En mode développement, utiliser une approche simplifiée
-    if (!token || process.env.NODE_ENV === 'development') {
-      console.log('🔧 Mode développement - authentification simplifiée')
+    // En mode développement, utiliser une approche simplifiée SEULEMENT si pas de token
+    if (!token && process.env.NODE_ENV === 'development') {
+      console.log('🔧 Mode développement - authentification simplifiée (pas de token)')
       
       // Récupérer directement le parent de test
       const parent = await prisma.userSession.findFirst({
@@ -88,7 +88,13 @@ async function verifyAuthServerSide(): Promise<UserInfo | null> {
     }
 
     // Vérifier le token JWT (approche normale)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any
+    let decoded: any
+    try {
+      decoded = jwt.verify(token!, process.env.JWT_SECRET || 'your-secret-key') as any
+    } catch (error) {
+      console.log('❌ Token JWT invalide:', error)
+      return null
+    }
     
     if (!decoded || !decoded.userId) {
       console.log('❌ Token invalide ou pas de userId')
@@ -128,6 +134,44 @@ async function verifyAuthServerSide(): Promise<UserInfo | null> {
   } catch (error) {
     console.error('❌ Erreur vérification auth côté serveur:', error)
     return null
+  }
+}
+
+// Fonction pour vérifier les connexions actives en temps réel
+async function getActiveConnections(accountId: string): Promise<any[]> {
+  try {
+    console.log('🔍 Vérification des connexions actives pour accountId:', accountId)
+    
+    // Récupérer tous les utilisateurs actifs de ce compte
+    const activeUsers = await prisma.userSession.findMany({
+      where: {
+        accountId: accountId,
+        isActive: true,
+        // Vérifier si la dernière connexion est récente (dans les 30 dernières minutes)
+        lastLoginAt: {
+          gte: new Date(Date.now() - 30 * 60 * 1000) // 30 minutes
+        }
+      },
+      select: {
+        id: true,
+        sessionId: true,
+        firstName: true,
+        lastName: true,
+        userType: true,
+        lastLoginAt: true,
+        totalConnectionDurationMs: true
+      }
+    })
+    
+    console.log('👥 Utilisateurs actifs trouvés:', activeUsers.length)
+    activeUsers.forEach(user => {
+      console.log(`   - ${user.firstName} ${user.lastName} (${user.userType}) - Dernière connexion: ${user.lastLoginAt}`)
+    })
+    
+    return activeUsers
+  } catch (error) {
+    console.error('❌ Erreur vérification connexions actives:', error)
+    return []
   }
 }
 
@@ -324,12 +368,25 @@ async function getChildrenData(accountId: string): Promise<any[]> {
 }
 
 // Fonction pour analyser les données et générer des insights
-function generateDataInsights(childrenData: any[]): string {
+function generateDataInsights(childrenData: any[], activeConnections: any[] = []): string {
   if (!childrenData || childrenData.length === 0) {
     return "Aucune donnée d'enfant disponible pour l'analyse."
   }
 
   let insights = "📊 **ANALYSE DES DONNÉES ENFANTS**\n\n"
+  
+  // Informations sur les connexions actives
+  if (activeConnections.length > 0) {
+    insights += "## 🔴 CONNEXIONS ACTIVES\n"
+    activeConnections.forEach(user => {
+      const timeAgo = Math.round((Date.now() - new Date(user.lastLoginAt).getTime()) / (1000 * 60))
+      insights += `• **${user.firstName} ${user.lastName}** (${user.userType}) - Connecté il y a ${timeAgo} minutes\n`
+    })
+    insights += "\n"
+  } else {
+    insights += "## 🔴 CONNEXIONS ACTIVES\n"
+    insights += "• Aucune connexion active détectée\n\n"
+  }
   
   childrenData.forEach((child, index) => {
     // Vérifier que child et child.activities existent
@@ -340,6 +397,21 @@ function generateDataInsights(childrenData: any[]): string {
     }
     
     insights += `**${child.firstName} ${child.lastName}** (${child.age || 'N/A'} ans)\n`
+    
+    // Vérifier si cet enfant est actuellement connecté
+    const isChildActive = activeConnections.some(active => 
+      active.firstName === child.firstName && active.lastName === child.lastName
+    )
+    
+    if (isChildActive) {
+      const activeUser = activeConnections.find(active => 
+        active.firstName === child.firstName && active.lastName === child.lastName
+      )
+      const timeAgo = Math.round((Date.now() - new Date(activeUser.lastLoginAt).getTime()) / (1000 * 60))
+      insights += `• **🟢 ACTUELLEMENT CONNECTÉ** (depuis ${timeAgo} minutes)\n`
+    } else {
+      insights += `• **🔴 Non connecté**\n`
+    }
     
     // Statistiques générales
     const totalActivities = child.activities.length
@@ -415,6 +487,7 @@ async function getUserContext(userInfo: UserInfo): Promise<UserContext> {
     
     // Si c'est un parent, récupérer les données de tous ses enfants
     let childrenData: any[] = []
+    let activeConnections: any[] = []
     if (role === 'parent') {
       console.log('👨‍👩‍👧‍👦 Parent détecté, récupération des données enfants...')
       
@@ -432,6 +505,9 @@ async function getUserContext(userInfo: UserInfo): Promise<UserContext> {
         childrenData = await getChildrenData(userSession.accountId)
         console.log('📊 Données enfants récupérées:', childrenData.length, 'enfants')
         
+        // Récupérer les connexions actives
+        activeConnections = await getActiveConnections(userSession.accountId)
+        
         if (childrenData.length > 0) {
           childrenData.forEach((child, index) => {
             console.log(`   Enfant ${index + 1}: ${child.firstName} (${child.activities.length} activités)`)
@@ -447,7 +523,7 @@ async function getUserContext(userInfo: UserInfo): Promise<UserContext> {
     }
     
     // Générer des insights basés sur les données réelles
-    const dataInsights = role === 'parent' ? generateDataInsights(childrenData) : ""
+    const dataInsights = role === 'parent' ? generateDataInsights(childrenData, activeConnections) : ""
     
     console.log('💡 Insights générés:', dataInsights ? 'Oui' : 'Non')
     console.log('📊 Données enfants disponibles:', childrenData.length, 'enfants')
@@ -1423,7 +1499,7 @@ export async function POST(request: NextRequest) {
     }
 
     const key = process.env.OPENAI_API_KEY
-    if (!key || key === 'sk-your-openai-api-key-here') {
+    if (!key || key === 'OPENAI_API_KEY') {
       return NextResponse.json({
         text: "Le mode LLM n'est pas configuré côté serveur. Contactez l'administrateur pour activer la réponse intelligente.",
         actions: [],
