@@ -280,7 +280,6 @@ async function main() {
       currency: 'EUR',
       description: 'Abonnement PRO_PLUS - Mai 2025',
       status: 'PAID',
-      billingDate: referenceDate,
       dueDate: referenceDate,
       paidAt: referenceDate
     }
