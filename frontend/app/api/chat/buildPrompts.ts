@@ -14,7 +14,8 @@ export function buildPrompts({
   user,
   childSessions,
   childrenData,
-  dataInsights
+  dataInsights,
+  agreedActivities
 }: {
   persona: 'kid' | 'pro' | 'public'
   role: 'child' | 'parent' | 'public'
@@ -28,6 +29,7 @@ export function buildPrompts({
   childSessions?: any[]
   childrenData?: any[]
   dataInsights?: string
+  agreedActivities?: any[]
 }) {
   
   // Obtenir la persona appropriée
@@ -111,6 +113,15 @@ ${role === 'child' ? `
 - Suis le système d'émotions : ${JSON.stringify(bubixPersona.pedagogy.emotionSystem)}
 - Utilise les modes d'apprentissage : ${bubixPersona.pedagogy.learningModes?.join(', ')}
 ${subProfile ? `- Incarne le profil spécialisé : ${subProfile.title} (${subProfile.domain})` : ''}
+
+## 🎯 ACTIVITÉS CONVENUES AVEC LES PARENTS
+**Si des activités sont convenues avec tes parents :**
+- Propose-les naturellement dans la conversation
+- Utilise des phrases comme "Dis, que dirais-tu de faire un peu de..." ou "On pourrait essayer..."
+- Sois enthousiaste mais pas insistant
+- Si l'enfant refuse, propose de revenir plus tard
+- Adapte l'activité au niveau et aux préférences de l'enfant
+- Utilise le style ludique et engageant de la persona enfant
 ` : `
 **MODE PARENT - EXPERT PÉDAGOGIQUE CUBEAI:**
 
@@ -169,6 +180,16 @@ ${child.cubeMatchData ? `
 `).join('\n') : 'Aucune donnée enfant disponible'}
 
 **INSIGHTS GÉNÉRÉS:** ${dataInsights || 'Aucun insight disponible'}
+
+**ACTIVITÉS CONVENUES AVEC LES PARENTS:**
+${agreedActivities && agreedActivities.length > 0 ? agreedActivities.map(activity => `
+**${activity.activityTitle}** (${activity.activityType})
+- Description: ${activity.description}
+- Demande parent: ${activity.parentRequest}
+- Réponse Bubix Pro: ${activity.bubixResponse}
+- Statut: ${activity.status}
+- Créée le: ${new Date(activity.createdAt).toLocaleDateString('fr-FR')}
+`).join('\n') : 'Aucune activité convenue avec les parents'}
 
 **RAG SNIPPETS:** ${rag.length ? rag.join('\n---\n') : 'n/a'}
 

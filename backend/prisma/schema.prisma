@@ -26,6 +26,7 @@ model Account {
   reportPreferences ReportPreference?
   dailyReportUserSessions DailyReportUserSession[]
   parentPrompts     ParentPrompt[]
+  agreedActivities  AgreedActivity[]
 }
 
 // Session utilisateur (connexion avec ID/mot de passe)
@@ -68,6 +69,7 @@ model UserSession {
   childPrompts    ParentPrompt[] @relation("ChildPrompts")
   cubeMatchScores CubeMatchScore[]
   cubeMatchUserStats CubeMatchUserStats?
+  agreedActivities AgreedActivity[]
 }
 
 // Profil détaillé de l'utilisateur
@@ -240,6 +242,37 @@ model UserPrompt {
   
   // Relations
   userSession     UserSession @relation(fields: [userSessionId], references: [id])
+}
+
+// Activités convenues entre parents et Bubix Pro
+model AgreedActivity {
+  id              String   @id @default(cuid())
+  accountId       String   // Compte parent
+  childSessionId  String   // Session enfant concernée
+  activityType    String   // Type d'activité (IA, MATH, SCIENCE, etc.)
+  activityTitle   String   // Titre de l'activité
+  description     String   // Description détaillée
+  parentRequest   String   // Demande originale du parent
+  bubixResponse   String   // Réponse de Bubix Pro
+  status          ActivityStatus @default(PENDING) // PENDING, PROPOSED, ACCEPTED, COMPLETED, DECLINED
+  proposedAt      DateTime @default(now())
+  acceptedAt      DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  account         Account     @relation(fields: [accountId], references: [id])
+  childSession    UserSession @relation(fields: [childSessionId], references: [id])
+}
+
+// Statut des activités convenues
+enum ActivityStatus {
+  PENDING     // En attente de proposition à l'enfant
+  PROPOSED    // Proposée à l'enfant
+  ACCEPTED    // Acceptée par l'enfant
+  COMPLETED   // Terminée par l'enfant
+  DECLINED    // Refusée par l'enfant
 }
 
 // Sessions de navigation
