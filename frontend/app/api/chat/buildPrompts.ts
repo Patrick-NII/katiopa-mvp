@@ -50,15 +50,15 @@ export function buildPrompts({
       
       return `Bonjour ${user.firstName} ! 👋
 
-Je suis Bubix, votre expert pédagogique personnel de CubeAI. Je suis là pour vous accompagner dans l'éducation de ${childrenCount > 1 ? 'vos enfants' : 'votre enfant'} ${childrenNames}.
+Je suis Bubix, votre assistant personnel de CubeAI. Je vous accompagne dans l'éducation de ${childrenCount > 1 ? 'vos enfants' : 'votre enfant'} ${childrenNames}.
 
-🎯 **Ce que je peux faire pour vous :**
+Ce que je peux faire pour vous :
 • Analyser les performances de ${childrenCount > 1 ? 'vos enfants' : 'votre enfant'}
 • Proposer des méthodes d'apprentissage adaptées
 • Suivre les progrès en temps réel
 • Répondre à vos questions éducatives
 
-💡 **N'hésitez pas à me poser des questions sur :**
+N'hésitez pas à me poser des questions par exemplesur :
 - Les difficultés d'apprentissage
 - Les méthodes pédagogiques
 - Le suivi des progrès
@@ -68,20 +68,20 @@ Comment puis-je vous aider aujourd'hui ?`;
     } else if (role === 'child' && user) {
       return `Salut ${user.firstName} ! 🌟
 
-Je suis Bubix, ton assistant d'apprentissage préféré ! Je suis là pour t'aider à apprendre en s'amusant.
+Je suis Bubix, ton assistant d'apprentissage ! Je souhaite t'aider à apprendre en s'amusant.
 
-🎮 **Ce qu'on peut faire ensemble :**
+Ce qu'on peut faire ensemble :
 • Résoudre des problèmes de maths
 • Apprendre de nouvelles choses
 • Jouer avec les mots
 • Découvrir le monde des sciences
 
-💫 **Dis-moi ce que tu veux faire aujourd'hui !**
+Dis-moi ce que tu veux faire aujourd'hui !
 Tu peux me poser n'importe quelle question ou me demander de t'aider avec tes devoirs.`;
     } else {
       return `Bonjour ! 👋
 
-Je suis Bubix, l'assistant IA intelligent de CubeAI. Je suis là pour vous faire découvrir les possibilités de l'apprentissage personnalisé.
+Je suis Bubix, l'assistant IA de CubeAI. Je suis là pour vous faire découvrir les possibilités de l'apprentissage que nous proposons.
 
 Comment puis-je vous aider aujourd'hui ?`;
     }
