@@ -26,6 +26,7 @@ model Account {
   reportPreferences ReportPreference?
   dailyReportUserSessions DailyReportUserSession[]
   parentPrompts     ParentPrompt[]
+  childPrompts      ChildPrompt[]
   agreedActivities  AgreedActivity[]
 }
 
@@ -66,7 +67,8 @@ model UserSession {
   passwordResetTokens PasswordResetToken[]
   aiAnalyses      AIAnalysis[]
   parentPrompts   ParentPrompt[] @relation("ParentPrompts")
-  childPrompts    ParentPrompt[] @relation("ChildPrompts")
+  parentPromptChildren ParentPrompt[] @relation("ParentPromptChild")
+  childPrompts    ChildPrompt[] @relation("ChildPrompts")
   cubeMatchScores CubeMatchScore[]
   cubeMatchUserStats CubeMatchUserStats?
   agreedActivities AgreedActivity[]
@@ -615,13 +617,37 @@ model ParentPrompt {
   accountId       String      @map("account_id")
   
   parentSession   UserSession @relation("ParentPrompts", fields: [parentSessionId], references: [id], onDelete: Cascade)
-  childSession    UserSession @relation("ChildPrompts", fields: [childSessionId], references: [id], onDelete: Cascade)
+  childSession    UserSession @relation("ParentPromptChild", fields: [childSessionId], references: [id], onDelete: Cascade)
   account         Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
   
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
 
   @@map("parent_prompts")
+}
+
+// Prompts des enfants avec Bubix Kid
+model ChildPrompt {
+  id              String      @id @default(cuid())
+  childMessage    String      // Message original de l'enfant
+  bubixResponse   String      // Réponse de Bubix Kid
+  promptType      String      @default("CHILD_CHAT") // Type de prompt
+  activityType    String?     // Type d'activité si applicable
+  difficulty      String      @default("MEDIUM") // Difficulté perçue
+  engagement      String?     // Niveau d'engagement (HIGH, MEDIUM, LOW)
+  status          PromptStatus @default(PROCESSED)
+  
+  // Relations
+  childSessionId  String      @map("child_session_id")
+  accountId       String      @map("account_id")
+  
+  childSession    UserSession @relation("ChildPrompts", fields: [childSessionId], references: [id], onDelete: Cascade)
+  account         Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  @@map("child_prompts")
 }
 
 // Statut des prompts

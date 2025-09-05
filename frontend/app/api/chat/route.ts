@@ -733,6 +733,49 @@ async function getAgreedActivitiesForChild(childSessionId: string) {
   }
 }
 
+// Fonctions de détection pour les prompts enfants
+function detectActivityType(userQuery: string): string | undefined {
+  const query = userQuery.toLowerCase()
+  
+  if (query.includes('math') || query.includes('calcul') || query.includes('nombre')) {
+    return 'MATHEMATIQUES'
+  } else if (query.includes('lecture') || query.includes('livre') || query.includes('histoire')) {
+    return 'LECTURE'
+  } else if (query.includes('science') || query.includes('expérience') || query.includes('nature')) {
+    return 'SCIENCES'
+  } else if (query.includes('code') || query.includes('programmation') || query.includes('robot')) {
+    return 'PROGRAMMATION'
+  } else if (query.includes('jeu') || query.includes('jouer') || query.includes('amusement')) {
+    return 'JEU'
+  }
+  
+  return undefined
+}
+
+function detectDifficulty(userQuery: string): string {
+  const query = userQuery.toLowerCase()
+  
+  if (query.includes('facile') || query.includes('simple') || query.includes('facilement')) {
+    return 'EASY'
+  } else if (query.includes('difficile') || query.includes('compliqué') || query.includes('dur')) {
+    return 'HARD'
+  }
+  
+  return 'MEDIUM'
+}
+
+function detectEngagement(userQuery: string): string | undefined {
+  const query = userQuery.toLowerCase()
+  
+  if (query.includes('super') || query.includes('génial') || query.includes('cool') || query.includes('j\'adore')) {
+    return 'HIGH'
+  } else if (query.includes('bof') || query.includes('pas intéressant') || query.includes('ennuyeux')) {
+    return 'LOW'
+  }
+  
+  return 'MEDIUM'
+}
+
 // Fonction pour détecter une activité convenue dans la conversation
 function detectAgreedActivity(userQuery: string, bubixResponse: string) {
   const query = userQuery.toLowerCase()
@@ -784,6 +827,42 @@ function detectAgreedActivity(userQuery: string, bubixResponse: string) {
   }
   
   return null
+}
+
+// Fonction pour sauvegarder automatiquement les prompts des enfants
+async function saveChildPrompt(
+  childSessionId: string,
+  accountId: string,
+  childMessage: string,
+  bubixResponse: string,
+  promptType: string = 'CHILD_CHAT',
+  activityType?: string,
+  difficulty: string = 'MEDIUM',
+  engagement?: string
+) {
+  try {
+    console.log('💾 Sauvegarde du prompt enfant...');
+    
+    const savedPrompt = await prisma.childPrompt.create({
+      data: {
+        childSessionId,
+        accountId,
+        childMessage,
+        bubixResponse,
+        promptType,
+        activityType,
+        difficulty,
+        engagement,
+        status: 'PROCESSED'
+      }
+    });
+    
+    console.log('✅ Prompt enfant sauvegardé:', savedPrompt.id);
+    return savedPrompt;
+  } catch (error: any) {
+    console.error('❌ Erreur sauvegarde prompt enfant:', error?.message);
+    return null;
+  }
 }
 
 // Fonction pour sauvegarder automatiquement les prompts des parents
@@ -1484,6 +1563,44 @@ export async function POST(request: NextRequest) {
       console.log('❌ Condition de sauvegarde non remplie');
       console.log(`👤 userContext.role: ${userContext.role} (attendu: 'parent')`);
       console.log(`🎫 userInfo.userType: ${userInfo.userType} (attendu: 'PARENT')`);
+    }
+
+    // Sauvegarder automatiquement le prompt si c'est un enfant
+    if (userContext.role === 'child' && userInfo.userType === 'CHILD') {
+      try {
+        console.log('💾 Sauvegarde automatique du prompt enfant...');
+        
+        // Récupérer l'accountId de l'enfant
+        const childSession = await prisma.userSession.findUnique({
+          where: { id: userInfo.id },
+          include: { account: true }
+        });
+        
+        if (childSession && childSession.account) {
+          // Détecter le type d'activité si applicable
+          const activityType = detectActivityType(userQuery);
+          const difficulty = detectDifficulty(userQuery);
+          const engagement = detectEngagement(userQuery);
+          
+          const savedPrompt = await saveChildPrompt(
+            childSession.id,
+            childSession.account.id,
+            userQuery,
+            text,
+            'CHILD_CHAT',
+            activityType,
+            difficulty,
+            engagement
+          );
+          
+          if (savedPrompt) {
+            console.log('✅ Prompt enfant sauvegardé automatiquement');
+            console.log(`🆔 ID du prompt sauvegardé: ${savedPrompt.id}`);
+          }
+        }
+      } catch (error: any) {
+        console.error('❌ Erreur sauvegarde automatique prompt enfant:', error?.message);
+      }
     }
 
     // Calculer les limites de caractères
