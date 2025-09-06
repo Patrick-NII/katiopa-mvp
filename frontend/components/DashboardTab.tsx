@@ -76,7 +76,7 @@ export default function DashboardTab({
   const [exerciseResponses, setExerciseResponses] = useState<Record<string, ExerciseResponse>>({});
   const [globalAnalyses, setGlobalAnalyses] = useState<Record<string, GlobalAnalysis>>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
-  const [aiWritingStates, setAiWritingStates] = useState<Record<string, { isWriting: boolean; type: 'compte_rendu' | 'appreciation' | 'conseils' }>>({});
+  const [aiWritingStates, setAiWritingStates] = useState<Record<string, { isWriting: boolean; type: 'compte_rendu' | 'appreciation' | 'conseils' | 'vigilance' }>>({});
   const [expandedAnalyses, setExpandedAnalyses] = useState<Record<string, boolean>>({});
   const [realSummary, setRealSummary] = useState<any>(null);
   const [savedAnalyses, setSavedAnalyses] = useState<any[]>([]);
@@ -635,6 +635,84 @@ export default function DashboardTab({
     }
   };
 
+  // Vigilance et alertes pour détecter les problèmes d'apprentissage
+  const generateVigilance = async (sessionId: string) => {
+    try {
+      setLoadingStates(prev => ({ ...prev, [`vigilance_${sessionId}`]: true }));
+      setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: true, type: 'vigilance' } }));
+      
+      // Fermer les autres onglets
+      setSessionAnalyses(prev => {
+        const newState = { ...prev };
+        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
+        return newState;
+      });
+      setGlobalAnalyses(prev => {
+        const newState = { ...prev };
+        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
+        return newState;
+      });
+      setExerciseResponses(prev => {
+        const newState = { ...prev };
+        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
+        return newState;
+      });
+      
+      let vigilanceText: string | null = null;
+      // Bloquer si limitation locale (Découverte)
+      if (user?.subscriptionType === 'FREE' && isAnalysisLimited()) {
+        showLimitPopup()
+        throw new Error('Limite atteinte: 1 analyse/semaine (Découverte)')
+      }
+
+      // 1) Tenter la route Next locale
+      try {
+        const response = await fetch(`/api/sessions/${sessionId}/vigilance`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include'
+        });
+        if (response.status === 429) {
+          showLimitPopup();
+        }
+        if (response.ok) {
+          const data = await response.json();
+          if (typeof data?.vigilance === 'string') vigilanceText = data.vigilance;
+          else if (typeof data?.alertes === 'string') vigilanceText = data.alertes;
+        }
+      } catch (_) {}
+
+      // 2) Fallback backend
+      if (!vigilanceText) {
+        try {
+          const data = await childSessionsAPI.generateExercise(sessionId) as any;
+          if (typeof data?.vigilance === 'string') vigilanceText = data.vigilance;
+          else if (typeof data?.exercise === 'string') vigilanceText = data.exercise;
+        } catch (e) { throw e; }
+      }
+
+      if (!vigilanceText) throw new Error("Aucune réponse valide de l'API");
+
+      setExerciseResponses(prev => ({ ...prev, [sessionId]: { sessionId, exercise: vigilanceText! } }));
+      if (user?.subscriptionType === 'FREE') setLastAnalysisTs()
+    } catch (error) {
+      console.error('Erreur lors de la génération de la vigilance:', error);
+      const errorVigilance: ExerciseResponse = {
+        sessionId,
+        exercise: `❌ Erreur lors de la génération de la vigilance: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
+      };
+      setExerciseResponses(prev => ({ ...prev, [sessionId]: errorVigilance }));
+    } finally {
+      setLoadingStates(prev => ({ ...prev, [`vigilance_${sessionId}`]: false }));
+      setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'vigilance' } }));
+      
+      // Déclencher le popup après l'action
+      setTimeout(() => {
+        triggerPopupAfterAction()
+      }, 2000)
+    }
+  };
+
   // Fonctions de gestion des analyses sauvegardées
   const saveAnalysis = (sessionId: string, type: string, content: string) => {
     const newAnalysis = {
@@ -849,28 +927,41 @@ export default function DashboardTab({
                 {expandedSessions.has(session.sessionId) && (
                   <div className="p-4 bg-white">
                     {/* Actions rapides */}
-                    <div className="flex gap-2 mb-4">
+                    <div className="grid grid-cols-2 gap-3 mb-4">
                       <button
                         onClick={() => generateCompteRendu(session.sessionId)}
                         disabled={loadingStates[`compte_rendu_${session.sessionId}`]}
-                        className="flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm"
+                        className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                       >
+                        <BookOpen className="w-4 h-4" />
                         Compte rendu
                       </button>
                       
                       <button
                         onClick={() => generateAppreciation(session.sessionId)}
                         disabled={loadingStates[`appreciation_${session.sessionId}`]}
-                        className="flex items-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm"
+                        className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-300 text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                       >
-                        Appréciation
+                        <Target className="w-4 h-4" />
+                        Points forts et à améliorer
                       </button>
+                      
                       <button
                         onClick={() => generateConseils(session.sessionId)}
                         disabled={loadingStates[`conseils_${session.sessionId}`]}
-                        className="flex items-center gap-2 px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm"
+                        className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                       >
-                        Conseils et exercices
+                        <Clock className="w-4 h-4" />
+                        Meilleurs moments pour apprendre
+                      </button>
+                      
+                      <button
+                        onClick={() => generateVigilance(session.sessionId)}
+                        disabled={loadingStates[`vigilance_${session.sessionId}`]}
+                        className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-300 text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                      >
+                        <Eye className="w-4 h-4" />
+                        Vigilance et alertes
                       </button>
                     </div>
 
