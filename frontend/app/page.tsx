@@ -848,7 +848,7 @@ export default function HomePage() {
             {/* Facebook */}
             <a 
               href="#" 
-              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-50 hover:bg-blue-50 transition-all duration-300"
+              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-100 hover:bg-blue-50 transition-all duration-300"
             >
               <img 
                 src="https://cdn-icons-png.flaticon.com/512/124/124010.png" 
@@ -861,7 +861,7 @@ export default function HomePage() {
             {/* Instagram */}
             <a 
               href="#" 
-              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-50 hover:bg-pink-50 transition-all duration-300"
+              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-100 hover:bg-pink-50 transition-all duration-300"
             >
               <img 
                 src="https://cdn-icons-png.flaticon.com/512/174/174855.png" 
@@ -874,7 +874,7 @@ export default function HomePage() {
             {/* LinkedIn */}
             <a 
               href="#" 
-              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-50 hover:bg-blue-50 transition-all duration-300"
+              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-100 hover:bg-blue-50 transition-all duration-300"
             >
               <img 
                 src="https://cdn-icons-png.flaticon.com/512/174/174857.png" 
@@ -887,7 +887,7 @@ export default function HomePage() {
             {/* YouTube */}
             <a 
               href="#" 
-              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-50 hover:bg-red-50 transition-all duration-300"
+              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-100 hover:bg-red-50 transition-all duration-300"
             >
               <img 
                 src="https://cdn-icons-png.flaticon.com/512/174/174883.png" 
