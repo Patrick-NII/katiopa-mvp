@@ -900,7 +900,7 @@ export default function HomePage() {
             {/* Bouton Partager */}
             <button className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transition-all duration-300">
               <img 
-                src="https://cdn-icons-png.flaticon.com/512/126/126472.png" 
+                src="https://cdn-icons-png.flaticon.com/512/1828/1828954.png" 
                 alt="Partager" 
                 className="w-5 h-5 group-hover:scale-110 transition-transform duration-300"
               />
