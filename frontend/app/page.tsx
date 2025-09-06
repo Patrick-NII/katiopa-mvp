@@ -250,78 +250,43 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-subtitle-xl text-white mb-4 max-w-3xl mx-auto drop-shadow-lg"
+              className="font-subtitle-xl text-white mb-8 max-w-4xl mx-auto drop-shadow-lg"
             >
-              L'<strong className="text-yellow-300">intelligence artificielle</strong> qui grandit avec vos enfants.
+              L'<strong className="text-yellow-300">intelligence artificielle</strong> qui grandit avec vos enfants et s'adapte à leur rythme d'apprentissage.
             </motion.p>
 
-            {/* Preuve sociale */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="mb-6 max-w-4xl mx-auto"
+              className="font-body-lg text-white mb-8 max-w-5xl mx-auto drop-shadow-lg"
             >
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-yellow-300 drop-shadow-lg">10 000+</div>
-                  <div className="text-sm text-white/80 drop-shadow">Familles</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-yellow-300 drop-shadow-lg">98%</div>
-                  <div className="text-sm text-white/80 drop-shadow">Satisfaction</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-yellow-300 drop-shadow-lg">+2h</div>
-                  <div className="text-sm text-white/80 drop-shadow">Apprentissage/jour</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-yellow-300 drop-shadow-lg">85%</div>
-                  <div className="text-sm text-white/80 drop-shadow">Amélioration</div>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="font-body-lg text-white mb-6 max-w-4xl mx-auto drop-shadow-lg"
-            >
-              <p className="mb-4 text-center">
-                Avec CubeAI, chaque enfant découvre un univers magique où l'IA devient un véritable <strong className="text-yellow-300">compagnon d'apprentissage</strong> : <strong className="text-yellow-300">Bubix</strong>.
+              <p className="mb-6 text-center">
+                Avec <strong className="text-yellow-300">CubeAI</strong>, chaque enfant découvre un univers magique où l'<strong className="text-yellow-300">intelligence artificielle</strong> devient un véritable <strong className="text-yellow-300">compagnon d'apprentissage</strong> : <strong className="text-yellow-300">Bubix</strong>.
               </p>
-              <div className="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-                <div className="text-center p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-                  <div className="text-2xl mb-2">📊</div>
-                  <div className="font-semibold text-yellow-300 mb-1">Mathématiques</div>
-                  <div className="text-sm text-white/80">Sciences interactives</div>
+              
+              <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-6">
+                <div className="text-center p-6 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl backdrop-blur-sm border border-white/20 hover:border-yellow-300/30 transition-all duration-300">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                    <span className="text-white text-2xl font-bold">📊</span>
+                  </div>
+                  <div className="font-semibold text-yellow-300 mb-2 text-lg">Mathématiques</div>
+                  <div className="text-sm text-white/90">Sciences interactives et ludiques</div>
                 </div>
-                <div className="text-center p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-                  <div className="text-2xl mb-2">💻</div>
-                  <div className="font-semibold text-yellow-300 mb-1">Programmation</div>
-                  <div className="text-sm text-white/80">Création de jeux</div>
+                <div className="text-center p-6 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl backdrop-blur-sm border border-white/20 hover:border-yellow-300/30 transition-all duration-300">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                    <span className="text-white text-2xl font-bold">💻</span>
+                  </div>
+                  <div className="font-semibold text-yellow-300 mb-2 text-lg">Programmation</div>
+                  <div className="text-sm text-white/90">Création de jeux et projets</div>
                 </div>
-                <div className="text-center p-4 bg-white/10 rounded-lg backdrop-blur-sm">
-                  <div className="text-2xl mb-2">📚</div>
-                  <div className="font-semibold text-yellow-300 mb-1">Histoires</div>
-                  <div className="text-sm text-white/80">Aventures personnalisées</div>
+                <div className="text-center p-6 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-xl backdrop-blur-sm border border-white/20 hover:border-yellow-300/30 transition-all duration-300">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center">
+                    <span className="text-white text-2xl font-bold">📚</span>
+                  </div>
+                  <div className="font-semibold text-yellow-300 mb-2 text-lg">Histoires</div>
+                  <div className="text-sm text-white/90">Aventures personnalisées</div>
                 </div>
-              </div>
-            </motion.div>
-
-            {/* Témoignage */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="mb-6 max-w-3xl mx-auto"
-            >
-              <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm border border-white/20">
-                <p className="text-white italic mb-3 drop-shadow-lg">
-                  "Mon fils de 8 ans a progressé de 3 niveaux en mathématiques en seulement 2 mois avec Bubix. Il adore ses sessions d'apprentissage !"
-                </p>
-                <div className="text-yellow-300 font-semibold">- Marie, maman de Lucas</div>
               </div>
             </motion.div>
 
@@ -329,9 +294,9 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-body-lg text-white mb-6 max-w-3xl mx-auto drop-shadow-lg text-center"
+              className="font-body-lg text-white mb-10 max-w-4xl mx-auto drop-shadow-lg text-center"
             >
-              Bubix n'est pas un simple chatbot. Il <strong className="text-yellow-300">grandit avec votre enfant</strong>, s'adapte à ses progrès, et crée un <strong className="text-yellow-300">parcours unique</strong> qui évolue jour après jour.
+              <strong className="text-yellow-300">Bubix</strong> n'est pas une IA comme les autres : il <strong className="text-yellow-300">grandit avec votre enfant</strong>, s'adapte à ses progrès, et crée un <strong className="text-yellow-300">parcours personnalisé</strong> qui évolue jour après jour pour un apprentissage optimal.
             </motion.p>
 
             <motion.div 
@@ -341,11 +306,8 @@ export default function HomePage() {
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
               <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 md:px-12 lg:px-16 py-3 md:py-3.5 lg:py-4 rounded-2xl text-base md:text-lg lg:text-xl font-semibold transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105 border-2 border-white/20 backdrop-blur-sm">
-                🚀 Commencer gratuitement - 7 jours d'essai
+                Commencer gratuitement
               </Link>
-              <p className="text-white/80 text-sm mt-2 drop-shadow">
-                Aucune carte bancaire requise • Annulation possible à tout moment
-              </p>
             </motion.div>
           </div>
         </div>
