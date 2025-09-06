@@ -367,76 +367,55 @@ export default function DashboardTab({
         throw new Error('Limite atteinte: 1 analyse/semaine (Découverte)')
       }
 
-      // Communiquer avec Bubix pour le compte rendu
-      let analysisText: string | null = null;
-      try {
-        const prompt = `Analyse complète de la session d'apprentissage de l'enfant ${sessionId}. 
-        Génère un compte rendu détaillé incluant :
-        - Résumé des activités réalisées
-        - Temps passé et progression
-        - Points forts observés
-        - Difficultés rencontrées
-        - Recommandations pour la suite
-        
-        Sois précis, constructif et encourageant.`;
+      // Communiquer uniquement avec Bubix
+      const prompt = `Analyse complète de la session d'apprentissage de l'enfant ${sessionId}. 
+      Génère un compte rendu détaillé incluant :
+      - Résumé des activités réalisées
+      - Temps passé et progression
+      - Points forts observés
+      - Difficultés rencontrées
+      - Recommandations pour la suite
+      
+      Sois précis, constructif et encourageant.`;
 
-        const response = await fetch('/api/bubix/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            prompt,
-            sessionId,
-            analysisType: 'compte_rendu',
-            context: {
-              childName: childSessions.find(s => s.sessionId === sessionId)?.name || 'Enfant',
-              activities: sessionActivities[sessionId] || [],
-              subscriptionType: user?.subscriptionType
-            }
-          })
-        });
-
-        if (response.status === 429) {
-          showLimitPopup();
-        }
-        
-        if (response.ok) {
-          const data = await response.json();
-          analysisText = data.response || data.content || data.analysis;
-        }
-      } catch (_) {}
-
-      // Fallback vers l'API existante si Bubix ne répond pas
-      if (!analysisText) {
-        try {
-          const response = await fetch(`/api/sessions/${sessionId}/analyze`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include'
-          });
-          if (response.ok) {
-            const data = await response.json();
-            if (typeof data?.analysis === 'string') {
-              analysisText = data.analysis;
-            } else if (data?.success && typeof data?.analysis === 'string') {
-              analysisText = data.analysis;
-            }
+      const response = await fetch('/api/bubix/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          prompt,
+          sessionId,
+          analysisType: 'compte_rendu',
+          context: {
+            childName: childSessions.find(s => s.sessionId === sessionId)?.name || 'Enfant',
+            activities: sessionActivities[sessionId] || [],
+            subscriptionType: user?.subscriptionType
           }
-        } catch (_) {}
+        })
+      });
+
+      if (response.status === 429) {
+        showLimitPopup();
+        throw new Error('Limite atteinte');
       }
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la communication avec Bubix');
+      }
+
+      const data = await response.json();
+      const analysisText = data.response || data.content || 'Aucune réponse de Bubix';
 
       // Stocker la réponse de Bubix
-      if (analysisText) {
-        setBubixResponses(prev => ({
-          ...prev,
-          [`compte_rendu_${sessionId}`]: {
-            type: 'compte_rendu',
-            content: analysisText!,
-            timestamp: new Date(),
-            sessionId
-          }
-        }));
-      }
+      setBubixResponses(prev => ({
+        ...prev,
+        [`compte_rendu_${sessionId}`]: {
+          type: 'compte_rendu',
+          content: analysisText,
+          timestamp: new Date(),
+          sessionId
+        }
+      }));
       // Marquer l'utilisation (Découverte)
       if (user?.subscriptionType === 'FREE') setLastAnalysisTs()
     } catch (error) {
@@ -476,93 +455,55 @@ export default function DashboardTab({
         return newState;
       });
       
-      let builtAnalysis: GlobalAnalysis | null = null;
-      // Bloquer si limitation locale (Découverte)
-      if (user?.subscriptionType === 'FREE' && isAnalysisLimited()) {
-        showLimitPopup()
-        throw new Error('Limite atteinte: 1 analyse/semaine (Découverte)')
-      }
+      // Communiquer uniquement avec Bubix
+      const prompt = `Analyse détaillée des points forts et points à améliorer pour l'enfant ${sessionId}.
+      Génère une évaluation complète incluant :
+      - Points forts identifiés dans l'apprentissage
+      - Compétences développées et maîtrisées
+      - Difficultés rencontrées et domaines à améliorer
+      - Suggestions concrètes pour progresser
+      - Stratégies d'apprentissage adaptées
+      
+      Sois constructif, encourageant et précis dans tes recommandations.`;
 
-      // 1) Tenter la route Next locale (renvoie une string "appreciation")
-      try {
-        const response = await fetch(`/api/sessions/${sessionId}/global-analysis`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include'
-        });
-        if (response.status === 429) {
-          showLimitPopup();
-        }
-        if (response.ok) {
-          const data = await response.json();
-          if (data?.success && typeof data?.appreciation === 'string') {
-            builtAnalysis = {
-              sessionId,
-              childName: data?.sessionData?.childName || (childSessions.find(s => s.sessionId === sessionId)?.name || 'Enfant'),
-              context: {
-                daysSinceRegistration: 0,
-                totalLearningTime: 0,
-                averageSessionDuration: 0,
-                learningFrequency: '',
-                sessionPatterns: { morning: 0, afternoon: 0, evening: 0 },
-                preferredTimeSlots: '',
-                age: 8,
-                grade: '',
-                totalActivities: 0,
-                averageScore: 0
-              },
-              analysis: {
-                engagement: '',
-                progression: '',
-                rythme: '',
-                recommandations: [],
-                aiAnalysis: data.appreciation
-              },
-              recommendations: []
-            };
+      const response = await fetch('/api/bubix/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          prompt,
+          sessionId,
+          analysisType: 'appreciation',
+          context: {
+            childName: childSessions.find(s => s.sessionId === sessionId)?.name || 'Enfant',
+            activities: sessionActivities[sessionId] || [],
+            subscriptionType: user?.subscriptionType
           }
-        }
-      } catch (_) {}
+        })
+      });
 
-      // 2) Fallback backend (renvoie un contexte + analysis string)
-      if (!builtAnalysis) {
-        try {
-          const data = await childSessionsAPI.getGlobalAnalysis(sessionId) as any;
-          builtAnalysis = {
-            sessionId,
-            childName: data?.childName || (childSessions.find(s => s.sessionId === sessionId)?.name || 'Enfant'),
-            context: data?.context || {
-              daysSinceRegistration: 0,
-              totalLearningTime: 0,
-              averageSessionDuration: 0,
-              learningFrequency: '',
-              sessionPatterns: { morning: 0, afternoon: 0, evening: 0 },
-              preferredTimeSlots: '',
-              age: 8,
-              grade: '',
-              totalActivities: 0,
-              averageScore: 0
-            },
-            analysis: typeof data?.analysis === 'string' ? {
-              engagement: '',
-              progression: '',
-              rythme: '',
-              recommandations: [],
-              aiAnalysis: data.analysis
-            } : (data?.analysis || {
-              engagement: '',
-              progression: '',
-              rythme: '',
-              recommandations: [],
-              aiAnalysis: ''
-            }),
-            recommendations: data?.recommendations || []
-          };
-        } catch (e) { throw e; }
+      if (response.status === 429) {
+        showLimitPopup();
+        throw new Error('Limite atteinte');
       }
 
-      if (!builtAnalysis) throw new Error("Aucune réponse valide de l'API");
-      setGlobalAnalyses(prev => ({ ...prev, [sessionId]: builtAnalysis! }));
+      if (!response.ok) {
+        throw new Error('Erreur lors de la communication avec Bubix');
+      }
+
+      const data = await response.json();
+      const appreciationText = data.response || data.content || 'Aucune réponse de Bubix';
+
+      // Stocker la réponse de Bubix
+      setBubixResponses(prev => ({
+        ...prev,
+        [`appreciation_${sessionId}`]: {
+          type: 'appreciation',
+          content: appreciationText,
+          timestamp: new Date(),
+          sessionId
+        }
+      }));
       if (user?.subscriptionType === 'FREE') setLastAnalysisTs()
     } catch (error) {
       console.error('Erreur lors de la génération de l\'appréciation:', error);
@@ -625,41 +566,56 @@ export default function DashboardTab({
         return newState;
       });
       
-      let exerciseText: string | null = null;
-      // Bloquer si limitation locale (Découverte)
-      if (user?.subscriptionType === 'FREE' && isAnalysisLimited()) {
-        showLimitPopup()
-        throw new Error('Limite atteinte: 1 analyse/semaine (Découverte)')
+      // Communiquer uniquement avec Bubix
+      const prompt = `Analyse des meilleurs moments pour apprendre pour l'enfant ${sessionId}.
+      Génère des recommandations sur :
+      - Moments optimaux de la journée pour l'apprentissage
+      - Durée idéale des sessions d'étude
+      - Fréquence recommandée des pauses
+      - Facteurs environnementaux favorables
+      - Stratégies pour maintenir la concentration
+      - Conseils pour créer un environnement d'apprentissage optimal
+      
+      Sois pratique et adapte tes conseils à l'âge et au profil de l'enfant.`;
+
+      const response = await fetch('/api/bubix/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          prompt,
+          sessionId,
+          analysisType: 'conseils',
+          context: {
+            childName: childSessions.find(s => s.sessionId === sessionId)?.name || 'Enfant',
+            activities: sessionActivities[sessionId] || [],
+            subscriptionType: user?.subscriptionType
+          }
+        })
+      });
+
+      if (response.status === 429) {
+        showLimitPopup();
+        throw new Error('Limite atteinte');
       }
 
-      // 1) Tenter la route Next locale
-      try {
-        const response = await fetch(`/api/sessions/${sessionId}/exercise`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include'
-        });
-        if (response.status === 429) {
-          showLimitPopup();
-        }
-        if (response.ok) {
-          const data = await response.json();
-          if (typeof data?.exercise === 'string') exerciseText = data.exercise;
-          else if (typeof data?.conseils === 'string') exerciseText = data.conseils;
-        }
-      } catch (_) {}
-
-      // 2) Fallback backend
-      if (!exerciseText) {
-        try {
-          const data = await childSessionsAPI.generateExercise(sessionId) as any;
-          if (typeof data?.exercise === 'string') exerciseText = data.exercise;
-        } catch (e) { throw e; }
+      if (!response.ok) {
+        throw new Error('Erreur lors de la communication avec Bubix');
       }
 
-      if (!exerciseText) throw new Error("Aucune réponse valide de l'API");
+      const data = await response.json();
+      const conseilsText = data.response || data.content || 'Aucune réponse de Bubix';
 
-      setExerciseResponses(prev => ({ ...prev, [sessionId]: { sessionId, exercise: exerciseText! } }));
+      // Stocker la réponse de Bubix
+      setBubixResponses(prev => ({
+        ...prev,
+        [`conseils_${sessionId}`]: {
+          type: 'conseils',
+          content: conseilsText,
+          timestamp: new Date(),
+          sessionId
+        }
+      }));
       if (user?.subscriptionType === 'FREE') setLastAnalysisTs()
     } catch (error) {
       console.error('Erreur lors de la génération des conseils:', error);
@@ -702,42 +658,56 @@ export default function DashboardTab({
         return newState;
       });
       
-      let vigilanceText: string | null = null;
-      // Bloquer si limitation locale (Découverte)
-      if (user?.subscriptionType === 'FREE' && isAnalysisLimited()) {
-        showLimitPopup()
-        throw new Error('Limite atteinte: 1 analyse/semaine (Découverte)')
+      // Communiquer uniquement avec Bubix
+      const prompt = `Analyse de vigilance et alertes pour l'enfant ${sessionId}.
+      Génère une surveillance attentive incluant :
+      - Signaux d'alerte à surveiller dans l'apprentissage
+      - Indicateurs de difficultés ou de décrochage
+      - Comportements préoccupants à identifier
+      - Recommandations pour prévenir les problèmes
+      - Actions à entreprendre en cas de signal d'alerte
+      - Conseils pour maintenir la motivation et l'engagement
+      
+      Sois vigilant mais rassurant dans tes recommandations.`;
+
+      const response = await fetch('/api/bubix/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          prompt,
+          sessionId,
+          analysisType: 'vigilance',
+          context: {
+            childName: childSessions.find(s => s.sessionId === sessionId)?.name || 'Enfant',
+            activities: sessionActivities[sessionId] || [],
+            subscriptionType: user?.subscriptionType
+          }
+        })
+      });
+
+      if (response.status === 429) {
+        showLimitPopup();
+        throw new Error('Limite atteinte');
       }
 
-      // 1) Tenter la route Next locale
-      try {
-        const response = await fetch(`/api/sessions/${sessionId}/vigilance`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include'
-        });
-        if (response.status === 429) {
-          showLimitPopup();
-        }
-        if (response.ok) {
-          const data = await response.json();
-          if (typeof data?.vigilance === 'string') vigilanceText = data.vigilance;
-          else if (typeof data?.alertes === 'string') vigilanceText = data.alertes;
-        }
-      } catch (_) {}
-
-      // 2) Fallback backend
-      if (!vigilanceText) {
-        try {
-          const data = await childSessionsAPI.generateExercise(sessionId) as any;
-          if (typeof data?.vigilance === 'string') vigilanceText = data.vigilance;
-          else if (typeof data?.exercise === 'string') vigilanceText = data.exercise;
-        } catch (e) { throw e; }
+      if (!response.ok) {
+        throw new Error('Erreur lors de la communication avec Bubix');
       }
 
-      if (!vigilanceText) throw new Error("Aucune réponse valide de l'API");
+      const data = await response.json();
+      const vigilanceText = data.response || data.content || 'Aucune réponse de Bubix';
 
-      setExerciseResponses(prev => ({ ...prev, [sessionId]: { sessionId, exercise: vigilanceText! } }));
+      // Stocker la réponse de Bubix
+      setBubixResponses(prev => ({
+        ...prev,
+        [`vigilance_${sessionId}`]: {
+          type: 'vigilance',
+          content: vigilanceText,
+          timestamp: new Date(),
+          sessionId
+        }
+      }));
       if (user?.subscriptionType === 'FREE') setLastAnalysisTs()
     } catch (error) {
       console.error('Erreur lors de la génération de la vigilance:', error);
