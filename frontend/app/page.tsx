@@ -246,47 +246,31 @@ export default function HomePage() {
         {/* Contenu principal - Positionné plus bas */}
         <div className="absolute bottom-50 left-0 right-0 z-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 xl:px-8 text-center">
+            
             <motion.p 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-subtitle-xl text-white mb-6 max-w-3xl mx-auto drop-shadow-lg"
+              className="font-subtitle-xl text-gray-600 mb-12 max-w-3xl mx-auto"
             >
-              L'<strong className="text-yellow-300">intelligence artificielle</strong> qui grandit avec vos enfants.
+              Découvrez <strong className="text-blue-700">CubeAI</strong>, la première plateforme 
+              d'<strong className="text-blue-700">apprentissage intelligent</strong> qui révolutionne 
+              l'<strong className="text-blue-700">éducation des enfants de 5 à 7 ans</strong>. 
+              Notre technologie d'<strong className="text-blue-700">intelligence artificielle adaptative</strong> 
+              crée des <strong className="text-blue-700">parcours personnalisés</strong> qui s'ajustent 
+              aux besoins de chaque enfant.
             </motion.p>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="font-body-lg text-white mb-6 max-w-4xl mx-auto drop-shadow-lg"
-            >
-              <p className="mb-4">
-                Avec CubeAI, chaque enfant découvre un univers magique où l'IA devient un véritable <strong className="text-yellow-300">compagnon d'apprentissage</strong> : <strong className="text-yellow-300">Bubix</strong>.
-              </p>
-              <ul className="text-left space-y-2 max-w-2xl mx-auto">
-                <li className="flex items-center">
-                  <span className="text-yellow-300 mr-2">•</span>
-                  <strong className="text-yellow-300">Mathématiques</strong> et sciences interactives
-                </li>
-                <li className="flex items-center">
-                  <span className="text-yellow-300 mr-2">•</span>
-                  <strong className="text-yellow-300">Programmation</strong> et création de jeux
-                </li>
-                <li className="flex items-center">
-                  <span className="text-yellow-300 mr-2">•</span>
-                  <strong className="text-yellow-300">Histoires</strong> et aventures personnalisées
-                </li>
-              </ul>
-            </motion.div>
-
             <motion.p 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-body-lg text-white mb-8 max-w-3xl mx-auto drop-shadow-lg"
+              className="font-body-lg text-gray-600 mb-12 max-w-4xl mx-auto"
             >
-              Bubix <strong className="text-yellow-300">grandit avec votre enfant</strong> et crée un <strong className="text-yellow-300">parcours personnalisé</strong> qui évolue jour après jour.
+              <strong>Mathématiques fondamentales, lecture et écriture, sciences naturelles, développement de la créativité</strong> - 
+              chaque domaine est abordé avec une approche <strong>ludique et progressive</strong>. Les parents suivent les progrès 
+              en temps réel tandis que les enfants développent leur <strong>confiance en soi</strong>, leur 
+              <strong>autonomie d'apprentissage</strong> et leur <strong>curiosité naturelle</strong>.
             </motion.p>
 
             <motion.div 
