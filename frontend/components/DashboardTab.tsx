@@ -673,8 +673,8 @@ export default function DashboardTab({
           
           {/* Layout en deux colonnes */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            {/* Colonne gauche - Sessions (60%) */}
-            <div className="lg:col-span-3">
+            {/* Colonne gauche - Sessions (40%) */}
+            <div className="lg:col-span-2">
               <h4 className="text-md font-medium text-gray-800 mb-4 flex items-center gap-2">
                 <Users className="w-4 h-4 text-blue-600" />
                 Sessions Enfants
@@ -775,8 +775,8 @@ export default function DashboardTab({
               </div>
             </div>
 
-            {/* Colonne droite - Tableau des analyses (40%) */}
-            <div className="lg:col-span-2">
+            {/* Colonne droite - Tableau des analyses (60%) */}
+            <div className="lg:col-span-3">
               <h4 className="text-md font-medium text-gray-800 mb-4 flex items-center gap-2">
                 <Brain className="w-4 h-4 text-purple-600" />
                 Analyses Bubix
