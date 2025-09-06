@@ -203,7 +203,7 @@ export default function HomePage() {
       <section className="relative overflow-hidden">
         {/* Éléments décoratifs supprimés - effets de brillance retirés */}
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 xl:px-8 py-12 md:py-20 xl:py-32 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 xl:px-8 py-16 md:py-24 xl:py-40 relative z-10">
           <div className="text-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
