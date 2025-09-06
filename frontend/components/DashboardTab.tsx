@@ -304,6 +304,7 @@ export default function DashboardTab({
       }
 
       const data = await response.json();
+      console.log('🔍 Réponse reçue pour compte rendu:', data);
       
       if (data.success) {
         // Formater la réponse pour correspondre à l'ancien format
@@ -311,8 +312,10 @@ export default function DashboardTab({
           sessionId: sessionId,
           analysis: data.analysis
         };
+        console.log('✅ Analyse formatée:', analysis);
         setSessionAnalyses(prev => ({ ...prev, [sessionId]: analysis }));
       } else {
+        console.log('❌ data.success est false:', data);
         throw new Error(data.message || 'Erreur lors de la génération du compte rendu');
       }
     } catch (error) {
