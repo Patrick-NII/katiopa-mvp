@@ -5,7 +5,6 @@ import { motion } from 'framer-motion'
 import { 
   Activity, 
   TrendingUp, 
-  Target, 
   Award,
   BarChart3,
   Clock,
@@ -19,7 +18,6 @@ import {
   Code,
   Lightbulb,
   Gamepad2,
-  Eye,
   Plus,
   RefreshCw,
   Bookmark
@@ -77,7 +75,7 @@ export default function DashboardTab({
   const [exerciseResponses, setExerciseResponses] = useState<Record<string, ExerciseResponse>>({});
   const [globalAnalyses, setGlobalAnalyses] = useState<Record<string, GlobalAnalysis>>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
-  const [aiWritingStates, setAiWritingStates] = useState<Record<string, { isWriting: boolean; type: 'compte_rendu' | 'appreciation' | 'conseils' | 'vigilance' }>>({});
+  const [aiWritingStates, setAiWritingStates] = useState<Record<string, { isWriting: boolean; type: 'compte_rendu' }>>({});
   const [expandedAnalyses, setExpandedAnalyses] = useState<Record<string, boolean>>({});
   const [realSummary, setRealSummary] = useState<any>(null);
   const [savedAnalyses, setSavedAnalyses] = useState<any[]>([]);
@@ -86,7 +84,7 @@ export default function DashboardTab({
   const [summaryLoading, setSummaryLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [bubixResponses, setBubixResponses] = useState<Record<string, {
-    type: 'compte_rendu' | 'appreciation' | 'conseils' | 'vigilance';
+    type: 'compte_rendu';
     content: string;
     timestamp: Date;
     sessionId: string;
@@ -509,301 +507,6 @@ export default function DashboardTab({
     }
   };
 
-  // Analyse détaillée de chaque élément et améliorations possibles
-  const generateAppreciation = async (sessionId: string) => {
-    try {
-      setLoadingStates(prev => ({ ...prev, [`appreciation_${sessionId}`]: true }));
-      setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: true, type: 'appreciation' } }));
-      
-      // Fermer les autres onglets
-      setSessionAnalyses(prev => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
-        return newState;
-      });
-      setGlobalAnalyses(prev => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
-        return newState;
-      });
-      setExerciseResponses(prev => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
-        return newState;
-      });
-      
-      // Communiquer uniquement avec Bubix
-      const prompt = `Analyse détaillée des points forts et points à améliorer pour l'enfant ${sessionId}.
-      Génère une évaluation complète incluant :
-      - Points forts identifiés dans l'apprentissage
-      - Compétences développées et maîtrisées
-      - Difficultés rencontrées et domaines à améliorer
-      - Suggestions concrètes pour progresser
-      - Stratégies d'apprentissage adaptées
-      
-      Sois constructif, encourageant et précis dans tes recommandations.`;
-
-      const response = await fetch('/api/bubix/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          prompt,
-          sessionId,
-          analysisType: 'appreciation',
-          context: {
-            childName: childSessions.find(s => s.sessionId === sessionId)?.name || 'Enfant',
-            activities: sessionActivities[sessionId] || [],
-            subscriptionType: user?.subscriptionType
-          }
-        })
-      });
-
-      if (response.status === 429) {
-        showLimitPopup();
-        throw new Error('Limite atteinte');
-      }
-
-      if (!response.ok) {
-        throw new Error('Erreur lors de la communication avec Bubix');
-      }
-
-      const data = await response.json();
-      const appreciationText = data.response || data.content || 'Aucune réponse de Bubix';
-
-      // Stocker la réponse de Bubix
-      setBubixResponses(prev => ({
-        ...prev,
-        [`appreciation_${sessionId}`]: {
-          type: 'appreciation',
-          content: appreciationText,
-          timestamp: new Date(),
-          sessionId
-        }
-      }));
-      if (user?.subscriptionType === 'FREE') setLastAnalysisTs()
-    } catch (error) {
-      console.error('Erreur lors de la génération de l\'appréciation:', error);
-      const errorAnalysis: GlobalAnalysis = {
-        sessionId,
-        childName: 'Enfant',
-        context: {
-          daysSinceRegistration: 0,
-          totalLearningTime: 0,
-          averageSessionDuration: 0,
-          learningFrequency: '',
-          sessionPatterns: { morning: 0, afternoon: 0, evening: 0 },
-          preferredTimeSlots: '',
-          age: 8,
-          grade: '',
-          totalActivities: 0,
-          averageScore: 0
-        },
-        analysis: {
-          engagement: '',
-          progression: '',
-          rythme: '',
-          recommandations: [],
-          aiAnalysis: `❌ Erreur lors de la génération de l'appréciation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
-        },
-        recommendations: []
-      };
-      setGlobalAnalyses(prev => ({ ...prev, [sessionId]: errorAnalysis }));
-    } finally {
-      setLoadingStates(prev => ({ ...prev, [`appreciation_${sessionId}`]: false }));
-      setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'appreciation' } }));
-      
-      // Déclencher le popup après l'action
-      setTimeout(() => {
-        triggerPopupAfterAction()
-      }, 2000)
-    }
-  };
-
-  // Conseils et plans d'action pour améliorer le programme
-  const generateConseils = async (sessionId: string) => {
-    try {
-      setLoadingStates(prev => ({ ...prev, [`conseils_${sessionId}`]: true }));
-      setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: true, type: 'conseils' } }));
-      
-      // Fermer les autres onglets
-      setSessionAnalyses(prev => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
-        return newState;
-      });
-      setGlobalAnalyses(prev => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
-        return newState;
-      });
-      setExerciseResponses(prev => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
-        return newState;
-      });
-      
-      // Communiquer uniquement avec Bubix
-      const prompt = `Analyse des meilleurs moments pour apprendre pour l'enfant ${sessionId}.
-      Génère des recommandations sur :
-      - Moments optimaux de la journée pour l'apprentissage
-      - Durée idéale des sessions d'étude
-      - Fréquence recommandée des pauses
-      - Facteurs environnementaux favorables
-      - Stratégies pour maintenir la concentration
-      - Conseils pour créer un environnement d'apprentissage optimal
-      
-      Sois pratique et adapte tes conseils à l'âge et au profil de l'enfant.`;
-
-      const response = await fetch('/api/bubix/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          prompt,
-          sessionId,
-          analysisType: 'conseils',
-          context: {
-            childName: childSessions.find(s => s.sessionId === sessionId)?.name || 'Enfant',
-            activities: sessionActivities[sessionId] || [],
-            subscriptionType: user?.subscriptionType
-          }
-        })
-      });
-
-      if (response.status === 429) {
-        showLimitPopup();
-        throw new Error('Limite atteinte');
-      }
-
-      if (!response.ok) {
-        throw new Error('Erreur lors de la communication avec Bubix');
-      }
-
-      const data = await response.json();
-      const conseilsText = data.response || data.content || 'Aucune réponse de Bubix';
-
-      // Stocker la réponse de Bubix
-      setBubixResponses(prev => ({
-        ...prev,
-        [`conseils_${sessionId}`]: {
-          type: 'conseils',
-          content: conseilsText,
-          timestamp: new Date(),
-          sessionId
-        }
-      }));
-      if (user?.subscriptionType === 'FREE') setLastAnalysisTs()
-    } catch (error) {
-      console.error('Erreur lors de la génération des conseils:', error);
-      const errorExercise: ExerciseResponse = {
-        sessionId,
-        exercise: `❌ Erreur lors de la génération des conseils: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
-      };
-      setExerciseResponses(prev => ({ ...prev, [sessionId]: errorExercise }));
-    } finally {
-      setLoadingStates(prev => ({ ...prev, [`conseils_${sessionId}`]: false }));
-      setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'conseils' } }));
-      
-      // Déclencher le popup après l'action
-      setTimeout(() => {
-        triggerPopupAfterAction()
-      }, 2000)
-    }
-  };
-
-  // Vigilance et alertes pour détecter les problèmes d'apprentissage
-  const generateVigilance = async (sessionId: string) => {
-    try {
-      setLoadingStates(prev => ({ ...prev, [`vigilance_${sessionId}`]: true }));
-      setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: true, type: 'vigilance' } }));
-      
-      // Fermer les autres onglets
-      setSessionAnalyses(prev => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
-        return newState;
-      });
-      setGlobalAnalyses(prev => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
-        return newState;
-      });
-      setExerciseResponses(prev => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
-        return newState;
-      });
-      
-      // Communiquer uniquement avec Bubix
-      const prompt = `Analyse de vigilance et alertes pour l'enfant ${sessionId}.
-      Génère une surveillance attentive incluant :
-      - Signaux d'alerte à surveiller dans l'apprentissage
-      - Indicateurs de difficultés ou de décrochage
-      - Comportements préoccupants à identifier
-      - Recommandations pour prévenir les problèmes
-      - Actions à entreprendre en cas de signal d'alerte
-      - Conseils pour maintenir la motivation et l'engagement
-      
-      Sois vigilant mais rassurant dans tes recommandations.`;
-
-      const response = await fetch('/api/bubix/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          prompt,
-          sessionId,
-          analysisType: 'vigilance',
-          context: {
-            childName: childSessions.find(s => s.sessionId === sessionId)?.name || 'Enfant',
-            activities: sessionActivities[sessionId] || [],
-            subscriptionType: user?.subscriptionType
-          }
-        })
-      });
-
-      if (response.status === 429) {
-        showLimitPopup();
-        throw new Error('Limite atteinte');
-      }
-
-      if (!response.ok) {
-        throw new Error('Erreur lors de la communication avec Bubix');
-      }
-
-      const data = await response.json();
-      const vigilanceText = data.response || data.content || 'Aucune réponse de Bubix';
-
-      // Stocker la réponse de Bubix
-      setBubixResponses(prev => ({
-        ...prev,
-        [`vigilance_${sessionId}`]: {
-          type: 'vigilance',
-          content: vigilanceText,
-          timestamp: new Date(),
-          sessionId
-        }
-      }));
-      if (user?.subscriptionType === 'FREE') setLastAnalysisTs()
-    } catch (error) {
-      console.error('Erreur lors de la génération de la vigilance:', error);
-      const errorVigilance: ExerciseResponse = {
-        sessionId,
-        exercise: `❌ Erreur lors de la génération de la vigilance: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
-      };
-      setExerciseResponses(prev => ({ ...prev, [sessionId]: errorVigilance }));
-    } finally {
-      setLoadingStates(prev => ({ ...prev, [`vigilance_${sessionId}`]: false }));
-      setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'vigilance' } }));
-      
-      // Déclencher le popup après l'action
-      setTimeout(() => {
-        triggerPopupAfterAction()
-      }, 2000)
-    }
-  };
-
   // Fonctions de gestion des analyses sauvegardées
   const saveAnalysis = (sessionId: string, type: string, content: string) => {
     const newAnalysis = {
@@ -1041,48 +744,6 @@ export default function DashboardTab({
                             <RefreshCw className="w-4 h-4 animate-spin" />
                           )}
                         </button>
-
-                        {/* Appréciation */}
-                        <button
-                          onClick={() => generateAppreciation(session.sessionId)}
-                          disabled={loadingStates[`appreciation_${session.sessionId}`]}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 !text-gray-200 font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                          title="Générer une appréciation détaillée"
-                        >
-                          <Target className="w-4 h-4" />
-                          <span>Appréciation</span>
-                          {loadingStates[`appreciation_${session.sessionId}`] && (
-                            <RefreshCw className="w-4 h-4 animate-spin" />
-                          )}
-                        </button>
-
-                        {/* Conseils */}
-                        <button
-                          onClick={() => generateConseils(session.sessionId)}
-                          disabled={loadingStates[`conseils_${session.sessionId}`]}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 !text-gray-200 font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                          title="Générer des conseils et exercices"
-                        >
-                          <Clock className="w-4 h-4" />
-                          <span>Conseils</span>
-                          {loadingStates[`conseils_${session.sessionId}`] && (
-                            <RefreshCw className="w-4 h-4 animate-spin" />
-                          )}
-                        </button>
-
-                        {/* Vigilance */}
-                        <button
-                          onClick={() => generateVigilance(session.sessionId)}
-                          disabled={loadingStates[`vigilance_${session.sessionId}`]}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 !text-gray-200 font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                          title="Surveillance des signaux d'alerte"
-                        >
-                          <Eye className="w-4 h-4" />
-                          <span>Vigilance</span>
-                          {loadingStates[`vigilance_${session.sessionId}`] && (
-                            <RefreshCw className="w-4 h-4 animate-spin" />
-                          )}
-                        </button>
                       </div>
                     </div>
 
@@ -1155,14 +816,8 @@ export default function DashboardTab({
                                 <td className="px-4 py-4 whitespace-nowrap">
                                   <div className="flex items-center gap-2">
                                     {response.type === 'compte_rendu' && <BookOpen className="w-4 h-4 text-blue-600" />}
-                                    {response.type === 'appreciation' && <Target className="w-4 h-4 text-purple-600" />}
-                                    {response.type === 'conseils' && <Clock className="w-4 h-4 text-green-600" />}
-                                    {response.type === 'vigilance' && <Eye className="w-4 h-4 text-orange-600" />}
                                     <span className="text-sm font-medium text-gray-900">
                                       {response.type === 'compte_rendu' && 'Compte rendu'}
-                                      {response.type === 'appreciation' && 'Points forts'}
-                                      {response.type === 'conseils' && 'Meilleurs moments'}
-                                      {response.type === 'vigilance' && 'Vigilance'}
                                     </span>
                                   </div>
                                 </td>
@@ -1190,7 +845,7 @@ export default function DashboardTab({
                                     })}
                                     className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors"
                                   >
-                                    <Eye className="w-3 h-3" />
+                                    <BookOpen className="w-3 h-3" />
                                     Lire
                                   </button>
                                 </td>
