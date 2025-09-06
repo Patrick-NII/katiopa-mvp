@@ -418,23 +418,11 @@ export default function DashboardTab({
     try {
       setLoadingStates(prev => ({ ...prev, [`compte_rendu_${sessionId}`]: true }));
       setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: true, type: 'compte_rendu' } }));
-      
-      // Fermer toutes les autres analyses
-      setSessionAnalyses(prev => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
-        return newState;
-      });
-      setGlobalAnalyses(prev => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
-        return newState;
-      });
-      setExerciseResponses(prev => {
-        const newState = { ...prev };
-        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
-        return newState;
-      });
+
+      // Initialiser la progression Bubix
+      setIsProgressVisible(true);
+      setProgressSteps(createBubixSteps());
+      setCurrentProgressStep('auth');
       
       // Bloquer si limitation locale (Découverte)
       if (user?.subscriptionType === 'FREE' && isAnalysisLimited()) {
@@ -495,10 +483,20 @@ export default function DashboardTab({
       if (user?.subscriptionType === 'FREE') setLastAnalysisTs()
     } catch (error) {
       console.error('Erreur lors de la génération du compte rendu:', error);
-      setSessionAnalyses(prev => ({ ...prev, [sessionId]: { sessionId, analysis: `❌ Erreur lors de la génération du compte rendu: ${error instanceof Error ? error.message : 'Erreur inconnue'}` } }));
+      // Stocker l'erreur dans BubixResponses au lieu de sessionAnalyses
+      setBubixResponses(prev => ({
+        ...prev,
+        [`compte_rendu_${sessionId}`]: {
+          type: 'compte_rendu',
+          content: `❌ Erreur lors de la génération du compte rendu: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
+          timestamp: new Date(),
+          sessionId
+        }
+      }));
     } finally {
       setLoadingStates(prev => ({ ...prev, [`compte_rendu_${sessionId}`]: false }));
       setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'compte_rendu' } }));
+      setIsProgressVisible(false);
       
       // Déclencher le popup après l'action (avec délai pour laisser l'utilisateur voir le résultat)
       setTimeout(() => {
