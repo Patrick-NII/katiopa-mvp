@@ -209,12 +209,12 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="mb-4 md:mb-6"
+              className="mb-2 md:mb-3"
             >
               <AnimatedMulticolorText 
                 text="Découvrez CubeAI & Bubix" 
                 variant="h1" 
-                className="leading-tight text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl whitespace-nowrap"
+                className="leading-none text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[12rem] whitespace-nowrap"
                 staggerDelay={0.1}
               />
             </motion.div>
