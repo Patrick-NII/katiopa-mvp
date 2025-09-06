@@ -675,42 +675,49 @@ Accompagner chaque enfant dans son épanouissement et sa réussite.`
 
         {/* Code Promo Section - seulement si pas en cours de paiement */}
         {paymentStep === 'selection' && (
-          <div className="text-center mb-6">
-            <Gift className="w-8 h-8 text-purple-500 mx-auto mb-3" />
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Code Promo</h3>
-            <p className="text-gray-600">Réduisez encore plus votre investissement éducatif</p>
-          </div>
-          
-          <div className="max-w-md mx-auto">
-            <div className="flex space-x-3">
-              <input
-                type="text"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value)}
-                placeholder="Entrez votre code promo"
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-              <button
-                onClick={applyPromoCode}
-                disabled={isApplyingPromo}
-                className="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50 transition-colors"
-              >
-                {isApplyingPromo ? '...' : 'Appliquer'}
-              </button>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-12"
+          >
+            <div className="text-center mb-6">
+              <Gift className="w-8 h-8 text-purple-500 mx-auto mb-3" />
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Code Promo</h3>
+              <p className="text-gray-600">Réduisez encore plus votre investissement éducatif</p>
             </div>
             
-            {appliedPromo && (
-              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                  <span className="text-green-700 font-medium">
-                    Code {appliedPromo.code} appliqué ! -{appliedPromo.discount}% de réduction
-                  </span>
-                </div>
+            <div className="max-w-md mx-auto">
+              <div className="flex space-x-3">
+                <input
+                  type="text"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                  placeholder="Entrez votre code promo"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+                <button
+                  onClick={applyPromoCode}
+                  disabled={isApplyingPromo}
+                  className="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50 transition-colors"
+                >
+                  {isApplyingPromo ? '...' : 'Appliquer'}
+                </button>
               </div>
-            )}
-          </div>
-        </motion.div>
+              
+              {appliedPromo && (
+                <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center">
+                    <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                    <span className="text-green-700 font-medium">
+                      Code {appliedPromo.code} appliqué ! -{appliedPromo.discount}% de réduction
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
 
         {/* CTA Final */}
         <motion.div
