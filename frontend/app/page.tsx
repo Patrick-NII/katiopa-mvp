@@ -204,7 +204,7 @@ export default function HomePage() {
         {/* Images de fond décoratives */}
         
         {/* Bubix décalé vers la droite avec effet néon */}
-        <div className="absolute top-40 left-1/2 transform translate-x-1/2 z-10">
+        <div className="absolute top-40 left-2/3 transform translate-x-1/2 z-10">
           <img 
             src="/image-bubix/bubix.png" 
             alt="Bubix" 
