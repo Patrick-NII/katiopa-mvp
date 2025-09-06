@@ -864,7 +864,7 @@ export default function HomePage() {
               className="group flex items-center gap-3 px-4 py-2 rounded-full transition-all duration-300"
               style={{ backgroundColor: '#f3f4f6 !important' }}
             >
-              <div className="w-6 h-6 rounded-lg bg-gray-600 group-hover:bg-gradient-to-br group-hover:from-pink-500 group-hover:via-purple-500 group-hover:to-orange-500 transition-all duration-300 flex items-center justify-center group-hover:scale-110">
+              <div className="w-6 h-6 rounded-lg bg-gray-100 group-hover:bg-gradient-to-br group-hover:from-pink-500 group-hover:via-purple-500 group-hover:to-orange-500 transition-all duration-300 flex items-center justify-center group-hover:scale-110">
                 <img 
                   src="/social/instagram.png" 
                   alt="Instagram" 
@@ -880,7 +880,7 @@ export default function HomePage() {
               className="group flex items-center gap-3 px-4 py-2 rounded-full transition-all duration-300"
               style={{ backgroundColor: '#f3f4f6 !important' }}
             >
-              <div className="w-6 h-6 rounded-lg bg-gray-600 group-hover:bg-blue-700 transition-colors duration-300 flex items-center justify-center group-hover:scale-110">
+              <div className="w-6 h-6 rounded-lg bg-gray-100 group-hover:bg-blue-700 transition-colors duration-300 flex items-center justify-center group-hover:scale-110">
                 <img 
                   src="/social/linkedin.png" 
                   alt="LinkedIn" 
@@ -896,7 +896,7 @@ export default function HomePage() {
               className="group flex items-center gap-3 px-4 py-2 rounded-full transition-all duration-300"
               style={{ backgroundColor: '#f3f4f6 !important' }}
             >
-              <div className="w-6 h-6 rounded-lg bg-gray-600 group-hover:bg-black transition-colors duration-300 flex items-center justify-center group-hover:scale-110">
+              <div className="w-6 h-6 rounded-lg bg-gray-100 group-hover:bg-black transition-colors duration-300 flex items-center justify-center group-hover:scale-110">
                 <img 
                   src="/social/tic-tac.png" 
                   alt="TikTok" 
@@ -912,7 +912,7 @@ export default function HomePage() {
               className="group flex items-center gap-3 px-4 py-2 rounded-full transition-all duration-300"
               style={{ backgroundColor: '#f3f4f6 !important' }}
             >
-              <div className="w-6 h-6 rounded-lg bg-gray-600 group-hover:bg-red-600 transition-colors duration-300 flex items-center justify-center group-hover:scale-110">
+              <div className="w-6 h-6 rounded-lg bg-gray-100 group-hover:bg-red-600 transition-colors duration-300 flex items-center justify-center group-hover:scale-110">
                 <img 
                   src="/social/youtube.png" 
                   alt="YouTube" 
@@ -923,9 +923,9 @@ export default function HomePage() {
             </a>
 
             {/* Bouton Partager */}
-            <button className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transition-all duration-300">
+            <button className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 !text-white transition-all duration-300">
               <img 
-                src="https://cdn-icons-png.flaticon.com/512/1828/1828954.png" 
+                src="/social/partager (1).png" 
                 alt="Partager" 
                 className="w-5 h-5 group-hover:scale-110 transition-transform duration-300"
               />
