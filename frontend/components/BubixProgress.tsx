@@ -36,6 +36,11 @@ export default function BubixProgress({
   currentStep, 
   onComplete 
 }: BubixProgressProps) {
+  // Vérification de sécurité
+  if (!isVisible || !steps || steps.length === 0) {
+    return null;
+  }
+
   const getStepIcon = (step: ProgressStep) => {
     if (step.status === 'completed') {
       return <CheckCircle className="w-5 h-5 text-green-600" />;
