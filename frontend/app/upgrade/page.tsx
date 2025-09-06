@@ -40,55 +40,75 @@ export default function UpgradePage({
   const [promoCode, setPromoCode] = useState('')
   const [isApplyingPromo, setIsApplyingPromo] = useState(false)
   const [appliedPromo, setAppliedPromo] = useState<any>(null)
+  const [paymentStep, setPaymentStep] = useState<'selection' | 'verification' | 'payment' | 'confirmation'>('selection')
+  const [paymentData, setPaymentData] = useState<any>(null)
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
 
   // Données des plans avec prix et fonctionnalités
   const plans = [
     {
-      id: 'STARTER',
-      name: 'Starter',
-      subtitle: 'Accompagnement personnalisé',
-      price: 9.99,
-      originalPrice: 14.99,
+      id: 'FREE',
+      name: 'Gratuit',
+      subtitle: 'Découverte des fonctionnalités',
+      price: 0,
+      originalPrice: 0,
       period: 'mois',
-      color: 'from-purple-500 to-blue-500',
+      color: 'from-gray-400 to-gray-500',
       icon: Star,
       features: [
-        '200 messages/mois avec Bubix',
-        '10 analyses détaillées/semaine',
-        '50 parties CubeMatch/mois',
-        'Support chat + email',
-        'Stockage 90 jours',
-        'Rapports mensuels'
+        'Chat Bubix : 50 messages/mois',
+        'Analyses basiques : 3 analyses/semaine',
+        'CubeMatch : 10 parties/mois',
+        'Support : Email uniquement',
+        'Stockage : 30 jours d\'historique',
+        'Accès : Dashboard basique uniquement',
+        'IA : Modèle local uniquement',
+        'Onglets : Dashboard + Chat limité'
+      ],
+      limitations: [
+        '❌ Pas d\'accès aux analyses avancées',
+        '❌ Pas d\'export de données',
+        '❌ Support limité',
+        '❌ Pas de rapports détaillés'
       ],
       benefits: [
-        'Accompagnement personnalisé',
-        'Suivi régulier des progrès',
-        'Support dédié'
+        'Découverte gratuite',
+        'Premiers pas avec l\'IA',
+        'Test des fonctionnalités de base'
       ]
     },
     {
       id: 'PRO',
       name: 'Pro',
-      subtitle: 'Potentiel optimisé',
-      price: 19.99,
-      originalPrice: 29.99,
+      subtitle: 'Accompagnement personnalisé',
+      price: 9.99,
+      originalPrice: 14.99,
       period: 'mois',
-      color: 'from-indigo-500 to-purple-500',
+      color: 'from-blue-500 to-purple-500',
       icon: Zap,
       features: [
-        'Messages illimités avec Bubix',
-        'Analyses professionnelles illimitées',
-        'CubeMatch illimité',
-        'Support prioritaire + téléphone',
-        'Stockage illimité',
-        'Rapports hebdomadaires détaillés',
-        'IA GPT-4o-mini avancée',
-        'Profils d\'apprentissage personnalisés'
+        'Chat Bubix : Messages illimités',
+        'Analyses avancées : Illimitées',
+        'CubeMatch : Parties illimitées',
+        'Support : Chat + Email + Téléphone',
+        'Stockage : Illimité',
+        'Accès : Tous les onglets (Dashboard, Statistiques, Profil, Abonnements)',
+        'IA : GPT-4o-mini avancé',
+        'Onglets : Accès complet à toutes les fonctionnalités',
+        'Rapports : Hebdomadaires détaillés',
+        'Export : Données en PDF/Excel',
+        'Personnalisation : Profils d\'apprentissage'
+      ],
+      limitations: [
+        '⚠️ IA limitée à GPT-4o-mini',
+        '⚠️ Pas d\'analyses prédictives',
+        '⚠️ Support standard'
       ],
       benefits: [
-        'Potentiel maximisé',
-        'Résultats mesurables',
-        'Support prioritaire'
+        'Accompagnement personnalisé',
+        'Suivi régulier des progrès',
+        'Support dédié',
+        'Économie de 33%'
       ],
       popular: true
     },
@@ -96,25 +116,33 @@ export default function UpgradePage({
       id: 'PRO_PLUS',
       name: 'Pro Plus',
       subtitle: 'Excellence éducative',
-      price: 39.99,
-      originalPrice: 59.99,
+      price: 19.99,
+      originalPrice: 29.99,
       period: 'mois',
       color: 'from-yellow-500 to-orange-500',
       icon: Crown,
       features: [
         'Tout Pro inclus',
-        'IA GPT-4o premium',
-        'Analyses prédictives',
-        'Support VIP + WhatsApp',
-        'Sauvegarde cloud',
-        'Rapports quotidiens',
-        'Contenu exclusif',
-        'Profils adaptatifs avancés'
+        'IA : GPT-4o premium (le plus avancé)',
+        'Analyses prédictives : IA qui anticipe les besoins',
+        'Support : VIP + WhatsApp + Téléphone prioritaire',
+        'Sauvegarde : Cloud automatique',
+        'Rapports : Quotidiens + Analyses prédictives',
+        'Contenu exclusif : Exercices premium',
+        'Profils adaptatifs : IA qui s\'adapte automatiquement',
+        'Accès anticipé : Nouvelles fonctionnalités en premier',
+        'Certificats : Diplômes de progression',
+        'Multi-utilisateurs : Jusqu\'à 6 enfants'
+      ],
+      limitations: [
+        '✅ Aucune limitation',
+        '✅ Accès complet à tout'
       ],
       benefits: [
         'Excellence éducative',
         'Accompagnement VIP',
-        'Résultats exceptionnels'
+        'Résultats exceptionnels',
+        'Économie de 33%'
       ]
     }
   ]
@@ -146,6 +174,68 @@ export default function UpgradePage({
     setIsApplyingPromo(false)
   }
 
+  // Passer à l'étape de vérification
+  const proceedToVerification = () => {
+    if (!selectedPlan) return
+    
+    const plan = plans.find(p => p.id === selectedPlan)
+    if (!plan) return
+    
+    setPaymentData({
+      plan,
+      finalPrice: getFinalPrice(plan),
+      promo: appliedPromo
+    })
+    setPaymentStep('verification')
+  }
+
+  // Traiter le paiement
+  const processPayment = async (paymentInfo: any) => {
+    setIsProcessingPayment(true)
+    
+    try {
+      // Simuler le traitement du paiement
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Appel API pour mettre à jour l'abonnement
+      const response = await fetch('/api/upgrade/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          planId: paymentData.plan.id,
+          paymentInfo,
+          promoCode: appliedPromo?.code,
+          upgradeEventId
+        })
+      })
+      
+      if (response.ok) {
+        setPaymentStep('confirmation')
+        // Envoyer email de confirmation
+        await fetch('/api/upgrade/send-confirmation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            planId: paymentData.plan.id,
+            email: paymentInfo.email,
+            childName
+          })
+        })
+      } else {
+        throw new Error('Erreur lors du paiement')
+      }
+    } catch (error) {
+      console.error('Erreur de paiement:', error)
+      alert('Erreur lors du traitement du paiement. Veuillez réessayer.')
+    } finally {
+      setIsProcessingPayment(false)
+    }
+  }
+
   // Calculer le prix avec promo
   const getFinalPrice = (plan: any) => {
     if (appliedPromo) {
@@ -161,12 +251,6 @@ export default function UpgradePage({
 
 Nous sommes impressionnés par les capacités extraordinaires de ${childName}. Pour continuer à nourrir ce potentiel exceptionnel, nous vous proposons nos outils les plus avancés.
 
-✨ **Pour ${childName} :**
-• Accompagnement VIP avec IA premium
-• Analyses prédictives de ses performances
-• Défis adaptés à son niveau élevé
-• Suivi quotidien de sa progression
-
 🔒 **Votre tranquillité :**
 Nous nous engageons à protéger et développer le potentiel unique de ${childName}.`
     } else if (level === 'élevé') {
@@ -174,24 +258,12 @@ Nous nous engageons à protéger et développer le potentiel unique de ${childNa
 
 Les progrès de ${childName} sont impressionnants. Pour l'accompagner au mieux dans son développement, nous vous proposons nos outils d'optimisation.
 
-📈 **Pour ${childName} :**
-• Analyses approfondies de ses performances
-• Recommandations personnalisées
-• Suivi détaillé de sa progression
-• Accès à des exercices adaptés à son niveau
-
-💝 **Notre engagement :**
+🔒 **Votre tranquillité :**
 Nous nous engageons à utiliser ces outils pour le bien-être et la progression de ${childName}.`
     } else {
       return `💫 **Découvrez le potentiel de ${childName} !**
 
 Chaque enfant a des capacités uniques à révéler. Nos outils d'accompagnement vous aident à découvrir et développer le potentiel de ${childName}.
-
-🎯 **Pour ${childName} :**
-• Accompagnement personnalisé et bienveillant
-• Suivi de ses progrès et forces
-• Recommandations adaptées à son rythme
-• Support dédié pour votre tranquillité
 
 🤝 **Notre mission :**
 Accompagner chaque enfant dans son épanouissement et sa réussite.`
@@ -258,6 +330,44 @@ Accompagner chaque enfant dans son épanouissement et sa réussite.`
           </div>
         </motion.div>
 
+        {/* Section Gains Observés */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-12"
+        >
+          <div className="text-center mb-8">
+            <TrendingUp className="w-8 h-8 text-green-500 mx-auto mb-3" />
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Gains Observés</h3>
+            <p className="text-gray-600">Résultats mesurables de nos utilisateurs</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center p-6 bg-green-50 rounded-xl">
+              <div className="text-3xl font-bold text-green-600 mb-2">+85%</div>
+              <div className="text-sm text-green-700 font-medium">Amélioration des scores</div>
+              <div className="text-xs text-green-600 mt-1">Moyenne sur 3 mois</div>
+            </div>
+            <div className="text-center p-6 bg-blue-50 rounded-xl">
+              <div className="text-3xl font-bold text-blue-600 mb-2">+60%</div>
+              <div className="text-sm text-blue-700 font-medium">Temps d'attention</div>
+              <div className="text-xs text-blue-600 mt-1">Sessions plus longues</div>
+            </div>
+            <div className="text-center p-6 bg-purple-50 rounded-xl">
+              <div className="text-3xl font-bold text-purple-600 mb-2">+90%</div>
+              <div className="text-sm text-purple-700 font-medium">Satisfaction parents</div>
+              <div className="text-xs text-purple-600 mt-1">Recommandation</div>
+            </div>
+          </div>
+          
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              <strong>Étude réalisée sur 1000+ familles</strong> utilisant CubeAI depuis plus de 6 mois
+            </p>
+          </div>
+        </motion.div>
+
         {/* Plans Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {plans.map((plan, index) => (
@@ -305,16 +415,35 @@ Accompagner chaque enfant dans son épanouissement et sa réussite.`
                   </div>
                 </div>
 
-                <div className="space-y-4 mb-8">
-                  {plan.features.map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-start">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700">{feature}</span>
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900 mb-2">✅ Fonctionnalités incluses :</h4>
+                    <div className="space-y-2">
+                      {plan.features.map((feature, featureIndex) => (
+                        <div key={featureIndex} className="flex items-start">
+                          <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                          <span className="text-xs text-gray-700">{feature}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+
+                  {plan.limitations && plan.limitations.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-900 mb-2">⚠️ Limitations :</h4>
+                      <div className="space-y-2">
+                        {plan.limitations.map((limitation, limitationIndex) => (
+                          <div key={limitationIndex} className="flex items-start">
+                            <span className="text-xs text-gray-600">{limitation}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2 mb-6">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-2">💎 Avantages :</h4>
                   {plan.benefits.map((benefit, benefitIndex) => (
                     <div key={benefitIndex} className="flex items-center text-sm text-gray-600">
                       <Heart className="w-4 h-4 text-red-400 mr-2" />
@@ -324,14 +453,24 @@ Accompagner chaque enfant dans son épanouissement et sa réussite.`
                 </div>
 
                 <button
-                  onClick={() => setSelectedPlan(plan.id)}
+                  onClick={() => {
+                    if (plan.id === 'FREE') {
+                      // Pour le plan gratuit, rediriger vers le dashboard
+                      window.location.href = '/dashboard'
+                    } else {
+                      setSelectedPlan(plan.id)
+                      proceedToVerification()
+                    }
+                  }}
                   className={`w-full py-3 px-6 rounded-xl font-medium transition-all duration-300 ${
                     plan.popular
                       ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600'
+                      : plan.id === 'FREE'
+                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                       : 'bg-gray-900 text-white hover:bg-gray-800'
                   }`}
                 >
-                  {selectedPlan === plan.id ? 'Sélectionné' : 'Choisir ce plan'}
+                  {plan.id === 'FREE' ? 'Continuer gratuitement' : 'Choisir ce plan'}
                   <ArrowRight className="w-4 h-4 inline ml-2" />
                 </button>
               </div>
@@ -339,13 +478,203 @@ Accompagner chaque enfant dans son épanouissement et sa réussite.`
           ))}
         </div>
 
-        {/* Code Promo Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-12"
-        >
+        {/* Étapes de paiement */}
+        {paymentStep === 'verification' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-12"
+          >
+            <div className="text-center mb-8">
+              <Shield className="w-8 h-8 text-blue-500 mx-auto mb-3" />
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Vérification des informations</h3>
+              <p className="text-gray-600">Confirmez votre sélection avant le paiement</p>
+            </div>
+            
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-gray-50 rounded-xl p-6 mb-6">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">Récapitulatif de votre commande</h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-700">Plan sélectionné :</span>
+                    <span className="font-semibold">{paymentData.plan.name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-700">Prix mensuel :</span>
+                    <span className="font-semibold">€{paymentData.plan.price}</span>
+                  </div>
+                  {paymentData.promo && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Code promo {paymentData.promo.code} :</span>
+                      <span>-{paymentData.promo.discount}%</span>
+                    </div>
+                  )}
+                  <div className="border-t pt-3 flex justify-between text-lg font-bold">
+                    <span>Total mensuel :</span>
+                    <span>€{paymentData.finalPrice.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => setPaymentStep('selection')}
+                  className="flex-1 py-3 px-6 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Retour
+                </button>
+                <button
+                  onClick={() => setPaymentStep('payment')}
+                  className="flex-1 py-3 px-6 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  Continuer vers le paiement
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {paymentStep === 'payment' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-12"
+          >
+            <div className="text-center mb-8">
+              <Heart className="w-8 h-8 text-red-500 mx-auto mb-3" />
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Informations de paiement</h3>
+              <p className="text-gray-600">Paiement sécurisé pour {childName}</p>
+            </div>
+            
+            <div className="max-w-md mx-auto">
+              <form onSubmit={(e) => {
+                e.preventDefault()
+                const formData = new FormData(e.target as HTMLFormElement)
+                const paymentInfo = {
+                  email: formData.get('email'),
+                  cardNumber: formData.get('cardNumber'),
+                  expiryDate: formData.get('expiryDate'),
+                  cvv: formData.get('cvv'),
+                  name: formData.get('name')
+                }
+                processPayment(paymentInfo)
+              }}>
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="votre@email.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Nom sur la carte</label>
+                    <input
+                      type="text"
+                      name="name"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Jean Dupont"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Numéro de carte</label>
+                    <input
+                      type="text"
+                      name="cardNumber"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="1234 5678 9012 3456"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Date d'expiration</label>
+                      <input
+                        type="text"
+                        name="expiryDate"
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="MM/AA"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                      <input
+                        type="text"
+                        name="cvv"
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="123"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentStep('verification')}
+                    className="flex-1 py-3 px-6 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Retour
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isProcessingPayment}
+                    className="flex-1 py-3 px-6 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors"
+                  >
+                    {isProcessingPayment ? 'Traitement...' : `Payer €${paymentData.finalPrice.toFixed(2)}`}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </motion.div>
+        )}
+
+        {paymentStep === 'confirmation' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-12"
+          >
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle className="w-8 h-8 text-green-500" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Paiement confirmé !</h3>
+              <p className="text-gray-600 mb-6">
+                Félicitations ! Votre abonnement {paymentData.plan.name} est maintenant actif pour {childName}.
+              </p>
+              
+              <div className="bg-green-50 rounded-xl p-6 mb-6">
+                <h4 className="text-lg font-semibold text-green-800 mb-3">Prochaines étapes :</h4>
+                <ul className="text-left text-green-700 space-y-2">
+                  <li>✅ Email de confirmation envoyé</li>
+                  <li>✅ Abonnement activé dans votre compte</li>
+                  <li>✅ Accès immédiat à toutes les fonctionnalités</li>
+                  <li>✅ Prochain prélèvement : {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}</li>
+                </ul>
+              </div>
+              
+              <button
+                onClick={() => window.location.href = '/dashboard'}
+                className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Accéder à votre dashboard
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Code Promo Section - seulement si pas en cours de paiement */}
+        {paymentStep === 'selection' && (
           <div className="text-center mb-6">
             <Gift className="w-8 h-8 text-purple-500 mx-auto mb-3" />
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Code Promo</h3>
