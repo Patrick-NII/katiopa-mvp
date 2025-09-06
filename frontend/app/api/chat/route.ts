@@ -5,6 +5,12 @@ import * as jwt from 'jsonwebtoken'
 import { PrismaClient } from '@prisma/client'
 import OpenAI from 'openai'
 import { buildPrompts } from './buildPrompts'
+import { 
+  BehavioralTrackingService, 
+  UpgradeTrackingService, 
+  ChildPerformanceAnalysisService,
+  PopupTrackingService 
+} from '../../../backend/src/services/upgrade-tracking.service'
 
 const prisma = new PrismaClient()
 
@@ -43,6 +49,150 @@ interface UserContext {
     stats: any
     updatedAt: Date
   }>
+}
+
+// ===== FONCTIONS D'ANALYSE COMPORTEMENTALE =====
+
+// Fonction pour analyser l'insistance d'un enfant
+async function analyzeChildInsistence(childId: string): Promise<{
+  shouldTriggerUpgrade: boolean
+  insistenceLevel: string
+  analysis: any
+}> {
+  try {
+    // Enregistrer la métrique d'insistance (basée sur la fréquence des messages)
+    const recentConversations = await prisma.conversation.findMany({
+      where: {
+        userSessionId: childId,
+        createdAt: {
+          gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // 24h
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+
+    const insistenceScore = Math.min(recentConversations.length / 20, 1) // Max 1.0 avec 20+ conversations
+    
+    // Enregistrer la métrique
+    await BehavioralTrackingService.recordMetric(
+      childId,
+      'insistence',
+      insistenceScore,
+      { conversationsCount: recentConversations.length },
+      childId
+    )
+
+    // Analyser l'insistance
+    const insistenceAnalysis = await BehavioralTrackingService.analyzeChildInsistence(childId, 24)
+    
+    // Déterminer si on doit déclencher un upgrade
+    const shouldTriggerUpgrade = 
+      insistenceAnalysis.insistenceLevel === 'high' && 
+      insistenceAnalysis.trend === 'increasing'
+
+    return {
+      shouldTriggerUpgrade,
+      insistenceLevel: insistenceAnalysis.insistenceLevel,
+      analysis: insistenceAnalysis
+    }
+  } catch (error) {
+    console.error('Erreur lors de l\'analyse de l\'insistance:', error)
+    return {
+      shouldTriggerUpgrade: false,
+      insistenceLevel: 'low',
+      analysis: null
+    }
+  }
+}
+
+// Fonction pour analyser les performances d'un enfant
+async function analyzeChildPerformance(childId: string): Promise<{
+  shouldTriggerUpgrade: boolean
+  performanceLevel: string
+  analysis: any
+}> {
+  try {
+    // Analyser le niveau de performance
+    const performanceAnalysis = await ChildPerformanceAnalysisService.analyzeChildLevel(childId)
+    
+    // Enregistrer la métrique de performance
+    const performanceScore = performanceAnalysis.analysisData.performanceScore || 0
+    await BehavioralTrackingService.recordMetric(
+      childId,
+      'performance',
+      performanceScore,
+      performanceAnalysis.analysisData,
+      childId
+    )
+
+    // Déterminer si on doit déclencher un upgrade
+    const shouldTriggerUpgrade = 
+      performanceAnalysis.performanceLevel === 'exceptional' ||
+      (performanceAnalysis.performanceLevel === 'elevated' && performanceAnalysis.confidence > 0.7)
+
+    return {
+      shouldTriggerUpgrade,
+      performanceLevel: performanceAnalysis.performanceLevel,
+      analysis: performanceAnalysis
+    }
+  } catch (error) {
+    console.error('Erreur lors de l\'analyse de la performance:', error)
+    return {
+      shouldTriggerUpgrade: false,
+      performanceLevel: 'basic',
+      analysis: null
+    }
+  }
+}
+
+// Fonction pour créer un événement d'upgrade si nécessaire
+async function checkAndCreateUpgradeEvent(
+  userInfo: UserInfo,
+  childId?: string,
+  triggerType: 'child_insistence' | 'parent_analysis' | 'performance_level' = 'child_insistence'
+) {
+  try {
+    // Vérifier si l'utilisateur est éligible pour un upgrade
+    if (userInfo.subscriptionType === 'PRO' || userInfo.subscriptionType === 'PRO_PLUS' || userInfo.subscriptionType === 'ENTERPRISE') {
+      return null // Pas besoin d'upgrade
+    }
+
+    let shouldTrigger = false
+    let triggerData = {}
+
+    if (triggerType === 'child_insistence' && childId) {
+      const insistenceResult = await analyzeChildInsistence(childId)
+      shouldTrigger = insistenceResult.shouldTriggerUpgrade
+      triggerData = insistenceResult.analysis
+    } else if (triggerType === 'performance_level' && childId) {
+      const performanceResult = await analyzeChildPerformance(childId)
+      shouldTrigger = performanceResult.shouldTriggerUpgrade
+      triggerData = performanceResult.analysis
+    }
+
+    if (shouldTrigger) {
+      // Créer l'événement d'upgrade
+      const upgradeEvent = await UpgradeTrackingService.createUpgradeEvent(
+        userInfo.id,
+        triggerType,
+        triggerData,
+        childId
+      )
+
+      console.log(`🎯 Événement d'upgrade créé pour ${userInfo.firstName}:`, {
+        triggerType,
+        childId,
+        upgradeEventId: upgradeEvent.id
+      })
+
+      return upgradeEvent
+    }
+
+    return null
+  } catch (error) {
+    console.error('Erreur lors de la vérification d\'upgrade:', error)
+    return null
+  }
 }
 
 // Fonction pour vérifier l'authentification côté serveur avec Prisma
@@ -1565,6 +1715,53 @@ export async function POST(request: NextRequest) {
     console.log('🔍 UserContext récupéré:', userContext.displayName, userContext.role)
     console.log('📊 Enfants dans le contexte:', userContext.childrenData?.length || 0)
     
+    // ===== DÉCLENCHEURS INTELLIGENTS D'UPGRADE =====
+    let upgradeEvent = null
+    
+    // Si c'est un enfant, analyser son insistance et ses performances
+    if (userInfo.userType === 'CHILD') {
+      console.log('👶 Analyse comportementale pour enfant:', userInfo.firstName)
+      
+      // Analyser l'insistance (fréquence des messages)
+      upgradeEvent = await checkAndCreateUpgradeEvent(
+        userInfo,
+        userInfo.id,
+        'child_insistence'
+      )
+      
+      // Si pas d'événement d'insistance, analyser les performances
+      if (!upgradeEvent) {
+        upgradeEvent = await checkAndCreateUpgradeEvent(
+          userInfo,
+          userInfo.id,
+          'performance_level'
+        )
+      }
+    }
+    
+    // Si c'est un parent, vérifier s'il y a des enfants avec des niveaux élevés
+    if (userInfo.userType === 'PARENT' && userContext.childrenData?.length > 0) {
+      console.log('👨‍👩‍👧‍👦 Analyse des enfants pour parent:', userInfo.firstName)
+      
+      // Analyser chaque enfant
+      for (const child of userContext.childrenData) {
+        // Analyser les performances de l'enfant
+        const performanceResult = await analyzeChildPerformance(child.id)
+        
+        if (performanceResult.shouldTriggerUpgrade) {
+          console.log(`🎯 Enfant ${child.firstName} avec niveau élevé détecté:`, performanceResult.performanceLevel)
+          
+          upgradeEvent = await checkAndCreateUpgradeEvent(
+            userInfo,
+            child.id,
+            'performance_level'
+          )
+          
+          if (upgradeEvent) break // Un seul événement à la fois
+        }
+      }
+    }
+    
     // Récupérer les snippets RAG
     const ragSnippets = getRAGSnippets(intent, userQuery)
     
@@ -1861,6 +2058,13 @@ export async function POST(request: NextRequest) {
         isCommercial: subscriptionInfo.isCommercial,
         showUpgrade: subscriptionInfo.showUpgrade
       },
+      upgradeEvent: upgradeEvent ? {
+        id: upgradeEvent.id,
+        triggerType: upgradeEvent.triggerType,
+        triggerData: upgradeEvent.triggerData,
+        childId: upgradeEvent.childId,
+        createdAt: upgradeEvent.createdAt
+      } : null,
       userInfo: {
         email: userInfo.email,
         sessionId: userInfo.sessionId,
