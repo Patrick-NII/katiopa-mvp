@@ -204,7 +204,7 @@ export default function HomePage() {
         {/* Images de fond décoratives */}
         
         {/* Bubix décalé vers la droite avec effet néon */}
-        <div className="absolute top-80 left-3/5 transform -translate-x-1/2 z-10">
+        <div className="absolute top-40 left-1/2 transform translate-x-1/2 z-10">
           <img 
             src="/image-bubix/bubix.png" 
             alt="Bubix" 
@@ -216,16 +216,11 @@ export default function HomePage() {
         <div className="absolute top-32 left-1/4 transform -translate-x-1/2 z-10">
           <div className="relative">
             <img 
-              src="/image-bg/cube.png" 
+              src="/image-bg/erasebg-transformed (5).png" 
               alt="Cube" 
-              className="w-72 h-72 sm:w-96 sm:h-96 md:w-[28rem] md:h-[28rem] lg:w-[32rem] lg:h-[32rem] xl:w-[36rem] xl:h-[36rem]"
+              className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 xl:w-[24rem] xl:h-[24rem]"
             />
-            {/* Effet miroir rapproché */}
-            <img 
-              src="/image-bg/cube.png" 
-              alt="Cube reflection" 
-              className="absolute top-[95%] left-0 w-72 h-72 sm:w-96 sm:h-96 md:w-[28rem] md:h-[28rem] lg:w-[32rem] lg:h-[32rem] xl:w-[36rem] xl:h-[36rem] opacity-30 scale-y-[-1] blur-[1px]"
-            />
+            
           </div>
         </div>
 
