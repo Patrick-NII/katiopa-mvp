@@ -488,11 +488,47 @@ router.post('/:sessionId/global-analysis', requireAuth, async (req, res) => {
       });
     }
 
+    // Limitation plan Découverte (FREE) : 1 analyse par 7 jours (tous types confondus)
+    if (parentSession.account.subscriptionType === 'FREE') {
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      const recentAnalyses = await prisma.aIAnalysis.count({
+        where: {
+          userSessionId: childSession.id,
+          analysisType: { in: ['progress', 'global', 'exercise'] },
+          createdAt: { gte: sevenDaysAgo }
+        }
+      });
+      if (recentAnalyses >= 1) {
+        return res.status(429).json({
+          error: 'Limite atteinte: 1 analyse/semaine pour le plan Découverte',
+          code: 'ANALYSIS_LIMIT_REACHED',
+          retryAfterDays: 7
+        });
+      }
+    }
+
     // Construire le contexte d'apprentissage
     const learningContext = await buildLearningContext(childSession);
     
     // Générer l'analyse IA globale
     const globalAnalysis = await generateGlobalAnalysis(childSession, learningContext);
+
+    // Stocker l'analyse globale
+    await prisma.aIAnalysis.create({
+      data: {
+        userSessionId: childSession.id,
+        analysisType: 'global',
+        content: typeof globalAnalysis === 'string' ? globalAnalysis : JSON.stringify(globalAnalysis),
+        prompt: 'Fallback Analysis - Appréciation Globale',
+        context: learningContext,
+        metadata: {
+          childAge: childSession.age,
+          totalActivities: childSession.childActivities.length,
+          averageScore: learningContext.averageScore,
+          analysisDate: new Date().toISOString()
+        }
+      }
+    });
 
     res.json({
       sessionId,
@@ -1093,6 +1129,25 @@ router.post('/:sessionId/analyze', requireAuth, async (req, res) => {
       });
     }
 
+    // Limitation plan Découverte (FREE) : 1 analyse par 7 jours (tous types confondus)
+    if (parentSession.account.subscriptionType === 'FREE') {
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      const recentAnalyses = await prisma.aIAnalysis.count({
+        where: {
+          userSessionId: childSession.id,
+          analysisType: { in: ['progress', 'global', 'exercise'] },
+          createdAt: { gte: sevenDaysAgo }
+        }
+      });
+      if (recentAnalyses >= 1) {
+        return res.status(429).json({
+          error: 'Limite atteinte: 1 analyse/semaine pour le plan Découverte',
+          code: 'ANALYSIS_LIMIT_REACHED',
+          retryAfterDays: 7
+        });
+      }
+    }
+
     // Construire le contexte pédagogique
     const pedagogicalContext = {
       childName: `${childSession.firstName} ${childSession.lastName}`,
@@ -1208,6 +1263,25 @@ router.post('/:sessionId/exercise', requireAuth, async (req, res) => {
         error: 'Session non trouvée',
         code: 'SESSION_NOT_FOUND'
       });
+    }
+
+    // Limitation plan Découverte (FREE) : 1 analyse par 7 jours (tous types confondus)
+    if (parentSession.account.subscriptionType === 'FREE') {
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      const recentAnalyses = await prisma.aIAnalysis.count({
+        where: {
+          userSessionId: childSession.id,
+          analysisType: { in: ['progress', 'global', 'exercise'] },
+          createdAt: { gte: sevenDaysAgo }
+        }
+      });
+      if (recentAnalyses >= 1) {
+        return res.status(429).json({
+          error: 'Limite atteinte: 1 analyse/semaine pour le plan Découverte',
+          code: 'ANALYSIS_LIMIT_REACHED',
+          retryAfterDays: 7
+        });
+      }
     }
 
     // Construire le contexte pédagogique
