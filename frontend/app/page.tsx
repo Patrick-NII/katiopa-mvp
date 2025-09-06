@@ -929,7 +929,7 @@ export default function HomePage() {
                 alt="Partager" 
                 className="w-5 h-5 group-hover:scale-110 transition-transform duration-300"
               />
-              <span className="font-body text-sm">Partager</span>
+              <span className="font-body text-sm text-gray-400">Partager</span>
             </button>
           </motion.div>
 
