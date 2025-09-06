@@ -22,6 +22,48 @@ export async function POST(request: NextRequest) {
 
     const parentAccountId = decoded.accountId;
     const parentUserId = decoded.userId;
+    const parentEmail = decoded.email;
+
+    // VÉRIFICATION 1.1: Vérifier que le compte parent existe et est actif
+    const parentAccount = await prisma.account.findUnique({
+      where: { 
+        id: parentAccountId,
+        email: parentEmail,
+        isActive: true
+      },
+      include: {
+        userSessions: {
+          where: {
+            userType: 'PARENT',
+            isActive: true
+          }
+        }
+      }
+    });
+
+    if (!parentAccount) {
+      return NextResponse.json({ 
+        error: 'Compte parent non trouvé ou inactif',
+        details: 'Le compte parent spécifié n\'existe pas ou a été désactivé'
+      }, { status: 404 });
+    }
+
+    // VÉRIFICATION 1.2: Vérifier que la session parent existe et correspond au compte
+    const parentSession = parentAccount.userSessions.find(session => session.id === parentUserId);
+    if (!parentSession) {
+      return NextResponse.json({ 
+        error: 'Session parent non trouvée',
+        details: 'La session parent spécifiée n\'appartient pas à ce compte'
+      }, { status: 404 });
+    }
+
+    // VÉRIFICATION 1.3: Vérifier la cohérence des données parent
+    if (parentSession.accountId !== parentAccountId) {
+      return NextResponse.json({ 
+        error: 'Incohérence des données parent',
+        details: 'Les identifiants parent ne correspondent pas'
+      }, { status: 403 });
+    }
 
     const body = await request.json();
     const { prompt, sessionId, analysisType, context } = body;
@@ -60,6 +102,22 @@ export async function POST(request: NextRequest) {
       }, { status: 403 });
     }
 
+    // VÉRIFICATION 3.1: Vérifier que l'enfant est actif
+    if (!childSession.isActive) {
+      return NextResponse.json({ 
+        error: 'Session enfant inactive',
+        details: 'Cette session enfant a été désactivée'
+      }, { status: 403 });
+    }
+
+    // VÉRIFICATION 3.2: Vérifier la cohérence des données enfant
+    if (childSession.accountId !== childSession.account.id) {
+      return NextResponse.json({ 
+        error: 'Incohérence des données enfant',
+        details: 'Les identifiants enfant ne correspondent pas'
+      }, { status: 403 });
+    }
+
     // VÉRIFICATION BONUS: Vérifier qu'il n'y a pas de confusion avec d'autres enfants du même prénom
     const childrenWithSameName = await prisma.userSession.findMany({
       where: {
@@ -68,13 +126,83 @@ export async function POST(request: NextRequest) {
         firstName: childSession.firstName,
         isActive: true
       },
-      select: { sessionId: true, firstName: true, lastName: true }
+      select: { 
+        id: true,
+        sessionId: true, 
+        firstName: true, 
+        lastName: true,
+        createdAt: true,
+        lastLoginAt: true
+      }
     });
+
+    // VÉRIFICATION BONUS: Vérifier qu'il n'y a pas de confusion avec d'autres parents du même nom
+    const parentsWithSameName = await prisma.userSession.findMany({
+      where: {
+        accountId: parentAccountId,
+        userType: 'PARENT',
+        firstName: parentSession.firstName,
+        lastName: parentSession.lastName,
+        isActive: true
+      },
+      select: { 
+        id: true,
+        sessionId: true, 
+        firstName: true, 
+        lastName: true,
+        createdAt: true,
+        lastLoginAt: true
+      }
+    });
+
+    // Logs de sécurité détaillés
+    const securityLog = {
+      timestamp: new Date().toISOString(),
+      parentAccount: {
+        id: parentAccountId,
+        email: parentEmail,
+        subscriptionType: parentAccount.subscriptionType,
+        createdAt: parentAccount.createdAt
+      },
+      parentSession: {
+        id: parentUserId,
+        sessionId: parentSession.sessionId,
+        name: `${parentSession.firstName} ${parentSession.lastName}`,
+        createdAt: parentSession.createdAt,
+        lastLoginAt: parentSession.lastLoginAt
+      },
+      childSession: {
+        id: childSession.id,
+        sessionId: childSession.sessionId,
+        name: `${childSession.firstName} ${childSession.lastName}`,
+        createdAt: childSession.createdAt,
+        lastLoginAt: childSession.lastLoginAt
+      },
+      analysisRequest: {
+        type: analysisType,
+        promptLength: prompt.length,
+        contextProvided: !!context
+      },
+      potentialConflicts: {
+        childrenWithSameName: childrenWithSameName.length,
+        parentsWithSameName: parentsWithSameName.length
+      }
+    };
 
     if (childrenWithSameName.length > 1) {
       console.log(`⚠️ ATTENTION: ${childrenWithSameName.length} enfants trouvés avec le prénom "${childSession.firstName}" pour le compte ${parentAccountId}`);
-      console.log('Enfants trouvés:', childrenWithSameName.map(c => `${c.firstName} ${c.lastName} (${c.sessionId})`));
+      console.log('Enfants trouvés:', childrenWithSameName.map(c => `${c.firstName} ${c.lastName} (${c.sessionId}) - Créé: ${c.createdAt}`));
+      securityLog.potentialConflicts.childrenDetails = childrenWithSameName;
     }
+
+    if (parentsWithSameName.length > 1) {
+      console.log(`⚠️ ATTENTION: ${parentsWithSameName.length} parents trouvés avec le nom "${parentSession.firstName} ${parentSession.lastName}" pour le compte ${parentAccountId}`);
+      console.log('Parents trouvés:', parentsWithSameName.map(p => `${p.firstName} ${p.lastName} (${p.sessionId}) - Créé: ${p.createdAt}`));
+      securityLog.potentialConflicts.parentsDetails = parentsWithSameName;
+    }
+
+    // Log complet de sécurité
+    console.log('🔒 ANALYSE BUBIX SÉCURISÉE:', JSON.stringify(securityLog, null, 2));
 
     // Récupérer les données réelles de l'enfant pour l'analyse
     const childData = {
@@ -174,6 +302,17 @@ Réponds maintenant en utilisant exclusivement les données réelles :
         averageScore: childData.averageScore,
         totalTimeMinutes: Math.round(childData.totalTime / (1000 * 60)),
         domains: childData.domains
+      },
+      securityInfo: {
+        parentVerified: true,
+        childVerified: true,
+        accountId: parentAccountId,
+        parentEmail: parentEmail,
+        verificationTimestamp: new Date().toISOString(),
+        potentialConflicts: {
+          childrenWithSameName: childrenWithSameName.length,
+          parentsWithSameName: parentsWithSameName.length
+        }
       }
     });
 
