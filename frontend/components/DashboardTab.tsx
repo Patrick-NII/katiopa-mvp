@@ -889,9 +889,7 @@ export default function DashboardTab({
         >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Session active</h3>
-            
           </div>
-          <div className="space-y-4">
             {childSessions && childSessions.length > 0 ? (
               childSessions.map((session) => (
               <div key={session.id} className="border border-gray-200 rounded-lg overflow-hidden">
@@ -940,120 +938,66 @@ export default function DashboardTab({
                 {/* Contenu déplié */}
                 {expandedSessions.has(session.sessionId) && (
                   <div className="p-4 bg-white">
-                    {/* Actions rapides - Design professionnel épuré */}
-                    <div className="space-y-3 mb-6">
-                      <div className="flex items-center gap-3">
+                    {/* Actions rapides — style aligné sur la page login */}
+                    <div className="mb-6">
+                      <div className="flex flex-wrap items-center gap-3">
+                        {/* Compte rendu */}
                         <button
                           onClick={() => generateCompteRendu(session.sessionId)}
                           disabled={loadingStates[`compte_rendu_${session.sessionId}`]}
-                          className="group flex items-center gap-3 px-6 py-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 text-left w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 btn-login font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Générer un compte rendu"
                         >
-                          <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                            <BookOpen className="w-5 h-5 text-blue-600" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-gray-900 text-sm">Compte rendu</h4>
-                            <p className="text-xs text-gray-500 mt-1">Analyse complète de la session</p>
-                          </div>
+                          <BookOpen className="w-4 h-4" />
+                          <span>Compte rendu</span>
                           {loadingStates[`compte_rendu_${session.sessionId}`] && (
-                            <RefreshCw className="w-4 h-4 text-blue-600 animate-spin" />
+                            <RefreshCw className="w-4 h-4 animate-spin" />
                           )}
                         </button>
-                        
+
+                        {/* Appréciation */}
                         <button
                           onClick={() => generateAppreciation(session.sessionId)}
                           disabled={loadingStates[`appreciation_${session.sessionId}`]}
-                          className="group flex items-center gap-3 px-6 py-4 bg-white border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-all duration-200 text-left w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 btn-login font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Générer une appréciation détaillée"
                         >
-                          <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-                            <Target className="w-5 h-5 text-purple-600" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-gray-900 text-sm">Points forts et à améliorer</h4>
-                            <p className="text-xs text-gray-500 mt-1">Évaluation détaillée des performances</p>
-                          </div>
+                          <Target className="w-4 h-4" />
+                          <span>Appréciation</span>
                           {loadingStates[`appreciation_${session.sessionId}`] && (
-                            <RefreshCw className="w-4 h-4 text-purple-600 animate-spin" />
+                            <RefreshCw className="w-4 h-4 animate-spin" />
                           )}
                         </button>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
+
+                        {/* Conseils */}
                         <button
                           onClick={() => generateConseils(session.sessionId)}
                           disabled={loadingStates[`conseils_${session.sessionId}`]}
-                          className="group flex items-center gap-3 px-6 py-4 bg-white border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-all duration-200 text-left w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 btn-login font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Générer des conseils et exercices"
                         >
-                          <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                            <Clock className="w-5 h-5 text-green-600" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-gray-900 text-sm">Meilleurs moments pour apprendre</h4>
-                            <p className="text-xs text-gray-500 mt-1">Optimisation du planning d'apprentissage</p>
-                          </div>
+                          <Clock className="w-4 h-4" />
+                          <span>Conseils</span>
                           {loadingStates[`conseils_${session.sessionId}`] && (
-                            <RefreshCw className="w-4 h-4 text-green-600 animate-spin" />
+                            <RefreshCw className="w-4 h-4 animate-spin" />
                           )}
                         </button>
-                        
+
+                        {/* Vigilance */}
                         <button
                           onClick={() => generateVigilance(session.sessionId)}
                           disabled={loadingStates[`vigilance_${session.sessionId}`]}
-                          className="group flex items-center gap-3 px-6 py-4 bg-white border border-gray-200 rounded-lg hover:border-orange-300 hover:bg-orange-50 transition-all duration-200 text-left w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 btn-login font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Surveillance des signaux d'alerte"
                         >
-                          <div className="flex-shrink-0 w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center group-hover:bg-orange-200 transition-colors">
-                            <Eye className="w-5 h-5 text-orange-600" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-gray-900 text-sm">Vigilance et alertes</h4>
-                            <p className="text-xs text-gray-500 mt-1">Surveillance des signaux d'alerte</p>
-                          </div>
+                          <Eye className="w-4 h-4" />
+                          <span>Vigilance</span>
                           {loadingStates[`vigilance_${session.sessionId}`] && (
-                            <RefreshCw className="w-4 h-4 text-orange-600 animate-spin" />
+                            <RefreshCw className="w-4 h-4 animate-spin" />
                           )}
                         </button>
                       </div>
                     </div>
-
-                    {/* Tableau des réponses Bubix */}
-                    {Object.keys(bubixResponses).length > 0 && (
-                      <div className="mt-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                          <Brain className="w-5 h-5 text-blue-600" />
-                          Analyses de Bubix
-                        </h3>
-                        <div className="space-y-4">
-                          {Object.entries(bubixResponses)
-                            .filter(([key]) => key.startsWith(session.sessionId))
-                            .map(([key, response]) => (
-                              <div key={key} className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
-                                <div className="flex items-center justify-between mb-3">
-                                  <div className="flex items-center gap-2">
-                                    {response.type === 'compte_rendu' && <BookOpen className="w-4 h-4 text-blue-600" />}
-                                    {response.type === 'appreciation' && <Target className="w-4 h-4 text-purple-600" />}
-                                    {response.type === 'conseils' && <Clock className="w-4 h-4 text-green-600" />}
-                                    {response.type === 'vigilance' && <Eye className="w-4 h-4 text-orange-600" />}
-                                    <h4 className="font-medium text-gray-900 capitalize">
-                                      {response.type === 'compte_rendu' && 'Compte rendu'}
-                                      {response.type === 'appreciation' && 'Points forts et à améliorer'}
-                                      {response.type === 'conseils' && 'Meilleurs moments pour apprendre'}
-                                      {response.type === 'vigilance' && 'Vigilance et alertes'}
-                                    </h4>
-                                  </div>
-                                  <span className="text-xs text-gray-500">
-                                    {response.timestamp.toLocaleTimeString()}
-                                  </span>
-                                </div>
-                                <div className="prose prose-sm max-w-none">
-                                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                                    {response.content}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    )}
 
                     {/* Animation IA en train d'écrire */}
                     {aiWritingStates[session.sessionId]?.isWriting && (
@@ -1064,140 +1008,185 @@ export default function DashboardTab({
                       />
                     )}
 
-                    {/* Analyse des performances */}
-                    {sessionAnalyses[session.sessionId] && (
-                      <AIAnalysisCard
-                        type="compte_rendu"
-                        title={`Compte rendu - ${session.name} (ID: ${session.sessionId})`}
-                        content={sessionAnalyses[session.sessionId].analysis}
-                        childName={session.name}
-                        isExpanded={expandedAnalyses[`compte_rendu_${session.sessionId}`] || false}
-                        onToggle={() => setExpandedAnalyses(prev => ({ 
-                          ...prev, 
-                          [`compte_rendu_${session.sessionId}`]: !prev[`compte_rendu_${session.sessionId}`] 
-                        }))}
-                        onClose={() => setSessionAnalyses(prev => {
-                          const newState = { ...prev }
-                          delete newState[session.sessionId]
-                          return newState
-                        })}
-                        onSave={() => saveAnalysis(session.sessionId, 'compte_rendu', sessionAnalyses[session.sessionId].analysis)}
-                        onShare={() => {
-                          if (navigator.share) {
-                            navigator.share({
-                              title: `Compte rendu - ${session.name}`,
-                              text: sessionAnalyses[session.sessionId].analysis
-                            })
-                          }
-                        }}
-                        rating={analysisRatings[`${session.sessionId}_compte_rendu`] || 0}
-                        onRate={(rating) => rateAnalysis(session.sessionId, 'compte_rendu', rating)}
-                      />
-                    )}
-
-                    {/* Analyse globale */}
-                    {globalAnalyses[session.sessionId] && (
-                      <AIAnalysisCard
-                        type="appreciation"
-                        title={`Appréciation détaillée - ${session.name} (ID: ${session.sessionId})`}
-                        content={globalAnalyses[session.sessionId].analysis.aiAnalysis}
-                        childName={session.name}
-                        isExpanded={expandedAnalyses[`appreciation_${session.sessionId}`] || false}
-                        onToggle={() => setExpandedAnalyses(prev => ({ 
-                          ...prev, 
-                          [`appreciation_${session.sessionId}`]: !prev[`appreciation_${session.sessionId}`] 
-                        }))}
-                        onClose={() => setGlobalAnalyses(prev => {
-                          const newState = { ...prev }
-                          delete newState[session.sessionId]
-                          return newState
-                        })}
-                        onSave={() => saveAnalysis(session.sessionId, 'appreciation', globalAnalyses[session.sessionId].analysis.aiAnalysis)}
-                        onShare={() => {
-                          if (navigator.share) {
-                            navigator.share({
-                              title: `Appréciation - ${session.name}`,
-                              text: globalAnalyses[session.sessionId].analysis.aiAnalysis
-                            })
-                          }
-                        }}
-                        rating={analysisRatings[`${session.sessionId}_appreciation`] || 0}
-                        onRate={(rating) => rateAnalysis(session.sessionId, 'appreciation', rating)}
-                        showDate={true}
-                      />
-                    )}
-
-                    {/* Exercice généré */}
-                    {exerciseResponses[session.sessionId] && (
-                      <AIAnalysisCard
-                        type="conseils"
-                        title={`Conseils et exercices - ${session.name} (ID: ${session.sessionId})`}
-                        content={exerciseResponses[session.sessionId].exercise}
-                        childName={session.name}
-                        isExpanded={expandedAnalyses[`conseils_${session.sessionId}`] || false}
-                        onToggle={() => setExpandedAnalyses(prev => ({ 
-                          ...prev, 
-                          [`conseils_${session.sessionId}`]: !prev[`conseils_${session.sessionId}`] 
-                        }))}
-                        onClose={() => setExerciseResponses(prev => {
-                          const newState = { ...prev }
-                          delete newState[session.sessionId]
-                          return newState
-                        })}
-                        onSave={() => saveAnalysis(session.sessionId, 'conseils', exerciseResponses[session.sessionId].exercise)}
-                        onShare={() => {
-                          if (navigator.share) {
-                            navigator.share({
-                              title: `Conseils - ${session.name}`,
-                              text: exerciseResponses[session.sessionId].exercise
-                            })
-                          }
-                        }}
-                        rating={analysisRatings[`${session.sessionId}_conseils`] || 0}
-                        onRate={(rating) => rateAnalysis(session.sessionId, 'conseils', rating)}
-                        showDate={true}
-                      />
-                    )}
-
-                     
-
-                    {/* Activités récentes */}
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Activités récentes</h4>
-                      {loadingStates[session.sessionId] ? (
-                        <div className="text-center py-4">
-                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+          {/* Structure en deux colonnes */}
+          <div className="grid grid-cols-5 gap-6">
+            {/* Colonne gauche - Sessions (60%) */}
+            <div className="col-span-3">
+              <div className="space-y-4">
+                {childSessions && childSessions.length > 0 ? (
+                  childSessions.map((session) => (
+                    <div key={session.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                      {/* En-tête de la session */}
+                      <div className="flex items-center justify-between p-4 bg-gray-50">
+                        <div className="flex items-center gap-3">
+                          <div className="text-2xl">{session.emoji}</div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{session.name}</p>
+                            <p className="text-xs text-gray-500">ID: {session.sessionId}</p>
+                          </div>
                         </div>
-                      ) : sessionActivities[session.sessionId] ? (
-                        <div className="space-y-2">
-                          {sessionActivities[session.sessionId].slice(0, 5).map((activity) => (
-                            <div key={activity.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                              <div className="flex items-center gap-2">
-                                {getActivityIcon(activity.type)}
-                                <span className="text-sm text-gray-700">{activity.title}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span className={`text-sm font-medium ${getScoreColor(activity.score)}`}>
-                                  {activity.score}%
-                                </span>
-                                <span className="text-xs text-gray-500">{activity.duration} min</span>
-                              </div>
+                        <div className="flex items-center gap-4">
+                          {/* Statut en ligne/hors ligne en temps réel */}
+                          <OnlineStatus
+                            isOnline={sessionStatuses[session.sessionId]?.isOnline || session.isOnline}
+                            lastActivity={sessionStatuses[session.sessionId]?.lastActivity}
+                            size="md"
+                          />
+                          <div className="text-right">
+                            <p className="text-sm font-semibold text-gray-900"> 
+                              {sessionStatuses[session.sessionId]?.totalTime || session.totalTime} min
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {sessionStatuses[session.sessionId]?.lastActivity 
+                                ? sessionStatuses[session.sessionId].lastActivity.toLocaleDateString('fr-FR')
+                                : new Date(session.lastActivity).toLocaleDateString('fr-FR')
+                              }
+                            </p>
+                          </div>
+                          {/* Bouton d'expansion */}
+                          <button
+                            onClick={() => toggleSessionExpansion(session.sessionId)}
+                            className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                          >
+                            {expandedSessions.has(session.sessionId) ? (
+                              <ChevronUp className="w-4 h-4 text-gray-600" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4 text-gray-600" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Contenu déplié */}
+                      {expandedSessions.has(session.sessionId) && (
+                        <div className="p-4 bg-white">
+                          {/* Actions rapides — style aligné sur la page login */}
+                          <div className="mb-6">
+                            <div className="flex flex-wrap items-center gap-3">
+                              {/* Compte rendu */}
+                              <button
+                                onClick={() => generateCompteRendu(session.sessionId)}
+                                disabled={loadingStates[`compte_rendu_${session.sessionId}`]}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 !text-gray-200 font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Générer un compte rendu"
+                              >
+                                <BookOpen className="w-4 h-4" />
+                                <span>Compte rendu</span>
+                                {loadingStates[`compte_rendu_${session.sessionId}`] && (
+                                  <RefreshCw className="w-4 h-4 animate-spin" />
+                                )}
+                              </button>
+
+                              {/* Appréciation */}
+                              <button
+                                onClick={() => generateAppreciation(session.sessionId)}
+                                disabled={loadingStates[`appreciation_${session.sessionId}`]}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 !text-gray-200 font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Générer une appréciation détaillée"
+                              >
+                                <Target className="w-4 h-4" />
+                                <span>Appréciation</span>
+                                {loadingStates[`appreciation_${session.sessionId}`] && (
+                                  <RefreshCw className="w-4 h-4 animate-spin" />
+                                )}
+                              </button>
+
+                              {/* Conseils */}
+                              <button
+                                onClick={() => generateConseils(session.sessionId)}
+                                disabled={loadingStates[`conseils_${session.sessionId}`]}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 !text-gray-200 font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Générer des conseils et exercices"
+                              >
+                                <Clock className="w-4 h-4" />
+                                <span>Conseils</span>
+                                {loadingStates[`conseils_${session.sessionId}`] && (
+                                  <RefreshCw className="w-4 h-4 animate-spin" />
+                                )}
+                              </button>
+
+                              {/* Vigilance */}
+                              <button
+                                onClick={() => generateVigilance(session.sessionId)}
+                                disabled={loadingStates[`vigilance_${session.sessionId}`]}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 !text-gray-200 font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Surveillance des signaux d'alerte"
+                              >
+                                <Eye className="w-4 h-4" />
+                                <span>Vigilance</span>
+                                {loadingStates[`vigilance_${session.sessionId}`] && (
+                                  <RefreshCw className="w-4 h-4 animate-spin" />
+                                )}
+                              </button>
                             </div>
-                          ))}
+                          </div>
+
+                          {/* Animation IA en train d'écrire */}
+                          {aiWritingStates[session.sessionId]?.isWriting && (
+                            <AIWritingAnimation
+                              isWriting={aiWritingStates[session.sessionId].isWriting}
+                              childName={session.name.split(' ')[0]}
+                              analysisType={aiWritingStates[session.sessionId].type}
+                            />
+                          )}
                         </div>
-                      ) : (
-                        <p className="text-sm text-gray-500">Aucune activité récente</p>
                       )}
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>Aucune session enfant trouvée</p>
                   </div>
                 )}
               </div>
-            ))
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <p>Aucune session enfant trouvée</p>
+            </div>
+
+            {/* Colonne droite - Tableau des analyses (40%) */}
+            <div className="col-span-2">
+              <div className="sticky top-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Brain className="w-5 h-5 text-blue-600" />
+                  Analyses de Bubix
+                </h3>
+                
+                {Object.keys(bubixResponses).length > 0 ? (
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {Object.entries(bubixResponses).map(([key, response]) => (
+                      <div key={key} className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            {response.type === 'compte_rendu' && <BookOpen className="w-4 h-4 text-blue-600" />}
+                            {response.type === 'appreciation' && <Target className="w-4 h-4 text-purple-600" />}
+                            {response.type === 'conseils' && <Clock className="w-4 h-4 text-green-600" />}
+                            {response.type === 'vigilance' && <Eye className="w-4 h-4 text-orange-600" />}
+                            <h4 className="font-medium text-gray-900 capitalize text-sm">
+                              {response.type === 'compte_rendu' && 'Compte rendu'}
+                              {response.type === 'appreciation' && 'Points forts et à améliorer'}
+                              {response.type === 'conseils' && 'Meilleurs moments pour apprendre'}
+                              {response.type === 'vigilance' && 'Vigilance et alertes'}
+                            </h4>
+                          </div>
+                          <span className="text-xs text-gray-500">
+                            {response.timestamp.toLocaleTimeString()}
+                          </span>
+                        </div>
+                        <div className="prose prose-sm max-w-none">
+                          <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">
+                            {response.content}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <Brain className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                    <p className="text-sm">Aucune analyse disponible</p>
+                    <p className="text-xs text-gray-400 mt-1">Cliquez sur les boutons d'analyse pour générer des rapports</p>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </motion.div>
       )}
