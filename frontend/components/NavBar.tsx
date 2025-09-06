@@ -55,7 +55,7 @@ export default function Navbar({ className = '' }: NavbarProps) {
   }
 
   return (
-    <nav className={`bg-white/90 dark:bg-gray-900/90 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 ${className}`}>
+    <nav className={`bg-white/20 dark:bg-gray-900/90 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-2 md:space-x-3">
