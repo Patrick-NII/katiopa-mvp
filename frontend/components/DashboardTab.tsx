@@ -890,8 +890,14 @@ export default function DashboardTab({
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Session active</h3>
           </div>
-            {childSessions && childSessions.length > 0 ? (
-              childSessions.map((session) => (
+          
+          {/* Structure en deux colonnes */}
+          <div className="grid grid-cols-5 gap-6">
+            {/* Colonne gauche - Sessions (60%) */}
+            <div className="col-span-3">
+              <div className="space-y-4">
+                {childSessions && childSessions.length > 0 ? (
+                  childSessions.map((session) => (
               <div key={session.id} className="border border-gray-200 rounded-lg overflow-hidden">
                 {/* En-tête de la session */}
                 <div className="flex items-center justify-between p-4 bg-gray-50">
@@ -948,10 +954,10 @@ export default function DashboardTab({
                           className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 btn-login font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Générer un compte rendu"
                         >
-                          <BookOpen className="w-4 h-4" />
-                          <span>Compte rendu</span>
+                          <BookOpen className="w-4 h-4 btn-login-text" />
+                          <span className="btn-login-text">Compte rendu</span>
                           {loadingStates[`compte_rendu_${session.sessionId}`] && (
-                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            <RefreshCw className="w-4 h-4 animate-spin btn-login-text" />
                           )}
                         </button>
 
@@ -962,10 +968,10 @@ export default function DashboardTab({
                           className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 btn-login font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Générer une appréciation détaillée"
                         >
-                          <Target className="w-4 h-4" />
-                          <span>Appréciation</span>
+                          <Target className="w-4 h-4 btn-login-text" />
+                          <span className="btn-login-text">Appréciation</span>
                           {loadingStates[`appreciation_${session.sessionId}`] && (
-                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            <RefreshCw className="w-4 h-4 animate-spin btn-login-text" />
                           )}
                         </button>
 
@@ -976,10 +982,10 @@ export default function DashboardTab({
                           className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 btn-login font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Générer des conseils et exercices"
                         >
-                          <Clock className="w-4 h-4" />
-                          <span>Conseils</span>
+                          <Clock className="w-4 h-4 btn-login-text" />
+                          <span className="btn-login-text">Conseils</span>
                           {loadingStates[`conseils_${session.sessionId}`] && (
-                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            <RefreshCw className="w-4 h-4 animate-spin btn-login-text" />
                           )}
                         </button>
 
@@ -990,10 +996,10 @@ export default function DashboardTab({
                           className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 btn-login font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Surveillance des signaux d'alerte"
                         >
-                          <Eye className="w-4 h-4" />
-                          <span>Vigilance</span>
+                          <Eye className="w-4 h-4 btn-login-text" />
+                          <span className="btn-login-text">Vigilance</span>
                           {loadingStates[`vigilance_${session.sessionId}`] && (
-                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            <RefreshCw className="w-4 h-4 animate-spin btn-login-text" />
                           )}
                         </button>
                       </div>
@@ -1241,5 +1247,5 @@ export default function DashboardTab({
       />
       
     </div>
-  )
-} 
+  );
+};
