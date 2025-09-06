@@ -410,7 +410,7 @@ export default function HomePage() {
                   </div>
                   <p className="font-body text-white/90 mb-2">{plan.description}</p>
                   <p className="font-body text-white/80 text-sm italic">
-                    {plan.name === 'Premium' ? '6 sessions' : '2 sessions'} • {plan.name === 'Premium' ? '1 parent + 5 enfants' : '1 parent + 1 enfant'}
+                    {plan.name === 'Maître' ? '5 sessions' : plan.name === 'Explorateur' ? '3 sessions' : '2 sessions'} • {plan.name === 'Maître' ? '1 parent + 4 enfants' : plan.name === 'Explorateur' ? '1 parent + 2 enfants' : '1 parent + 1 enfant'}
                   </p>
                 </div>
 
