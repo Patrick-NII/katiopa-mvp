@@ -180,7 +180,7 @@ export default function RegisterPage() {
         'Certificats simples',
         'Support email + chat + téléphone'
       ],
-      maxMembers: 2,
+      maxMembers: 3,
       popular: true,
       cardClass: 'card-pro',
       icon: Star,
@@ -208,9 +208,8 @@ export default function RegisterPage() {
         'Diplômes officiels et badges',
         'Dashboard parental enrichi (comparatifs IA)',
         'Sauvegarde cloud automatique + historique illimité',
-        'Support VIP prioritaire (WhatsApp & téléphone)'
-      ],
-      maxMembers: 6,
+        'Support VIP prioritaire (WhatsApp & téléphone)'n      ],
+      maxMembers: 5,
       popular: false,
       complete: true,
       cardClass: 'card-premium',
@@ -831,10 +830,50 @@ const SummarySidebar = () => {
                       Choisissez votre plan
                     </h1>
                     <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                      Sélectionnez l’offre qui vous convient et lancez l’aventure CubeAI dès aujourd’hui.
+                      Sélectionnez l'offre qui vous convient et lancez l'aventure CubeAI dès aujourd'hui.
                     </p>
                   </motion.div>
                   
+                  {/* Champ Email au-dessus des cartes */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className="max-w-md mx-auto mb-8"
+                  >
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+                      <input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        className="w-full pl-12 pr-4 py-3 md:py-4 border-b-2 border-gray-300 dark:border-gray-600 focus:border-b-blue-500 dark:focus:border-b-blue-400 transition-all bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                        placeholder="Email de contact *"
+                      />
+                      {emailStatus !== 'idle' && (
+                        <div className="mt-2">
+                          <p className={
+                            emailStatus === 'available' ? 'text-emerald-600 dark:text-emerald-400 text-sm' :
+                            emailStatus === 'checking' ? 'text-gray-600 dark:text-gray-400 text-sm' :
+                            'text-red-600 dark:text-red-400 text-sm'
+                          }>
+                            {emailHelper}
+                          </p>
+                          {emailStatus === 'taken' && (
+                            <div className="mt-2">
+                              <button
+                                type="button"
+                                onClick={() => router.push('/login')}
+                                className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                              >
+                                Se connecter →
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
 
                 </div>
 
@@ -899,7 +938,7 @@ const SummarySidebar = () => {
                           {/* pill sessions — transparent si non sélectionné */}
                           <div className={`${isSelected ? 'bg-white/15 ring-1 ring-white/20' : 'bg-transparent'} rounded-xl p-2 md:p-2.5 lg:p-3`}>
                             <p className={`font-semibold text-xs md:text-sm lg:text-base ${isSelected ? 'text-white drop-shadow-sm' : 'text-gray-700 dark:text-gray-200'}`}>
-                              {plan.maxMembers === 2 ? '2 sessions' : plan.maxMembers === 6 ? '6 sessions' : '1 session'} • {plan.maxMembers === 2 ? '1 parent + 1 enfant' : plan.maxMembers === 6 ? '1 parent + 5 enfants' : '1 parent'}
+                              {plan.maxMembers === 2 ? '2 sessions' : plan.maxMembers === 3 ? '3 sessions' : plan.maxMembers === 5 ? '5 sessions' : '1 session'} • {plan.maxMembers === 2 ? '1 parent + 1 enfant' : plan.maxMembers === 3 ? '1 parent + 2 enfants' : plan.maxMembers === 5 ? '1 parent + 4 enfants' : '1 parent'}
                             </p>
                           </div>
                         </div>
@@ -921,7 +960,7 @@ const SummarySidebar = () => {
                         <div className="mt-auto">
                           {isSelected && (
                           <button
-                            onClick={() => handleInputChange('subscriptionType', plan.id)}
+                            onClick={() => handleNext()}
                               className={`w-full font-semibold px-5 lg:px-6 py-3.5 lg:py-4 rounded-2xl transition-all duration-300 border-2 bg-gradient-to-r ${plan.color} text-white ${plan.selected.buttonBorder} shadow-xl ring-2 ${plan.selected.ring}`}
                             >
                               ✓ Sélectionné
@@ -933,63 +972,6 @@ const SummarySidebar = () => {
                   })}
                 </div>
 
-                <div className="mt-8 md:mt-10 lg:mt-12">
-                  <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 md:gap-6 max-w-4xl mx-auto">
-                    {/* Champ Email à gauche */}
-                    <div className="lg:w-1/2">
-                      <label className="block text-sm md:text-base font-semibold text-gray-700 dark:text-gray-200 mb-3 text-left">
-                        
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
-                        <input
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => handleInputChange('email', e.target.value)}
-                          className="w-full pl-12 pr-4 py-3 md:py-4 border-b-2 border-gray-300 dark:border-gray-600 focus:border-b-blue-500 dark:focus:border-b-blue-400 transition-all bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
-                          placeholder="Email de contact  *"
-                        />
-                        {emailStatus !== 'idle' && (
-                          <div className="mt-2">
-                            <p className={
-                              emailStatus === 'available' ? 'text-emerald-600 dark:text-emerald-400 text-sm' :
-                              emailStatus === 'checking' ? 'text-gray-600 dark:text-gray-400 text-sm' :
-                              'text-red-600 dark:text-red-400 text-sm'
-                            }>
-                              {emailHelper}
-                            </p>
-                            {emailStatus === 'taken' && (
-                              <div className="mt-2">
-                                <button
-                                  type="button"
-                                  onClick={() => router.push('/login')}
-                                  className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
-                                >
-                                  Se connecter →
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Bouton Continuer à droite */}
-                    <div className="lg:w-1/2 text-center">
-                  <motion.button
-                    onClick={handleNext}
-                        whileHover={{ scale: 1.04 }}
-                        whileTap={{ scale: 0.96 }}
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 md:px-12 lg:px-16 py-3 md:py-3.5 lg:py-4 rounded-2xl text-base md:text-lg lg:text-xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl"
-                  >
-                    Continuer
-                  </motion.button>
-                    </div>
-                  </div>
-                  <p className="mt-4 text-xs md:text-sm text-gray-600 dark:text-gray-300 text-center">
-                    3 mois offerts sur Starter. Mettez à niveau quand vous voulez — vos progrès sont conservés.
-                  </p>
-                </div>
               </div>
             </motion.div>
           )}
