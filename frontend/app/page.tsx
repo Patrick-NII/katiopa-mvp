@@ -201,9 +201,9 @@ export default function HomePage() {
 
       {/* Section principale */}
       <section className="relative overflow-hidden min-h-screen flex items-center">
-        {/* Image de fond full screen */}
+        {/* Image de fond réduite */}
         <div 
-          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-contain bg-center bg-no-repeat"
           style={{
             backgroundImage: "url('/image-bg/hero-bg-1-removebg.png')"
           }}
@@ -229,7 +229,7 @@ export default function HomePage() {
         </div>
 
         {/* Contenu principal - Positionné plus bas */}
-        <div className="absolute bottom-20 left-0 right-0 z-20">
+        <div className="absolute bottom-50 left-0 right-0 z-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 xl:px-8 text-center">
             <motion.p 
               initial={{ opacity: 0, y: 30 }}
