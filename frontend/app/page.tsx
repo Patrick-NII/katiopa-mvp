@@ -203,28 +203,28 @@ export default function HomePage() {
       <section className="relative overflow-hidden min-h-screen flex items-center">
         {/* Images de fond décoratives */}
         
-        {/* Bubix à droite avec effet néon */}
-        <div className="absolute top-1/2 right-8 transform -translate-y-1/2 z-10">
+        {/* Bubix juste en dessous du titre avec effet néon */}
+        <div className="absolute top-80 left-1/2 transform -translate-x-1/2 z-10">
           <img 
             src="/image-bubix/bubix.png" 
             alt="Bubix" 
-            className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 xl:w-64 xl:h-64 drop-shadow-[0_0_20px_rgba(255,255,255,0.8)] drop-shadow-[0_0_40px_rgba(59,130,246,0.6)] drop-shadow-[0_0_60px_rgba(139,92,246,0.4)]"
+            className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[28rem] lg:h-[28rem] xl:w-[32rem] xl:h-[32rem] drop-shadow-[0_0_20px_rgba(255,255,255,0.8)] drop-shadow-[0_0_40px_rgba(59,130,246,0.6)] drop-shadow-[0_0_60px_rgba(139,92,246,0.4)]"
           />
         </div>
 
-        {/* Cube à gauche avec effet miroir */}
-        <div className="absolute top-1/2 left-8 transform -translate-y-1/2 z-10">
+        {/* Cube centre-gauche et plus haut avec effet miroir */}
+        <div className="absolute top-32 left-1/4 transform -translate-x-1/2 z-10">
           <div className="relative">
             <img 
               src="/image-bg/cube.png" 
               alt="Cube" 
-              className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 xl:w-56 xl:h-56"
+              className="w-72 h-72 sm:w-96 sm:h-96 md:w-[28rem] md:h-[28rem] lg:w-[32rem] lg:h-[32rem] xl:w-[36rem] xl:h-[36rem]"
             />
             {/* Effet miroir vers le sol */}
             <img 
               src="/image-bg/cube.png" 
               alt="Cube reflection" 
-              className="absolute top-full left-0 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 xl:w-56 xl:h-56 opacity-30 scale-y-[-1] blur-[1px]"
+              className="absolute top-full left-0 w-72 h-72 sm:w-96 sm:h-96 md:w-[28rem] md:h-[28rem] lg:w-[32rem] lg:h-[32rem] xl:w-[36rem] xl:h-[36rem] opacity-30 scale-y-[-1] blur-[1px]"
             />
           </div>
         </div>
