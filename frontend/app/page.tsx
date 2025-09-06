@@ -848,53 +848,61 @@ export default function HomePage() {
             {/* Facebook */}
             <a 
               href="#" 
-              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-100 hover:bg-blue-50 transition-all duration-300"
+              className="group flex items-center gap-3 px-4 py-2 rounded-full transition-all duration-300"
+              style={{ backgroundColor: '#f3f4f6 !important' }}
             >
               <img 
                 src="https://cdn-icons-png.flaticon.com/512/124/124010.png" 
                 alt="Facebook" 
                 className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"
+                style={{ filter: 'none !important' }}
               />
-              <span className="font-body text-sm text-gray-600 group-hover:text-blue-600">Facebook</span>
+              <span className="font-body text-sm text-gray-600 group-hover:text-blue-600" style={{ color: '#374151 !important' }}>Facebook</span>
             </a>
 
             {/* Instagram */}
             <a 
               href="#" 
-              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-100 hover:bg-pink-50 transition-all duration-300"
+              className="group flex items-center gap-3 px-4 py-2 rounded-full transition-all duration-300"
+              style={{ backgroundColor: '#f3f4f6 !important' }}
             >
               <img 
                 src="https://cdn-icons-png.flaticon.com/512/174/174855.png" 
                 alt="Instagram" 
                 className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"
+                style={{ filter: 'none !important' }}
               />
-              <span className="font-body text-sm text-gray-600 group-hover:text-pink-600">Instagram</span>
+              <span className="font-body text-sm text-gray-600 group-hover:text-pink-600" style={{ color: '#374151 !important' }}>Instagram</span>
             </a>
 
             {/* LinkedIn */}
             <a 
               href="#" 
-              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-100 hover:bg-blue-50 transition-all duration-300"
+              className="group flex items-center gap-3 px-4 py-2 rounded-full transition-all duration-300"
+              style={{ backgroundColor: '#f3f4f6 !important' }}
             >
               <img 
                 src="https://cdn-icons-png.flaticon.com/512/174/174857.png" 
                 alt="LinkedIn" 
                 className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"
+                style={{ filter: 'none !important' }}
               />
-              <span className="font-body text-sm text-gray-600 group-hover:text-blue-700">LinkedIn</span>
+              <span className="font-body text-sm text-gray-600 group-hover:text-blue-700" style={{ color: '#374151 !important' }}>LinkedIn</span>
             </a>
 
             {/* YouTube */}
             <a 
               href="#" 
-              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-100 hover:bg-red-50 transition-all duration-300"
+              className="group flex items-center gap-3 px-4 py-2 rounded-full transition-all duration-300"
+              style={{ backgroundColor: '#f3f4f6 !important' }}
             >
               <img 
                 src="https://cdn-icons-png.flaticon.com/512/174/174883.png" 
                 alt="YouTube" 
                 className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"
+                style={{ filter: 'none !important' }}
               />
-              <span className="font-body text-sm text-gray-600 group-hover:text-red-600">YouTube</span>
+              <span className="font-body text-sm text-gray-600 group-hover:text-red-600" style={{ color: '#374151 !important' }}>YouTube</span>
             </a>
 
             {/* Bouton Partager */}
