@@ -571,36 +571,41 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
-                className={`${feature.bgColor} ${feature.borderColor} border-2 rounded-2xl p-6 flex flex-col h-full group hover:shadow-xl transition-all duration-300 cursor-pointer`}
+                className={`${feature.bgColor} ${feature.borderColor} border-2 rounded-2xl overflow-hidden h-full group hover:shadow-xl transition-all duration-500 cursor-pointer relative`}
               >
-                <div className="relative mb-4">
-                  <img 
-                    src={feature.image} 
-                    alt={feature.title}
-                    className="w-20 h-20 mx-auto rounded-xl object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-                
-                <h3 className="font-subtitle-lg text-gray-900 mb-3 group-hover:text-blue-600 transition-colors duration-300">{feature.title}</h3>
-                
-                <div className="flex-grow">
-                  <p className="font-body text-gray-600 mb-4 group-hover:hidden">{feature.description}</p>
-                  <div className="hidden group-hover:block">
-                    <p className="font-body text-gray-700 mb-4 text-sm leading-relaxed">{feature.details}</p>
+                {/* État normal : Image + Titre */}
+                <div className="h-full flex flex-col group-hover:opacity-0 transition-opacity duration-500">
+                  <div className="flex-grow flex items-center justify-center p-6">
+                    <img 
+                      src={feature.image} 
+                      alt={feature.title}
+                      className="w-full h-full object-cover rounded-xl"
+                    />
+                  </div>
+                  <div className="p-4 bg-white/90 backdrop-blur-sm">
+                    <h3 className="font-subtitle-lg text-gray-900 text-center">{feature.title}</h3>
                   </div>
                 </div>
-                
-                <ul className="space-y-2">
-                  {feature.benefits.map((benefit, benefitIndex) => (
-                    <li key={benefitIndex} className="flex items-center text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
-                      <svg className="w-4 h-4 text-green-500 mr-2 group-hover:text-green-600 transition-colors duration-300" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
-                      </svg>
-                      {benefit}
-                    </li>
-                  ))}
-                </ul>
+
+                {/* État hover : Texte détaillé */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 p-6 flex flex-col justify-center">
+                  <h3 className="font-subtitle-lg text-blue-600 mb-4 text-center">{feature.title}</h3>
+                  
+                  <div className="flex-grow">
+                    <p className="font-body text-gray-700 mb-4 text-sm leading-relaxed">{feature.details}</p>
+                  </div>
+                  
+                  <ul className="space-y-2">
+                    {feature.benefits.map((benefit, benefitIndex) => (
+                      <li key={benefitIndex} className="flex items-center text-sm text-gray-700">
+                        <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                        </svg>
+                        {benefit}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </motion.div>
             ))}
           </div>
