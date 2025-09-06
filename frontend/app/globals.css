@@ -190,16 +190,43 @@
   .logo-multicolor span:nth-child(7) { color: var(--color-violet-soft); }
   
   /* Cartes d'offres avec dégradés simples */
-  .card-starter {
+  .card-decouverte {
     background: linear-gradient(135deg, var(--color-green-mint) 0%, var(--color-blue-sky) 100%);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+    transition: all 0.3s ease;
   }
   
-  .card-pro {
+  .card-decouverte:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(16, 185, 129, 0.4);
+  }
+  
+  .card-explorateur {
     background: linear-gradient(135deg, var(--color-violet-soft) 0%, var(--color-rose-raspberry) 100%);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+    transition: all 0.3s ease;
   }
   
-  .card-premium {
+  .card-explorateur:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.4);
+  }
+  
+  .card-maitre {
     background: linear-gradient(135deg, var(--color-orange-peach) 0%, var(--color-violet-soft) 100%);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(245, 158, 11, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .card-maitre:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(245, 158, 11, 0.4);
   }
   
   
