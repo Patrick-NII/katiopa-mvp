@@ -817,101 +817,96 @@ export default function HomePage() {
       {/* Section Rejoindre la Communauté */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-              className="mb-6"
+              className="mb-4"
             >
-              <MulticolorText 
-                text="Rejoignez la communauté CubeAI" 
-                variant="h2" 
-                className="text-gray-900"
-              />
+              <h2 className="font-subtitle-xl text-gray-700">Rejoignez la communauté CubeAI</h2>
             </motion.div>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="font-subtitle-lg text-gray-600 max-w-2xl mx-auto"
+              className="font-body text-gray-500 max-w-xl mx-auto mb-8"
             >
-              Connectez-vous avec d'autres parents, partagez vos expériences et restez informés des dernières nouveautés
+              Restez connecté et partagez votre expérience
             </motion.p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                platform: 'Facebook',
-                description: 'Groupe privé pour échanger conseils et astuces',
-                icon: (
-                  <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-.8 0-1.54.37-2.01 1l-4.7 6.28c-.18.24-.29.54-.29.85V20c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2h2v2c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2h2v2c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2h2v2z"/>
-                  </svg>
-                ),
-                bgColor: 'bg-blue-50',
-                borderColor: 'border-blue-200',
-                hoverColor: 'hover:bg-blue-100'
-              },
-              {
-                platform: 'Instagram',
-                description: 'Suivez nos activités et partagez vos moments',
-                icon: (
-                  <svg className="w-8 h-8 text-pink-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.297-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.807.875 1.297 2.026 1.297 3.323s-.49 2.448-1.297 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.718-1.297c-.49.49-1.297.807-2.026.807s-1.536-.317-2.026-.807c-.49-.49-.807-1.297-.807-2.026s.317-1.536.807-2.026c.49-.49 1.297-.807 2.026-.807s1.536.317 2.026.807c.49.49.807 1.297.807 2.026s-.317 1.536-.807 2.026z"/>
-                  </svg>
-                ),
-                bgColor: 'bg-pink-50',
-                borderColor: 'border-pink-200',
-                hoverColor: 'hover:bg-pink-100'
-              },
-              {
-                platform: 'LinkedIn',
-                description: 'Réseau professionnel pour les parents',
-                icon: (
-                  <svg className="w-8 h-8 text-blue-700" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                ),
-                bgColor: 'bg-blue-50',
-                borderColor: 'border-blue-200',
-                hoverColor: 'hover:bg-blue-100'
-              },
-              {
-                platform: 'YouTube',
-                description: 'Tutoriels et contenus éducatifs',
-                icon: (
-                  <svg className="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                  </svg>
-                ),
-                bgColor: 'bg-red-50',
-                borderColor: 'border-red-200',
-                hoverColor: 'hover:bg-red-100'
-              }
-            ].map((social, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true }}
-                className={`${social.bgColor} ${social.borderColor} border-2 rounded-2xl p-6 text-center`}
-              >
-                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  {social.icon}
-                </div>
-                <h3 className="font-subtitle text-gray-900 mb-2">{social.platform}</h3>
-                <p className="font-body text-gray-600 text-sm">{social.description}</p>
-                <button className="mt-4 font-button bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg text-sm transition-all hover:from-blue-700 hover:to-purple-700">
-                  Rejoindre
-                </button>
-              </motion.div>
-            ))}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="flex flex-wrap justify-center items-center gap-8 mb-8"
+          >
+            {/* Facebook */}
+            <a 
+              href="#" 
+              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-50 hover:bg-blue-50 transition-all duration-300"
+            >
+              <img 
+                src="https://cdn-icons-png.flaticon.com/512/124/124010.png" 
+                alt="Facebook" 
+                className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"
+              />
+              <span className="font-body text-sm text-gray-600 group-hover:text-blue-600">Facebook</span>
+            </a>
+
+            {/* Instagram */}
+            <a 
+              href="#" 
+              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-50 hover:bg-pink-50 transition-all duration-300"
+            >
+              <img 
+                src="https://cdn-icons-png.flaticon.com/512/174/174855.png" 
+                alt="Instagram" 
+                className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"
+              />
+              <span className="font-body text-sm text-gray-600 group-hover:text-pink-600">Instagram</span>
+            </a>
+
+            {/* LinkedIn */}
+            <a 
+              href="#" 
+              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-50 hover:bg-blue-50 transition-all duration-300"
+            >
+              <img 
+                src="https://cdn-icons-png.flaticon.com/512/174/174857.png" 
+                alt="LinkedIn" 
+                className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"
+              />
+              <span className="font-body text-sm text-gray-600 group-hover:text-blue-700">LinkedIn</span>
+            </a>
+
+            {/* YouTube */}
+            <a 
+              href="#" 
+              className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gray-50 hover:bg-red-50 transition-all duration-300"
+            >
+              <img 
+                src="https://cdn-icons-png.flaticon.com/512/174/174883.png" 
+                alt="YouTube" 
+                className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"
+              />
+              <span className="font-body text-sm text-gray-600 group-hover:text-red-600">YouTube</span>
+            </a>
+
+            {/* Bouton Partager */}
+            <button className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transition-all duration-300">
+              <img 
+                src="https://cdn-icons-png.flaticon.com/512/126/126472.png" 
+                alt="Partager" 
+                className="w-5 h-5 group-hover:scale-110 transition-transform duration-300"
+              />
+              <span className="font-body text-sm">Partager</span>
+            </button>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
