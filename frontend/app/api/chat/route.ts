@@ -188,7 +188,7 @@ async function getCubeMatchData(childId: string): Promise<any> {
       orderBy: {
         created_at: 'desc'
       },
-      take: 50 // Limiter aux 50 dernières parties
+      // SUPPRIMÉ: take: 50 - Accès complet à toutes les parties CubeMatch
     });
 
     if (cubeMatchScores.length === 0) {
@@ -259,8 +259,8 @@ async function getChildrenData(accountId: string): Promise<any[]> {
       },
       include: {
         activities: {
-          orderBy: { createdAt: 'desc' },
-          take: 100 // Limiter pour éviter les surcharges
+          orderBy: { createdAt: 'desc' }
+          // SUPPRIMÉ: take: 100 - Accès complet à toutes les activités
         },
         profile: true
       }
@@ -270,6 +270,21 @@ async function getChildrenData(accountId: string): Promise<any[]> {
     children.forEach((child, index) => {
       console.log(`👶 Enfant ${index + 1}: ${child.firstName} ${child.lastName} (${child.activities.length} activités)`)
     })
+
+    // Récupérer tous les prompts pour ce compte
+    const allPrompts = await prisma.ParentPrompt.findMany({
+      where: {
+        userSession: {
+          accountId: accountId
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        userSession: true
+      }
+    })
+
+    console.log('📝 Prompts trouvés:', allPrompts.length)
 
     // Enrichir avec les données CubeMatch
     const enrichedChildren = await Promise.all(children.map(async (child) => {
@@ -360,20 +375,61 @@ async function getChildrenData(accountId: string): Promise<any[]> {
       }
     }));
     
-    return enrichedChildren;
+    return {
+      children: enrichedChildren,
+      prompts: allPrompts.map(prompt => ({
+        id: prompt.id,
+        content: prompt.content,
+        type: prompt.type,
+        status: prompt.status,
+        createdAt: prompt.createdAt,
+        updatedAt: prompt.updatedAt,
+        metadata: prompt.metadata,
+        childSessionId: prompt.childSessionId,
+        parentName: prompt.userSession?.firstName + ' ' + prompt.userSession?.lastName
+      }))
+    }
   } catch (error) {
     console.error('❌ Erreur récupération données enfants:', error)
-    return []
+    return { children: [], prompts: [] }
   }
 }
 
 // Fonction pour analyser les données et générer des insights
-function generateDataInsights(childrenData: any[], activeConnections: any[] = []): string {
+function generateDataInsights(childrenData: any[], activeConnections: any[] = [], prompts: any[] = []): string {
   if (!childrenData || childrenData.length === 0) {
     return "Aucune donnée d'enfant disponible pour l'analyse."
   }
 
   let insights = "📊 **ANALYSE DES DONNÉES ENFANTS**\n\n"
+  
+  // Informations sur les prompts générés
+  if (prompts && prompts.length > 0) {
+    insights += "## 📝 PROMPTS GÉNÉRÉS\n"
+    insights += `• **${prompts.length} prompts** générés au total\n`
+    
+    // Grouper par type
+    const promptsByType = prompts.reduce((acc: any, prompt: any) => {
+      acc[prompt.type] = (acc[prompt.type] || 0) + 1
+      return acc
+    }, {})
+    
+    Object.entries(promptsByType).forEach(([type, count]) => {
+      insights += `• **${type}**: ${count} prompts\n`
+    })
+    
+    // Derniers prompts
+    const recentPrompts = prompts.slice(0, 3)
+    insights += `• **Derniers prompts**:\n`
+    recentPrompts.forEach((prompt: any, index: number) => {
+      const date = new Date(prompt.createdAt).toLocaleDateString('fr-FR')
+      insights += `  ${index + 1}. ${prompt.type} (${date}) - ${prompt.status}\n`
+    })
+    insights += "\n"
+  } else {
+    insights += "## 📝 PROMPTS GÉNÉRÉS\n"
+    insights += "• Aucun prompt généré pour le moment\n\n"
+  }
   
   // Informations sur les connexions actives
   if (activeConnections.length > 0) {
@@ -502,8 +558,10 @@ async function getUserContext(userInfo: UserInfo): Promise<UserContext> {
       
       if (userSession?.accountId) {
         console.log('🔍 Appel de getChildrenData avec accountId:', userSession.accountId)
-        childrenData = await getChildrenData(userSession.accountId)
+        const dataResult = await getChildrenData(userSession.accountId)
+        childrenData = dataResult.children
         console.log('📊 Données enfants récupérées:', childrenData.length, 'enfants')
+        console.log('📝 Prompts récupérés:', dataResult.prompts.length, 'prompts')
         
         // Récupérer les connexions actives
         activeConnections = await getActiveConnections(userSession.accountId)
@@ -523,7 +581,7 @@ async function getUserContext(userInfo: UserInfo): Promise<UserContext> {
     }
     
     // Générer des insights basés sur les données réelles
-    const dataInsights = role === 'parent' ? generateDataInsights(childrenData, activeConnections) : ""
+    const dataInsights = role === 'parent' ? generateDataInsights(childrenData, activeConnections, dataResult?.prompts || []) : ""
     
     console.log('💡 Insights générés:', dataInsights ? 'Oui' : 'Non')
     console.log('📊 Données enfants disponibles:', childrenData.length, 'enfants')
@@ -695,18 +753,8 @@ function getMaxTokensForSubscription(subscriptionType: string): number {
 
 // Fonction pour obtenir la limite de caractères par abonnement
 function getMaxCharactersForSubscription(subscriptionType: string): number {
-  switch (subscriptionType) {
-    case 'FREE':
-      return 500 // Limité pour les comptes gratuits
-    case 'PRO':
-      return 2000 // Bubix Pro - limite généreuse
-    case 'PRO_PLUS':
-      return 4000 // Très généreux
-    case 'ENTERPRISE':
-      return 6000 // Illimité virtuellement
-    default:
-      return 500
-  }
+  // BUBIX ACCÈS ILLIMITÉ - Plus de limitations par abonnement
+  return 999999 // Virtuellement illimité
 }
 
 // Fonction pour obtenir le nombre de caractères restants
