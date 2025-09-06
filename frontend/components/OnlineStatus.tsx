@@ -26,7 +26,7 @@ export default function OnlineStatus({ isOnline, lastActivity, size = 'md' }: On
     const now = new Date()
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
     
-    const timePrefix = isOnline ? 'En ligne il y a' : 'Hors ligne il y a'
+    const timePrefix = isOnline ? 'En ligne depuis' : 'En ligne il y a'
     
     if (diffInMinutes < 1) return isOnline ? 'En ligne maintenant' : 'Hors ligne à l\'instant'
     if (diffInMinutes < 60) return `${timePrefix} ${diffInMinutes} min`
