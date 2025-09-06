@@ -499,13 +499,10 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
             {[
               {
-                icon: (
-                  <svg className="w-12 h-12 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
-                ),
+                image: '/image-bg/intelligence artificielle.png',
                 title: 'Intelligence Artificielle Adaptative',
                 description: 'Notre algorithme d\'IA analyse en temps réel les réponses de votre enfant pour ajuster instantanément la difficulté et le style d\'apprentissage. Plus besoin de suivre un programme rigide - l\'éducation s\'adapte à l\'enfant, pas l\'inverse.',
+                details: 'L\'IA de CubeAI utilise des algorithmes de machine learning avancés pour créer un profil d\'apprentissage unique pour chaque enfant. Elle analyse les patterns de réussite, les temps de réponse, et les préférences cognitives pour optimiser l\'expérience éducative.',
                 benefits: ['Adaptation en temps réel', 'Personnalisation poussée', 'Suivi des progrès'],
                 bgColor: 'bg-blue-50',
                 borderColor: 'border-blue-200',
@@ -513,13 +510,10 @@ export default function HomePage() {
                 iconColor: 'text-blue-600'
               },
               {
-                icon: (
-                  <svg className="w-12 h-12 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                  </svg>
-                ),
+                image: '/image-bg/contenu premium.png',
                 title: 'Contenu Éducatif Premium',
                 description: 'Développé par des experts en pédagogie et des enseignants expérimentés, notre contenu couvre tous les domaines essentiels : mathématiques fondamentales, lecture et écriture, sciences naturelles, et développement de la créativité.',
+                details: 'Notre équipe d\'experts pédagogiques a créé plus de 10 000 exercices interactifs couvrant tous les niveaux scolaires. Chaque contenu est testé et validé par des enseignants expérimentés pour garantir une efficacité maximale.',
                 benefits: ['Experts pédagogiques', 'Programme complet', 'Méthodes éprouvées'],
                 bgColor: 'bg-purple-50',
                 borderColor: 'border-purple-200',
@@ -527,13 +521,10 @@ export default function HomePage() {
                 iconColor: 'text-purple-600'
               },
               {
-                icon: (
-                  <svg className="w-12 h-12 text-pink-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01 1l-4.7 6.28c-.18.24-.29.54-.29.85V20c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2h2v2c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2h2v2z"/>
-                  </svg>
-                ),
+                image: '/image-bg/Suivi parental.png',
                 title: 'Suivi Parental Avancé',
                 description: 'Restez connecté à l\'éducation de votre enfant avec des rapports détaillés, des analyses de progression et des recommandations personnalisées. Participez activement à son développement scolaire depuis votre smartphone.',
+                details: 'Recevez des rapports hebdomadaires détaillés avec des graphiques de progression, des recommandations d\'activités supplémentaires, et des insights sur les forces et faiblesses de votre enfant. Interface parent intuitive et notifications en temps réel.',
                 benefits: ['Rapports détaillés', 'Recommandations', 'Suivi en temps réel'],
                 bgColor: 'bg-pink-50',
                 borderColor: 'border-pink-200',
@@ -541,13 +532,10 @@ export default function HomePage() {
                 iconColor: 'text-pink-600'
               },
               {
-                icon: (
-                  <svg className="w-12 h-12 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
-                  </svg>
-                ),
+                image: '/image-bg/securiter.png',
                 title: 'Sécurité et Confidentialité',
                 description: 'La protection des données de votre enfant est notre priorité absolue. Nous utilisons les technologies de cryptage les plus avancées et respectons strictement le RGPD pour garantir un environnement d\'apprentissage 100% sécurisé.',
+                details: 'Cryptage AES-256, serveurs sécurisés en Europe, conformité RGPD complète, et audit de sécurité régulier par des experts indépendants. Vos données et celles de votre enfant sont protégées selon les standards les plus élevés de l\'industrie.',
                 benefits: ['Cryptage avancé', 'Conformité RGPD', 'Protection maximale'],
                 bgColor: 'bg-green-50',
                 borderColor: 'border-green-200',
@@ -555,13 +543,10 @@ export default function HomePage() {
                 iconColor: 'text-green-600'
               },
               {
-                icon: (
-                  <svg className="w-12 h-12 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M13 2.05v3.03c3.39.49 6 3.39 6 6.92 0 .9-.18 1.75-.48 2.54l2.6 1.53c.56-1.24.88-2.62.88-4.07 0-5.18-3.95-9.45-9-9.95zM12 19c-3.87 0-7-3.13-7-7 0-3.53 2.61-6.43 6-6.92V2.05c-5.06.5-9 4.76-9 9.95 0 5.52 4.47 10 9.99 10 3.31 0 6.24-1.61 8.06-4.09l-2.6-1.53C16.17 17.98 14.21 19 12 19z"/>
-                  </svg>
-                ),
+                image: '/image-bg/resultat mesurables.png',
                 title: 'Résultats Mesurables',
                 description: 'Voyez les progrès de votre enfant en temps réel avec des métriques précises et des graphiques interactifs. Notre système de suivi vous montre exactement où votre enfant excelle et où il a besoin de soutien supplémentaire.',
+                details: 'Tableaux de bord interactifs avec métriques détaillées : temps d\'apprentissage, taux de réussite par matière, progression hebdomadaire, et comparaisons avec les standards de l\'éducation nationale. Visualisations claires et actionables.',
                 benefits: ['Métriques précises', 'Graphiques interactifs', 'Progrès visibles'],
                 bgColor: 'bg-yellow-50',
                 borderColor: 'border-yellow-200',
@@ -569,13 +554,10 @@ export default function HomePage() {
                 iconColor: 'text-yellow-600'
               },
               {
-                icon: (
-                  <svg className="w-12 h-12 text-indigo-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                  </svg>
-                ),
+                image: '/image-bg/accessibilité.png',
                 title: 'Accessibilité Universelle',
                 description: 'CubeAI fonctionne sur tous vos appareils : ordinateur, tablette ou smartphone. Votre enfant peut continuer à apprendre partout, que ce soit à la maison, en voyage ou chez les grands-parents.',
+                details: 'Application native iOS et Android, version web responsive, synchronisation cloud en temps réel, et mode hors-ligne pour continuer l\'apprentissage même sans connexion internet. Interface adaptée à tous les âges et capacités.',
                 benefits: ['Multi-plateformes', 'Synchronisation', 'Apprentissage mobile'],
                 bgColor: 'bg-indigo-50',
                 borderColor: 'border-indigo-200',
@@ -589,18 +571,33 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
-                className={`${feature.bgColor} ${feature.borderColor} border-2 rounded-2xl p-6 flex flex-col h-full`}
+                className={`${feature.bgColor} ${feature.borderColor} border-2 rounded-2xl p-6 flex flex-col h-full group hover:shadow-xl transition-all duration-300 cursor-pointer`}
               >
-                <div className={`${feature.iconBgColor} w-16 h-16 rounded-xl flex items-center justify-center mb-4`}>
-                  {feature.icon}
+                <div className="relative mb-4">
+                  <img 
+                    src={feature.image} 
+                    alt={feature.title}
+                    className="w-20 h-20 mx-auto rounded-xl object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-                <h3 className="font-subtitle-lg text-gray-900 mb-3">{feature.title}</h3>
-                <p className="font-body text-gray-600 mb-4 flex-grow">{feature.description}</p>
+                
+                <h3 className="font-subtitle-lg text-gray-900 mb-3 group-hover:text-blue-600 transition-colors duration-300">{feature.title}</h3>
+                
+                <div className="flex-grow">
+                  <p className="font-body text-gray-600 mb-4 group-hover:hidden">{feature.description}</p>
+                  <div className="hidden group-hover:block">
+                    <p className="font-body text-gray-700 mb-4 text-sm leading-relaxed">{feature.details}</p>
+                  </div>
+                </div>
+                
                 <ul className="space-y-2">
                   {feature.benefits.map((benefit, benefitIndex) => (
-                    <li key={benefitIndex} className="flex items-center text-gray-700">
-                      <div className={`w-2 h-2 ${feature.iconColor} rounded-full mr-3`} />
-                      <span className="font-body text-sm">{benefit}</span>
+                    <li key={benefitIndex} className="flex items-center text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
+                      <svg className="w-4 h-4 text-green-500 mr-2 group-hover:text-green-600 transition-colors duration-300" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                      </svg>
+                      {benefit}
                     </li>
                   ))}
                 </ul>
