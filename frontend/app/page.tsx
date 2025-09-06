@@ -203,8 +203,8 @@ export default function HomePage() {
       <section className="relative overflow-hidden min-h-screen flex items-center">
         {/* Images de fond décoratives */}
         
-        {/* Bubix juste en dessous du titre avec effet néon */}
-        <div className="absolute top-80 left-1/2 transform -translate-x-1/2 z-10">
+        {/* Bubix décalé vers la droite avec effet néon */}
+        <div className="absolute top-80 left-3/5 transform -translate-x-1/2 z-10">
           <img 
             src="/image-bubix/bubix.png" 
             alt="Bubix" 
@@ -212,7 +212,7 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Cube centre-gauche et plus haut avec effet miroir */}
+        {/* Cube centre-gauche et plus haut avec effet miroir rapproché */}
         <div className="absolute top-32 left-1/4 transform -translate-x-1/2 z-10">
           <div className="relative">
             <img 
@@ -220,11 +220,11 @@ export default function HomePage() {
               alt="Cube" 
               className="w-72 h-72 sm:w-96 sm:h-96 md:w-[28rem] md:h-[28rem] lg:w-[32rem] lg:h-[32rem] xl:w-[36rem] xl:h-[36rem]"
             />
-            {/* Effet miroir vers le sol */}
+            {/* Effet miroir rapproché */}
             <img 
               src="/image-bg/cube.png" 
               alt="Cube reflection" 
-              className="absolute top-full left-0 w-72 h-72 sm:w-96 sm:h-96 md:w-[28rem] md:h-[28rem] lg:w-[32rem] lg:h-[32rem] xl:w-[36rem] xl:h-[36rem] opacity-30 scale-y-[-1] blur-[1px]"
+              className="absolute top-[95%] left-0 w-72 h-72 sm:w-96 sm:h-96 md:w-[28rem] md:h-[28rem] lg:w-[32rem] lg:h-[32rem] xl:w-[36rem] xl:h-[36rem] opacity-30 scale-y-[-1] blur-[1px]"
             />
           </div>
         </div>
