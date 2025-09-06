@@ -848,7 +848,7 @@ export default function HomePage() {
               className="group flex items-center gap-3 px-4 py-2 rounded-full transition-all duration-300"
               style={{ backgroundColor: '#f3f4f6 !important' }}
             >
-              <div className="w-6 h-6 rounded-lg bg-gray-600 group-hover:bg-blue-600 transition-colors duration-300 flex items-center justify-center group-hover:scale-110">
+              <div className="w-6 h-6 rounded-lg bg-gray-100 group-hover:bg-blue-600 transition-colors duration-300 flex items-center justify-center group-hover:scale-110">
                 <img 
                   src="/social/facebook (1).png" 
                   alt="Facebook" 
@@ -904,6 +904,22 @@ export default function HomePage() {
                 />
               </div>
               <span className="font-body text-sm text-gray-600 group-hover:text-gray-800" style={{ color: '#374151 !important' }}>TikTok</span>
+            </a>
+
+            {/* YouTube */}
+            <a 
+              href="#" 
+              className="group flex items-center gap-3 px-4 py-2 rounded-full transition-all duration-300"
+              style={{ backgroundColor: '#f3f4f6 !important' }}
+            >
+              <div className="w-6 h-6 rounded-lg bg-gray-600 group-hover:bg-red-600 transition-colors duration-300 flex items-center justify-center group-hover:scale-110">
+                <img 
+                  src="/social/youtube.png" 
+                  alt="YouTube" 
+                  className="w-4 h-4"
+                />
+              </div>
+              <span className="font-body text-sm text-gray-600 group-hover:text-red-600" style={{ color: '#374151 !important' }}>YouTube</span>
             </a>
 
             {/* Bouton Partager */}
