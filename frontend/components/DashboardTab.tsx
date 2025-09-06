@@ -37,6 +37,7 @@ import AIAnalysisCard from './AIAnalysisCard'
 import SavedAnalyses from './SavedAnalyses'
 import OnlineStatus from './OnlineStatus'
 import LimitationPopup from './LimitationPopup'
+import AnalysisModal from './AnalysisModal'
 import { useLimitationPopup } from '@/hooks/useLimitationPopup'
 
 interface DashboardTabProps {
@@ -90,6 +91,12 @@ export default function DashboardTab({
     timestamp: Date;
     sessionId: string;
   }>>({});
+  
+  // États pour le modal d'analyse
+  const [selectedAnalysis, setSelectedAnalysis] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [likedAnalyses, setLikedAnalyses] = useState<Set<string>>(new Set());
+  const [favoriteAnalyses, setFavoriteAnalyses] = useState<Set<string>>(new Set());
 
   // Hook pour le statut en temps réel
   const { sessionStatuses, isLoading: statusLoading, refreshStatus } = useRealTimeStatus({
@@ -205,6 +212,71 @@ export default function DashboardTab({
       triggerLimitationPopup(mockSubscriptionInfo)
     }
   }
+
+  // Fonctions pour gérer les actions du modal d'analyse
+  const handleOpenModal = (analysis: any) => {
+    setSelectedAnalysis(analysis);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedAnalysis(null);
+  };
+
+  const handleSaveAnalysis = (analysis: any) => {
+    // Sauvegarder l'analyse
+    const savedAnalysis = {
+      ...analysis,
+      savedAt: new Date(),
+      id: `${analysis.type}_${analysis.sessionId}_${Date.now()}`
+    };
+    setSavedAnalyses(prev => [...prev, savedAnalysis]);
+    console.log('Analyse sauvegardée:', savedAnalysis);
+  };
+
+  const handleDeleteAnalysis = (analysisId: string) => {
+    // Supprimer l'analyse
+    setBubixResponses(prev => {
+      const newResponses = { ...prev };
+      Object.keys(newResponses).forEach(key => {
+        if (key.includes(analysisId)) {
+          delete newResponses[key];
+        }
+      });
+      return newResponses;
+    });
+    handleCloseModal();
+  };
+
+  const handleLikeAnalysis = (analysisId: string) => {
+    setLikedAnalyses(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(analysisId)) {
+        newSet.delete(analysisId);
+      } else {
+        newSet.add(analysisId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleFavoriteAnalysis = (analysisId: string) => {
+    setFavoriteAnalyses(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(analysisId)) {
+        newSet.delete(analysisId);
+      } else {
+        newSet.add(analysisId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleDialogueAnalysis = (analysisId: string) => {
+    // Ici on pourrait ouvrir un chat avec Bubix Pro
+    console.log('Ouverture du dialogue Bubix Pro pour:', analysisId);
+  };
 
   // Déclencheur de popup aléatoire (pour tester)
   useEffect(() => {
@@ -1165,45 +1237,83 @@ export default function DashboardTab({
               
               {/* Tableau des réponses Bubix */}
               {Object.keys(bubixResponses).length > 0 ? (
-                <div className="space-y-4 max-h-96 overflow-y-auto">
-                  {Object.entries(bubixResponses)
-                    .sort(([,a], [,b]) => b.timestamp.getTime() - a.timestamp.getTime())
-                    .map(([key, response]) => (
-                      <div key={key} className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            {response.type === 'compte_rendu' && <BookOpen className="w-4 h-4 text-blue-600" />}
-                            {response.type === 'appreciation' && <Target className="w-4 h-4 text-purple-600" />}
-                            {response.type === 'conseils' && <Clock className="w-4 h-4 text-green-600" />}
-                            {response.type === 'vigilance' && <Eye className="w-4 h-4 text-orange-600" />}
-                            <h5 className="font-medium text-gray-900 text-sm">
-                              {response.type === 'compte_rendu' && 'Compte rendu'}
-                              {response.type === 'appreciation' && 'Points forts'}
-                              {response.type === 'conseils' && 'Meilleurs moments'}
-                              {response.type === 'vigilance' && 'Vigilance'}
-                            </h5>
-                          </div>
-                          <span className="text-xs text-gray-500">
-                            {response.timestamp.toLocaleTimeString()}
-                          </span>
-                        </div>
-                        <div className="prose prose-sm max-w-none">
-                          <p className="text-gray-700 leading-relaxed text-xs whitespace-pre-wrap line-clamp-4">
-                            {response.content}
-                          </p>
-                        </div>
-                        <button 
-                          onClick={() => {
-                            // Fonction pour voir l'analyse complète
-                            const fullContent = response.content;
-                            alert(fullContent); // Temporaire, à remplacer par un modal
-                          }}
-                          className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium"
-                        >
-                          Voir plus...
-                        </button>
-                      </div>
-                    ))}
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Type
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Enfant
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Aperçu
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {Object.entries(bubixResponses)
+                          .sort(([,a], [,b]) => b.timestamp.getTime() - a.timestamp.getTime())
+                          .map(([key, response]) => {
+                            const childName = childSessions.find(s => s.sessionId === response.sessionId)?.name || 'Enfant';
+                            return (
+                              <tr key={key} className="hover:bg-gray-50">
+                                <td className="px-4 py-4 whitespace-nowrap">
+                                  <div className="flex items-center gap-2">
+                                    {response.type === 'compte_rendu' && <BookOpen className="w-4 h-4 text-blue-600" />}
+                                    {response.type === 'appreciation' && <Target className="w-4 h-4 text-purple-600" />}
+                                    {response.type === 'conseils' && <Clock className="w-4 h-4 text-green-600" />}
+                                    {response.type === 'vigilance' && <Eye className="w-4 h-4 text-orange-600" />}
+                                    <span className="text-sm font-medium text-gray-900">
+                                      {response.type === 'compte_rendu' && 'Compte rendu'}
+                                      {response.type === 'appreciation' && 'Points forts'}
+                                      {response.type === 'conseils' && 'Meilleurs moments'}
+                                      {response.type === 'vigilance' && 'Vigilance'}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-4 whitespace-nowrap">
+                                  <div className="text-sm text-gray-900">{childName}</div>
+                                </td>
+                                <td className="px-4 py-4 whitespace-nowrap">
+                                  <div className="text-sm text-gray-500">
+                                    {response.timestamp.toLocaleDateString('fr-FR')}
+                                  </div>
+                                  <div className="text-xs text-gray-400">
+                                    {response.timestamp.toLocaleTimeString('fr-FR')}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-4">
+                                  <div className="text-sm text-gray-700 max-w-xs truncate">
+                                    {response.content.substring(0, 100)}...
+                                  </div>
+                                </td>
+                                <td className="px-4 py-4 whitespace-nowrap text-center">
+                                  <button
+                                    onClick={() => handleOpenModal({
+                                      ...response,
+                                      childName
+                                    })}
+                                    className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                                  >
+                                    <Eye className="w-3 h-3" />
+                                    Lire
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-8 text-gray-500">
@@ -1250,6 +1360,23 @@ export default function DashboardTab({
       )}
 
       
+      {/* Modal d'analyse */}
+      {selectedAnalysis && (
+        <AnalysisModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          analysis={selectedAnalysis}
+          onSave={handleSaveAnalysis}
+          onDelete={handleDeleteAnalysis}
+          onLike={handleLikeAnalysis}
+          onFavorite={handleFavoriteAnalysis}
+          onDialogue={handleDialogueAnalysis}
+          isLiked={likedAnalyses.has(selectedAnalysis.sessionId)}
+          isFavorite={favoriteAnalyses.has(selectedAnalysis.sessionId)}
+          canDialogue={user?.subscriptionType === 'MAITRE' || user?.subscriptionType === 'ENTERPRISE'}
+        />
+      )}
+
       {/* Popup de limitation */}
       <LimitationPopup
         isVisible={limitationState.isVisible}
