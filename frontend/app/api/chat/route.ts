@@ -782,35 +782,87 @@ function getMaxCharactersForSubscription(subscriptionType: string): number {
   }
 }
 
+// Fonction pour obtenir les messages de limitation selon le contexte
+function getLimitationMessage(subscriptionType: string, userType: 'PARENT' | 'CHILD', childName?: string, childGender?: string): {
+  message: string,
+  isCommercial: boolean,
+  showUpgrade: boolean
+} {
+  if (userType === 'CHILD') {
+    // Messages pour enfants - non commerciaux et encourageants
+    const parentTitle = childGender === 'F' ? 'ta maman' : 'ton papa'
+    
+    switch (subscriptionType) {
+      case 'FREE':
+        return {
+          message: `🌟 **Bravo ${childName || 'petit(e) champion(ne)'} !**\n\nTu progresses vraiment bien ! J'ai hâte de faire un point avec ${parentTitle} pour voir comment on peut continuer à grandir ensemble ! 🌱✨`,
+          isCommercial: false,
+          showUpgrade: false
+        }
+      case 'STARTER':
+        return {
+          message: `🚀 **Incroyable ${childName || 'petit(e) génie'} !**\n\nTon niveau devient extraordinaire ! Je vais discuter avec ${parentTitle} pour voir comment on peut encore mieux t'accompagner dans ton apprentissage ! 🎯💫`,
+          isCommercial: false,
+          showUpgrade: false
+        }
+      default:
+        return {
+          message: `🎉 **Félicitations ${childName || 'petit(e) champion(ne)'} !**\n\nTu es en train de devenir vraiment fort(e) ! Continue comme ça ! 🌟`,
+          isCommercial: false,
+          showUpgrade: false
+        }
+    }
+  } else {
+    // Messages pour parents - tactiques et informatifs
+    const childTitle = childGender === 'F' ? 'votre fille' : 'votre fils'
+    
+    switch (subscriptionType) {
+      case 'FREE':
+        return {
+          message: `👨‍👩‍👧‍👦 **${childName || 'Votre enfant'} atteint un niveau extraordinaire !**\n\nNous sommes impressionnés par les progrès de ${childTitle}. Pour continuer à l'accompagner au mieux dans son apprentissage, nous vous proposons de découvrir nos fonctionnalités avancées.\n\n✨ **Bénéfices pour ${childName || 'votre enfant'} :**\n• Analyses plus approfondies de ses performances\n• Recommandations personnalisées\n• Suivi détaillé de sa progression\n• Accès à des exercices adaptés à son niveau\n\n🔒 **Votre tranquillité :** Nous nous engageons à protéger la progression de ${childName || 'votre enfant'} et à respecter son rythme d'apprentissage.`,
+          isCommercial: true,
+          showUpgrade: true
+        }
+      case 'STARTER':
+        return {
+          message: `🌟 **${childName || 'Votre enfant'} montre un potentiel exceptionnel !**\n\nLes progrès de ${childTitle} sont remarquables. Pour lui offrir l'accompagnement le plus adapté, nous vous proposons d'accéder à nos outils d'analyse avancés.\n\n🚀 **Avantages pour ${childName || 'votre enfant'} :**\n• Intelligence artificielle plus performante\n• Analyses détaillées de ses forces et axes d'amélioration\n• Recommandations pédagogiques personnalisées\n• Suivi en temps réel de ses performances\n\n💝 **Notre engagement :** Votre confiance est précieuse. Nous nous engageons à utiliser ces outils pour le bien-être et la progression de ${childName || 'votre enfant'}.`,
+          isCommercial: true,
+          showUpgrade: true
+        }
+      default:
+        return {
+          message: `🎯 **${childName || 'Votre enfant'} progresse magnifiquement !**\n\nContinuez à l'encourager dans son apprentissage ! 🌟`,
+          isCommercial: false,
+          showUpgrade: false
+        }
+    }
+  }
+}
+
 // Fonction pour obtenir les informations d'abonnement
-function getSubscriptionInfo(subscriptionType: string): { 
+function getSubscriptionInfo(subscriptionType: string, userType: 'PARENT' | 'CHILD' = 'PARENT', childName?: string, childGender?: string): { 
   model: string, 
   maxTokens: number, 
   maxChars: number, 
-  upgradeMessage?: string 
+  limitationMessage?: string,
+  isCommercial?: boolean,
+  showUpgrade?: boolean
 } {
   const model = getModelForSubscription(subscriptionType)
   const maxTokens = getMaxTokensForSubscription(subscriptionType)
   const maxChars = getMaxCharactersForSubscription(subscriptionType)
   
-  let upgradeMessage = ''
+  // Obtenir le message de limitation contextuel
+  const limitationInfo = getLimitationMessage(subscriptionType, userType, childName, childGender)
   
-  switch (subscriptionType) {
-    case 'FREE':
-      upgradeMessage = '💡 **Passez à STARTER** pour plus de tokens et de caractères !'
-      break
-    case 'STARTER':
-      upgradeMessage = '🚀 **Passez à PRO** pour GPT-4o-mini et des réponses plus intelligentes !'
-      break
-    case 'PRO':
-      upgradeMessage = '⭐ **Passez à PRO_PLUS** pour GPT-4o et des réponses premium !'
-      break
-    case 'PRO_PLUS':
-      upgradeMessage = '🏢 **Passez à ENTERPRISE** pour des fonctionnalités sur mesure !'
-      break
+  return { 
+    model, 
+    maxTokens, 
+    maxChars, 
+    limitationMessage: limitationInfo.message,
+    isCommercial: limitationInfo.isCommercial,
+    showUpgrade: limitationInfo.showUpgrade
   }
-  
-  return { model, maxTokens, maxChars, upgradeMessage }
 }
 
 // Fonction pour obtenir le nombre de caractères restants
@@ -1788,8 +1840,13 @@ export async function POST(request: NextRequest) {
     const currentCharacters = userQuery.length
     const remainingCharacters = getRemainingCharacters(userQuery, userInfo.subscriptionType)
 
-    // Obtenir les informations d'abonnement
-    const subscriptionInfo = getSubscriptionInfo(userInfo.subscriptionType)
+    // Obtenir les informations d'abonnement contextuelles
+    const subscriptionInfo = getSubscriptionInfo(
+      userInfo.subscriptionType, 
+      userInfo.userType,
+      userContext.childrenData?.[0]?.firstName, // Nom du premier enfant
+      userContext.childrenData?.[0]?.gender     // Genre du premier enfant
+    )
     
     return NextResponse.json({
       text,
@@ -1800,7 +1857,9 @@ export async function POST(request: NextRequest) {
         model: subscriptionInfo.model,
         maxTokens: subscriptionInfo.maxTokens,
         maxChars: subscriptionInfo.maxChars,
-        upgradeMessage: subscriptionInfo.upgradeMessage
+        limitationMessage: subscriptionInfo.limitationMessage,
+        isCommercial: subscriptionInfo.isCommercial,
+        showUpgrade: subscriptionInfo.showUpgrade
       },
       userInfo: {
         email: userInfo.email,
