@@ -30,7 +30,7 @@ interface BubixProgressProps {
   onComplete?: () => void;
 }
 
-function BubixProgress({ 
+export default function BubixProgress({ 
   isVisible, 
   steps, 
   currentStep, 
@@ -227,5 +227,3 @@ export function createBubixSteps(): ProgressStep[] {
     }
   ];
 }
-
-export default BubixProgress;
