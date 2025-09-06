@@ -210,7 +210,7 @@ export default function HomePage() {
         />
 
         {/* Titre principal - Positionné indépendamment */}
-        <div className="absolute top-16 left-0 right-0 z-20">
+        <div className="absolute top-0 left-0 right-0 z-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 xl:px-8">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -221,16 +221,16 @@ export default function HomePage() {
               <AnimatedMulticolorText 
                 text="Découvrez CubeAI & Bubix" 
                 variant="h1" 
-                className="leading-none text-7xl sm:text-8xl md:text-9xl lg:text-[12rem] xl:text-[16rem] whitespace-nowrap drop-shadow-2xl"
+                className="leading-none text-7xl sm:text-8xl md:text-9xl lg:text-[10rem] xl:text-[12rem] whitespace-nowrap drop-shadow-2xl"
                 staggerDelay={0.1}
               />
             </motion.div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 xl:px-8 w-full relative z-10">
-          <div className="text-center">
-            
+        {/* Contenu principal - Positionné plus bas */}
+        <div className="absolute bottom-20 left-0 right-0 z-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 xl:px-8 text-center">
             <motion.p 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
