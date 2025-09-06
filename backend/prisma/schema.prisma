@@ -72,6 +72,14 @@ model UserSession {
   cubeMatchScores CubeMatchScore[]
   cubeMatchUserStats CubeMatchUserStats?
   agreedActivities AgreedActivity[]
+  
+  // Relations pour le tracking d'upgrade
+  upgradeTracking UpgradeTracking[] @relation("UpgradeTrackingUser")
+  upgradeTrackingChild UpgradeTracking[] @relation("UpgradeTrackingChild")
+  behavioralMetrics BehavioralMetrics[] @relation("BehavioralMetricsUser")
+  popupInteractions PopupInteraction[] @relation("PopupInteractionUser")
+  rewardTracking RewardTracking[] @relation("RewardTrackingUser")
+  childPerformanceAnalysis ChildPerformanceAnalysis[] @relation("ChildPerformanceAnalysisChild")
 }
 
 // Profil détaillé de l'utilisateur
@@ -717,4 +725,96 @@ model CubeMatchUserStats {
   userSession         UserSession @relation(fields: [user_id], references: [id], onDelete: Cascade)
   
   @@map("cubematch_user_stats")
+}
+
+// ===== TABLES DE TRACKING POUR UPGRADE INTELLIGENT =====
+
+// Table pour tracker les événements d'upgrade
+model UpgradeTracking {
+  id                String      @id @default(cuid())
+  userId            String      // ID de l'utilisateur parent
+  childId           String?     // ID de l'enfant concerné
+  triggerType       String      // 'child_insistence', 'parent_analysis', 'performance_level'
+  triggerData       Json?       // Données contextuelles (scores, fréquence, etc.)
+  popupShownAt      DateTime?   // Quand le popup a été affiché
+  popupAction       String?     // 'upgrade', 'remind_later', 'dismiss'
+  upgradePageVisitedAt DateTime? // Quand la page upgrade a été visitée
+  conversionAt      DateTime?   // Quand la conversion a eu lieu
+  subscriptionType  String?    // Nouveau type d'abonnement
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  
+  // Relations
+  user              UserSession @relation("UpgradeTrackingUser", fields: [userId], references: [id], onDelete: Cascade)
+  child             UserSession? @relation("UpgradeTrackingChild", fields: [childId], references: [id], onDelete: Cascade)
+  
+  @@map("upgrade_tracking")
+}
+
+// Table pour tracker les métriques comportementales
+model BehavioralMetrics {
+  id                String      @id @default(cuid())
+  userId            String      // ID de l'utilisateur
+  sessionId         String?     // ID de la session
+  metricType        String      // 'insistence', 'performance', 'engagement'
+  metricValue       Decimal     // Valeur de la métrique
+  contextData       Json?       // Données contextuelles supplémentaires
+  recordedAt        DateTime    @default(now())
+  
+  // Relations
+  user              UserSession @relation("BehavioralMetricsUser", fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("behavioral_metrics")
+}
+
+// Table pour tracker les interactions avec les popups
+model PopupInteraction {
+  id                String      @id @default(cuid())
+  userId            String      // ID de l'utilisateur
+  popupType         String      // 'limitation', 'upgrade', 'achievement'
+  popupContent      Json?       // Contenu du popup affiché
+  action            String      // 'shown', 'clicked', 'dismissed', 'upgraded'
+  actionData        Json?       // Données de l'action (bouton cliqué, etc.)
+  sessionContext    Json?       // Contexte de la session
+  createdAt         DateTime    @default(now())
+  
+  // Relations
+  user              UserSession @relation("PopupInteractionUser", fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("popup_interactions")
+}
+
+// Table pour tracker les codes promo et récompenses
+model RewardTracking {
+  id                String      @id @default(cuid())
+  userId            String      // ID de l'utilisateur
+  rewardType        String      // 'promo_code', 'referral', 'achievement'
+  rewardCode        String?     // Code promo utilisé
+  rewardValue       Decimal?    // Valeur de la récompense
+  rewardData        Json?       // Données de la récompense
+  usedAt            DateTime?   // Quand la récompense a été utilisée
+  expiresAt         DateTime?   // Expiration de la récompense
+  createdAt         DateTime    @default(now())
+  
+  // Relations
+  user              UserSession @relation("RewardTrackingUser", fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("reward_tracking")
+}
+
+// Table pour tracker les analyses de performance des enfants
+model ChildPerformanceAnalysis {
+  id                String      @id @default(cuid())
+  childId           String      // ID de l'enfant
+  analysisType      String      // 'level_assessment', 'potential_detection', 'progress_analysis'
+  analysisData      Json        // Données de l'analyse
+  performanceLevel  String      // 'basic', 'elevated', 'exceptional'
+  confidence        Decimal     // Niveau de confiance de l'analyse (0-1)
+  recommendations   Json?       // Recommandations générées
+  createdAt         DateTime    @default(now())
+  
+  // Relations
+  child             UserSession @relation("ChildPerformanceAnalysisChild", fields: [childId], references: [id], onDelete: Cascade)
+  
+  @@map("child_performance_analysis")
 }
