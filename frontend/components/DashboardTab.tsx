@@ -290,7 +290,7 @@ export default function DashboardTab({
         return newState;
       });
       
-      // Appeler la nouvelle route API
+      // Appeler la nouvelle route API (frontend Next.js, pas backend)
       const response = await fetch(`/api/sessions/${sessionId}/analyze`, {
         method: 'POST',
         headers: {

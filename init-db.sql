@@ -28,3 +28,6 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO katiopa_user;
 
 
 
+
+
+
