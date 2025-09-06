@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 import { PrismaClient } from '@prisma/client'
 import OpenAI from 'openai'
@@ -10,32 +9,69 @@ const openai = new OpenAI({
 })
 
 // Fonction pour vérifier l'authentification côté serveur
-async function verifyAuthServerSide(): Promise<any> {
+async function verifyAuthServerSide(request: NextRequest): Promise<any> {
   try {
-    const cookieStore = cookies()
-    const token = cookieStore.get('auth-token')?.value
+    const token = request.cookies.get('authToken')?.value
 
-    if (!token) {
-      // Mode développement - utiliser le premier parent trouvé
-      if (process.env.NODE_ENV === 'development') {
-        const parent = await prisma.userSession.findFirst({
-          where: { userType: 'PARENT' },
-          include: { account: true }
-        })
-        if (parent) {
-          console.log('🔧 Mode dev - utilisateur trouvé:', parent.account.firstName)
-          return parent
+    console.log('🔍 Vérification auth - token trouvé:', token ? 'Oui' : 'Non')
+    console.log('🔧 NODE_ENV:', process.env.NODE_ENV)
+
+    // En mode développement, utiliser une approche simplifiée SEULEMENT si pas de token
+    if (!token && process.env.NODE_ENV === 'development') {
+      console.log('🔧 Mode développement - authentification simplifiée (pas de token)')
+      
+      // Récupérer directement le parent de test
+      const parent = await prisma.userSession.findFirst({
+        where: {
+          userType: 'PARENT',
+          isActive: true
+        },
+        include: {
+          account: true
         }
+      })
+      
+      if (parent) {
+        console.log('✅ Parent trouvé en mode dev:', parent.firstName)
+        return parent
+      } else {
+        console.log('❌ Aucun parent trouvé en mode dev')
+        return null
       }
+    }
+
+    // Vérifier le token JWT (approche normale)
+    let decoded: any
+    try {
+      decoded = jwt.verify(token!, process.env.JWT_SECRET || 'your-secret-key') as any
+    } catch (error) {
+      console.log('❌ Token JWT invalide:', error)
+      return null
+    }
+    
+    if (!decoded || !decoded.userId) {
+      console.log('❌ Token invalide ou pas de userId')
       return null
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    console.log('🔍 Recherche utilisateur avec userId:', decoded.userId)
+
+    // Récupérer directement depuis la base de données avec Prisma
     const userSession = await prisma.userSession.findUnique({
-      where: { id: decoded.userSessionId },
-      include: { account: true }
+      where: {
+        id: decoded.userId
+      },
+      include: {
+        account: true
+      }
     })
 
+    if (!userSession) {
+      console.log('❌ Utilisateur non trouvé en base')
+      return null
+    }
+
+    console.log('✅ Utilisateur trouvé:', userSession.firstName)
     return userSession
   } catch (error) {
     console.error('❌ Erreur auth:', error)
@@ -151,7 +187,7 @@ export async function POST(
     const { sessionId } = params
 
     // Vérifier l'authentification
-    const userInfo = await verifyAuthServerSide()
+    const userInfo = await verifyAuthServerSide(request)
     if (!userInfo || userInfo.userType !== 'PARENT') {
       return NextResponse.json(
         { error: 'Non autorisé' },
