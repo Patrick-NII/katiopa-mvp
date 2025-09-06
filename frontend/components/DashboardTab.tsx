@@ -290,10 +290,39 @@ export default function DashboardTab({
         return newState;
       });
       
-      const analysis = await childSessionsAPI.analyzeSession(sessionId);
-      setSessionAnalyses(prev => ({ ...prev, [sessionId]: analysis }));
+      // Appeler la nouvelle route API
+      const response = await fetch(`/api/sessions/${sessionId}/analyze`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur API: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Formater la réponse pour correspondre à l'ancien format
+        const analysis: SessionAnalysis = {
+          sessionId: sessionId,
+          analysis: data.analysis
+        };
+        setSessionAnalyses(prev => ({ ...prev, [sessionId]: analysis }));
+      } else {
+        throw new Error(data.message || 'Erreur lors de la génération du compte rendu');
+      }
     } catch (error) {
       console.error('Erreur lors de la génération du compte rendu:', error);
+      // Afficher un message d'erreur à l'utilisateur
+      const errorAnalysis: SessionAnalysis = {
+        sessionId: sessionId,
+        analysis: `❌ Erreur lors de la génération du compte rendu: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
+      };
+      setSessionAnalyses(prev => ({ ...prev, [sessionId]: errorAnalysis }));
     } finally {
       setLoadingStates(prev => ({ ...prev, [`compte_rendu_${sessionId}`]: false }));
       setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'compte_rendu' } }));
@@ -335,10 +364,62 @@ export default function DashboardTab({
         return newState;
       });
       
-      const analysis = await childSessionsAPI.getGlobalAnalysis(sessionId);
-      setGlobalAnalyses(prev => ({ ...prev, [sessionId]: analysis }));
+      // Appeler la nouvelle route API
+      const response = await fetch(`/api/sessions/${sessionId}/global-analysis`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur API: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Formater la réponse pour correspondre à l'ancien format
+        const analysis: GlobalAnalysis = {
+          sessionId: sessionId,
+          childName: data.sessionData.childName,
+          context: data.analysis.context,
+          analysis: data.analysis,
+          recommendations: []
+        };
+        setGlobalAnalyses(prev => ({ ...prev, [sessionId]: analysis }));
+      } else {
+        throw new Error(data.message || 'Erreur lors de la génération de l\'appréciation');
+      }
     } catch (error) {
       console.error('Erreur lors de la génération de l\'appréciation:', error);
+      // Afficher un message d'erreur à l'utilisateur
+      const errorAnalysis: GlobalAnalysis = {
+        sessionId: sessionId,
+        childName: 'Enfant',
+        context: {
+          daysSinceRegistration: 0,
+          totalLearningTime: 0,
+          averageSessionDuration: 0,
+          learningFrequency: '',
+          sessionPatterns: { morning: 0, afternoon: 0, evening: 0 },
+          preferredTimeSlots: '',
+          age: 8,
+          grade: '',
+          totalActivities: 0,
+          averageScore: 0
+        },
+        analysis: {
+          engagement: '',
+          progression: '',
+          rythme: '',
+          recommandations: [],
+          aiAnalysis: `❌ Erreur lors de la génération de l'appréciation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
+        },
+        recommendations: []
+      };
+      setGlobalAnalyses(prev => ({ ...prev, [sessionId]: errorAnalysis }));
     } finally {
       setLoadingStates(prev => ({ ...prev, [`appreciation_${sessionId}`]: false }));
       setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'appreciation' } }));
@@ -380,10 +461,39 @@ export default function DashboardTab({
         return newState;
       });
       
-      const exercise = await childSessionsAPI.generateExercise(sessionId);
-      setExerciseResponses(prev => ({ ...prev, [sessionId]: exercise }));
+      // Appeler la nouvelle route API
+      const response = await fetch(`/api/sessions/${sessionId}/exercise`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur API: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Formater la réponse pour correspondre à l'ancien format
+        const exercise: ExerciseResponse = {
+          sessionId: sessionId,
+          exercise: data.exercise
+        };
+        setExerciseResponses(prev => ({ ...prev, [sessionId]: exercise }));
+      } else {
+        throw new Error(data.message || 'Erreur lors de la génération des conseils');
+      }
     } catch (error) {
       console.error('Erreur lors de la génération des conseils:', error);
+      // Afficher un message d'erreur à l'utilisateur
+      const errorExercise: ExerciseResponse = {
+        sessionId: sessionId,
+        exercise: `❌ Erreur lors de la génération des conseils: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
+      };
+      setExerciseResponses(prev => ({ ...prev, [sessionId]: errorExercise }));
     } finally {
       setLoadingStates(prev => ({ ...prev, [`conseils_${sessionId}`]: false }));
       setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'conseils' } }));
