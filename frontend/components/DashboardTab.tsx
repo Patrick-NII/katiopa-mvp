@@ -1384,12 +1384,14 @@ export default function DashboardTab({
       )}
 
       {/* Progression Bubix */}
-      <BubixProgress
-        isVisible={isProgressVisible}
-        steps={progressSteps}
-        currentStep={currentProgressStep}
-        onComplete={() => setIsProgressVisible(false)}
-      />
+      {isProgressVisible && (
+        <BubixProgress
+          isVisible={isProgressVisible}
+          steps={progressSteps}
+          currentStep={currentProgressStep}
+          onComplete={() => setIsProgressVisible(false)}
+        />
+      )}
 
       {/* Popup de limitation */}
       <LimitationPopup
