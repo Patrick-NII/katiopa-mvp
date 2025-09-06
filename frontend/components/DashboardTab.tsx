@@ -1003,6 +1003,9 @@ export default function DashboardTab({
         isCommercial={limitationState.isCommercial}
         showUpgrade={limitationState.showUpgrade}
         childName={limitationState.childName}
+        userType={limitationState.userType}
+        subscriptionType={limitationState.subscriptionType}
+        upgradeEvent={limitationState.upgradeEvent}
         onClose={closePopup}
         onUpgrade={upgrade}
         onRemindLater={remindLater}
