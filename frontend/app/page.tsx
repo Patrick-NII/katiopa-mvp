@@ -205,7 +205,7 @@ export default function HomePage() {
         <div 
           className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: "url('/image-bg/hero-bg-1.png')"
+            backgroundImage: "url('/image-bg/hero-bg-1-removebg.png')"
           }}
         />
 
@@ -215,12 +215,12 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="mb-2 md:mb-3"
+              className="mb-8 md:mb-12"
             >
               <AnimatedMulticolorText 
                 text="Découvrez CubeAI & Bubix" 
                 variant="h1" 
-                className="leading-none text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[12rem] whitespace-nowrap"
+                className="leading-none text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl whitespace-nowrap drop-shadow-2xl"
                 staggerDelay={0.1}
               />
             </motion.div>
@@ -229,27 +229,27 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-subtitle-xl text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto"
+              className="font-subtitle-xl text-white mb-8 max-w-3xl mx-auto drop-shadow-lg"
             >
-              L'<strong className="text-blue-700 dark:text-blue-400">intelligence artificielle</strong> qui grandit avec vos enfants.
+              L'<strong className="text-yellow-300">intelligence artificielle</strong> qui grandit avec vos enfants.
             </motion.p>
 
             <motion.p 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-body-lg text-gray-600 dark:text-gray-300 mb-12 max-w-4xl mx-auto"
+              className="font-body-lg text-white mb-8 max-w-4xl mx-auto drop-shadow-lg"
             >
-              Apprendre les <strong>mathématiques</strong>, coder ses premiers jeux, explorer les <strong>sciences</strong>, ou rêver avec des <strong>histoires interactives</strong>… Avec CubeAI, chaque enfant découvre un univers magique où l'IA devient un véritable <strong>compagnon d'apprentissage</strong> : <strong className="text-blue-700 dark:text-blue-400">Bubix</strong>.
+              Apprendre les <strong className="text-yellow-300">mathématiques</strong>, coder ses premiers jeux, explorer les <strong className="text-yellow-300">sciences</strong>, ou rêver avec des <strong className="text-yellow-300">histoires interactives</strong>… Avec CubeAI, chaque enfant découvre un univers magique où l'IA devient un véritable <strong className="text-yellow-300">compagnon d'apprentissage</strong> : <strong className="text-yellow-300">Bubix</strong>.
             </motion.p>
 
             <motion.p 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-body-lg text-gray-600 dark:text-gray-300 mb-12 max-w-4xl mx-auto"
+              className="font-body-lg text-white mb-12 max-w-4xl mx-auto drop-shadow-lg"
             >
-              Bubix n'est pas une IA comme les autres : il <strong>grandit avec votre enfant</strong>, s'adapte à ses progrès, et crée un <strong>parcours personnalisé</strong> qui évolue jour après jour.
+              Bubix n'est pas une IA comme les autres : il <strong className="text-yellow-300">grandit avec votre enfant</strong>, s'adapte à ses progrès, et crée un <strong className="text-yellow-300">parcours personnalisé</strong> qui évolue jour après jour.
             </motion.p>
 
             <motion.div 
@@ -258,7 +258,7 @@ export default function HomePage() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
-              <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 md:px-12 lg:px-16 py-3 md:py-3.5 lg:py-4 rounded-2xl text-base md:text-lg lg:text-xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105">
+              <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 md:px-12 lg:px-16 py-3 md:py-3.5 lg:py-4 rounded-2xl text-base md:text-lg lg:text-xl font-semibold transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105 border-2 border-white/20 backdrop-blur-sm">
                 Commencer gratuitement
               </Link>
             </motion.div>
