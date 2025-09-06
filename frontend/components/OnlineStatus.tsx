@@ -1,7 +1,6 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Wifi, WifiOff } from 'lucide-react'
 
 interface OnlineStatusProps {
   isOnline: boolean
@@ -37,31 +36,23 @@ export default function OnlineStatus({ isOnline, lastActivity, size = 'md' }: On
 
   return (
     <div className="flex items-center gap-2">
-      {/* Indicateur visuel avec icône */}
-      <div className="flex items-center gap-1">
-        <motion.div
-          className={`${getSizeClasses()} rounded-full ${
-            isOnline 
-              ? 'bg-green-500 shadow-lg shadow-green-500/50' 
-              : 'bg-gray-400'
-          }`}
-          animate={{
-            scale: isOnline ? [1, 1.2, 1] : 1,
-            opacity: isOnline ? [0.8, 1, 0.8] : 0.6
-          }}
-          transition={{
-            duration: 2,
-            repeat: isOnline ? Infinity : 0,
-            ease: "easeInOut"
-          }}
-        />
-        
-        {isOnline ? (
-          <Wifi className="w-3 h-3 text-green-600" />
-        ) : (
-          <WifiOff className="w-3 h-3 text-gray-500" />
-        )}
-      </div>
+      {/* Indicateur visuel */}
+      <motion.div
+        className={`${getSizeClasses()} rounded-full ${
+          isOnline 
+            ? 'bg-green-500 shadow-lg shadow-green-500/50' 
+            : 'bg-gray-400'
+        }`}
+        animate={{
+          scale: isOnline ? [1, 1.2, 1] : 1,
+          opacity: isOnline ? [0.8, 1, 0.8] : 0.6
+        }}
+        transition={{
+          duration: 2,
+          repeat: isOnline ? Infinity : 0,
+          ease: "easeInOut"
+        }}
+      />
       
       {/* Statut textuel */}
       <div className="flex flex-col">
