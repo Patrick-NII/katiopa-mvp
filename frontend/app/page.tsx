@@ -252,12 +252,6 @@ export default function HomePage() {
               <Link href="/register" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 md:px-12 lg:px-16 py-3 md:py-3.5 lg:py-4 rounded-2xl text-base md:text-lg lg:text-xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105">
                 Commencer gratuitement
               </Link>
-              <button
-                onClick={() => setShowBubix(true)}
-                className="font-button bg-white/80 backdrop-blur-sm hover:bg-white text-gray-700 border border-gray-300 hover:border-gray-400 px-6 md:px-8 py-3 md:py-3.5 rounded-2xl text-base md:text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                💬 Tester Bubix
-              </button>
             </motion.div>
           </div>
         </div>
