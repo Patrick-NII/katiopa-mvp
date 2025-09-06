@@ -91,6 +91,33 @@ export default function DashboardTab({
     refreshInterval: 5000 // Mise à jour toutes les 5 secondes
   });
 
+  // Limitation Découverte: 1 analyse / 7 jours (UX côté frontend + popup)
+  const getLastAnalysisTs = (): number => {
+    if (typeof window === 'undefined') return 0
+    const v = localStorage.getItem('analysis_last_ts')
+    return v ? parseInt(v, 10) : 0
+  }
+  const setLastAnalysisTs = () => {
+    if (typeof window === 'undefined') return
+    localStorage.setItem('analysis_last_ts', Date.now().toString())
+  }
+  const isAnalysisLimited = (): boolean => {
+    if (!user?.subscriptionType || user.subscriptionType !== 'FREE') return false
+    const last = getLastAnalysisTs()
+    if (!last) return false
+    const sevenDays = 7 * 24 * 60 * 60 * 1000
+    return Date.now() - last < sevenDays
+  }
+  const showLimitPopup = () => {
+    const childName = childSessions[0]?.name || 'votre enfant'
+    const subscriptionInfo = {
+      limitationMessage: `⏳ Limite atteinte\n\nVotre plan Découverte permet 1 analyse par semaine.\n\n💡 Passez à Explorateur pour des analyses hebdomadaires détaillées, ou à Maître pour des analyses quotidiennes et prédictives.`,
+      isCommercial: true,
+      showUpgrade: true
+    }
+    showPopup(subscriptionInfo, 'PARENT', childName)
+  }
+
   // Déterminer les couleurs selon le type d'abonnement
   const getSubscriptionColors = () => {
     if (subscriptionType === 'PRO_PLUS' || subscriptionType === 'ENTERPRISE') {
@@ -328,6 +355,12 @@ export default function DashboardTab({
         return newState;
       });
       
+      // Bloquer si limitation locale (Découverte)
+      if (user?.subscriptionType === 'FREE' && isAnalysisLimited()) {
+        showLimitPopup()
+        throw new Error('Limite atteinte: 1 analyse/semaine (Découverte)')
+      }
+
       // 1) Tenter la route Next locale
       let analysisText: string | null = null;
       try {
@@ -336,6 +369,9 @@ export default function DashboardTab({
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include'
         });
+        if (response.status === 429) {
+          showLimitPopup();
+        }
         if (response.ok) {
           const data = await response.json();
           if (typeof data?.analysis === 'string') {
@@ -357,6 +393,8 @@ export default function DashboardTab({
       if (!analysisText) throw new Error("Aucune réponse valide de l'API");
 
       setSessionAnalyses(prev => ({ ...prev, [sessionId]: { sessionId, analysis: analysisText! } }));
+      // Marquer l'utilisation (Découverte)
+      if (user?.subscriptionType === 'FREE') setLastAnalysisTs()
     } catch (error) {
       console.error('Erreur lors de la génération du compte rendu:', error);
       setSessionAnalyses(prev => ({ ...prev, [sessionId]: { sessionId, analysis: `❌ Erreur lors de la génération du compte rendu: ${error instanceof Error ? error.message : 'Erreur inconnue'}` } }));
@@ -395,6 +433,12 @@ export default function DashboardTab({
       });
       
       let builtAnalysis: GlobalAnalysis | null = null;
+      // Bloquer si limitation locale (Découverte)
+      if (user?.subscriptionType === 'FREE' && isAnalysisLimited()) {
+        showLimitPopup()
+        throw new Error('Limite atteinte: 1 analyse/semaine (Découverte)')
+      }
+
       // 1) Tenter la route Next locale (renvoie une string "appreciation")
       try {
         const response = await fetch(`/api/sessions/${sessionId}/global-analysis`, {
@@ -402,6 +446,9 @@ export default function DashboardTab({
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include'
         });
+        if (response.status === 429) {
+          showLimitPopup();
+        }
         if (response.ok) {
           const data = await response.json();
           if (data?.success && typeof data?.appreciation === 'string') {
@@ -472,6 +519,7 @@ export default function DashboardTab({
 
       if (!builtAnalysis) throw new Error("Aucune réponse valide de l'API");
       setGlobalAnalyses(prev => ({ ...prev, [sessionId]: builtAnalysis! }));
+      if (user?.subscriptionType === 'FREE') setLastAnalysisTs()
     } catch (error) {
       console.error('Erreur lors de la génération de l\'appréciation:', error);
       const errorAnalysis: GlobalAnalysis = {
@@ -534,6 +582,12 @@ export default function DashboardTab({
       });
       
       let exerciseText: string | null = null;
+      // Bloquer si limitation locale (Découverte)
+      if (user?.subscriptionType === 'FREE' && isAnalysisLimited()) {
+        showLimitPopup()
+        throw new Error('Limite atteinte: 1 analyse/semaine (Découverte)')
+      }
+
       // 1) Tenter la route Next locale
       try {
         const response = await fetch(`/api/sessions/${sessionId}/exercise`, {
@@ -541,6 +595,9 @@ export default function DashboardTab({
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include'
         });
+        if (response.status === 429) {
+          showLimitPopup();
+        }
         if (response.ok) {
           const data = await response.json();
           if (typeof data?.exercise === 'string') exerciseText = data.exercise;
@@ -559,6 +616,7 @@ export default function DashboardTab({
       if (!exerciseText) throw new Error("Aucune réponse valide de l'API");
 
       setExerciseResponses(prev => ({ ...prev, [sessionId]: { sessionId, exercise: exerciseText! } }));
+      if (user?.subscriptionType === 'FREE') setLastAnalysisTs()
     } catch (error) {
       console.error('Erreur lors de la génération des conseils:', error);
       const errorExercise: ExerciseResponse = {

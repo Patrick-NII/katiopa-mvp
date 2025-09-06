@@ -2053,7 +2053,7 @@ export async function POST(request: NextRequest) {
       userContext.childrenData?.[0]?.firstName, // Nom du premier enfant
       userContext.childrenData?.[0]?.gender     // Genre du premier enfant
     )
-    
+
     return NextResponse.json({
       text,
       actions,
