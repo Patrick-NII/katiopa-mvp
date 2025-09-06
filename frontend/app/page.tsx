@@ -571,7 +571,7 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
-                className={`bg-white border-2 border-gray-200 rounded-2xl overflow-hidden h-full group hover:${feature.bgColor} hover:${feature.borderColor} hover:shadow-xl transition-all duration-500 cursor-pointer relative`}
+                className={`bg-transparent border-0 rounded-2xl overflow-hidden h-full group hover:shadow-xl transition-all duration-500 cursor-pointer relative`}
               >
                 {/* État normal : Image + Titre */}
                 <div className="h-full flex flex-col group-hover:opacity-0 transition-opacity duration-500">
