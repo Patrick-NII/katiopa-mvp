@@ -250,53 +250,43 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-subtitle-xl text-white mb-8 max-w-4xl mx-auto drop-shadow-lg"
+              className="font-subtitle-xl text-white mb-6 max-w-3xl mx-auto drop-shadow-lg"
             >
-              L'<strong className="text-yellow-300">intelligence artificielle</strong> qui grandit avec vos enfants et s'adapte à leur rythme d'apprentissage.
+              L'<strong className="text-yellow-300">intelligence artificielle</strong> qui grandit avec vos enfants.
             </motion.p>
 
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-body-lg text-white mb-8 max-w-5xl mx-auto drop-shadow-lg"
+              className="font-body-lg text-white mb-6 max-w-4xl mx-auto drop-shadow-lg"
             >
-              <p className="mb-6 text-center">
-                Avec <strong className="text-yellow-300">CubeAI</strong>, chaque enfant découvre un univers magique où l'<strong className="text-yellow-300">intelligence artificielle</strong> devient un véritable <strong className="text-yellow-300">compagnon d'apprentissage</strong> : <strong className="text-yellow-300">Bubix</strong>.
+              <p className="mb-4">
+                Avec CubeAI, chaque enfant découvre un univers magique où l'IA devient un véritable <strong className="text-yellow-300">compagnon d'apprentissage</strong> : <strong className="text-yellow-300">Bubix</strong>.
               </p>
-              
-              <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-6">
-                <div className="text-center p-6 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl backdrop-blur-sm border border-white/20 hover:border-yellow-300/30 transition-all duration-300">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-2xl font-bold">📊</span>
-                  </div>
-                  <div className="font-semibold text-yellow-300 mb-2 text-lg">Mathématiques</div>
-                  <div className="text-sm text-white/90">Sciences interactives et ludiques</div>
-                </div>
-                <div className="text-center p-6 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl backdrop-blur-sm border border-white/20 hover:border-yellow-300/30 transition-all duration-300">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-2xl font-bold">💻</span>
-                  </div>
-                  <div className="font-semibold text-yellow-300 mb-2 text-lg">Programmation</div>
-                  <div className="text-sm text-white/90">Création de jeux et projets</div>
-                </div>
-                <div className="text-center p-6 bg-gradient-to-br from-pink-500/20 to-orange-500/20 rounded-xl backdrop-blur-sm border border-white/20 hover:border-yellow-300/30 transition-all duration-300">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-2xl font-bold">📚</span>
-                  </div>
-                  <div className="font-semibold text-yellow-300 mb-2 text-lg">Histoires</div>
-                  <div className="text-sm text-white/90">Aventures personnalisées</div>
-                </div>
-              </div>
+              <ul className="text-left space-y-2 max-w-2xl mx-auto">
+                <li className="flex items-center">
+                  <span className="text-yellow-300 mr-2">•</span>
+                  <strong className="text-yellow-300">Mathématiques</strong> et sciences interactives
+                </li>
+                <li className="flex items-center">
+                  <span className="text-yellow-300 mr-2">•</span>
+                  <strong className="text-yellow-300">Programmation</strong> et création de jeux
+                </li>
+                <li className="flex items-center">
+                  <span className="text-yellow-300 mr-2">•</span>
+                  <strong className="text-yellow-300">Histoires</strong> et aventures personnalisées
+                </li>
+              </ul>
             </motion.div>
 
             <motion.p 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-body-lg text-white mb-10 max-w-4xl mx-auto drop-shadow-lg text-center"
+              className="font-body-lg text-white mb-8 max-w-3xl mx-auto drop-shadow-lg"
             >
-              <strong className="text-yellow-300">Bubix</strong> n'est pas une IA comme les autres : il <strong className="text-yellow-300">grandit avec votre enfant</strong>, s'adapte à ses progrès, et crée un <strong className="text-yellow-300">parcours personnalisé</strong> qui évolue jour après jour pour un apprentissage optimal.
+              Bubix <strong className="text-yellow-300">grandit avec votre enfant</strong> et crée un <strong className="text-yellow-300">parcours personnalisé</strong> qui évolue jour après jour.
             </motion.p>
 
             <motion.div 
