@@ -33,7 +33,6 @@ import { childSessionsAPI, type ChildSession, type ChildActivity, type SessionAn
 import { useTracking } from '@/hooks/useTracking'
 import { useRealTimeStatus } from '@/hooks/useRealTimeStatus'
 import AIWritingAnimation from './AIWritingAnimation'
-import AIAnalysisCard from './AIAnalysisCard'
 import SavedAnalyses from './SavedAnalyses'
 import OnlineStatus from './OnlineStatus'
 import LimitationPopup from './LimitationPopup'
@@ -1096,131 +1095,12 @@ export default function DashboardTab({
                       />
                     )}
 
-                    {/* Analyse des performances */}
-                    {sessionAnalyses[session.sessionId] && (
-                      <AIAnalysisCard
-                        type="compte_rendu"
-                        title={`Compte rendu - ${session.name} (ID: ${session.sessionId})`}
-                        content={sessionAnalyses[session.sessionId].analysis}
-                        childName={session.name}
-                        isExpanded={expandedAnalyses[`compte_rendu_${session.sessionId}`] || false}
-                        onToggle={() => setExpandedAnalyses(prev => ({ 
-                          ...prev, 
-                          [`compte_rendu_${session.sessionId}`]: !prev[`compte_rendu_${session.sessionId}`] 
-                        }))}
-                        onClose={() => setSessionAnalyses(prev => {
-                          const newState = { ...prev }
-                          delete newState[session.sessionId]
-                          return newState
-                        })}
-                        onSave={() => saveAnalysis(session.sessionId, 'compte_rendu', sessionAnalyses[session.sessionId].analysis)}
-                        onShare={() => {
-                          if (navigator.share) {
-                            navigator.share({
-                              title: `Compte rendu - ${session.name}`,
-                              text: sessionAnalyses[session.sessionId].analysis
-                            })
-                          }
-                        }}
-                        rating={analysisRatings[`${session.sessionId}_compte_rendu`] || 0}
-                        onRate={(rating) => rateAnalysis(session.sessionId, 'compte_rendu', rating)}
-                      />
-                    )}
 
-                    {/* Analyse globale */}
-                    {globalAnalyses[session.sessionId] && (
-                      <AIAnalysisCard
-                        type="appreciation"
-                        title={`Appréciation détaillée - ${session.name} (ID: ${session.sessionId})`}
-                        content={globalAnalyses[session.sessionId].analysis.aiAnalysis}
-                        childName={session.name}
-                        isExpanded={expandedAnalyses[`appreciation_${session.sessionId}`] || false}
-                        onToggle={() => setExpandedAnalyses(prev => ({ 
-                          ...prev, 
-                          [`appreciation_${session.sessionId}`]: !prev[`appreciation_${session.sessionId}`] 
-                        }))}
-                        onClose={() => setGlobalAnalyses(prev => {
-                          const newState = { ...prev }
-                          delete newState[session.sessionId]
-                          return newState
-                        })}
-                        onSave={() => saveAnalysis(session.sessionId, 'appreciation', globalAnalyses[session.sessionId].analysis.aiAnalysis)}
-                        onShare={() => {
-                          if (navigator.share) {
-                            navigator.share({
-                              title: `Appréciation - ${session.name}`,
-                              text: globalAnalyses[session.sessionId].analysis.aiAnalysis
-                            })
-                          }
-                        }}
-                        rating={analysisRatings[`${session.sessionId}_appreciation`] || 0}
-                        onRate={(rating) => rateAnalysis(session.sessionId, 'appreciation', rating)}
-                        showDate={true}
-                      />
-                    )}
 
-                    {/* Exercice généré */}
-                    {exerciseResponses[session.sessionId] && (
-                      <AIAnalysisCard
-                        type="conseils"
-                        title={`Conseils et exercices - ${session.name} (ID: ${session.sessionId})`}
-                        content={exerciseResponses[session.sessionId].exercise}
-                        childName={session.name}
-                        isExpanded={expandedAnalyses[`conseils_${session.sessionId}`] || false}
-                        onToggle={() => setExpandedAnalyses(prev => ({ 
-                          ...prev, 
-                          [`conseils_${session.sessionId}`]: !prev[`conseils_${session.sessionId}`] 
-                        }))}
-                        onClose={() => setExerciseResponses(prev => {
-                          const newState = { ...prev }
-                          delete newState[session.sessionId]
-                          return newState
-                        })}
-                        onSave={() => saveAnalysis(session.sessionId, 'conseils', exerciseResponses[session.sessionId].exercise)}
-                        onShare={() => {
-                          if (navigator.share) {
-                            navigator.share({
-                              title: `Conseils - ${session.name}`,
-                              text: exerciseResponses[session.sessionId].exercise
-                            })
-                          }
-                        }}
-                        rating={analysisRatings[`${session.sessionId}_conseils`] || 0}
-                        onRate={(rating) => rateAnalysis(session.sessionId, 'conseils', rating)}
-                        showDate={true}
-                      />
-                    )}
 
                      
 
-                    {/* Activités récentes */}
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Activités récentes</h4>
-                      {loadingStates[session.sessionId] ? (
-                        <div className="text-center py-4">
-                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
-                        </div>
-                      ) : sessionActivities[session.sessionId] ? (
-                        <div className="space-y-2">
-                          {sessionActivities[session.sessionId].slice(0, 5).map((activity) => (
-                            <div key={activity.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                              <div className="flex items-center gap-2">
-                                {getActivityIcon(activity.type)}
-                                <span className="text-sm text-gray-700">{activity.title}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span className={`text-sm font-medium ${getScoreColor(activity.score)}`}>
-                                  {activity.score}%
-                                </span>
-                                <span className="text-xs text-gray-500">{activity.duration} min</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-gray-500">Aucune activité récente</p>
-                      )}
-                    </div>
+                    
                   </div>
                 )}
               </div>
