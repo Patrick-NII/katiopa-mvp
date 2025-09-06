@@ -264,68 +264,52 @@ export default function DashboardTab({
       // Fermer toutes les autres analyses
       setSessionAnalyses(prev => {
         const newState = { ...prev };
-        Object.keys(newState).forEach(key => {
-          if (key !== sessionId) {
-            delete newState[key];
-          }
-        });
+        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
         return newState;
       });
       setGlobalAnalyses(prev => {
         const newState = { ...prev };
-        Object.keys(newState).forEach(key => {
-          if (key !== sessionId) {
-            delete newState[key];
-          }
-        });
+        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
         return newState;
       });
       setExerciseResponses(prev => {
         const newState = { ...prev };
-        Object.keys(newState).forEach(key => {
-          if (key !== sessionId) {
-            delete newState[key];
-          }
-        });
+        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
         return newState;
       });
       
-      // Appeler la nouvelle route API (frontend Next.js, pas backend)
-      const response = await fetch(`/api/sessions/${sessionId}/analyze`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include'
-      });
+      // 1) Tenter la route Next locale
+      let analysisText: string | null = null;
+      try {
+        const response = await fetch(`/api/sessions/${sessionId}/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (typeof data?.analysis === 'string') {
+            analysisText = data.analysis;
+          } else if (data?.success && typeof data?.analysis === 'string') {
+            analysisText = data.analysis;
+          }
+        }
+      } catch (_) {}
 
-      if (!response.ok) {
-        throw new Error(`Erreur API: ${response.status}`);
+      // 2) Fallback backend via API client
+      if (!analysisText) {
+        try {
+          const data = await childSessionsAPI.analyzeSession(sessionId) as any;
+          if (typeof data?.analysis === 'string') analysisText = data.analysis;
+        } catch (e) { throw e; }
       }
 
-      const data = await response.json();
-      console.log('🔍 Réponse reçue pour compte rendu:', data);
-      
-      if (data.success) {
-        // Formater la réponse pour correspondre à l'ancien format
-        const analysis: SessionAnalysis = {
-          sessionId: sessionId,
-          analysis: data.analysis
-        };
-        console.log('✅ Analyse formatée:', analysis);
-        setSessionAnalyses(prev => ({ ...prev, [sessionId]: analysis }));
-      } else {
-        console.log('❌ data.success est false:', data);
-        throw new Error(data.message || 'Erreur lors de la génération du compte rendu');
-      }
+      if (!analysisText) throw new Error("Aucune réponse valide de l'API");
+
+      setSessionAnalyses(prev => ({ ...prev, [sessionId]: { sessionId, analysis: analysisText! } }));
     } catch (error) {
       console.error('Erreur lors de la génération du compte rendu:', error);
-      // Afficher un message d'erreur à l'utilisateur
-      const errorAnalysis: SessionAnalysis = {
-        sessionId: sessionId,
-        analysis: `❌ Erreur lors de la génération du compte rendu: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
-      };
-      setSessionAnalyses(prev => ({ ...prev, [sessionId]: errorAnalysis }));
+      setSessionAnalyses(prev => ({ ...prev, [sessionId]: { sessionId, analysis: `❌ Erreur lors de la génération du compte rendu: ${error instanceof Error ? error.message : 'Erreur inconnue'}` } }));
     } finally {
       setLoadingStates(prev => ({ ...prev, [`compte_rendu_${sessionId}`]: false }));
       setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'compte_rendu' } }));
@@ -341,65 +325,102 @@ export default function DashboardTab({
       // Fermer les autres onglets
       setSessionAnalyses(prev => {
         const newState = { ...prev };
-        Object.keys(newState).forEach(key => {
-          if (key !== sessionId) {
-            delete newState[key];
-          }
-        });
+        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
         return newState;
       });
       setGlobalAnalyses(prev => {
         const newState = { ...prev };
-        Object.keys(newState).forEach(key => {
-          if (key !== sessionId) {
-            delete newState[key];
-          }
-        });
+        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
         return newState;
       });
       setExerciseResponses(prev => {
         const newState = { ...prev };
-        Object.keys(newState).forEach(key => {
-          if (key !== sessionId) {
-            delete newState[key];
-          }
-        });
+        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
         return newState;
       });
       
-      // Appeler la nouvelle route API
-      const response = await fetch(`/api/sessions/${sessionId}/global-analysis`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include'
-      });
+      let builtAnalysis: GlobalAnalysis | null = null;
+      // 1) Tenter la route Next locale (renvoie une string "appreciation")
+      try {
+        const response = await fetch(`/api/sessions/${sessionId}/global-analysis`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.success && typeof data?.appreciation === 'string') {
+            builtAnalysis = {
+              sessionId,
+              childName: data?.sessionData?.childName || (childSessions.find(s => s.sessionId === sessionId)?.name || 'Enfant'),
+              context: {
+                daysSinceRegistration: 0,
+                totalLearningTime: 0,
+                averageSessionDuration: 0,
+                learningFrequency: '',
+                sessionPatterns: { morning: 0, afternoon: 0, evening: 0 },
+                preferredTimeSlots: '',
+                age: 8,
+                grade: '',
+                totalActivities: 0,
+                averageScore: 0
+              },
+              analysis: {
+                engagement: '',
+                progression: '',
+                rythme: '',
+                recommandations: [],
+                aiAnalysis: data.appreciation
+              },
+              recommendations: []
+            };
+          }
+        }
+      } catch (_) {}
 
-      if (!response.ok) {
-        throw new Error(`Erreur API: ${response.status}`);
+      // 2) Fallback backend (renvoie un contexte + analysis string)
+      if (!builtAnalysis) {
+        try {
+          const data = await childSessionsAPI.getGlobalAnalysis(sessionId) as any;
+          builtAnalysis = {
+            sessionId,
+            childName: data?.childName || (childSessions.find(s => s.sessionId === sessionId)?.name || 'Enfant'),
+            context: data?.context || {
+              daysSinceRegistration: 0,
+              totalLearningTime: 0,
+              averageSessionDuration: 0,
+              learningFrequency: '',
+              sessionPatterns: { morning: 0, afternoon: 0, evening: 0 },
+              preferredTimeSlots: '',
+              age: 8,
+              grade: '',
+              totalActivities: 0,
+              averageScore: 0
+            },
+            analysis: typeof data?.analysis === 'string' ? {
+              engagement: '',
+              progression: '',
+              rythme: '',
+              recommandations: [],
+              aiAnalysis: data.analysis
+            } : (data?.analysis || {
+              engagement: '',
+              progression: '',
+              rythme: '',
+              recommandations: [],
+              aiAnalysis: ''
+            }),
+            recommendations: data?.recommendations || []
+          };
+        } catch (e) { throw e; }
       }
 
-      const data = await response.json();
-      
-      if (data.success) {
-        // Formater la réponse pour correspondre à l'ancien format
-        const analysis: GlobalAnalysis = {
-          sessionId: sessionId,
-          childName: data.sessionData.childName,
-          context: data.analysis.context,
-          analysis: data.analysis,
-          recommendations: []
-        };
-        setGlobalAnalyses(prev => ({ ...prev, [sessionId]: analysis }));
-      } else {
-        throw new Error(data.message || 'Erreur lors de la génération de l\'appréciation');
-      }
+      if (!builtAnalysis) throw new Error("Aucune réponse valide de l'API");
+      setGlobalAnalyses(prev => ({ ...prev, [sessionId]: builtAnalysis! }));
     } catch (error) {
       console.error('Erreur lors de la génération de l\'appréciation:', error);
-      // Afficher un message d'erreur à l'utilisateur
       const errorAnalysis: GlobalAnalysis = {
-        sessionId: sessionId,
+        sessionId,
         childName: 'Enfant',
         context: {
           daysSinceRegistration: 0,
@@ -438,62 +459,50 @@ export default function DashboardTab({
       // Fermer les autres onglets
       setSessionAnalyses(prev => {
         const newState = { ...prev };
-        Object.keys(newState).forEach(key => {
-          if (key !== sessionId) {
-            delete newState[key];
-          }
-        });
+        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
         return newState;
       });
       setGlobalAnalyses(prev => {
         const newState = { ...prev };
-        Object.keys(newState).forEach(key => {
-          if (key !== sessionId) {
-            delete newState[key];
-          }
-        });
+        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
         return newState;
       });
       setExerciseResponses(prev => {
         const newState = { ...prev };
-        Object.keys(newState).forEach(key => {
-          if (key !== sessionId) {
-            delete newState[key];
-          }
-        });
+        Object.keys(newState).forEach(key => { if (key !== sessionId) { delete newState[key]; } });
         return newState;
       });
       
-      // Appeler la nouvelle route API
-      const response = await fetch(`/api/sessions/${sessionId}/exercise`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include'
-      });
+      let exerciseText: string | null = null;
+      // 1) Tenter la route Next locale
+      try {
+        const response = await fetch(`/api/sessions/${sessionId}/exercise`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (typeof data?.exercise === 'string') exerciseText = data.exercise;
+          else if (typeof data?.conseils === 'string') exerciseText = data.conseils;
+        }
+      } catch (_) {}
 
-      if (!response.ok) {
-        throw new Error(`Erreur API: ${response.status}`);
+      // 2) Fallback backend
+      if (!exerciseText) {
+        try {
+          const data = await childSessionsAPI.generateExercise(sessionId) as any;
+          if (typeof data?.exercise === 'string') exerciseText = data.exercise;
+        } catch (e) { throw e; }
       }
 
-      const data = await response.json();
-      
-      if (data.success) {
-        // Formater la réponse pour correspondre à l'ancien format
-        const exercise: ExerciseResponse = {
-          sessionId: sessionId,
-          exercise: data.exercise
-        };
-        setExerciseResponses(prev => ({ ...prev, [sessionId]: exercise }));
-      } else {
-        throw new Error(data.message || 'Erreur lors de la génération des conseils');
-      }
+      if (!exerciseText) throw new Error("Aucune réponse valide de l'API");
+
+      setExerciseResponses(prev => ({ ...prev, [sessionId]: { sessionId, exercise: exerciseText! } }));
     } catch (error) {
       console.error('Erreur lors de la génération des conseils:', error);
-      // Afficher un message d'erreur à l'utilisateur
       const errorExercise: ExerciseResponse = {
-        sessionId: sessionId,
+        sessionId,
         exercise: `❌ Erreur lors de la génération des conseils: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
       };
       setExerciseResponses(prev => ({ ...prev, [sessionId]: errorExercise }));
@@ -926,4 +935,3 @@ export default function DashboardTab({
     </div>
   )
 } 
-

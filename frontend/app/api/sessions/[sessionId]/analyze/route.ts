@@ -164,6 +164,30 @@ export async function POST(
     }
     
     console.log('✅ Parent trouvé:', userInfo.firstName)
+    
+    // Convertir le nom d'enfant en ID Prisma si nécessaire
+    let childSessionId = sessionId
+    if (sessionId === 'milan' || sessionId === 'aylon') {
+      // Chercher l'enfant par nom
+      const child = await prisma.userSession.findFirst({
+        where: {
+          userType: 'CHILD',
+          firstName: sessionId === 'milan' ? 'Milan' : 'Aylon',
+          isActive: true
+        }
+      })
+      
+      if (child) {
+        childSessionId = child.id
+        console.log('✅ Enfant trouvé:', child.firstName, 'ID:', child.id)
+      } else {
+        console.log('❌ Enfant non trouvé pour:', sessionId)
+        return NextResponse.json(
+          { error: 'Enfant non trouvé', code: 'CHILD_NOT_FOUND' },
+          { status: 404 }
+        )
+      }
+    }
 
     // POUR LE MOMENT, retourner une analyse simulée simple
     const analysis = `📊 **Compte rendu simulé pour la session ${sessionId}**
