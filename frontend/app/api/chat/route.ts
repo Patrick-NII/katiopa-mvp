@@ -83,7 +83,7 @@ async function verifyAuthServerSide(): Promise<UserInfo | null> {
         }
       } else {
         console.log('❌ Aucun parent trouvé en mode dev')
-        return null
+      return null
       }
     }
 
@@ -604,7 +604,7 @@ async function getUserContext(userInfo: UserInfo): Promise<UserContext> {
         console.log(`   ${index + 1}. ${child.firstName} ${child.lastName} (${child.activities.length} activités)`)
       })
     }
-    
+
     return {
       displayName,
       role,
@@ -728,13 +728,15 @@ function getRAGSnippets(intent: string, userQuery: string): string[] {
 function getModelForSubscription(subscriptionType: string): string {
   switch (subscriptionType) {
     case 'FREE':
-      return 'gpt-3.5-turbo'
+      return 'gpt-3.5-turbo' // Modèle de base pour tester
+    case 'STARTER':
+      return 'gpt-3.5-turbo' // Même modèle mais plus de tokens
     case 'PRO':
-      return 'gpt-4o-mini'
+      return 'gpt-4o-mini' // Modèle avancé, plus intelligent
     case 'PRO_PLUS':
-      return 'gpt-4o'
+      return 'gpt-4o' // Modèle premium, très intelligent
     case 'ENTERPRISE':
-      return 'gpt-4o'
+      return 'gpt-4o' // Modèle enterprise + custom prompts
     default:
       return 'gpt-3.5-turbo'
   }
@@ -742,21 +744,23 @@ function getModelForSubscription(subscriptionType: string): string {
 
 // Fonction pour vérifier si le LLM est activé
 function isLLMEnabled(subscriptionType: string): boolean {
-  // LLM disponible à partir de PRO
-  return ['PRO', 'PRO_PLUS', 'ENTERPRISE'].includes(subscriptionType)
+  // LLM disponible pour tous, mais avec limitations selon l'abonnement
+  return true
 }
 
 // Fonction pour obtenir le nombre max de tokens
 function getMaxTokensForSubscription(subscriptionType: string): number {
   switch (subscriptionType) {
     case 'FREE':
-      return 200 // Limité pour les comptes gratuits
+      return 200 // Très limité pour tester
+    case 'STARTER':
+      return 500 // Limité mais utilisable
     case 'PRO':
-      return 800
+      return 1000 // Confortable pour usage régulier
     case 'PRO_PLUS':
-      return 1500
+      return 2000 // Très généreux
     case 'ENTERPRISE':
-      return 2000
+      return 4000 // Illimité virtuellement
     default:
       return 200
   }
@@ -766,9 +770,9 @@ function getMaxTokensForSubscription(subscriptionType: string): number {
 function getMaxCharactersForSubscription(subscriptionType: string): number {
   switch (subscriptionType) {
     case 'FREE':
-      return 500 // Limité pour les comptes gratuits
+      return 500 // Très limité pour tester
     case 'STARTER':
-      return 1000 // Limité pour les comptes starter
+      return 1000 // Limité mais utilisable
     case 'PRO':
     case 'PRO_PLUS':
     case 'ENTERPRISE':
@@ -776,6 +780,37 @@ function getMaxCharactersForSubscription(subscriptionType: string): number {
     default:
       return 500
   }
+}
+
+// Fonction pour obtenir les informations d'abonnement
+function getSubscriptionInfo(subscriptionType: string): { 
+  model: string, 
+  maxTokens: number, 
+  maxChars: number, 
+  upgradeMessage?: string 
+} {
+  const model = getModelForSubscription(subscriptionType)
+  const maxTokens = getMaxTokensForSubscription(subscriptionType)
+  const maxChars = getMaxCharactersForSubscription(subscriptionType)
+  
+  let upgradeMessage = ''
+  
+  switch (subscriptionType) {
+    case 'FREE':
+      upgradeMessage = '💡 **Passez à STARTER** pour plus de tokens et de caractères !'
+      break
+    case 'STARTER':
+      upgradeMessage = '🚀 **Passez à PRO** pour GPT-4o-mini et des réponses plus intelligentes !'
+      break
+    case 'PRO':
+      upgradeMessage = '⭐ **Passez à PRO_PLUS** pour GPT-4o et des réponses premium !'
+      break
+    case 'PRO_PLUS':
+      upgradeMessage = '🏢 **Passez à ENTERPRISE** pour des fonctionnalités sur mesure !'
+      break
+  }
+  
+  return { model, maxTokens, maxChars, upgradeMessage }
 }
 
 // Fonction pour obtenir le nombre de caractères restants
@@ -1753,11 +1788,20 @@ export async function POST(request: NextRequest) {
     const currentCharacters = userQuery.length
     const remainingCharacters = getRemainingCharacters(userQuery, userInfo.subscriptionType)
 
+    // Obtenir les informations d'abonnement
+    const subscriptionInfo = getSubscriptionInfo(userInfo.subscriptionType)
+    
     return NextResponse.json({
       text,
       actions,
       model: model,
       subscriptionType: userInfo.subscriptionType,
+      subscriptionInfo: {
+        model: subscriptionInfo.model,
+        maxTokens: subscriptionInfo.maxTokens,
+        maxChars: subscriptionInfo.maxChars,
+        upgradeMessage: subscriptionInfo.upgradeMessage
+      },
       userInfo: {
         email: userInfo.email,
         sessionId: userInfo.sessionId,
