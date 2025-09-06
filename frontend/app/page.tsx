@@ -287,89 +287,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Section Pourquoi choisir CubeAI ? */}
-      <section className="py-20 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <motion.div
-              initial={{ opacity: 0, y: 0 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="mb-6"
-            >
-              <h2 className="text-3xl md:text-4xl font-title bg-gradient-to-r from-green-600 via-purple-400 to-yellow-600 bg-clip-text text-transparent mb-6">
-                Pourquoi choisir CubeAI ?
-              </h2>
-            </motion.div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true }}
-              className="text-center p-8 bg-white/80 backdrop-blur rounded-3xl shadow-xl border border-gray-200 hover:shadow-2xl transition-all duration-300"
-            >
-              <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
-                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Bubix" className="w-8 h-8 filter brightness-0 invert" />
-              </div>
-              <h3 className="text-xl font-subtitle text-gray-900 dark:text-white mb-4">
-                Bubix, votre e-professeur IA
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 font-body leading-relaxed">
-                Parce que chaque enfant mérite un professeur patient et intelligent, disponible à tout moment.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-              className="text-center p-8 bg-white/80 backdrop-blur rounded-3xl shadow-xl border border-gray-200 hover:shadow-2xl transition-all duration-300"
-            >
-              <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center">
-                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Analytics" className="w-8 h-8 filter brightness-0 invert" />
-              </div>
-              <h3 className="text-xl font-subtitle text-gray-900 dark:text-white mb-4">
-                Suivi des progrès en temps réel
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 font-body leading-relaxed">
-                Les parents peuvent suivre les progrès de leurs enfants sans stress grâce au dashboard CubeAI.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              viewport={{ once: true }}
-              className="text-center p-8 bg-white/80 backdrop-blur rounded-3xl shadow-xl border border-gray-200 hover:shadow-2xl transition-all duration-300"
-            >
-              <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
-                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Magic" className="w-8 h-8 filter brightness-0 invert" />
-              </div>
-              <h3 className="text-xl font-subtitle text-gray-900 dark:text-white mb-4">
-                Apprentissage personnalisé 
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 font-body leading-relaxed">
-                Bubix s'adapte au rythme de chaque enfant pour créer un voyage d'apprentissage unique.
-              </p>
-            </motion.div>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="text-center mt-12"
-          >
-          </motion.div>
-        </div>
-      </section>
 
       {/* Section des plans */}
       <section className="py-20 bg-white dark:bg-gray-900">
@@ -383,9 +300,11 @@ export default function HomePage() {
               className="mb-6"
             >
               
-              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-600 via-purple-400 to-yellow-600 bg-clip-text text-transparent mb-6">
-              Choisissez votre plan d'abonnement
-              </h2>
+              <MulticolorText 
+                text="Choisissez votre plan d'abonnement" 
+                variant="h2" 
+                className="text-gray-900"
+              />
             </motion.div>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -580,7 +499,7 @@ export default function HomePage() {
                     />
                   </div>
                   <div className="p-4 bg-white/90 backdrop-blur-sm">
-                    <h3 className="font-subtitle-lg text-gray-900 text-center">{feature.title}</h3>
+                    <h3 className="font-subtitle-lg text-gray-500 text-center">{feature.title}</h3>
                   </div>
                 </div>
 
@@ -923,13 +842,13 @@ export default function HomePage() {
             </a>
 
             {/* Bouton Partager */}
-            <button className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 !text-white transition-all duration-300">
+            <button className="group flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600  transition-all duration-300">
               <img 
                 src="/social/partager (1).png" 
                 alt="Partager" 
                 className="w-5 h-5 group-hover:scale-110 transition-transform duration-300"
               />
-              <span className="font-body text-sm text-gray-400">Partager</span>
+              <span className="font-body text-sm text-gray-100">Partager</span>
             </button>
           </motion.div>
 

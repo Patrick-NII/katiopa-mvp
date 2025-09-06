@@ -827,9 +827,7 @@ const SummarySidebar = () => {
                     transition={{ duration: 0.6 }}
                     className="mb-6"
                   >
-                    <h1 className="text-4xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text !text-gray-700 mb-3">
-                      Choisissez votre plan
-                    </h1>
+                    
                     <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                       Sélectionnez l'offre qui vous convient et lancez l'aventure CubeAI dès aujourd'hui.
                     </p>
