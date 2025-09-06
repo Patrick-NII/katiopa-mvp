@@ -163,8 +163,10 @@ router.post('/register', async (req, res) => {
 
     // Calcul du nombre maximum de sessions selon le plan
     const maxSessions = subscriptionType === 'FREE' ? 1 : 
-                       subscriptionType === 'PRO' ? 2 : 
-                       subscriptionType === 'PRO_PLUS' ? 4 : 10;
+                       subscriptionType === 'DECOUVERTE' ? 1 : 
+                       subscriptionType === 'EXPLORATEUR' ? 2 : 
+                       subscriptionType === 'MAITRE' ? 4 : 
+                       subscriptionType === 'ENTERPRISE' ? 10 : 1;
 
     // Création du compte avec toutes les informations
     const account = await prisma.account.create({

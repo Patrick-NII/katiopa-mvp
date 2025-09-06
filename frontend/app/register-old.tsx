@@ -113,18 +113,17 @@ export default function RegisterPage() {
   const subscriptionPlans = [
     {
       id: 'STARTER',
-      name: "Starter",
-      price: "0€",
+      name: "Découverte",
+      price: "4,99€",
       period: "/mois",
       maxSessions: 2,
       features: [
         "2 sessions simultanées",
         "1 parent + 1 enfant",
-        "Accès complet à la plateforme",
-        "Programmation, IA, maths et lecture",
-        "Jeux éducatifs et progression",
-        "Évaluation et coaching IA basique",
-        "3 mois gratuit puis 9,99€/mois"
+        "Bubix (version simplifiée)",
+        "MathCube — bases en jouant",
+        "Expériences (lite)",
+        "1 analyse simple par semaine"
       ],
       icon: Gift,
       cardClass: 'card-starter',
@@ -133,7 +132,7 @@ export default function RegisterPage() {
     },
     {
       id: 'PRO',
-      name: 'Pro',
+      name: 'Explorateur',
       price: '29,99€',
       period: '/mois',
       maxSessions: 2,
@@ -154,8 +153,8 @@ export default function RegisterPage() {
     },
     {
       id: 'PREMIUM',
-      name: 'Premium',
-      price: '69,99€',
+      name: 'Maître',
+      price: '59,99€',
       period: '/mois',
       maxSessions: 6,
       features: [

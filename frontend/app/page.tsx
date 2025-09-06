@@ -34,66 +34,68 @@ export default function HomePage() {
   }, [])
   const plans = [
     {
-      name: 'Starter',
-      price: '0€',
+      name: 'Découverte',
+      price: '4,99€',
       period: '/mois',
-      description: 'Parfait pour commencer l\'aventure',
+      description: 'Le premier pas vers l\'aventure',
       features: [
-        '2 sessions simultanées',
         '1 parent + 1 enfant',
-        'Accès complet à la plateforme',
-        'Programmation, IA, maths et lecture',
-        'Jeux éducatifs et progression',
-        'Évaluation et coaching IA basique',
-        '3 mois gratuit puis 9,99€/mois'
+        'Bubix (version simplifiée)',
+        'MathCube pour découvrir les bases',
+        'Expériences (lite) : mini-dashboard',
+        '1 analyse simple par semaine',
+        'Radar de connaissance : petit cerveau',
+        'Support : Email uniquement',
+        'IA : GPT-3.5-turbo limité'
       ],
       popular: false,
       starter: true,
-      cta: 'Commencer gratuitement',
+      cta: 'Commencer l\'aventure',
       href: '/register',
-      cardClass: 'card-starter'
+      cardClass: 'card-decouverte'
     },
     {
-      name: 'Pro',
+      name: 'Explorateur',
       price: '29,99€',
       period: '/mois',
-      description: 'L\'expérience complète recommandée',
+      description: 'L\'univers complet CubeAI',
       features: [
-        '2 sessions simultanées',
-        '1 parent + 1 enfant',
-        'Tous les exercices et contenus',
-        'Communauté et défis familiaux',
-        'Stats détaillées et rapports',
-        'Certificats de progression',
-        'IA coach personnalisé',
-        'Support par email'
+        '1 parent + 2 enfants',
+        'Bubix (avancé, personnalisable)',
+        'Tous les onglets enfants',
+        'Dashboard parental complet + ComCube',
+        'Analyses hebdomadaires + export',
+        'Radar de connaissance complet',
+        'Certificats simples',
+        'Support : Email, chat et téléphone',
+        'IA : GPT-4o-mini custom'
       ],
       popular: true,
-      cta: 'Choisir Pro',
+      cta: 'Explorer l\'univers',
       href: '/register',
-      cardClass: 'card-pro'
+      cardClass: 'card-explorateur'
     },
     {
-      name: 'Premium',
-      price: '69,99€',
+      name: 'Maître',
+      price: '59,99€',
       period: '/mois',
-      description: 'La solution complète pour les familles',
+      description: 'L\'excellence éducative pour les familles ambitieuses',
       features: [
-        '6 sessions simultanées',
-        '1 parent + jusqu\'à 5 enfants',
-        'IA coach Premium avancé',
-        'Certificats officiels reconnus',
-        'Exports PDF/Excel détaillés',
-        'Multi-appareils synchronisés',
-        'Support prioritaire 24/7',
-        'Programme de parrainage',
-        'Contenus exclusifs'
+        '1 parent + 4 enfants',
+        'Bubix premium (le plus avancé)',
+        'Analyses prédictives quotidiennes',
+        'Radar de connaissance évolutif',
+        'Contenus exclusifs',
+        'Diplômes officiels',
+        'Dashboard parental enrichi',
+        'Support VIP prioritaire',
+        'IA : GPT-4o premium adaptatif'
       ],
       popular: false,
       complete: true,
-      cta: 'Choisir Premium',
+      cta: 'Devenir maître',
       href: '/register',
-      cardClass: 'card-premium'
+      cardClass: 'card-maitre'
     }
   ]
 
@@ -210,7 +212,7 @@ export default function HomePage() {
               className="mb-6 md:mb-8"
             >
               <AnimatedMulticolorText 
-                text="Apprendre en s'amusant" 
+                text="Découvrez CubeAI & Bubix" 
                 variant="h1" 
                 className="leading-tight text-3xl md:text-5xl lg:text-6xl"
                 staggerDelay={0.1}
@@ -223,12 +225,7 @@ export default function HomePage() {
               transition={{ duration: 0.8 }}
               className="font-subtitle-xl text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto"
             >
-              Découvrez <strong className="text-blue-700 dark:text-blue-400">CubeAI</strong>, la première plateforme 
-              d'<strong className="text-blue-700 dark:text-blue-400">apprentissage intelligent</strong> qui révolutionne 
-              l'<strong className="text-blue-700 dark:text-blue-400">éducation des enfants de 5 à 7 ans</strong>. 
-              Notre technologie d'<strong className="text-blue-700 dark:text-blue-400">intelligence artificielle adaptative</strong> 
-              crée des <strong className="text-blue-700 dark:text-blue-400">parcours personnalisés</strong> qui s'ajustent 
-              aux besoins de chaque enfant.
+              L'<strong className="text-blue-700 dark:text-blue-400">intelligence artificielle</strong> qui grandit avec vos enfants.
             </motion.p>
 
             <motion.p 
@@ -237,10 +234,16 @@ export default function HomePage() {
               transition={{ duration: 0.8 }}
               className="font-body-lg text-gray-600 dark:text-gray-300 mb-12 max-w-4xl mx-auto"
             >
-              <strong>Mathématiques fondamentales, lecture et écriture, sciences naturelles, développement de la créativité</strong> - 
-              chaque domaine est abordé avec une approche <strong>ludique et progressive</strong>. Les parents suivent les progrès 
-              en temps réel tandis que les enfants développent leur <strong>confiance en soi</strong>, leur 
-              <strong>autonomie d'apprentissage</strong> et leur <strong>curiosité naturelle</strong>.
+              Apprendre les <strong>mathématiques</strong>, coder ses premiers jeux, explorer les <strong>sciences</strong>, ou rêver avec des <strong>histoires interactives</strong>… Avec CubeAI, chaque enfant découvre un univers magique où l'IA devient un véritable <strong>compagnon d'apprentissage</strong> : <strong className="text-blue-700 dark:text-blue-400">Bubix</strong>.
+            </motion.p>
+
+            <motion.p 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="font-body-lg text-gray-600 dark:text-gray-300 mb-12 max-w-4xl mx-auto"
+            >
+              Bubix n'est pas une IA comme les autres : il <strong>grandit avec votre enfant</strong>, s'adapte à ses progrès, et crée un <strong>parcours personnalisé</strong> qui évolue jour après jour.
             </motion.p>
 
             <motion.div 
@@ -254,6 +257,87 @@ export default function HomePage() {
               </Link>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Section Pourquoi choisir CubeAI ? */}
+      <section className="py-20 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="mb-6"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                🎯 Pourquoi choisir CubeAI ?
+              </h2>
+            </motion.div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="text-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
+            >
+              <div className="text-4xl mb-4">👨‍🏫</div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                Professeur patient, disponible 24h/24
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Parce que chaque enfant mérite un professeur patient, disponible 24h/24.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="text-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
+            >
+              <div className="text-4xl mb-4">👨‍👩‍👧‍👦</div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                Voir les progrès sans stress
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Parce que les parents méritent de voir les progrès de leurs enfants, sans stress.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              viewport={{ once: true }}
+              className="text-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
+            >
+              <div className="text-4xl mb-4">✨</div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                Voyage magique et personnalisé
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Parce que l'éducation doit être un voyage magique et personnalisé, pas une corvée.
+              </p>
+            </motion.div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
+              <strong>Positionnement :</strong> familles exigeantes / écoles → Bubix devient un mentor adaptatif.
+            </p>
+          </motion.div>
         </div>
       </section>
 

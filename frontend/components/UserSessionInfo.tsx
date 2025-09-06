@@ -58,9 +58,9 @@ export default function UserSessionInfo({
 
   const getSubscriptionDisplay = (type: string) => {
     switch (type) {
-      case 'FREE': return 'Gratuit'
-      case 'PRO': return 'Pro'
-      case 'PRO_PLUS': return 'Pro Plus'
+      case 'FREE': return 'Découverte'
+      case 'PRO': return 'Explorateur'
+      case 'PRO_PLUS': return 'Maître'
       case 'ENTERPRISE': return 'Entreprise'
       default: return 'Inconnu'
     }

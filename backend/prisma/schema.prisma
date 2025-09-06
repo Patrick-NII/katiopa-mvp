@@ -582,8 +582,9 @@ enum BounceType {
 // Enums existants
 enum SubscriptionType {
   FREE
-  PRO
-  PRO_PLUS
+  DECOUVERTE
+  EXPLORATEUR
+  MAITRE
   ENTERPRISE
 }
 

@@ -49,21 +49,21 @@ export default function UpgradePage({
     {
       id: 'FREE',
       name: 'Gratuit',
-      subtitle: 'Découverte des fonctionnalités',
+      subtitle: 'Le premier pas vers l\'aventure',
       price: 0,
       originalPrice: 0,
       period: 'mois',
       color: 'from-gray-400 to-gray-500',
       icon: Star,
       features: [
-        'Chat Bubix : 50 messages/mois',
-        'Analyses basiques : 3 analyses/semaine',
-        'CubeMatch : 10 parties/mois',
+        '1 parent + 1 enfant',
+        'Bubix (version simplifiée)',
+        'MathCube pour découvrir les bases',
+        'Expériences (lite) : mini-dashboard',
+        '1 analyse simple par semaine',
+        'Radar de connaissance : petit cerveau',
         'Support : Email uniquement',
-        'Stockage : 30 jours d\'historique',
-        'Accès : Dashboard basique uniquement',
-        'IA : Modèle local uniquement',
-        'Onglets : Dashboard + Chat limité'
+        'Stockage : 30 jours'
       ],
       limitations: [
         '❌ Pas d\'accès aux analyses avancées',
@@ -78,71 +78,97 @@ export default function UpgradePage({
       ]
     },
     {
-      id: 'PRO',
-      name: 'Pro',
-      subtitle: 'Accompagnement personnalisé',
-      price: 9.99,
-      originalPrice: 14.99,
+      id: 'DECOUVERTE',
+      name: 'Découverte',
+      subtitle: 'Le premier pas vers l\'aventure',
+      price: 4.99,
+      originalPrice: 6.99,
+      period: 'mois',
+      color: 'from-green-500 to-emerald-500',
+      icon: Sparkles,
+      features: [
+        '1 parent + 1 enfant',
+        'Bubix (version simplifiée) pour poser des questions',
+        'MathCube pour découvrir les bases en jouant',
+        'Expériences (lite) : mini-dashboard',
+        '1 analyse simple par semaine',
+        'Radar de connaissance : petit cerveau qui commence',
+        'Support : Email uniquement',
+        'IA : GPT-3.5-turbo limité'
+      ],
+      limitations: [
+        '❌ Analyses limitées',
+        '❌ Pas d\'export',
+        '❌ Support email uniquement',
+        '❌ Pas de certificats'
+      ],
+      benefits: [
+        'Idéal pour tester CubeAI',
+        'Premier goût de l\'apprentissage ludique',
+        'Découverte progressive'
+      ]
+    },
+    {
+      id: 'EXPLORATEUR',
+      name: 'Explorateur',
+      subtitle: 'L\'univers complet CubeAI',
+      price: 29.99,
+      originalPrice: 39.99,
       period: 'mois',
       color: 'from-blue-500 to-purple-500',
       icon: Zap,
       features: [
-        'Chat Bubix : Messages illimités',
-        'Analyses avancées : Illimitées',
-        'CubeMatch : Parties illimitées',
-        'Support : Chat + Email + Téléphone',
-        'Stockage : Illimité',
-        'Accès : Tous les onglets (Dashboard, Statistiques, Profil, Abonnements)',
-        'IA : GPT-4o-mini avancé',
-        'Onglets : Accès complet à toutes les fonctionnalités',
-        'Rapports : Hebdomadaires détaillés',
-        'Export : Données en PDF/Excel',
-        'Personnalisation : Profils d\'apprentissage'
+        '1 parent + 2 enfants',
+        'Bubix (avancé, personnalisable : professeur, coach ou ami)',
+        'Tous les onglets enfants : MathCube, CodeCube, PlayCube, ScienceCube, DreamCube, Expériences',
+        'Dashboard parental complet + ComCube',
+        'Analyses hebdomadaires + export PDF/Excel',
+        'Radar de connaissance complet (cerveau qui relie toutes les notions)',
+        'Certificats simples pour valoriser les progrès',
+        'Support : Email, chat et téléphone',
+        'IA : GPT-4o-mini custom (analyses)'
       ],
       limitations: [
-        '⚠️ IA limitée à GPT-4o-mini',
-        '⚠️ Pas d\'analyses prédictives',
-        '⚠️ Support standard'
+        '❌ Pas d\'analyses prédictives',
+        '❌ Pas de contenu exclusif',
+        '❌ Support standard'
       ],
       benefits: [
-        'Accompagnement personnalisé',
-        'Suivi régulier des progrès',
-        'Support dédié',
-        'Économie de 33%'
+        'Le plan parfait pour accompagner la scolarité',
+        'Transformer chaque devoir en aventure motivante',
+        'Accès complet à tous les univers'
       ],
       popular: true
     },
     {
-      id: 'PRO_PLUS',
-      name: 'Pro Plus',
-      subtitle: 'Excellence éducative',
-      price: 19.99,
-      originalPrice: 29.99,
+      id: 'MAITRE',
+      name: 'Maître',
+      subtitle: 'L\'excellence éducative pour les familles ambitieuses',
+      price: 59.99,
+      originalPrice: 79.99,
       period: 'mois',
-      color: 'from-yellow-500 to-orange-500',
+      color: 'from-purple-600 to-pink-600',
       icon: Crown,
       features: [
-        'Tout Pro inclus',
-        'IA : GPT-4o premium (le plus avancé)',
-        'Analyses prédictives : IA qui anticipe les besoins',
-        'Support : VIP + WhatsApp + Téléphone prioritaire',
-        'Sauvegarde : Cloud automatique',
-        'Rapports : Quotidiens + Analyses prédictives',
-        'Contenu exclusif : Exercices premium',
-        'Profils adaptatifs : IA qui s\'adapte automatiquement',
-        'Accès anticipé : Nouvelles fonctionnalités en premier',
-        'Certificats : Diplômes de progression',
-        'Multi-utilisateurs : Jusqu\'à 6 enfants'
+        '1 parent + 4 enfants',
+        'Bubix premium (le plus avancé) : prédictions, adaptation automatique',
+        'Analyses quotidiennes et prédictives : coach virtuel',
+        'Radar de connaissance évolutif dense : cerveau digital qui grandit',
+        'Contenus exclusifs : exercices premium, défis communautaires',
+        'Diplômes officiels et badges de progression',
+        'Dashboard parental enrichi : comparatifs évolutifs',
+        'Sauvegarde cloud automatique + historique illimité',
+        'Support VIP prioritaire (WhatsApp & téléphone dédié)',
+        'IA : GPT-4o premium adaptatif'
       ],
       limitations: [
         '✅ Aucune limitation',
-        '✅ Accès complet à tout'
+        '✅ Accès complet à toutes les fonctionnalités'
       ],
       benefits: [
-        'Excellence éducative',
-        'Accompagnement VIP',
-        'Résultats exceptionnels',
-        'Économie de 33%'
+        'Pour les parents qui veulent offrir les meilleures chances de réussite',
+        'Suivi de chaque étape de l\'évolution',
+        'Excellence éducative garantie'
       ]
     }
   ]

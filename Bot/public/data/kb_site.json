@@ -27,8 +27,8 @@
   {
     "id": "pricing_basics",
     "q": "Tarifs",
-    "a_kid": "Tu peux essayer gratuitement. Après, il y a des formules famille pour débloquer plus d’activités et de rapports.",
-    "a_pro": "Essai gratuit puis offres famille. Les plans payants débloquent plus de contenus et des rapports parentaux détaillés.",
+    "a_kid": "Les abonnements commencent à 4,99€/mois : Découverte, Explorateur, Maître.",
+    "a_pro": "Abonnements à partir de 4,99€/mois. Plans : Découverte (4,99€), Explorateur (29,99€), Maître (59,99€).",
     "tags": [
       "prix",
       "tarifs",

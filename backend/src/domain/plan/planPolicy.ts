@@ -1,10 +1,8 @@
-// Politiques centralisées pour les plans et fonctionnalités v2
+// Politiques centralisées pour les plans et fonctionnalités v3
 // Source de vérité unique pour le RBAC et le gating des fonctionnalités
-// @deprecated - Ancien système, maintenu pour compatibilité
-export type Plan = "FREE" | "PRO" | "PRO_PLUS" | "PREMIUM";
 
-// Nouveau système d'abonnement v2
-export type PlanV2 = "STARTER" | "PRO" | "PREMIUM" | "ANTI_CHURN";
+// Nouveau système d'abonnement v3
+export type Plan = "FREE" | "DECOUVERTE" | "EXPLORATEUR" | "MAITRE" | "ENTERPRISE";
 
 /**
  * Détermine le nombre maximum d'enfants autorisés par plan
@@ -12,9 +10,10 @@ export type PlanV2 = "STARTER" | "PRO" | "PREMIUM" | "ANTI_CHURN";
 export function seatsForPlan(plan: Plan): number | "UNLIMITED" {
   switch (plan) {
     case "FREE": return 1;
-    case "PRO": return 2;
-    case "PRO_PLUS": return 4;
-    case "PREMIUM": return "UNLIMITED";
+    case "DECOUVERTE": return 1;
+    case "EXPLORATEUR": return 2;
+    case "MAITRE": return 4;
+    case "ENTERPRISE": return "UNLIMITED";
   }
 }
 
@@ -158,7 +157,7 @@ export function getPlanLimitsV2(plan: PlanV2) {
     maxChildren: seatsForPlanV2(plan),
     features: getAvailableFeaturesV2(plan),
     price: getPlanPrice(plan),
-    freeDays: plan === "STARTER" ? 90 : 0 // Starter gratuit pendant 3 mois
+    freeDays: 0 // Plus de période gratuite
   };
 }
 
@@ -167,10 +166,10 @@ export function getPlanLimitsV2(plan: PlanV2) {
  */
 export function getPlanPrice(plan: PlanV2): number {
   switch (plan) {
-    case "STARTER": return 0;      // Gratuit pendant 3 mois
-    case "PRO": return 2999;       // 29,99€
-    case "PREMIUM": return 6999;   // 69,99€
-    case "ANTI_CHURN": return 1499; // 14,99€
+    case "STARTER": return 499;      // Découverte 4,99€
+    case "PRO": return 2999;         // Explorateur 29,99€
+    case "PREMIUM": return 5999;     // Maître 59,99€
+    case "ANTI_CHURN": return 1499;  // Offre anti-churn 14,99€
   }
 }
 
@@ -186,14 +185,14 @@ export function canCreateChildV2(plan: PlanV2, currentChildCount: number): boole
  * Détermine le plan de conversion après la période gratuite
  */
 export function getDefaultPlanAfterFreePeriod(): PlanV2 {
-  return "STARTER"; // Par défaut, conversion vers Starter payant
+  return "PRO"; // Conversion directe vers PRO (pas d'essai)
 }
 
 /**
  * Vérifie si un plan est en période gratuite
  */
 export function isFreePlan(plan: PlanV2): boolean {
-  return plan === "STARTER"; // Starter commence gratuit
+  return false; // Plus de plan avec période gratuite
 }
 
 /**

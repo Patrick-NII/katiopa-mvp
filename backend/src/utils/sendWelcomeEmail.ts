@@ -29,9 +29,10 @@ export async function sendWelcomeEmail(data: WelcomeEmailData) {
   // Déterminer le plan d'abonnement
   const getPlanName = (type: string) => {
     switch (type) {
-      case 'FREE': return 'Starter (Gratuit)';
-      case 'PRO': return 'Pro';
-      case 'PRO_PLUS': return 'Premium';
+      case 'FREE': return 'Découverte';
+      case 'PRO': return 'Explorateur';
+      case 'PRO_PLUS': return 'Maître';
+      case 'ENTERPRISE': return 'Entreprise';
       default: return type;
     }
   };

@@ -115,10 +115,21 @@ export default function SidebarNavigation({
   const normalizedType = userSubscriptionType?.toUpperCase() || 'FREE'
   
   const isFree = normalizedType === 'FREE'
-  const isPro = normalizedType === 'PRO'
-  const isProPlus = normalizedType === 'PRO_PLUS'
+  const isDecouverte = normalizedType === 'DECOUVERTE'
+  const isExplorateur = normalizedType === 'EXPLORATEUR'
+  const isMaitre = normalizedType === 'MAITRE'
   const isEnterprise = normalizedType === 'ENTERPRISE'
-  const isPremium = isPro || isProPlus || isEnterprise
+  const isPremium = isExplorateur || isMaitre || isEnterprise
+
+  // Nouveau mapping commercial (Découverte, Explorateur, Maître)
+  type PlanTier = 'DECOUVERTE' | 'EXPLORATEUR' | 'MAITRE' | 'ENTERPRISE'
+  const planTier: PlanTier = (
+    isFree ? 'DECOUVERTE' :
+    isDecouverte ? 'DECOUVERTE' :
+    isExplorateur ? 'EXPLORATEUR' :
+    isMaitre ? 'MAITRE' :
+    'ENTERPRISE'
+  )
   
   // Déterminer les permissions selon le type d'utilisateur
   const isChild = userType === 'CHILD'
@@ -322,15 +333,17 @@ export default function SidebarNavigation({
       label: 'ComCube',
       icon: Globe,
       description: 'Communauté et partage',
-      available: !isChild // Seuls les parents ont accès
+      // Parents: disponible à partir d'Explorateur (planTier !== DECOUVERTE)
+      available: !isChild && planTier !== 'DECOUVERTE'
     },
     {
       id: 'abonnements',
       label: 'Abonnements',
       icon: Crown,
       description: 'Plans et fonctionnalités',
-      available: !isChild, // Seuls les parents ont accès aux abonnements
-      badge: isFree ? 'Gratuit' : isPro ? 'Pro' : isProPlus ? 'Pro Plus' : 'Entreprise'
+      available: !isChild,
+      // Badge avec les nouveaux noms commerciaux
+      badge: planTier === 'DECOUVERTE' ? 'Découverte' : planTier === 'EXPLORATEUR' ? 'Explorateur' : planTier === 'MAITRE' ? 'Maître' : 'Entreprise'
     },
     {
       id: 'family-members',
@@ -344,7 +357,8 @@ export default function SidebarNavigation({
       label: 'Facturation',
       icon: CreditCard,
       description: 'Historique et paiements',
-      available: !isChild && !isFree // Parents + comptes Pro et supérieurs
+      // Tous les parents abonnés (dès Découverte payant)
+      available: !isChild
     },
     {
       id: 'bubix',
@@ -362,9 +376,19 @@ export default function SidebarNavigation({
     }
   ]
 
-  // Espace enfant: Expériences + tous les cubes + communauté + bubix + réglages
+  // Espace enfant: onglets selon le plan
   if (isChild) {
-    const keep: NavigationTab[] = ['experiences', 'mathcube', 'codecube', 'playcube', 'sciencecube', 'dreamcube', 'comcube', 'bubix', 'reglages']
+    let keep: NavigationTab[] = []
+    if (planTier === 'DECOUVERTE') {
+      // Découverte: Expériences (lite), MathCube, Bubix
+      keep = ['experiences', 'mathcube', 'bubix', 'reglages']
+    } else if (planTier === 'EXPLORATEUR') {
+      // Explorateur: tous les onglets enfants
+      keep = ['experiences', 'mathcube', 'codecube', 'playcube', 'sciencecube', 'dreamcube', 'bubix', 'reglages']
+    } else {
+      // Maître/Entreprise: tous les onglets enfants (contenus premium gérés dans les vues)
+      keep = ['experiences', 'mathcube', 'codecube', 'playcube', 'sciencecube', 'dreamcube', 'bubix', 'reglages']
+    }
     tabs = tabs.filter(t => keep.includes(t.id))
   }
 

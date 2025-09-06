@@ -163,7 +163,7 @@ export default function DashboardTab({
 
   // Fonction pour déclencher le popup après une action (comme générer une analyse)
   const triggerPopupAfterAction = () => {
-    if (user?.subscriptionType === 'FREE' || user?.subscriptionType === 'STARTER') {
+    if (user?.subscriptionType === 'FREE') {
       const mockSubscriptionInfo = {
         limitationMessage: `🌟 **${childSessions[0]?.name || 'Votre enfant'} montre un potentiel exceptionnel !**\n\nLes progrès de votre enfant sont remarquables. Pour lui offrir l'accompagnement le plus adapté, nous vous proposons d'accéder à nos outils d'analyse avancés.\n\n🚀 **Avantages pour ${childSessions[0]?.name || 'votre enfant'} :**\n• Intelligence artificielle plus performante\n• Analyses détaillées de ses forces et axes d'amélioration\n• Recommandations pédagogiques personnalisées\n• Suivi en temps réel de ses performances\n\n💝 **Notre engagement :** Votre confiance est précieuse. Nous nous engageons à utiliser ces outils pour le bien-être et la progression de ${childSessions[0]?.name || 'votre enfant'}.`,
         isCommercial: true,
@@ -175,8 +175,8 @@ export default function DashboardTab({
 
   // Déclencheur de popup aléatoire (pour tester)
   useEffect(() => {
-    // Déclencher le popup après 5 secondes pour les comptes FREE/STARTER
-    if (user?.subscriptionType === 'FREE' || user?.subscriptionType === 'STARTER') {
+    // Déclencher le popup après 5 secondes pour les comptes FREE
+    if (user?.subscriptionType === 'FREE') {
       const timer = setTimeout(() => {
         // Simuler des informations de limitation
         const mockSubscriptionInfo = {
