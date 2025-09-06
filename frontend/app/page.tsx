@@ -221,7 +221,7 @@ export default function HomePage() {
               <AnimatedMulticolorText 
                 text="Découvrez CubeAI & Bubix" 
                 variant="h1" 
-                className="leading-none text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] whitespace-nowrap drop-shadow-2xl"
+                className="leading-none text-7xl sm:text-8xl md:text-9xl lg:text-[12rem] xl:text-[16rem] whitespace-nowrap drop-shadow-2xl"
                 staggerDelay={0.1}
               />
             </motion.div>
