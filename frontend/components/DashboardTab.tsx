@@ -38,6 +38,7 @@ import SavedAnalyses from './SavedAnalyses'
 import OnlineStatus from './OnlineStatus'
 import LimitationPopup from './LimitationPopup'
 import AnalysisModal from './AnalysisModal'
+import BubixProgress, { createBubixSteps } from './BubixProgress'
 import { useLimitationPopup } from '@/hooks/useLimitationPopup'
 
 interface DashboardTabProps {
@@ -97,6 +98,11 @@ export default function DashboardTab({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [likedAnalyses, setLikedAnalyses] = useState<Set<string>>(new Set());
   const [favoriteAnalyses, setFavoriteAnalyses] = useState<Set<string>>(new Set());
+  
+  // États pour la progression Bubix
+  const [isProgressVisible, setIsProgressVisible] = useState(false);
+  const [progressSteps, setProgressSteps] = useState(createBubixSteps());
+  const [currentProgressStep, setCurrentProgressStep] = useState('');
 
   // Hook pour le statut en temps réel
   const { sessionStatuses, isLoading: statusLoading, refreshStatus } = useRealTimeStatus({
@@ -1376,6 +1382,14 @@ export default function DashboardTab({
           canDialogue={user?.subscriptionType === 'MAITRE' || user?.subscriptionType === 'ENTERPRISE'}
         />
       )}
+
+      {/* Progression Bubix */}
+      <BubixProgress
+        isVisible={isProgressVisible}
+        steps={progressSteps}
+        currentStep={currentProgressStep}
+        onComplete={() => setIsProgressVisible(false)}
+      />
 
       {/* Popup de limitation */}
       <LimitationPopup
