@@ -201,7 +201,15 @@ export default function HomePage() {
 
       {/* Section principale */}
       <section className="relative overflow-hidden min-h-screen flex items-center">
-        {/* Éléments décoratifs supprimés - effets de brillance retirés */}
+        {/* Image de fond full screen */}
+        <div 
+          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: "url('/image-bg/hero-bg-1.png')"
+          }}
+        />
+        {/* Overlay pour améliorer la lisibilité du texte */}
+        <div className="absolute inset-0 bg-white/20 backdrop-blur-[0.5px]" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 xl:px-8 w-full relative z-10">
           <div className="text-center">
