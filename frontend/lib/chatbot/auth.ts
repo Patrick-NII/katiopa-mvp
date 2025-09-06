@@ -89,38 +89,38 @@ export async function getUserSubscription(): Promise<UserSubscription | null> {
 }
 
 export function getModelForSubscription(subscriptionType: string): string {
-  // Configuration normale selon l'abonnement
+  // Découverte (FREE) → gpt-3.5, Explorateur (PRO) → gpt-4o-mini, Maître (PRO_PLUS) → gpt-4o
   switch (subscriptionType) {
     case 'FREE':
-      return 'gpt-3.5-turbo' // Modèle de base pour les abonnements gratuits
+      return 'gpt-3.5-turbo'
     case 'PRO':
-      return 'gpt-4o-mini' // Modèle intermédiaire pour PRO
+      return 'gpt-4o-mini'
     case 'PRO_PLUS':
-      return 'gpt-4o' // Modèle premium pour PRO_PLUS
+      return 'gpt-4o'
     case 'ENTERPRISE':
-      return 'gpt-4o' // Modèle premium pour ENTERPRISE
+      return 'gpt-4o'
     default:
       return 'gpt-3.5-turbo' // Fallback par défaut
   }
 }
 
 export function isLLMEnabled(subscriptionType: string): boolean {
-  // Seuls les abonnements payants ont accès au LLM
-  return subscriptionType !== 'FREE'
+  // LLM disponible pour tous, mais fortement limité en Découverte
+  return true
 }
 
 export function getMaxTokensForSubscription(subscriptionType: string): number {
-  // Limitation selon l'abonnement
+  // Découverte (limité), Explorateur (analyses confortables), Maître (très généreux)
   switch (subscriptionType) {
     case 'FREE':
-      return 0 // Pas de LLM pour les abonnements gratuits
+      return 300
     case 'PRO':
-      return 400 // Limitation pour PRO
+      return 1200
     case 'PRO_PLUS':
-      return 800 // Plus de tokens pour PRO_PLUS
+      return 2500
     case 'ENTERPRISE':
-      return 1000 // Maximum pour ENTERPRISE
+      return 4000
     default:
-      return 0
+      return 300
   }
 }

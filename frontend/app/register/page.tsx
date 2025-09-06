@@ -61,9 +61,9 @@ interface RegistrationData {
 }
 
 const PLAN_PRICES: Record<RegistrationData['subscriptionType'], number> = {
-  STARTER: 0,
+  STARTER: 4.99,
   PRO: 29.99,
-  PREMIUM: 69.99
+  PREMIUM: 59.99
 }
 
 function formatPrice(n: number) {
@@ -139,18 +139,16 @@ export default function RegisterPage() {
   const subscriptionPlans = [
     {
       id: 'STARTER',
-      name: 'Starter',
-      price: '0€',
+      name: 'Découverte',
+      price: '4,99€',
       period: '/mois',
-      description: 'Démarrez gratuitement et découvrez CubeAI en douceur.',
+      description: 'Le premier pas vers l\'aventure CubeAI.',
       features: [
-        '1 session simultanée',
-        '1 propriétaire (admin)',
-        'Accès complet à la plateforme',
-        'Programmation, IA, maths et lecture',
-        'Jeux éducatifs et progression',
-        'Évaluation et coaching IA basique',
-        '3 mois gratuit puis 9,99€/mois'
+        '1 parent + 1 enfant',
+        'Bubix (version simplifiée)',
+        'MathCube — bases en jouant',
+        'Expériences (lite)',
+        '1 analyse simple par semaine'
       ],
       maxMembers: 2,
       popular: false,
@@ -164,23 +162,23 @@ export default function RegisterPage() {
         buttonBorder: 'border-emerald-800',
         glow: 'shadow-[0_10px_40px_rgba(16,185,129,0.45)]'
       },
-      cta: 'Commencer gratuitement'
+      cta: 'Choisir Découverte'
     },
     {
       id: 'PRO',
-      name: 'Pro',
+      name: 'Explorateur',
       price: '29,99€',
       period: '/mois',
-      description: 'Progressez chaque semaine avec des rapports et un coach IA.',
+      description: 'L\'univers complet CubeAI.',
       features: [
-        '2 sessions simultanées',
-        '1 propriétaire + 1 membre',
-        'Tous les exercices et contenus',
-        'Communauté et défis familiaux',
-        'Stats détaillées et rapports',
-        'Certificats de progression',
-        'IA coach personnalisé',
-        'Support par email'
+        '1 parent + 2 enfants',
+        'Bubix avancé (professeur/coach/ami)',
+        'Math, Code, Play, Science, Dream, Expériences',
+        'Dashboard parental complet + ComCube',
+        'Analyses hebdomadaires + export PDF/Excel',
+        'Radar de connaissance complet',
+        'Certificats simples',
+        'Support email + chat + téléphone'
       ],
       maxMembers: 2,
       popular: true,
@@ -193,24 +191,24 @@ export default function RegisterPage() {
         buttonBorder: 'border-indigo-800',
         glow: 'shadow-[0_10px_40px_rgba(79,70,229,0.45)]'
       },
-      cta: 'Choisir Pro'
+      cta: 'Choisir Explorateur'
     },
     {
       id: 'PREMIUM',
-      name: 'Premium',
-      price: '69,99€',
+      name: 'Maître',
+      price: '59,99€',
       period: '/mois',
-      description: 'La solution familiale la plus complète, sans compromis.',
+      description: 'L\'excellence éducative pour les familles ambitieuses.',
       features: [
-        '6 sessions simultanées',
-        "1 propriétaire + jusqu'à 5 membres",
-        'IA coach Premium avancé',
-        'Certificats officiels reconnus',
-        'Exports PDF/Excel détaillés',
-        'Multi-appareils synchronisés',
-        'Support prioritaire 24/7',
-        'Programme de parrainage',
-        'Contenus exclusifs'
+        '1 parent + 4 enfants',
+        'Bubix premium: prédictions & adaptation automatique',
+        'Analyses quotidiennes et prédictives',
+        'Radar de connaissance évolutif dense',
+        'Contenus exclusifs et défis communautaires',
+        'Diplômes officiels et badges',
+        'Dashboard parental enrichi (comparatifs IA)',
+        'Sauvegarde cloud automatique + historique illimité',
+        'Support VIP prioritaire (WhatsApp & téléphone)'
       ],
       maxMembers: 6,
       popular: false,
@@ -224,7 +222,7 @@ export default function RegisterPage() {
         buttonBorder: 'border-fuchsia-800',
         glow: 'shadow-[0_10px_40px_rgba(217,70,239,0.45)]'
       },
-      cta: 'Passer en Premium'
+      cta: 'Choisir Maître'
     }
   ] as const
 
@@ -393,7 +391,7 @@ export default function RegisterPage() {
       setError('Veuillez sélectionner une méthode de paiement')
       return false
     }
-    if (formData.selectedPaymentMethod !== 'applepay' && selectedPlan.id !== 'STARTER' && !formData.paymentMethodId) {
+    if (formData.selectedPaymentMethod !== 'applepay' && !formData.paymentMethodId) {
       setError('Veuillez renseigner vos informations de paiement')
       return false
     }

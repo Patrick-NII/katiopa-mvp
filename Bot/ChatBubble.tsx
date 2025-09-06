@@ -219,8 +219,8 @@ export default function ChatBubble(){
                                    "Pour commencer, clique sur « Commencer gratuitement ».") ,
                  actions: [{label:'Créer un compte', href: LINKS.signup}, {label:'Tarifs', href: LINKS.pricing}] }
       case 'pricing':
-        return { text: say(persona, "Essai gratuit puis offres famille. Les plans payants débloquent plus de contenus et des rapports parentaux.",
-                                   "Tu peux essayer gratuitement. Après, il y a des formules famille.") ,
+        return { text: say(persona, "Abonnements à partir de 4,99€/mois. Bubix grandit avec votre enfant : Découverte (4,99€), Explorateur (29,99€), Maître (59,99€).",
+                                   "Les abonnements commencent à 4,99€/mois : Découverte, Explorateur, Maître.") ,
                  actions: [{label:'Voir les tarifs', href: LINKS.pricing}, {label:'Souscrire', href: LINKS.subscribe}] }
       case 'subscribe':
         return { text: "La souscription active les contenus premium et les outils parentaux avancés.",

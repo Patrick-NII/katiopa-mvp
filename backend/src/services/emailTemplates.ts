@@ -1180,23 +1180,22 @@ function getEmailConfig(emailType: 'noreply' | 'support' | 'hello') {
 // Configuration des plans d'abonnement pour les emails
 export const SUBSCRIPTION_PLANS_DATA = {
   FREE: {
-    name: 'Starter',
-    price: '0€',
-    monthlyPrice: '0€',
+    name: 'Découverte',
+    price: '4,99€',
+    monthlyPrice: '4,99€',
     maxSessions: 2,
-    trialPeriod: '3 mois gratuit puis 9,99€/mois',
+    trialPeriod: 'Sans engagement',
     trialStartDate: '{{trialStartDate}}',
-    trialEndDate: '{{trialEndDate}}',
-    firstBillingDate: '{{firstBillingDate}}',
+    trialEndDate: 'Non applicable',
+    firstBillingDate: 'Non applicable',
     billingCycle: 'Mensuel',
     paymentMethod: 'Carte bancaire',
     features: [
-      '2 sessions simultanées',
       '1 parent + 1 enfant',
-      'Accès complet à la plateforme',
-      'Programmation, IA, maths et lecture',
-      'Jeux éducatifs et progression',
-      'Évaluation et coaching IA basique'
+      'Bubix (version simplifiée)',
+      'MathCube — bases en jouant',
+      'Expériences (lite)',
+      '1 analyse simple par semaine'
     ],
     advantages: [
       'Parfait pour commencer l\'aventure',
@@ -1204,17 +1203,17 @@ export const SUBSCRIPTION_PLANS_DATA = {
       'Accès immédiat'
     ],
     trialDetails: {
-      duration: '3 mois',
-      startMessage: 'Votre période d\'essai gratuit de 3 mois commence aujourd\'hui',
-      endMessage: 'Après 3 mois, votre abonnement passera automatiquement à 9,99€/mois',
-      cancellation: 'Vous pouvez annuler à tout moment sans frais'
+      duration: 'Sans période d\'essai',
+      startMessage: 'Votre abonnement Découverte commence immédiatement',
+      endMessage: 'Facturation mensuelle de 4,99€',
+      cancellation: 'Résiliation possible à tout moment'
     }
   },
   PRO: {
-    name: 'Pro',
+    name: 'Explorateur',
     price: '29,99€',
     monthlyPrice: '29,99€',
-    maxSessions: 2,
+    maxSessions: 3,
     trialPeriod: 'Sans engagement',
     trialStartDate: '{{trialStartDate}}',
     trialEndDate: '{{trialEndDate}}',
@@ -1222,14 +1221,14 @@ export const SUBSCRIPTION_PLANS_DATA = {
     billingCycle: 'Mensuel',
     paymentMethod: 'Carte bancaire',
     features: [
-      '2 sessions simultanées',
-      '1 parent + 1 enfant',
-      'Tous les exercices et contenus',
-      'Communauté et défis familiaux',
-      'Stats détaillées et rapports',
-      'Certificats de progression',
-      'IA coach personnalisé',
-      'Support par email'
+      '1 parent + 2 enfants',
+      'Bubix avancé (professeur/coach/ami)',
+      'Tous les onglets enfants (Math, Code, Play, Science, Dream, Expériences)',
+      'Dashboard parental complet + ComCube',
+      'Analyses hebdomadaires + export PDF/Excel',
+      'Radar de connaissance complet',
+      'Certificats simples',
+      'Support email + chat + téléphone'
     ],
     advantages: [
       'L\'expérience complète recommandée',
@@ -1239,15 +1238,15 @@ export const SUBSCRIPTION_PLANS_DATA = {
     trialDetails: {
       duration: 'Sans période d\'essai',
       startMessage: 'Votre abonnement Pro commence immédiatement',
-      endMessage: 'Facturation mensuelle de 29,99€',
+      endMessage: 'Facturation mensuelle de 9,99€',
       cancellation: 'Résiliation possible à tout moment'
     }
   },
   PRO_PLUS: {
-    name: 'Premium',
-    price: '69,99€',
-    monthlyPrice: '69,99€',
-    maxSessions: 6,
+    name: 'Maître',
+    price: '59,99€',
+    monthlyPrice: '59,99€',
+    maxSessions: 5,
     trialPeriod: 'Sans engagement',
     trialStartDate: '{{trialStartDate}}',
     trialEndDate: '{{trialEndDate}}',
@@ -1255,15 +1254,15 @@ export const SUBSCRIPTION_PLANS_DATA = {
     billingCycle: 'Mensuel',
     paymentMethod: 'Carte bancaire',
     features: [
-      '6 sessions simultanées',
-      '1 parent + jusqu\'à 5 enfants',
-      'IA coach Premium avancé',
-      'Certificats officiels reconnus',
-      'Exports PDF/Excel détaillés',
-      'Multi-appareils synchronisés',
-      'Support prioritaire 24/7',
-      'Programme de parrainage',
-      'Contenus exclusifs'
+      '1 parent + 4 enfants',
+      'Bubix premium: prédictions et adaptation automatique',
+      'Analyses quotidiennes et prédictives',
+      'Radar de connaissance évolutif dense',
+      'Contenus exclusifs & défis communautaires',
+      'Diplômes officiels et badges',
+      'Dashboard parental enrichi (comparatifs IA)',
+      'Sauvegarde cloud + historique illimité',
+      'Support VIP prioritaire (WhatsApp & téléphone)'
     ],
     advantages: [
       'La solution complète pour les familles',
@@ -1272,8 +1271,8 @@ export const SUBSCRIPTION_PLANS_DATA = {
     ],
     trialDetails: {
       duration: 'Sans période d\'essai',
-      startMessage: 'Votre abonnement Premium commence immédiatement',
-      endMessage: 'Facturation mensuelle de 69,99€',
+      startMessage: 'Votre abonnement Pro Plus commence immédiatement',
+      endMessage: 'Facturation mensuelle de 19,99€',
       cancellation: 'Résiliation possible à tout moment'
     }
   }
@@ -1295,17 +1294,11 @@ export function enrichEmailDataWithPlan(data: any, subscriptionType: keyof typeo
   let firstBillingDate = '';
   
   if (subscriptionType === 'FREE') {
-    // Pour le plan Starter : 3 mois d'essai gratuit
-    const trialEnd = new Date(today);
-    trialEnd.setMonth(trialEnd.getMonth() + 3);
-    trialEndDate = trialEnd.toLocaleDateString('fr-FR', { 
-      day: '2-digit', 
-      month: '2-digit', 
-      year: 'numeric' 
-    });
-    firstBillingDate = trialEndDate; // Première facturation après la période d'essai
+    // Plus de période d'essai — plan gratuit sans facturation
+    trialEndDate = 'Non applicable';
+    firstBillingDate = 'Non applicable';
   } else {
-    // Pour les plans payants : facturation immédiate
+    // Plans payants : facturation immédiate
     trialEndDate = 'Facturation immédiate';
     firstBillingDate = trialStartDate;
   }

@@ -32,7 +32,7 @@ interface UserInfo {
   lastName: string
   email?: string
   userType: 'PARENT' | 'CHILD'
-  subscriptionType: 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE'
+  subscriptionType: 'FREE' | 'DECOUVERTE' | 'EXPLORATEUR' | 'MAITRE' | 'ENTERPRISE'
   isActive: boolean
 }
 
@@ -402,7 +402,7 @@ async function getChildrenData(accountId: string, subscriptionType: string = 'FR
     console.log('🔍 Recherche enfants pour accountId:', accountId)
     
     // Déterminer les limitations selon l'abonnement
-    const isProOrHigher = ['PRO', 'PRO_PLUS', 'ENTERPRISE'].includes(subscriptionType)
+    const isProOrHigher = ['EXPLORATEUR', 'MAITRE', 'ENTERPRISE'].includes(subscriptionType)
     const activitiesLimit = isProOrHigher ? undefined : 100
     const cubeMatchLimit = isProOrHigher ? undefined : 50
     
@@ -833,9 +833,9 @@ function getRAGSnippets(intent: string, userQuery: string): string[] {
   switch (intent) {
     case 'pricing':
       snippets.push(
-        "Tarifs CubeAI : Essai gratuit de 3 mois, puis abonnements famille à partir de 9,99€/mois.",
-        "Plans disponibles : Starter (gratuit), Pro (29,99€/mois), Premium (69,99€/mois).",
-        "Avantages Premium : 6 sessions simultanées, IA coach avancé, certificats officiels."
+        "Tarifs CubeAI : Abonnements à partir de 4,99€/mois.",
+        "Plans disponibles : Découverte (4,99€), Explorateur (29,99€/mois), Maître (59,99€/mois).",
+        "Avantages Maître : IA premium adaptative, analyses prédictives, cloud et support VIP."
       )
       break
     case 'signup':
@@ -876,19 +876,20 @@ function getRAGSnippets(intent: string, userQuery: string): string[] {
 
 // Fonction pour obtenir le modèle selon l'abonnement
 function getModelForSubscription(subscriptionType: string): string {
+  // FREE → local, DECOUVERTE → gpt-3.5, EXPLORATEUR → gpt-4o-mini, MAITRE → gpt-4o
   switch (subscriptionType) {
     case 'FREE':
-      return 'gpt-3.5-turbo' // Modèle de base pour tester
-    case 'STARTER':
-      return 'gpt-3.5-turbo' // Même modèle mais plus de tokens
-    case 'PRO':
-      return 'gpt-4o-mini' // Modèle avancé, plus intelligent
-    case 'PRO_PLUS':
-      return 'gpt-4o' // Modèle premium, très intelligent
+      return 'local' // Modèle local uniquement
+    case 'DECOUVERTE':
+      return 'gpt-3.5-turbo' // GPT-3 limité
+    case 'EXPLORATEUR':
+      return 'gpt-4o-mini' // GPT-4o-mini custom
+    case 'MAITRE':
+      return 'gpt-4o' // GPT-4o premium adaptatif
     case 'ENTERPRISE':
-      return 'gpt-4o' // Modèle enterprise + custom prompts
+      return 'gpt-4o' // GPT-4o + modèles personnalisés
     default:
-      return 'gpt-3.5-turbo'
+      return 'local'
   }
 }
 
@@ -900,19 +901,20 @@ function isLLMEnabled(subscriptionType: string): boolean {
 
 // Fonction pour obtenir le nombre max de tokens
 function getMaxTokensForSubscription(subscriptionType: string): number {
+  // FREE → 0, DECOUVERTE → 500, EXPLORATEUR → 1000, MAITRE → 2000, ENTERPRISE → illimité
   switch (subscriptionType) {
     case 'FREE':
-      return 200 // Très limité pour tester
-    case 'STARTER':
-      return 500 // Limité mais utilisable
-    case 'PRO':
-      return 1000 // Confortable pour usage régulier
-    case 'PRO_PLUS':
-      return 2000 // Très généreux
+      return 0
+    case 'DECOUVERTE':
+      return 500
+    case 'EXPLORATEUR':
+      return 1000
+    case 'MAITRE':
+      return 2000
     case 'ENTERPRISE':
-      return 4000 // Illimité virtuellement
+      return 999999 // Illimité
     default:
-      return 200
+      return 0
   }
 }
 
@@ -920,15 +922,16 @@ function getMaxTokensForSubscription(subscriptionType: string): number {
 function getMaxCharactersForSubscription(subscriptionType: string): number {
   switch (subscriptionType) {
     case 'FREE':
-      return 500 // Très limité pour tester
-    case 'STARTER':
-      return 1000 // Limité mais utilisable
-    case 'PRO':
-    case 'PRO_PLUS':
+      return 1000
+    case 'DECOUVERTE':
+      return 5000
+    case 'EXPLORATEUR':
+      return 20000
+    case 'MAITRE':
     case 'ENTERPRISE':
-      return 999999 // Illimité à partir de PRO
+      return 999999
     default:
-      return 500
+      return 1000
   }
 }
 
@@ -949,7 +952,7 @@ function getLimitationMessage(subscriptionType: string, userType: 'PARENT' | 'CH
           isCommercial: false,
           showUpgrade: false
         }
-      case 'STARTER':
+      case 'DECOUVERTE':
         return {
           message: `🚀 **Incroyable ${childName || 'petit(e) génie'} !**\n\nTon niveau devient extraordinaire ! Je vais discuter avec ${parentTitle} pour voir comment on peut encore mieux t'accompagner dans ton apprentissage ! 🎯💫`,
           isCommercial: false,
@@ -973,9 +976,15 @@ function getLimitationMessage(subscriptionType: string, userType: 'PARENT' | 'CH
           isCommercial: true,
           showUpgrade: true
         }
-      case 'STARTER':
+      case 'DECOUVERTE':
         return {
           message: `🌟 **${childName || 'Votre enfant'} montre un potentiel exceptionnel !**\n\nLes progrès de ${childTitle} sont remarquables. Pour lui offrir l'accompagnement le plus adapté, nous vous proposons d'accéder à nos outils d'analyse avancés.\n\n🚀 **Avantages pour ${childName || 'votre enfant'} :**\n• Intelligence artificielle plus performante\n• Analyses détaillées de ses forces et axes d'amélioration\n• Recommandations pédagogiques personnalisées\n• Suivi en temps réel de ses performances\n\n💝 **Notre engagement :** Votre confiance est précieuse. Nous nous engageons à utiliser ces outils pour le bien-être et la progression de ${childName || 'votre enfant'}.`,
+          isCommercial: true,
+          showUpgrade: true
+        }
+      case 'EXPLORATEUR':
+        return {
+          message: `🎯 **${childName || 'Votre enfant'} mérite l'excellence éducative !**\n\nLes performances de ${childTitle} sont exceptionnelles. Pour lui offrir le meilleur accompagnement possible, découvrez nos fonctionnalités premium.\n\n👑 **Excellence pour ${childName || 'votre enfant'} :**\n• Intelligence artificielle premium avec analyses prédictives\n• Accès à tous les univers d'apprentissage\n• Certificats et diplômes officiels\n• Support VIP prioritaire\n\n🌟 **Votre satisfaction :** Nous nous engageons à offrir à ${childName || 'votre enfant'} l'expérience éducative la plus enrichissante.`,
           isCommercial: true,
           showUpgrade: true
         }
