@@ -208,7 +208,7 @@ export default function HomePage() {
           <img 
             src="/image-bubix/bubix.png" 
             alt="Bubix" 
-            className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[28rem] lg:h-[28rem] xl:w-[32rem] xl:h-[32rem] drop-shadow-[0_0_20px_rgba(255,255,255,0.8)] drop-shadow-[0_0_40px_rgba(59,130,246,0.6)] drop-shadow-[0_0_60px_rgba(139,92,246,0.4)]"
+            className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[28rem] lg:h-[28rem] xl:w-[32rem] xl:h-[32rem] drop-shadow-[0_0_30px_rgba(59,130,246,0.9)] drop-shadow-[0_0_50px_rgba(34,197,94,0.8)] drop-shadow-[0_0_70px_rgba(234,179,8,0.7)] drop-shadow-[0_0_90px_rgba(59,130,246,0.6)] drop-shadow-[0_0_110px_rgba(34,197,94,0.5)] drop-shadow-[0_0_130px_rgba(234,179,8,0.4)]"
           />
         </div>
 
