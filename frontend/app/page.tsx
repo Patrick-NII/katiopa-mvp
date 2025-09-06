@@ -261,7 +261,7 @@ export default function HomePage() {
       </section>
 
       {/* Section Pourquoi choisir CubeAI ? */}
-      <section className="py-20 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-900">
+      <section className="py-20 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <motion.div
@@ -271,8 +271,8 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="mb-6"
             >
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">
-                🎯 Pourquoi choisir CubeAI ?
+              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent mb-6">
+                Pourquoi choisir CubeAI ?
               </h2>
             </motion.div>
           </div>
@@ -283,13 +283,15 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
               viewport={{ once: true }}
-              className="text-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
+              className="text-center p-8 bg-white/80 backdrop-blur rounded-3xl shadow-xl border border-gray-200 hover:shadow-2xl transition-all duration-300"
             >
-              <div className="text-4xl mb-4">👨‍🏫</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+              <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Professeur" className="w-8 h-8 filter brightness-0 invert" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 font-['Fredoka']">
                 Professeur patient, disponible 24h/24
               </h3>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-gray-600 dark:text-gray-300 font-['Inter'] leading-relaxed">
                 Parce que chaque enfant mérite un professeur patient, disponible 24h/24.
               </p>
             </motion.div>
@@ -299,13 +301,15 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
-              className="text-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
+              className="text-center p-8 bg-white/80 backdrop-blur rounded-3xl shadow-xl border border-gray-200 hover:shadow-2xl transition-all duration-300"
             >
-              <div className="text-4xl mb-4">👨‍👩‍👧‍👦</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+              <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Famille" className="w-8 h-8 filter brightness-0 invert" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 font-['Fredoka']">
                 Voir les progrès sans stress
               </h3>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-gray-600 dark:text-gray-300 font-['Inter'] leading-relaxed">
                 Parce que les parents méritent de voir les progrès de leurs enfants, sans stress.
               </p>
             </motion.div>
@@ -315,13 +319,15 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
               viewport={{ once: true }}
-              className="text-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
+              className="text-center p-8 bg-white/80 backdrop-blur rounded-3xl shadow-xl border border-gray-200 hover:shadow-2xl transition-all duration-300"
             >
-              <div className="text-4xl mb-4">✨</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+              <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Magie" className="w-8 h-8 filter brightness-0 invert" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 font-['Fredoka']">
                 Voyage magique et personnalisé
               </h3>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-gray-600 dark:text-gray-300 font-['Inter'] leading-relaxed">
                 Parce que l'éducation doit être un voyage magique et personnalisé, pas une corvée.
               </p>
             </motion.div>
@@ -334,8 +340,8 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mt-12"
           >
-            <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
-              <strong>Positionnement :</strong> familles exigeantes / écoles → Bubix devient un mentor adaptatif.
+            <p className="text-lg text-gray-700 dark:text-gray-300 mb-4 font-['Inter']">
+              Positionnement : familles exigeantes / écoles → Bubix devient un mentor adaptatif.
             </p>
           </motion.div>
         </div>
