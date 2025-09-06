@@ -201,16 +201,36 @@ export default function HomePage() {
 
       {/* Section principale */}
       <section className="relative overflow-hidden min-h-screen flex items-center">
-        {/* Image de fond réduite */}
-        <div 
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-contain bg-center bg-no-repeat"
-          style={{
-            backgroundImage: "url('/image-bg/hero-bg-1-removebg.png')"
-          }}
-        />
+        {/* Images de fond décoratives */}
+        
+        {/* Bubix à droite avec effet néon */}
+        <div className="absolute top-1/2 right-8 transform -translate-y-1/2 z-10">
+          <img 
+            src="/image-bubix/bubix.png" 
+            alt="Bubix" 
+            className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 xl:w-64 xl:h-64 drop-shadow-[0_0_20px_rgba(255,255,255,0.8)] drop-shadow-[0_0_40px_rgba(59,130,246,0.6)] drop-shadow-[0_0_60px_rgba(139,92,246,0.4)]"
+          />
+        </div>
+
+        {/* Cube à gauche avec effet miroir */}
+        <div className="absolute top-1/2 left-8 transform -translate-y-1/2 z-10">
+          <div className="relative">
+            <img 
+              src="/image-bg/cube.png" 
+              alt="Cube" 
+              className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 xl:w-56 xl:h-56"
+            />
+            {/* Effet miroir vers le sol */}
+            <img 
+              src="/image-bg/cube.png" 
+              alt="Cube reflection" 
+              className="absolute top-full left-0 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 xl:w-56 xl:h-56 opacity-30 scale-y-[-1] blur-[1px]"
+            />
+          </div>
+        </div>
 
         {/* Titre principal - Positionné indépendamment */}
-        <div className="absolute top-0 left-0 right-0 z-20">
+        <div className="absolute top-20 left-0 right-0 z-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 xl:px-8">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -221,7 +241,7 @@ export default function HomePage() {
               <AnimatedMulticolorText 
                 text="Découvrez CubeAI & Bubix" 
                 variant="h1" 
-                className="leading-none text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[8rem] whitespace-nowrap drop-shadow-2xl"
+                className="leading-none text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[8rem] whitespace-nowrap drop-shadow-xl"
                 staggerDelay={0.1}
               />
             </motion.div>
