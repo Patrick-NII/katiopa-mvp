@@ -208,7 +208,8 @@ export default function RegisterPage() {
         'Diplômes officiels et badges',
         'Dashboard parental enrichi (comparatifs IA)',
         'Sauvegarde cloud automatique + historique illimité',
-        'Support VIP prioritaire (WhatsApp & téléphone)'n      ],
+        'Support VIP prioritaire (WhatsApp & téléphone)'
+      ],
       maxMembers: 5,
       popular: false,
       complete: true,
