@@ -176,7 +176,7 @@ async function getActiveConnections(accountId: string): Promise<any[]> {
 }
 
 // Fonction pour récupérer les données CubeMatch d'un enfant
-async function getCubeMatchData(childId: string): Promise<any> {
+async function getCubeMatchData(childId: string, limit?: number): Promise<any> {
   try {
     console.log(`🎮 Récupération données CubeMatch pour enfant ${childId}...`);
     
@@ -188,7 +188,7 @@ async function getCubeMatchData(childId: string): Promise<any> {
       orderBy: {
         created_at: 'desc'
       },
-      // SUPPRIMÉ: take: 50 - Accès complet à toutes les parties CubeMatch
+      ...(limit && { take: limit })
     });
 
     if (cubeMatchScores.length === 0) {
@@ -247,10 +247,22 @@ function generateCubeMatchSummary(cubeMatchData: any): string {
   
   return `CubeMatch: ${cubeMatchData.totalGames} parties jouées, niveau ${cubeMatchData.currentLevel}, meilleur score ${cubeMatchData.bestScore}, opérateur préféré ${cubeMatchData.favoriteOperator}`;
 }
-async function getChildrenData(accountId: string): Promise<any[]> {
+async function getChildrenData(accountId: string, subscriptionType: string = 'FREE'): Promise<any> {
   try {
     console.log('🔍 Recherche enfants pour accountId:', accountId)
     
+    // Déterminer les limitations selon l'abonnement
+    const isProOrHigher = ['PRO', 'PRO_PLUS', 'ENTERPRISE'].includes(subscriptionType)
+    const activitiesLimit = isProOrHigher ? undefined : 100
+    const cubeMatchLimit = isProOrHigher ? undefined : 50
+    
+    console.log('🔒 Limitations appliquées:', {
+      subscriptionType,
+      isProOrHigher,
+      activitiesLimit: activitiesLimit || 'illimité',
+      cubeMatchLimit: cubeMatchLimit || 'illimité'
+    })
+
     const children = await prisma.userSession.findMany({
       where: {
         accountId: accountId,
@@ -259,8 +271,8 @@ async function getChildrenData(accountId: string): Promise<any[]> {
       },
       include: {
         activities: {
-          orderBy: { createdAt: 'desc' }
-          // SUPPRIMÉ: take: 100 - Accès complet à toutes les activités
+          orderBy: { createdAt: 'desc' },
+          ...(activitiesLimit && { take: activitiesLimit })
         },
         profile: true
       }
@@ -290,7 +302,7 @@ async function getChildrenData(accountId: string): Promise<any[]> {
     const enrichedChildren = await Promise.all(children.map(async (child) => {
       try {
         // Récupérer les données CubeMatch
-        const cubeMatchData = await getCubeMatchData(child.id);
+        const cubeMatchData = await getCubeMatchData(child.id, cubeMatchLimit);
         
         return {
           id: child.id,
@@ -558,7 +570,7 @@ async function getUserContext(userInfo: UserInfo): Promise<UserContext> {
       
       if (userSession?.accountId) {
         console.log('🔍 Appel de getChildrenData avec accountId:', userSession.accountId)
-        const dataResult = await getChildrenData(userSession.accountId)
+        const dataResult = await getChildrenData(userSession.accountId, userInfo.subscriptionType)
         childrenData = dataResult.children
         console.log('📊 Données enfants récupérées:', childrenData.length, 'enfants')
         console.log('📝 Prompts récupérés:', dataResult.prompts.length, 'prompts')
@@ -730,9 +742,8 @@ function getModelForSubscription(subscriptionType: string): string {
 
 // Fonction pour vérifier si le LLM est activé
 function isLLMEnabled(subscriptionType: string): boolean {
-  // Bubix est accessible à tous les utilisateurs connectés
-  // Les fonctionnalités avancées sont limitées selon l'abonnement
-  return true
+  // LLM disponible à partir de PRO
+  return ['PRO', 'PRO_PLUS', 'ENTERPRISE'].includes(subscriptionType)
 }
 
 // Fonction pour obtenir le nombre max de tokens
@@ -753,8 +764,18 @@ function getMaxTokensForSubscription(subscriptionType: string): number {
 
 // Fonction pour obtenir la limite de caractères par abonnement
 function getMaxCharactersForSubscription(subscriptionType: string): number {
-  // BUBIX ACCÈS ILLIMITÉ - Plus de limitations par abonnement
-  return 999999 // Virtuellement illimité
+  switch (subscriptionType) {
+    case 'FREE':
+      return 500 // Limité pour les comptes gratuits
+    case 'STARTER':
+      return 1000 // Limité pour les comptes starter
+    case 'PRO':
+    case 'PRO_PLUS':
+    case 'ENTERPRISE':
+      return 999999 // Illimité à partir de PRO
+    default:
+      return 500
+  }
 }
 
 // Fonction pour obtenir le nombre de caractères restants
