@@ -271,7 +271,7 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="mb-6"
             >
-              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-600 via-purple-400 to-yellow-600 bg-clip-text text-transparent mb-6">
+              <h2 className="text-3xl md:text-4xl font-title bg-gradient-to-r from-green-600 via-purple-400 to-yellow-600 bg-clip-text text-transparent mb-6">
                 Pourquoi choisir CubeAI ?
               </h2>
             </motion.div>
@@ -286,14 +286,12 @@ export default function HomePage() {
               className="text-center p-8 bg-white/80 backdrop-blur rounded-3xl shadow-xl border border-gray-200 hover:shadow-2xl transition-all duration-300"
             >
               <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">B</span>
-                </div>
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Bubix" className="w-8 h-8 filter brightness-0 invert" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 font-['Fredoka']">
+              <h3 className="text-xl font-subtitle text-gray-900 dark:text-white mb-4">
                 Bubix, votre professeur IA disponible 24h/24
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 font-['Inter'] leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-300 font-body leading-relaxed">
                 Parce que chaque enfant mérite un professeur patient et intelligent, disponible à tout moment.
               </p>
             </motion.div>
@@ -306,14 +304,12 @@ export default function HomePage() {
               className="text-center p-8 bg-white/80 backdrop-blur rounded-3xl shadow-xl border border-gray-200 hover:shadow-2xl transition-all duration-300"
             >
               <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center">
-                <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">📊</span>
-                </div>
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Analytics" className="w-8 h-8 filter brightness-0 invert" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 font-['Fredoka']">
+              <h3 className="text-xl font-subtitle text-gray-900 dark:text-white mb-4">
                 Suivi des progrès en temps réel
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 font-['Inter'] leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-300 font-body leading-relaxed">
                 Les parents peuvent suivre les progrès de leurs enfants sans stress grâce au dashboard CubeAI.
               </p>
             </motion.div>
@@ -326,14 +322,12 @@ export default function HomePage() {
               className="text-center p-8 bg-white/80 backdrop-blur rounded-3xl shadow-xl border border-gray-200 hover:shadow-2xl transition-all duration-300"
             >
               <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">✨</span>
-                </div>
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Magic" className="w-8 h-8 filter brightness-0 invert" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 font-['Fredoka']">
+              <h3 className="text-xl font-subtitle text-gray-900 dark:text-white mb-4">
                 Apprentissage personnalisé et magique
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 font-['Inter'] leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-300 font-body leading-relaxed">
                 Bubix s'adapte au rythme de chaque enfant pour créer un voyage d'apprentissage unique.
               </p>
             </motion.div>
@@ -346,7 +340,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mt-12"
           >
-            <p className="text-lg text-gray-700 dark:text-gray-300 mb-4 font-['Inter']">
+            <p className="text-lg text-gray-700 dark:text-gray-300 mb-4 font-body">
               <strong>Positionnement :</strong> familles exigeantes / écoles → Bubix devient un mentor adaptatif.
             </p>
           </motion.div>
