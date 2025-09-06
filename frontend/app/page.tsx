@@ -221,7 +221,7 @@ export default function HomePage() {
               <AnimatedMulticolorText 
                 text="Découvrez CubeAI & Bubix" 
                 variant="h1" 
-                className="leading-none text-7xl sm:text-8xl md:text-9xl lg:text-[10rem] xl:text-[12rem] whitespace-nowrap drop-shadow-2xl"
+                className="leading-none text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[8rem] whitespace-nowrap drop-shadow-2xl"
                 staggerDelay={0.1}
               />
             </motion.div>
@@ -235,27 +235,43 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-subtitle-xl text-white mb-8 max-w-3xl mx-auto drop-shadow-lg"
+              className="font-subtitle-xl text-white mb-6 max-w-3xl mx-auto drop-shadow-lg"
             >
               L'<strong className="text-yellow-300">intelligence artificielle</strong> qui grandit avec vos enfants.
             </motion.p>
 
-            <motion.p 
+            <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-body-lg text-white mb-8 max-w-4xl mx-auto drop-shadow-lg"
+              className="font-body-lg text-white mb-6 max-w-4xl mx-auto drop-shadow-lg"
             >
-              Apprendre les <strong className="text-yellow-300">mathématiques</strong>, coder ses premiers jeux, explorer les <strong className="text-yellow-300">sciences</strong>, ou rêver avec des <strong className="text-yellow-300">histoires interactives</strong>… Avec CubeAI, chaque enfant découvre un univers magique où l'IA devient un véritable <strong className="text-yellow-300">compagnon d'apprentissage</strong> : <strong className="text-yellow-300">Bubix</strong>.
-            </motion.p>
+              <p className="mb-4">
+                Avec CubeAI, chaque enfant découvre un univers magique où l'IA devient un véritable <strong className="text-yellow-300">compagnon d'apprentissage</strong> : <strong className="text-yellow-300">Bubix</strong>.
+              </p>
+              <ul className="text-left space-y-2 max-w-2xl mx-auto">
+                <li className="flex items-center">
+                  <span className="text-yellow-300 mr-2">•</span>
+                  <strong className="text-yellow-300">Mathématiques</strong> et sciences interactives
+                </li>
+                <li className="flex items-center">
+                  <span className="text-yellow-300 mr-2">•</span>
+                  <strong className="text-yellow-300">Programmation</strong> et création de jeux
+                </li>
+                <li className="flex items-center">
+                  <span className="text-yellow-300 mr-2">•</span>
+                  <strong className="text-yellow-300">Histoires</strong> et aventures personnalisées
+                </li>
+              </ul>
+            </motion.div>
 
             <motion.p 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-body-lg text-white mb-12 max-w-4xl mx-auto drop-shadow-lg"
+              className="font-body-lg text-white mb-8 max-w-3xl mx-auto drop-shadow-lg"
             >
-              Bubix n'est pas une IA comme les autres : il <strong className="text-yellow-300">grandit avec votre enfant</strong>, s'adapte à ses progrès, et crée un <strong className="text-yellow-300">parcours personnalisé</strong> qui évolue jour après jour.
+              Bubix <strong className="text-yellow-300">grandit avec votre enfant</strong> et crée un <strong className="text-yellow-300">parcours personnalisé</strong> qui évolue jour après jour.
             </motion.p>
 
             <motion.div 
