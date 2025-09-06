@@ -36,6 +36,8 @@ import AIWritingAnimation from './AIWritingAnimation'
 import AIAnalysisCard from './AIAnalysisCard'
 import SavedAnalyses from './SavedAnalyses'
 import OnlineStatus from './OnlineStatus'
+import LimitationPopup from './LimitationPopup'
+import { useLimitationPopup } from '@/hooks/useLimitationPopup'
 
 interface DashboardTabProps {
   user: any
@@ -140,6 +142,54 @@ export default function DashboardTab({
     trackPerformance: false,
     trackPrompts: false
   });
+
+  // Hook pour gérer les popups de limitation
+  const {
+    limitationState,
+    showPopup,
+    closePopup,
+    remindLater,
+    dismiss,
+    upgrade
+  } = useLimitationPopup()
+
+  // Fonction pour déclencher le popup de limitation
+  const triggerLimitationPopup = (subscriptionInfo: any) => {
+    if (subscriptionInfo?.isCommercial && subscriptionInfo?.showUpgrade) {
+      const childName = childSessions[0]?.name || 'votre enfant'
+      showPopup(subscriptionInfo, 'PARENT', childName)
+    }
+  }
+
+  // Fonction pour déclencher le popup après une action (comme générer une analyse)
+  const triggerPopupAfterAction = () => {
+    if (user?.subscriptionType === 'FREE' || user?.subscriptionType === 'STARTER') {
+      const mockSubscriptionInfo = {
+        limitationMessage: `🌟 **${childSessions[0]?.name || 'Votre enfant'} montre un potentiel exceptionnel !**\n\nLes progrès de votre enfant sont remarquables. Pour lui offrir l'accompagnement le plus adapté, nous vous proposons d'accéder à nos outils d'analyse avancés.\n\n🚀 **Avantages pour ${childSessions[0]?.name || 'votre enfant'} :**\n• Intelligence artificielle plus performante\n• Analyses détaillées de ses forces et axes d'amélioration\n• Recommandations pédagogiques personnalisées\n• Suivi en temps réel de ses performances\n\n💝 **Notre engagement :** Votre confiance est précieuse. Nous nous engageons à utiliser ces outils pour le bien-être et la progression de ${childSessions[0]?.name || 'votre enfant'}.`,
+        isCommercial: true,
+        showUpgrade: true
+      }
+      triggerLimitationPopup(mockSubscriptionInfo)
+    }
+  }
+
+  // Déclencheur de popup aléatoire (pour tester)
+  useEffect(() => {
+    // Déclencher le popup après 5 secondes pour les comptes FREE/STARTER
+    if (user?.subscriptionType === 'FREE' || user?.subscriptionType === 'STARTER') {
+      const timer = setTimeout(() => {
+        // Simuler des informations de limitation
+        const mockSubscriptionInfo = {
+          limitationMessage: `👨‍👩‍👧‍👦 **${childSessions[0]?.name || 'Votre enfant'} atteint un niveau extraordinaire !**\n\nNous sommes impressionnés par les progrès de votre enfant. Pour continuer à l'accompagner au mieux dans son apprentissage, nous vous proposons de découvrir nos fonctionnalités avancées.\n\n✨ **Bénéfices pour ${childSessions[0]?.name || 'votre enfant'} :**\n• Analyses plus approfondies de ses performances\n• Recommandations personnalisées\n• Suivi détaillé de sa progression\n• Accès à des exercices adaptés à son niveau\n\n🔒 **Votre tranquillité :** Nous nous engageons à protéger la progression de ${childSessions[0]?.name || 'votre enfant'} et à respecter son rythme d'apprentissage.`,
+          isCommercial: true,
+          showUpgrade: true
+        }
+        triggerLimitationPopup(mockSubscriptionInfo)
+      }, 5000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [user?.subscriptionType, childSessions])
 
   // Récupération des vraies données depuis l'API
   useEffect(() => {
@@ -313,6 +363,11 @@ export default function DashboardTab({
     } finally {
       setLoadingStates(prev => ({ ...prev, [`compte_rendu_${sessionId}`]: false }));
       setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'compte_rendu' } }));
+      
+      // Déclencher le popup après l'action (avec délai pour laisser l'utilisateur voir le résultat)
+      setTimeout(() => {
+        triggerPopupAfterAction()
+      }, 2000)
     }
   };
 
@@ -447,6 +502,11 @@ export default function DashboardTab({
     } finally {
       setLoadingStates(prev => ({ ...prev, [`appreciation_${sessionId}`]: false }));
       setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'appreciation' } }));
+      
+      // Déclencher le popup après l'action
+      setTimeout(() => {
+        triggerPopupAfterAction()
+      }, 2000)
     }
   };
 
@@ -509,6 +569,11 @@ export default function DashboardTab({
     } finally {
       setLoadingStates(prev => ({ ...prev, [`conseils_${sessionId}`]: false }));
       setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'conseils' } }));
+      
+      // Déclencher le popup après l'action
+      setTimeout(() => {
+        triggerPopupAfterAction()
+      }, 2000)
     }
   };
 
@@ -931,6 +996,18 @@ export default function DashboardTab({
       )}
 
       
+      {/* Popup de limitation */}
+      <LimitationPopup
+        isVisible={limitationState.isVisible}
+        message={limitationState.message}
+        isCommercial={limitationState.isCommercial}
+        showUpgrade={limitationState.showUpgrade}
+        childName={limitationState.childName}
+        onClose={closePopup}
+        onUpgrade={upgrade}
+        onRemindLater={remindLater}
+        onDismiss={dismiss}
+      />
       
     </div>
   )
