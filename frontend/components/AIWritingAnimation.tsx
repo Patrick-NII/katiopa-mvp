@@ -6,7 +6,7 @@ import { Brain, Loader2 } from 'lucide-react'
 interface AIWritingAnimationProps {
   isWriting: boolean
   childName: string
-  analysisType: 'compte_rendu' | 'appreciation' | 'conseils'
+  analysisType: 'compte_rendu' | 'appreciation' | 'conseils' | 'vigilance'
 }
 
 export default function AIWritingAnimation({ isWriting, childName, analysisType }: AIWritingAnimationProps) {
@@ -32,6 +32,8 @@ export default function AIWritingAnimation({ isWriting, childName, analysisType 
         return `J'analyse en détail les performances de ${childName}`
       case 'conseils':
         return `Je prépare des conseils personnalisés pour ${childName}`
+      case 'vigilance':
+        return `Je surveille les alertes et la vigilance pour ${childName}`
       default:
         return `Je réfléchis à propos de ${childName}`
     }
