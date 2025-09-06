@@ -6,6 +6,9 @@ interface LimitationState {
   isCommercial: boolean
   showUpgrade: boolean
   childName?: string
+  userType?: 'PARENT' | 'CHILD'
+  subscriptionType?: string
+  upgradeEvent?: any
 }
 
 interface LimitationSettings {
@@ -73,7 +76,12 @@ export function useLimitationPopup() {
   }
 
   // Afficher le popup
-  const showPopup = (subscriptionInfo: any, userType: string, childName?: string) => {
+  const showPopup = (
+    subscriptionInfo: any, 
+    userType: 'PARENT' | 'CHILD' = 'PARENT', 
+    childName?: string,
+    upgradeEvent?: any
+  ) => {
     if (!shouldShowPopup(subscriptionInfo, userType)) return
 
     setLimitationState({
@@ -81,7 +89,10 @@ export function useLimitationPopup() {
       message: subscriptionInfo.limitationMessage,
       isCommercial: subscriptionInfo.isCommercial,
       showUpgrade: subscriptionInfo.showUpgrade,
-      childName
+      childName,
+      userType,
+      subscriptionType: subscriptionInfo.subscriptionType || 'FREE',
+      upgradeEvent
     })
 
     // Mettre à jour la date de dernière affichage
