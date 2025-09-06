@@ -500,7 +500,7 @@ export default function HomePage() {
             {[
               {
                 image: '/image-bg/intelligence artificielle.png',
-                title: 'Intelligence Artificielle Adaptative',
+                title: 'Intelligence Artificielle',
                 description: 'Notre algorithme d\'IA analyse en temps réel les réponses de votre enfant pour ajuster instantanément la difficulté et le style d\'apprentissage. Plus besoin de suivre un programme rigide - l\'éducation s\'adapte à l\'enfant, pas l\'inverse.',
                 details: 'L\'IA de CubeAI utilise des algorithmes de machine learning avancés pour créer un profil d\'apprentissage unique pour chaque enfant. Elle analyse les patterns de réussite, les temps de réponse, et les préférences cognitives pour optimiser l\'expérience éducative.',
                 benefits: ['Adaptation en temps réel', 'Personnalisation poussée', 'Suivi des progrès'],
