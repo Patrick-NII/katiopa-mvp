@@ -140,6 +140,98 @@ export default function WeeklyCycle({
   }
 
   if (error) {
+    // Si c'est une erreur d'authentification, afficher le cycle par défaut
+    if (error.includes('401') || error.includes('Non authentifié') || error.includes('Unauthorized')) {
+      return (
+        <div className="space-y-6">
+          {/* En-tête du cycle */}
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 mb-2">
+              <Calendar className="w-5 h-5 text-blue-600" />
+              <h3 className="text-lg font-semibold text-gray-900">Cycle d'apprentissage hebdomadaire</h3>
+            </div>
+            <p className="text-sm text-gray-600">
+              Programme pédagogique adapté pour {childName}
+            </p>
+          </div>
+
+          {/* Jour actuel */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className={`relative overflow-hidden rounded-xl p-6 ${currentDayInfo.bgColor} ${currentDayInfo.borderColor} border-2`}
+          >
+            <div className={`absolute inset-0 bg-gradient-to-r ${currentDayInfo.color} opacity-10`}></div>
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className={`p-3 rounded-lg ${currentDayInfo.bgColor} ${currentDayInfo.textColor}`}>
+                  <currentDayInfo.icon className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className={`text-lg font-semibold ${currentDayInfo.textColor}`}>
+                    {currentDayInfo.name} - {currentDayInfo.focus}
+                  </h4>
+                  <p className={`text-sm ${currentDayInfo.textColor} opacity-80`}>
+                    {currentDayInfo.description}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className={`text-sm font-medium ${currentDayInfo.textColor}`}>
+                  Aujourd'hui
+                </div>
+                <div className={`text-xs ${currentDayInfo.textColor} opacity-60`}>
+                  Connectez-vous pour suivre votre progression
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Grille des jours */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {Object.entries(WEEKLY_CYCLE).map(([dayKey, dayInfo]) => {
+              const isCurrentDay = dayKey === currentDay.toLowerCase();
+              const isCompleted = false; // Pas de données sans authentification
+              
+              return (
+                <motion.div
+                  key={dayKey}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  className={`relative overflow-hidden rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                    isCurrentDay 
+                      ? `${dayInfo.bgColor} ${dayInfo.borderColor} border-2 shadow-lg` 
+                      : 'bg-gray-50 border border-gray-200 hover:shadow-md'
+                  }`}
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-r ${dayInfo.color} opacity-5`}></div>
+                  <div className="relative">
+                    <div className="flex items-center justify-between mb-2">
+                      <dayInfo.icon className={`w-5 h-5 ${isCurrentDay ? dayInfo.textColor : 'text-gray-500'}`} />
+                      {isCompleted ? (
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Circle className="w-4 h-4 text-gray-300" />
+                      )}
+                    </div>
+                    <h5 className={`text-sm font-medium ${isCurrentDay ? dayInfo.textColor : 'text-gray-700'}`}>
+                      {dayInfo.name}
+                    </h5>
+                    <p className={`text-xs ${isCurrentDay ? dayInfo.textColor : 'text-gray-500'} opacity-80 mt-1`}>
+                      {dayInfo.focus}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+    
+    // Pour les autres erreurs, afficher le message d'erreur
     return (
       <div className="space-y-6">
         <div className="text-center">
