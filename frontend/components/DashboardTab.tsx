@@ -1056,6 +1056,7 @@ export default function DashboardTab({
                   <div className="flex items-center gap-3">
                     <div>
                       <p className="text-sm font-medium text-gray-900">{session.name}</p>
+                      <p className="text-xs text-gray-500 font-mono">ID: {session.sessionId}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -1269,6 +1270,7 @@ export default function DashboardTab({
                                   <div className="text-xs text-gray-900 leading-tight">
                                     <div className="font-medium">{lastName}</div>
                                     <div className="text-gray-600">{firstName}</div>
+                                    <div className="text-gray-400 font-mono text-xs">ID: {response.sessionId}</div>
                                   </div>
                                 </td>
                                 <td className="px-3 py-3">
