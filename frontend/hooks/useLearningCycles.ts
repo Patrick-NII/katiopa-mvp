@@ -67,7 +67,10 @@ export function useLearningCycles(childSessionId?: string): UseLearningCyclesRet
       });
 
       if (!response.ok) {
-        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+        if (response.status === 401) {
+          throw new Error('Non authentifié');
+        }
+        throw new Error(`Erreur ${response.status}: ${response.statusText || 'Erreur interne du serveur'}`);
       }
 
       const data = await response.json();
@@ -99,7 +102,10 @@ export function useLearningCycles(childSessionId?: string): UseLearningCyclesRet
       });
 
       if (!response.ok) {
-        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+        if (response.status === 401) {
+          throw new Error('Non authentifié');
+        }
+        throw new Error(`Erreur ${response.status}: ${response.statusText || 'Erreur interne du serveur'}`);
       }
 
       const data = await response.json();
@@ -144,7 +150,10 @@ export function useLearningCycles(childSessionId?: string): UseLearningCyclesRet
       });
 
       if (!response.ok) {
-        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+        if (response.status === 401) {
+          throw new Error('Non authentifié');
+        }
+        throw new Error(`Erreur ${response.status}: ${response.statusText || 'Erreur interne du serveur'}`);
       }
 
       const data = await response.json();
@@ -217,7 +226,10 @@ export function useCommunicationAnalytics(childSessionId: string, timeRange: num
       });
 
       if (!response.ok) {
-        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+        if (response.status === 401) {
+          throw new Error('Non authentifié');
+        }
+        throw new Error(`Erreur ${response.status}: ${response.statusText || 'Erreur interne du serveur'}`);
       }
 
       const data = await response.json();
@@ -250,7 +262,10 @@ export function useCommunicationAnalytics(childSessionId: string, timeRange: num
       });
 
       if (!response.ok) {
-        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+        if (response.status === 401) {
+          throw new Error('Non authentifié');
+        }
+        throw new Error(`Erreur ${response.status}: ${response.statusText || 'Erreur interne du serveur'}`);
       }
 
       const data = await response.json();
