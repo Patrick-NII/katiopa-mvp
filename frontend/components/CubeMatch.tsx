@@ -1396,20 +1396,20 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
       window.innerWidth < 768 ? 'p-0' : 'p-1'
     }`}>
       {/* Grille de jeu avec design épuré et responsive */}
-        <div 
-          ref={frameRef} 
-          className={`rounded-2xl shadow-lg border border-gray-200 flex items-center justify-center ${
-            window.innerWidth < 768 
-              ? 'bg-transparent border-transparent shadow-none' 
-              : 'bg-white'
-          }`}
-          style={{
-            width: '100%',
-            height: '100%',
-            maxWidth: '100%',
-            maxHeight: '100%'
-          }}
-        >
+      <div 
+        ref={frameRef} 
+        className={`rounded-2xl shadow-lg border border-gray-200 flex items-center justify-center ${
+          window.innerWidth < 768 
+            ? 'bg-transparent border-transparent shadow-none' 
+            : 'bg-white'
+        }`}
+        style={{
+          width: '100%',
+          height: '100%',
+          maxWidth: '100%',
+          maxHeight: '100%'
+        }}
+      >
         <div
           className="grid"
           style={{
