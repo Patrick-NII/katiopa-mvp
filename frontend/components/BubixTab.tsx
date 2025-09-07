@@ -513,7 +513,7 @@ Comment puis-je vous aider aujourd'hui ?`;
   }
 
   return (
-    <div className="w-full h-full flex flex-col lg:flex-row bg-gradient-to-br from-blue-50 to-indigo-50" style={{ 
+    <div className="w-full h-full flex flex-col xl:flex-row bg-gradient-to-br from-blue-50 to-indigo-50" style={{ 
       width: '100vw', 
       height: '100vh', 
       margin: '0',
@@ -533,7 +533,7 @@ Comment puis-je vous aider aujourd'hui ?`;
         {showSidebar && (
           <motion.aside
             initial={{ width: 0 }}
-            animate={{ width: 280 }}
+            animate={{ width: 320 }}
             exit={{ width: 0 }}
             className="bg-white/80 backdrop-blur-sm border-r border-gray-200/50 flex flex-col h-full min-w-0 shadow-lg lg:relative lg:z-auto z-50 fixed lg:static inset-0 lg:inset-auto"
           >
@@ -588,7 +588,7 @@ Comment puis-je vous aider aujourd'hui ?`;
                 className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <Search size={16} className="sm:w-5 sm:h-5" />
-                <span className="text-sm sm:text-base">{showSearch ? 'Masquer' : 'Rechercher'}</span>
+                <span className="text-sm sm:text-base text-white">{showSearch ? 'Masquer' : 'Rechercher'}</span>
               </button>
             </div>
 
@@ -638,7 +638,7 @@ Comment puis-je vous aider aujourd'hui ?`;
                 className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-blue-600 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:from-emerald-700 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <Plus size={16} className="sm:w-5 sm:h-5" />
-                <span className="text-sm sm:text-base">Nouvelle conversation</span>
+                <span className="text-sm sm:text-base text-white">Nouvelle conversation</span>
               </button>
             </div>
 
@@ -698,28 +698,12 @@ Comment puis-je vous aider aujourd'hui ?`;
       {/* Main */}
       <section className="flex-1 flex flex-col h-full min-h-0 min-w-0 bg-white/50 backdrop-blur-sm">
         {/* Header */}
-        <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 px-3 sm:px-4 py-2 sm:py-3 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-3">
-              {/* Bouton menu hamburger - même dimension que le logo */}
-              {!showSidebar && (
-                <button 
-                  onClick={() => setShowSidebar(true)} 
-                  className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
-                >
-                  <Bot size={16} className="sm:w-5 sm:h-5 text-white" />
-                </button>
-              )}
-              
-              {/* Logo Bubix */}
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg">
-                <Bot size={20} className="sm:w-6 sm:h-6 text-white" />
-              </div>
-              
+        <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex-shrink-0">
+          <div className="flex items-center justify-between max-w-6xl mx-auto">
+            <div className="flex items-center gap-3 sm:gap-4">
               <div>
-                <h1 className="text-base sm:text-lg font-bold text-blue-900">Bubix {subscriptionType}</h1>
                 <div className="flex items-center gap-2">
-                  <p className="text-xs sm:text-sm text-blue-600">
+                  <p className="text-sm sm:text-base lg:text-lg text-blue-600 ml-12">
                     {userType === 'CHILD' ? "Assistant d'apprentissage" : 'Assistant parental'}
                   </p>
                 </div>
@@ -727,14 +711,14 @@ Comment puis-je vous aider aujourd'hui ?`;
             </div>
 
             {/* Bouton conversations intégré subtilement */}
-            {!showSidebar && isMobile && (
+            {!showSidebar && (
               <button
                 onClick={() => setShowSidebar(true)}
-                className="flex items-center gap-1 px-3 py-2 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg hover:from-emerald-600 hover:to-blue-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg hover:from-emerald-600 hover:to-blue-600 transition-all duration-200 shadow-md hover:shadow-lg"
               >
-                <MessageCircle size={14} className="sm:w-4 sm:h-4" />
-                <span className="text-xs sm:text-sm font-medium">
-                  {conversations.length}
+                <MessageCircle size={16} className="sm:w-5 sm:h-5" />
+                <span className="text-sm sm:text-base font-medium text-white">
+                  Conversations ({conversations.length})
                 </span>
               </button>
             )}
@@ -742,40 +726,41 @@ Comment puis-je vous aider aujourd'hui ?`;
         </header>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-4 min-h-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-          {currentConversation?.messages.length === 0 ? (
-            <div className="h-full flex items-center justify-center">
-              <div className="text-center max-w-md px-4">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-xl">
-                  <Sparkles size={24} className="sm:w-8 sm:h-8 text-white" />
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">Bienvenue chez Bubix !</h3>
-                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
-                  {userType === 'CHILD'
-                    ? "Je suis ton assistant d'apprentissage. Pose-moi des questions sur tes exercices ou demande-moi de l'aide !"
-                    : "Je suis votre assistant parental. Je peux vous aider à suivre les progrès de vos enfants et répondre à vos questions."}
-                </p>
-                <div className="space-y-2">
-                  <p className="text-xs sm:text-sm text-gray-500">💡 Essayez de me demander :</p>
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    {(userType === 'CHILD' 
-                      ? ['Aide-moi avec les maths', 'Explique-moi la programmation', 'Comment bien réviser ?', 'Je suis bloqué']
-                      : ['Progrès de mon enfant', 'Conseils éducatifs', 'Activités recommandées', 'Suivi scolaire']
-                    ).map((suggestion) => (
-                      <button
-                        key={suggestion}
-                        onClick={() => setInputValue(suggestion)}
-                        className="px-2 sm:px-3 py-1 sm:py-2 bg-blue-100 text-blue-700 rounded-full text-xs sm:text-sm hover:bg-blue-200 transition-colors"
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 min-h-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+          <div className="max-w-4xl mx-auto">
+            {currentConversation?.messages.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <div className="text-center max-w-md px-4">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 shadow-xl">
+                    <Sparkles size={32} className="sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-white" />
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">Bienvenue chez Bubix !</h3>
+                  <p className="text-base sm:text-lg lg:text-xl text-gray-600 mb-6 sm:mb-8">
+                    {userType === 'CHILD'
+                      ? "Je suis ton assistant d'apprentissage. Pose-moi des questions sur tes exercices ou demande-moi de l'aide !"
+                      : "Je suis votre assistant parental. Je peux vous aider à suivre les progrès de vos enfants et répondre à vos questions."}
+                  </p>
+                  <div className="space-y-3">
+                    <p className="text-sm sm:text-base text-gray-500">💡 Essayez de me demander :</p>
+                    <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
+                      {(userType === 'CHILD' 
+                        ? ['Aide-moi avec les maths', 'Explique-moi la programmation', 'Comment bien réviser ?', 'Je suis bloqué']
+                        : ['Progrès de mon enfant', 'Conseils éducatifs', 'Activités recommandées', 'Suivi scolaire']
+                      ).map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          onClick={() => setInputValue(suggestion)}
+                          className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-100 text-blue-700 rounded-full text-sm sm:text-base hover:bg-blue-200 transition-colors"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
           ) : (
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-4 sm:space-y-6 lg:space-y-8">
               {currentConversation?.messages.map((message) => (
                 <motion.div
                   key={message.id}
@@ -784,7 +769,7 @@ Comment puis-je vous aider aujourd'hui ?`;
                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[85%] sm:max-w-[80%] flex gap-2 sm:gap-3 ${
+                    className={`max-w-[70%] sm:max-w-[60%] lg:max-w-[50%] flex gap-3 sm:gap-4 ${
                       message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'
                     }`}
                   >
@@ -794,25 +779,25 @@ Comment puis-je vous aider aujourd'hui ?`;
                         <img
                           src={selectedAvatar || user?.avatarPath || '/avatar/46634418-D597-4138-A12C-ED6DB610C8BD_1_105_c.jpeg'}
                           alt={`Avatar de ${user?.firstName || 'Utilisateur'}`}
-                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-white shadow-lg"
+                          className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full object-cover border-2 border-white shadow-lg"
                         />
                       ) : (
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
-                          <Bot size={16} className="sm:w-5 sm:h-5 text-white" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
+                          <Bot size={20} className="sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-white" />
                         </div>
                       )}
                     </div>
 
                     {/* Message */}
                     <div
-                      className={`px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl shadow-sm ${
+                      className={`px-4 sm:px-5 lg:px-6 py-3 sm:py-4 lg:py-5 rounded-xl sm:rounded-2xl shadow-sm ${
                         message.sender === 'user'
                           ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
                           : 'bg-white text-gray-900 border border-gray-200/50'
                       }`}
                     >
-                      <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                      <p className={`text-xs mt-1 sm:mt-2 ${
+                      <p className="text-sm sm:text-base lg:text-lg leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                      <p className={`text-xs sm:text-sm mt-2 sm:mt-3 ${
                         message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
                       }`}>
                         {formatDate(message.timestamp)}
@@ -824,18 +809,18 @@ Comment puis-je vous aider aujourd'hui ?`;
 
               {isLoading && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
-                  <div className="flex gap-2 sm:gap-3">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
-                      <Bot size={16} className="sm:w-5 sm:h-5 text-white" />
+                  <div className="flex gap-3 sm:gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
+                      <Bot size={20} className="sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-white" />
                     </div>
-                    <div className="bg-white border border-gray-200/50 px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl shadow-sm">
+                    <div className="bg-white border border-gray-200/50 px-4 sm:px-5 lg:px-6 py-3 sm:py-4 lg:py-5 rounded-xl sm:rounded-2xl shadow-sm">
                       <div className="flex items-center gap-2">
                         <div className="flex space-x-1">
-                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce" />
-                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                          <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-400 rounded-full animate-bounce" />
+                          <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                          <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
                         </div>
-                        <span className="text-xs sm:text-sm text-gray-500">Bubix réfléchit...</span>
+                        <span className="text-sm sm:text-base text-gray-500">Bubix réfléchit...</span>
                       </div>
                     </div>
                   </div>
@@ -844,12 +829,13 @@ Comment puis-je vous aider aujourd'hui ?`;
             </div>
           )}
           <div ref={messagesEndRef} />
+          </div>
         </div>
 
         {/* Input */}
-        <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200/50 p-3 sm:p-4 flex-shrink-0">
+        <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200/50 p-4 sm:p-6 lg:p-8 flex-shrink-0">
           <div className="max-w-4xl mx-auto">
-            <div className="flex gap-2 sm:gap-3 items-end">
+            <div className="flex gap-3 sm:gap-4 items-end">
               <div className="flex-1 relative">
                 <textarea
                   ref={inputRef}
@@ -857,13 +843,13 @@ Comment puis-je vous aider aujourd'hui ?`;
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder={userType === 'CHILD' ? 'Pose ta question à Bubix...' : 'Posez votre question à Bubix...'}
-                  className="w-full resize-none border border-gray-300 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm leading-5 bg-white/50 backdrop-blur-sm"
+                  className="w-full resize-none border border-gray-300 rounded-lg sm:rounded-xl lg:rounded-2xl px-4 sm:px-5 lg:px-6 py-3 sm:py-4 lg:py-5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base lg:text-lg leading-5 bg-white/50 backdrop-blur-sm"
                   rows={1}
                   disabled={isLoading}
                   maxLength={characterLimits.max}
                 />
                 {/* Compteur de caractères */}
-                <div className="absolute bottom-1 sm:bottom-2 right-2 sm:right-3 flex items-center gap-1 text-xs">
+                <div className="absolute bottom-2 sm:bottom-3 lg:bottom-4 right-3 sm:right-4 lg:right-5 flex items-center gap-1 text-xs sm:text-sm">
                   <span className={`${
                     characterLimits.remaining < 100 ? 'text-red-500' : 
                     characterLimits.remaining < 300 ? 'text-orange-500' : 'text-gray-400'
@@ -878,16 +864,16 @@ Comment puis-je vous aider aujourd'hui ?`;
               <button
                 onClick={sendMessage}
                 disabled={!inputValue.trim() || isLoading || characterLimits.remaining < 0}
-                className="px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg sm:rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="px-4 sm:px-5 lg:px-6 py-3 sm:py-4 lg:py-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg sm:rounded-xl lg:rounded-2xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
               >
-                <Send size={16} className="sm:w-5 sm:h-5" />
+                <Send size={18} className="sm:w-6 sm:h-6 lg:w-7 lg:h-7" />
               </button>
             </div>
-            <div className="flex justify-between items-center mt-2">
-              <p className="text-xs text-gray-500">
+            <div className="flex justify-between items-center mt-3 sm:mt-4">
+              <p className="text-xs sm:text-sm text-gray-500">
                 Entrée pour envoyer • Shift+Entrée pour une nouvelle ligne
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs sm:text-sm text-gray-500">
                 Limite: {characterLimits.max} caractères ({subscriptionType})
               </p>
             </div>
