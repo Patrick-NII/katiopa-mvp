@@ -6,6 +6,7 @@ import { authAPI } from '@/lib/api'
 import ModularDashboard from '@/components/dashboard/ModularDashboard'
 
 export default function DashboardPage() {
+  console.log('🚀 DashboardPage rendu')
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -42,8 +43,10 @@ export default function DashboardPage() {
   }
 
   if (!isAuthenticated) {
+    console.log('❌ Non authentifié, retour null')
     return null
   }
 
+  console.log('✅ Authentifié, rendu ModularDashboard')
   return <ModularDashboard />
 }

@@ -371,7 +371,7 @@ export default function ModularNavigation({
     <motion.div
       initial={{ width: collapsedProp ? 80 : 256 }}
       animate={{ width: collapsedProp ? 80 : 256 }}
-      className={`bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-screen flex flex-col transition-all duration-300 ${
+      className={`fixed left-0 top-0 z-50 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-screen flex flex-col transition-all duration-300 ${
         collapsedProp ? 'w-20' : 'w-64'
       }`}
     >

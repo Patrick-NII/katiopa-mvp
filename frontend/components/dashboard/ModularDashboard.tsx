@@ -255,10 +255,10 @@ export default function ModularDashboard() {
         />
 
         {/* Contenu principal */}
-        <div className={`transition-all duration-300 ${
+        <div className={`transition-all duration-300 min-h-screen ${
           sidebarCollapsed ? 'ml-20' : 'ml-64'
         }`}>
-          <main className="p-2 md:p-4 lg:p-6">
+          <main className="p-2 md:p-4 lg:p-6 min-h-screen">
             {ready ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
