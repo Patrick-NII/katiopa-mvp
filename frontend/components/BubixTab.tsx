@@ -701,17 +701,21 @@ Comment puis-je vous aider aujourd'hui ?`;
         <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 px-3 sm:px-4 py-2 sm:py-3 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3">
+              {/* Bouton menu hamburger - même dimension que le logo */}
               {!showSidebar && (
                 <button 
                   onClick={() => setShowSidebar(true)} 
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors mr-3 bg-white/50 backdrop-blur-sm border border-gray-200/50 shadow-sm"
+                  className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
                 >
-                  <Bot size={18} className="sm:w-5 sm:h-5 text-blue-600" />
+                  <Bot size={16} className="sm:w-5 sm:h-5 text-white" />
                 </button>
               )}
+              
+              {/* Logo Bubix */}
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg">
                 <Bot size={20} className="sm:w-6 sm:h-6 text-white" />
               </div>
+              
               <div>
                 <h1 className="text-base sm:text-lg font-bold text-blue-900">Bubix {subscriptionType}</h1>
                 <div className="flex items-center gap-2">
@@ -721,23 +725,21 @@ Comment puis-je vous aider aujourd'hui ?`;
                 </div>
               </div>
             </div>
+
+            {/* Bouton conversations intégré subtilement */}
+            {!showSidebar && isMobile && (
+              <button
+                onClick={() => setShowSidebar(true)}
+                className="flex items-center gap-1 px-3 py-2 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg hover:from-emerald-600 hover:to-blue-600 transition-all duration-200 shadow-md hover:shadow-lg"
+              >
+                <MessageCircle size={14} className="sm:w-4 sm:h-4" />
+                <span className="text-xs sm:text-sm font-medium">
+                  {conversations.length}
+                </span>
+              </button>
+            )}
           </div>
         </header>
-
-        {/* Onglet Conversations pour mobile */}
-        {!showSidebar && isMobile && (
-          <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200/50 px-3 py-2 flex-shrink-0">
-            <button
-              onClick={() => setShowSidebar(true)}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-blue-600 text-white px-4 py-3 rounded-lg hover:from-emerald-700 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-            >
-              <MessageCircle size={16} />
-              <span className="text-sm font-medium">
-                Mes Conversations ({conversations.length})
-              </span>
-            </button>
-          </div>
-        )}
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-3 sm:p-4 min-h-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
