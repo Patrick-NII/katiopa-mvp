@@ -217,13 +217,13 @@ const defaultConfig: Config = {
   cascadeMode: false,
 };
 
-// Configuration adaptée au mobile - grille 7x7 max
+// Configuration adaptée au mobile - grille 5x5 max
 const getMobileOptimizedConfig = (): Config => {
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   return {
     ...defaultConfig,
-    rows: isMobile ? 7 : 10,
-    cols: isMobile ? 7 : 10,
+    rows: isMobile ? 5 : 10,
+    cols: isMobile ? 5 : 10,
   };
 };
 
@@ -300,7 +300,7 @@ function loadSaved(): State | null {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
     }
     
-    // Migration automatique : si rows/cols > 10, les ramener à 10x10 (ou 7x7 sur mobile)
+    // Migration automatique : si rows/cols > limite mobile/desktop, les ramener
     const mobileConfig = getMobileOptimizedConfig();
     const maxRows = mobileConfig.rows;
     const maxCols = mobileConfig.cols;
@@ -312,7 +312,7 @@ function loadSaved(): State | null {
       savedConfig.cols = maxCols;
     }
     
-    // Fusionner proprement avec defaultConfig en s'assurant que maxSize >= 9
+    // Fusionner proprement avec mobileConfig en s'assurant que maxSize >= 9
     const mergedConfig = { 
       ...mobileConfig, 
       ...savedConfig,
@@ -799,8 +799,8 @@ export default function CubeMatch() {
   useEffect(() => {
     const handleResize = () => {
       const isMobile = window.innerWidth < 768;
-      const currentMaxRows = isMobile ? 7 : 10;
-      const currentMaxCols = isMobile ? 7 : 10;
+      const currentMaxRows = isMobile ? 5 : 10;
+      const currentMaxCols = isMobile ? 5 : 10;
       
       // Si la grille actuelle dépasse les limites mobiles, la redimensionner
       if (state.config.rows > currentMaxRows || state.config.cols > currentMaxCols) {
@@ -1245,9 +1245,7 @@ export default function CubeMatch() {
 
       {/* Zone de jeu principale - responsive */}
       <div className="h-[calc(100vh-3rem)] lg:h-full flex flex-col lg:flex-row">
-        <div className={`flex-1 flex items-center justify-center min-h-0 ${
-          window.innerWidth < 768 ? 'p-0' : 'p-1 lg:p-2'
-        }`}>
+        <div className="flex-1 flex items-center justify-center p-1 lg:p-2 min-h-0">
           <GameArea state={state} dispatch={dispatch} />
         </div>
         
@@ -1392,17 +1390,11 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
   };
 
   return (
-    <div className={`flex items-center justify-center h-full w-full ${
-      window.innerWidth < 768 ? 'p-0' : 'p-1'
-    }`}>
+    <div className="flex items-center justify-center h-full w-full p-1">
       {/* Grille de jeu avec design épuré et responsive */}
       <div 
         ref={frameRef} 
-        className={`rounded-2xl shadow-lg border border-gray-200 flex items-center justify-center ${
-          window.innerWidth < 768 
-            ? 'bg-transparent border-transparent shadow-none' 
-            : 'bg-white'
-        }`}
+        className="bg-white rounded-2xl shadow-lg border border-gray-200 flex items-center justify-center"
         style={{
           width: '100%',
           height: '100%',
@@ -1416,7 +1408,7 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
             gridTemplateColumns: `repeat(${cols}, ${cellSizePx}px)`,
             gridTemplateRows: `repeat(${rows}, ${cellSizePx}px)`,
             gap,
-            padding: window.innerWidth < 768 ? '2px' : '8px'
+            padding: '8px'
           }}
         >
           {state.grid.flat().map(cell => {
@@ -1777,11 +1769,11 @@ function OptionsModal({ state, dispatch, onClose }:{ state: State; dispatch: Rea
                   <input
                     type="number"
                     min={4}
-                    max={typeof window !== 'undefined' && window.innerWidth < 768 ? 7 : 10}
+                    max={typeof window !== 'undefined' && window.innerWidth < 768 ? 5 : 10}
                     step={1}
                     value={state.config.rows}
                     onChange={e => {
-                      const maxRows = typeof window !== 'undefined' && window.innerWidth < 768 ? 7 : 10;
+                      const maxRows = typeof window !== 'undefined' && window.innerWidth < 768 ? 5 : 10;
                       const rows = Math.max(4, Math.min(maxRows, parseInt(e.target.value || '10', 10)));
                       dispatch({type: 'SET_SIZE', rows, cols: state.config.cols});
                     }}
@@ -1793,11 +1785,11 @@ function OptionsModal({ state, dispatch, onClose }:{ state: State; dispatch: Rea
                   <input
                     type="number"
                     min={4}
-                    max={typeof window !== 'undefined' && window.innerWidth < 768 ? 7 : 10}
+                    max={typeof window !== 'undefined' && window.innerWidth < 768 ? 5 : 10}
                     step={1}
                     value={state.config.cols}
                     onChange={e => {
-                      const maxCols = typeof window !== 'undefined' && window.innerWidth < 768 ? 7 : 10;
+                      const maxCols = typeof window !== 'undefined' && window.innerWidth < 768 ? 5 : 10;
                       const cols = Math.max(4, Math.min(maxCols, parseInt(e.target.value || '10', 10)));
                       dispatch({type: 'SET_SIZE', rows: state.config.rows, cols});
                     }}
