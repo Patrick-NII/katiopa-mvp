@@ -79,8 +79,7 @@ export async function GET(request: NextRequest) {
           select: {
             firstName: true,
             lastName: true,
-            sessionId: true,
-            emoji: true
+            sessionId: true
           }
         }
       }
@@ -93,7 +92,6 @@ export async function GET(request: NextRequest) {
         acc[childKey] = {
           childName: `${prompt.childSession.firstName} ${prompt.childSession.lastName}`,
           childSessionId: prompt.childSession.sessionId,
-          emoji: prompt.childSession.emoji,
           prompts: []
         }
       }

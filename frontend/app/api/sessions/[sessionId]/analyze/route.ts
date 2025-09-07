@@ -76,9 +76,9 @@ async function getSessionData(sessionId: string) {
     })
 
     // Récupérer les données CubeMatch
-    const cubeMatchScores = await prisma.CubeMatchScore.findMany({
-      where: { userId: sessionId },
-      orderBy: { createdAt: 'desc' },
+    const cubeMatchScores = await prisma.cubeMatchScore.findMany({
+      where: { user_id: sessionId },
+      orderBy: { created_at: 'desc' },
       take: 10
     })
 
@@ -93,12 +93,12 @@ async function getSessionData(sessionId: string) {
 
     return {
       child: {
-        name: `${childSession.account.firstName} ${childSession.account.lastName}`,
-        age: childSession.account.age || 8,
-        grade: childSession.account.grade || 'CE2'
+        name: `${childSession.firstName} ${childSession.lastName}`,
+        age: childSession.age || 8,
+        grade: childSession.grade || 'CE2'
       },
       activities: activities.map(activity => ({
-        title: activity.title,
+        title: activity.nodeKey,
         domain: activity.domain,
         score: activity.score,
         duration: activity.durationMs ? Math.round(activity.durationMs / 60000) : 0,
@@ -115,8 +115,8 @@ async function getSessionData(sessionId: string) {
         score: score.score,
         level: score.level,
         operator: score.operator,
-        accuracyRate: score.accuracyRate,
-        createdAt: score.createdAt
+        accuracyRate: score.accuracy_rate,
+        createdAt: score.created_at
       })),
       stats: {
         totalActivities: activities.length,

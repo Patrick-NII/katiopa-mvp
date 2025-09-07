@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérifier le cache pour cette analyse
-    const cachedAnalysis = getCachedBubixAnalysis(sessionId, analysisType);
+    const cachedAnalysis = getCachedBubixAnalysis<any>(sessionId, analysisType);
     if (cachedAnalysis) {
       console.log('✅ Analyse récupérée depuis le cache');
       return NextResponse.json({
@@ -113,6 +113,15 @@ export async function POST(request: NextRequest) {
           accountId: decoded.accountId,
           userType: 'CHILD',
           isActive: true
+        },
+        include: {
+          activities: true,
+          cubeMatchScores: true,
+          childActivities: true,
+          learningSessions: true,
+          performanceMetrics: true,
+          userInteractions: true,
+          navigationSessions: true
         }
       });
     }
@@ -127,15 +136,15 @@ export async function POST(request: NextRequest) {
     // Calculer les statistiques réelles (version robuste)
     const activities = child.activities || [];
     const cubeMatchScores = child.cubeMatchScores || [];
-    const childActivities = child.childActivities || [];
-    const learningSessions = child.learningSessions || [];
-    const performanceMetrics = child.performanceMetrics || [];
-    const userInteractions = child.userInteractions || [];
-    const navigationSessions = child.navigationSessions || [];
+    const childActivities = (child as any).childActivities || [];
+    const learningSessions = (child as any).learningSessions || [];
+    const performanceMetrics = (child as any).performanceMetrics || [];
+    const userInteractions = (child as any).userInteractions || [];
+    const navigationSessions = (child as any).navigationSessions || [];
     
     const totalActivities = activities.length + (childActivities?.length || 0);
-    const totalTime = activities.reduce((sum, activity) => sum + (activity.durationMs || 0), 0) +
-                     (childActivities?.reduce((sum, activity) => sum + (activity.duration || 0) * 60000, 0) || 0);
+    const totalTime = activities.reduce((sum: number, activity: any) => sum + (activity.durationMs || 0), 0) +
+                     (childActivities?.reduce((sum: number, activity: any) => sum + (activity.duration || 0) * 60000, 0) || 0);
 
     // Récupérer les conversations ChildPrompts récentes
     const childPrompts = await prisma.childPrompt.findMany({
@@ -159,7 +168,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Récupérer les rapports quotidiens et données de tracking (optionnel)
-    let dailyReportSessions = [];
+    let dailyReportSessions: any[] = [];
     try {
       dailyReportSessions = await prisma.dailyReportUserSession.findMany({
         where: {
@@ -185,7 +194,7 @@ export async function POST(request: NextRequest) {
         }
       });
     } catch (error) {
-      console.log('Rapports quotidiens non disponibles:', error.message);
+      console.log('Rapports quotidiens non disponibles:', (error as Error).message);
       dailyReportSessions = [];
     }
 
@@ -211,15 +220,15 @@ export async function POST(request: NextRequest) {
     };
     
     // Calculer le score moyen (séparer les activités et les scores CubeMatch)
-    const activityScores = activities.map(activity => activity.score).filter(Boolean);
-    const cubeMatchScoreValues = cubeMatchScores.map(score => score.score).filter(Boolean);
+    const activityScores = activities.map(activity => activity.score).filter((score): score is number => score !== null && score !== undefined);
+    const cubeMatchScoreValues = cubeMatchScores.map(score => score.score).filter((score): score is number => score !== null && score !== undefined);
     
     // Calculer les moyennes séparément
     const activityAverage = activityScores.length > 0 ? 
-      activityScores.reduce((sum, score) => sum + score, 0) / activityScores.length : 0;
+      activityScores.reduce((sum: number, score: number) => sum + score, 0) / activityScores.length : 0;
     
     const cubeMatchAverage = cubeMatchScoreValues.length > 0 ? 
-      cubeMatchScoreValues.reduce((sum, score) => sum + score, 0) / cubeMatchScoreValues.length : 0;
+      cubeMatchScoreValues.reduce((sum: number, score: number) => sum + score, 0) / cubeMatchScoreValues.length : 0;
     
     // Score moyen global (pondéré par le nombre d'activités)
     const totalActivitiesCount = activityScores.length + cubeMatchScoreValues.length;
@@ -288,23 +297,23 @@ export async function POST(request: NextRequest) {
       // Données CubeMatch détaillées
       cubeMatchAnalysis,
       // Nouvelles données enrichies
-      profile: child.profile ? {
-        learningGoals: child.profile.learningGoals || [],
-        preferredSubjects: child.profile.preferredSubjects || [],
-        learningStyle: child.profile.learningStyle || 'Non spécifié',
-        difficulty: child.profile.difficulty || 'Non spécifié',
-        interests: child.profile.interests || [],
-        specialNeeds: child.profile.specialNeeds || []
+      profile: (child as any).profile ? {
+        learningGoals: (child as any).profile.learningGoals || [],
+        preferredSubjects: (child as any).profile.preferredSubjects || [],
+        learningStyle: (child as any).profile.learningStyle || 'Non spécifié',
+        difficulty: (child as any).profile.difficulty || 'Non spécifié',
+        interests: (child as any).profile.interests || [],
+        specialNeeds: (child as any).profile.specialNeeds || []
       } : null,
-      parentPreferences: child.parentPreferences ? {
-        childStrengths: child.parentPreferences.childStrengths || [],
-        focusAreas: child.parentPreferences.focusAreas || [],
-        learningGoals: child.parentPreferences.learningGoals || [],
-        concerns: child.parentPreferences.concerns || [],
-        learningStyle: child.parentPreferences.learningStyle || 'Non spécifié',
-        motivationFactors: child.parentPreferences.motivationFactors || []
+      parentPreferences: (child as any).parentPreferences ? {
+        childStrengths: (child as any).parentPreferences.childStrengths || [],
+        focusAreas: (child as any).parentPreferences.focusAreas || [],
+        learningGoals: (child as any).parentPreferences.learningGoals || [],
+        concerns: (child as any).parentPreferences.concerns || [],
+        learningStyle: (child as any).parentPreferences.learningStyle || 'Non spécifié',
+        motivationFactors: (child as any).parentPreferences.motivationFactors || []
       } : null,
-      learningSessions: learningSessions.slice(0, 5).map(session => ({
+      learningSessions: learningSessions.slice(0, 5).map((session: any) => ({
         duration: session.duration,
         completionRate: session.completionRate,
         mood: session.mood,
@@ -312,23 +321,23 @@ export async function POST(request: NextRequest) {
         startTime: session.startTime,
         endTime: session.endTime
       })),
-      performanceMetrics: performanceMetrics.slice(0, 10).map(metric => ({
+      performanceMetrics: performanceMetrics.slice(0, 10).map((metric: any) => ({
         type: metric.metricType,
         value: metric.value,
         timestamp: metric.timestamp
       })),
-      userInteractions: userInteractions.slice(0, 10).map(interaction => ({
+      userInteractions: userInteractions.slice(0, 10).map((interaction: any) => ({
         type: interaction.interactionType,
         data: interaction.data,
         timestamp: interaction.timestamp
       })),
-      cubeMatchStats: child.cubeMatchUserStats ? {
-        totalGames: child.cubeMatchUserStats.totalGames,
-        bestScore: child.cubeMatchUserStats.bestScore,
-        averageScore: child.cubeMatchUserStats.averageScore,
-        highestLevel: child.cubeMatchUserStats.highestLevel,
-        favoriteOperator: child.cubeMatchUserStats.favoriteOperator,
-        totalTimePlayed: child.cubeMatchUserStats.totalTimePlayed
+      cubeMatchStats: (child as any).cubeMatchUserStats ? {
+        totalGames: (child as any).cubeMatchUserStats.totalGames,
+        bestScore: (child as any).cubeMatchUserStats.bestScore,
+        averageScore: (child as any).cubeMatchUserStats.averageScore,
+        highestLevel: (child as any).cubeMatchUserStats.highestLevel,
+        favoriteOperator: (child as any).cubeMatchUserStats.favoriteOperator,
+        totalTimePlayed: (child as any).cubeMatchUserStats.totalTimePlayed
       } : null,
       // Métriques comportementales avancées (optionnelles)
       behavioralMetrics: [],
@@ -339,21 +348,21 @@ export async function POST(request: NextRequest) {
       // Données des rapports quotidiens (optionnelles)
       dailyReports: dailyReportSessions.length > 0 ? {
         totalSessions: dailyReportSessions.length,
-        recentLearningEvents: dailyReportSessions[0]?.learningEvents?.slice(0, 5).map(event => ({
+        recentLearningEvents: dailyReportSessions[0]?.learningEvents?.slice(0, 5).map((event: any) => ({
           domain: event.domain,
           activity: event.activity,
           durationSec: event.durationSec,
           successRatio: event.successRatio,
           timestamp: event.ts
         })) || [],
-        recentQuizResults: dailyReportSessions[0]?.quizResults?.slice(0, 5).map(quiz => ({
+        recentQuizResults: dailyReportSessions[0]?.quizResults?.slice(0, 5).map((quiz: any) => ({
           module: quiz.module,
           score: quiz.score,
           attempts: quiz.attempts,
           timeSec: quiz.timeSec,
           timestamp: quiz.ts
         })) || [],
-        sessionStats: dailyReportSessions[0]?.sessionStats?.slice(0, 7).map(stat => ({
+        sessionStats: dailyReportSessions[0]?.sessionStats?.slice(0, 7).map((stat: any) => ({
           date: stat.date,
           totalTimeMin: stat.totalTimeMin,
           kpiAssiduite: stat.kpiAssiduite,
@@ -365,7 +374,7 @@ export async function POST(request: NextRequest) {
           consecutiveDays: stat.consecutiveDays,
           focusScore: stat.focusScore
         })) || [],
-        dailyReports: dailyReportSessions[0]?.dailyReports?.slice(0, 3).map(report => ({
+        dailyReports: dailyReportSessions[0]?.dailyReports?.slice(0, 3).map((report: any) => ({
           date: report.date,
           subject: report.subject,
           modelUsed: report.modelUsed,
@@ -427,13 +436,13 @@ export async function POST(request: NextRequest) {
     console.log('🤖 ÉTAPE 5: Traitement par l\'IA...');
     
     // Déterminer le style de communication pédagogique
-    const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'lowercase' });
+    const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
     const communicationStyle = getCommunicationStyle({
       currentModule: childData.domains.includes('math') ? 'MathCube' : 
                     childData.domains.includes('code') ? 'CodeCube' :
                     childData.domains.includes('science') ? 'ScienceCube' : 'PlayCube',
       dayOfWeek: currentDay,
-      childAge: childData.age,
+      childAge: childData.age || undefined,
       childPreferences: childData.conversationAnalysis.favoriteTopics ? Object.keys(childData.conversationAnalysis.favoriteTopics) : []
     });
     
@@ -525,11 +534,11 @@ ${childData.parentPreferences ? `
 - Facteurs de motivation : ${childData.parentPreferences.motivationFactors.length > 0 ? childData.parentPreferences.motivationFactors.join(', ') : 'Non spécifiés'}` : '- Préférences parentales non disponibles'}
 
 📊 SESSIONS D'APPRENTISSAGE DÉTAILLÉES :
-${childData.learningSessions.length > 0 ? childData.learningSessions.map((session, index) => `
+${childData.learningSessions.length > 0 ? childData.learningSessions.map((session: any, index: number) => `
   ${index + 1}. Durée: ${session.duration}min, Taux de completion: ${session.completionRate}%, Humeur: ${session.mood || 'Non spécifiée'}, Pauses: ${session.breaks}`).join('') : '  Aucune session d\'apprentissage détaillée'}
 
 🎯 MÉTRIQUES DE PERFORMANCE :
-${childData.performanceMetrics.length > 0 ? childData.performanceMetrics.slice(0, 5).map((metric, index) => `
+${childData.performanceMetrics.length > 0 ? childData.performanceMetrics.slice(0, 5).map((metric: any, index: number) => `
   ${index + 1}. ${metric.type}: ${metric.value} (${new Date(metric.timestamp).toLocaleDateString('fr-FR')})`).join('') : '  Aucune métrique de performance disponible'}
 
 🎮 STATISTIQUES CUBEMATCH DÉTAILLÉES :
@@ -542,22 +551,22 @@ ${childData.cubeMatchStats ? `
 - Temps total de jeu : ${Math.round(Number(childData.cubeMatchStats.totalTimePlayed) / (1000 * 60))} minutes` : '- Statistiques CubeMatch non disponibles'}
 
 🧠 MÉTRIQUES COMPORTEMENTALES AVANCÉES :
-${childData.behavioralMetrics.length > 0 ? childData.behavioralMetrics.slice(0, 5).map((metric, index) => `
+${childData.behavioralMetrics.length > 0 ? childData.behavioralMetrics.slice(0, 5).map((metric: any, index: number) => `
   ${index + 1}. ${metric.type}: ${metric.value} (${new Date(metric.recordedAt).toLocaleDateString('fr-FR')})`).join('') : '  Aucune métrique comportementale disponible'}
 
 📈 ANALYSES DE PERFORMANCE PRÉCÉDENTES :
-${childData.childPerformanceAnalysis.length > 0 ? childData.childPerformanceAnalysis.map((analysis, index) => `
+${childData.childPerformanceAnalysis.length > 0 ? childData.childPerformanceAnalysis.map((analysis: any, index: number) => `
   ${index + 1}. ${analysis.analysisType}: Niveau ${analysis.performanceLevel} (Confiance: ${analysis.confidence})`).join('') : '  Aucune analyse de performance précédente'}
 
 🎯 TRACKING D'UPGRADE ET INTERACTIONS :
 ${childData.upgradeTracking.length > 0 ? `
 - Événements d'upgrade : ${childData.upgradeTracking.length}
-- Derniers déclencheurs : ${childData.upgradeTracking.slice(0, 3).map(t => t.triggerType).join(', ')}` : '- Aucun tracking d\'upgrade'}
+- Derniers déclencheurs : ${childData.upgradeTracking.slice(0, 3).map((t: any) => t.triggerType).join(', ')}` : '- Aucun tracking d\'upgrade'}
 
 🎁 RÉCOMPENSES ET MOTIVATION :
 ${childData.rewardTracking.length > 0 ? `
 - Récompenses utilisées : ${childData.rewardTracking.length}
-- Types de récompenses : ${childData.rewardTracking.map(r => r.rewardType).join(', ')}` : '- Aucune récompense utilisée'}
+- Types de récompenses : ${childData.rewardTracking.map((r: any) => r.rewardType).join(', ')}` : '- Aucune récompense utilisée'}
 
 📊 RAPPORTS QUOTIDIENS ET KPIs :
 ${childData.dailyReports ? `
@@ -566,9 +575,9 @@ ${childData.dailyReports ? `
 - Résultats de quiz récents : ${childData.dailyReports.recentQuizResults.length}
 - Statistiques de session (7 derniers jours) : ${childData.dailyReports.sessionStats.length}
 - Rapports quotidiens envoyés : ${childData.dailyReports.dailyReports.length}
-- KPIs moyens : Assiduité ${childData.dailyReports.sessionStats.length > 0 ? (childData.dailyReports.sessionStats.reduce((sum, stat) => sum + stat.kpiAssiduite, 0) / childData.dailyReports.sessionStats.length).toFixed(1) : 'N/A'}, Compréhension ${childData.dailyReports.sessionStats.length > 0 ? (childData.dailyReports.sessionStats.reduce((sum, stat) => sum + stat.kpiComprehension, 0) / childData.dailyReports.sessionStats.length).toFixed(1) : 'N/A'}, Progression ${childData.dailyReports.sessionStats.length > 0 ? (childData.dailyReports.sessionStats.reduce((sum, stat) => sum + stat.kpiProgression, 0) / childData.dailyReports.sessionStats.length).toFixed(1) : 'N/A'}
-- Jours consécutifs max : ${childData.dailyReports.sessionStats.length > 0 ? Math.max(...childData.dailyReports.sessionStats.map(stat => stat.consecutiveDays)) : 'N/A'}
-- Score de focus moyen : ${childData.dailyReports.sessionStats.length > 0 ? (childData.dailyReports.sessionStats.reduce((sum, stat) => sum + stat.focusScore, 0) / childData.dailyReports.sessionStats.length).toFixed(1) : 'N/A'}` : '- Aucun rapport quotidien disponible'}
+- KPIs moyens : Assiduité ${childData.dailyReports.sessionStats.length > 0 ? (childData.dailyReports.sessionStats.reduce((sum: number, stat: any) => sum + stat.kpiAssiduite, 0) / childData.dailyReports.sessionStats.length).toFixed(1) : 'N/A'}, Compréhension ${childData.dailyReports.sessionStats.length > 0 ? (childData.dailyReports.sessionStats.reduce((sum: number, stat: any) => sum + stat.kpiComprehension, 0) / childData.dailyReports.sessionStats.length).toFixed(1) : 'N/A'}, Progression ${childData.dailyReports.sessionStats.length > 0 ? (childData.dailyReports.sessionStats.reduce((sum: number, stat: any) => sum + stat.kpiProgression, 0) / childData.dailyReports.sessionStats.length).toFixed(1) : 'N/A'}
+- Jours consécutifs max : ${childData.dailyReports.sessionStats.length > 0 ? Math.max(...childData.dailyReports.sessionStats.map((stat: any) => stat.consecutiveDays)) : 'N/A'}
+- Score de focus moyen : ${childData.dailyReports.sessionStats.length > 0 ? (childData.dailyReports.sessionStats.reduce((sum: number, stat: any) => sum + stat.focusScore, 0) / childData.dailyReports.sessionStats.length).toFixed(1) : 'N/A'}` : '- Aucun rapport quotidien disponible'}
 
 🔮 ANALYSES PRÉDICTIVES GÉNÉRÉES :
 - Tendance de performance : ${predictiveAnalyses.performanceTrend.prediction.trend} (Confiance: ${predictiveAnalyses.performanceTrend.prediction.confidence.toFixed(2)})

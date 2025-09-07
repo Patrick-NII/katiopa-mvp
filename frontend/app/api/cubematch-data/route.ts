@@ -47,9 +47,9 @@ async function getCubeMatchData(userId: string): Promise<any> {
     `;
 
     return {
-      globalStats: globalStats[0],
+      globalStats: (globalStats as any)[0],
       operatorStats,
-      hasData: globalStats[0].totalGames > 0
+      hasData: (globalStats as any)[0].totalGames > 0
     };
   } catch (error) {
     console.error('Erreur lors de la récupération des données CubeMatch:', error);

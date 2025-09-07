@@ -23,7 +23,6 @@ export async function POST(request: NextRequest) {
     
     console.log('🔍 Token depuis Authorization header:', authToken ? 'Oui' : 'Non')
     console.log('🔍 Authorization header complet:', authHeader)
-    console.log('🔍 Tous les headers disponibles:', Array.from(headersList.entries()))
     
     const finalToken = token || authToken
     console.log('🔍 Token final utilisé:', finalToken ? 'Oui' : 'Non')
@@ -35,8 +34,7 @@ export async function POST(request: NextRequest) {
         success: false, 
         message: 'Aucun token trouvé',
         tokenFromCookie: !!token,
-        tokenFromHeader: !!authToken,
-        allHeaders: Array.from(headersList.entries())
+        tokenFromHeader: !!authToken
       })
     }
 
@@ -86,7 +84,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ 
         success: false, 
         message: 'Erreur décodage token',
-        error: error.message
+        error: (error as Error).message
       })
     }
 
@@ -95,7 +93,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: false, 
       message: 'Erreur générale',
-      error: error.message
+      error: (error as Error).message
     })
   }
 }
