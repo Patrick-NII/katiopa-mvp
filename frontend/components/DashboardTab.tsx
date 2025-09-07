@@ -780,6 +780,16 @@ export default function DashboardTab({
                 Analyses Bubix
               </h4>
               
+              {/* Progression Bubix intégrée */}
+              {isProgressVisible && (
+                <BubixProgress
+                  isVisible={isProgressVisible}
+                  steps={progressSteps}
+                  currentStep={currentProgressStep}
+                  onComplete={() => setIsProgressVisible(false)}
+                />
+              )}
+              
               {/* Tableau des réponses Bubix */}
               {Object.keys(bubixResponses).length > 0 ? (
                 <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -916,15 +926,6 @@ export default function DashboardTab({
         />
       )}
 
-      {/* Progression Bubix */}
-      {isProgressVisible && (
-        <BubixProgress
-          isVisible={isProgressVisible}
-          steps={progressSteps}
-          currentStep={currentProgressStep}
-          onComplete={() => setIsProgressVisible(false)}
-        />
-      )}
 
       {/* Popup de limitation */}
       <LimitationPopup
