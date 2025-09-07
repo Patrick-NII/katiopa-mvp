@@ -529,50 +529,44 @@ export default function SidebarNavigation({
 
   return (
     <>
-      {/* Menu hamburger pour mobile avec breakpoints étendus */}
+      {/* Menu hamburger pour mobile - design amélioré */}
       {isMobile && (
         <button
           onClick={toggleCollapsed}
-          className={`fixed top-4 left-4 z-50 p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 ${
-            typeof window !== 'undefined' && window.innerWidth < 480 ? 'p-1.5' : 'p-2'
-          }`}
+          className="fixed top-4 left-4 z-50 p-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 hover:shadow-2xl transition-all duration-300 hover:scale-105"
           aria-label="Menu"
         >
-          <div className={`flex flex-col justify-center items-center ${
-            typeof window !== 'undefined' && window.innerWidth < 480 ? 'w-5 h-5' : 'w-6 h-6'
-          }`}>
-            <div className={`bg-gray-600 dark:bg-gray-300 rounded-full transition-all duration-300 ${
+          <div className="w-6 h-6 flex flex-col justify-center items-center">
+            <div className={`bg-gradient-to-r from-blue-600 to-purple-600 rounded-full transition-all duration-300 ${
               !collapsed ? 'rotate-45 translate-y-1.5' : ''
-            } ${
-              typeof window !== 'undefined' && window.innerWidth < 480 ? 'w-4 h-0.5' : 'w-5 h-1'
-            }`}></div>
-            <div className={`bg-gray-600 dark:bg-gray-300 rounded-full transition-all duration-300 mt-1 ${
+            } w-5 h-1`}></div>
+            <div className={`bg-gradient-to-r from-blue-600 to-purple-600 rounded-full transition-all duration-300 mt-1 ${
               !collapsed ? 'opacity-0' : ''
-            } ${
-              typeof window !== 'undefined' && window.innerWidth < 480 ? 'w-4 h-0.5' : 'w-5 h-1'
-            }`}></div>
-            <div className={`bg-gray-600 dark:bg-gray-300 rounded-full transition-all duration-300 mt-1 ${
+            } w-5 h-1`}></div>
+            <div className={`bg-gradient-to-r from-blue-600 to-purple-600 rounded-full transition-all duration-300 mt-1 ${
               !collapsed ? '-rotate-45 -translate-y-1.5' : ''
-            } ${
-              typeof window !== 'undefined' && window.innerWidth < 480 ? 'w-4 h-0.5' : 'w-5 h-1'
-            }`}></div>
+            } w-5 h-1`}></div>
           </div>
         </button>
       )}
 
-      {/* Overlay sombre pour mobile */}
+      {/* Overlay moderne pour mobile */}
       {isMobile && !collapsed && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
           onClick={toggleCollapsed}
         />
       )}
 
       {/* Sidebar */}
       <motion.div 
-        className={`fixed left-0 top-0 h-screen bg-white dark:bg-gray-900 shadow-2xl z-50 flex flex-col overflow-hidden ${
+        className={`fixed left-0 top-0 h-screen bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl z-50 flex flex-col overflow-hidden ${
           isMobile && collapsed ? 'w-0' : ''
-        }`}
+        } ${isMobile ? 'border-r border-gray-200/50 dark:border-gray-700/50' : ''}`}
         initial={{ 
           width: getSidebarWidth(),
           x: isMobile && collapsed ? -getSidebarWidth() : 0
@@ -581,12 +575,12 @@ export default function SidebarNavigation({
           width: getSidebarWidth(),
           x: isMobile && collapsed ? -getSidebarWidth() : 0
         }}
-        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
       >
-      {/* En-tête de la sidebar — branding unifié */}
-      <div className={`relative h-16 ${getSidebarPadding()} pr-10 border-b border-gray-200 dark:border-gray-700 flex items-center`}>
+      {/* En-tête de la sidebar — branding unifié avec design mobile amélioré */}
+      <div className={`relative ${isMobile ? 'h-20' : 'h-16'} ${getSidebarPadding()} ${isMobile ? 'pr-16' : 'pr-10'} border-b border-gray-200/50 dark:border-gray-700/50 flex items-center bg-gradient-to-r from-white/50 to-gray-50/50 dark:from-gray-900/50 dark:to-gray-800/50`}>
         <div className="flex items-center gap-3 w-full">
-          <div className={`${getLogoSize()} bg-gradient-to-r ${colors.gradient} rounded-lg flex items-center justify-center shadow-lg flex-shrink-0`}>
+          <div className={`${getLogoSize()} bg-gradient-to-r ${colors.gradient} rounded-xl flex items-center justify-center shadow-lg flex-shrink-0 ${isMobile ? 'ring-2 ring-white/20' : ''}`}>
             <span className="font-title text-white text-2xl leading-none">C</span>
           </div>
           {!collapsed && (
@@ -611,16 +605,16 @@ export default function SidebarNavigation({
         {/* Indicateur de type de compte (désactivé ici pour stabilité de layout) */}
       </div>
 
-      {/* Navigation des onglets - verticale */}
-      <div className="flex-1 py-4">
-        <nav className={`space-y-3 ${getSidebarPadding()}`}>
+      {/* Navigation des onglets - verticale avec design mobile amélioré */}
+      <div className={`flex-1 ${isMobile ? 'py-6' : 'py-4'} overflow-y-auto ${isMobile ? 'scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent' : ''}`}>
+        <nav className={`${isMobile ? 'space-y-4' : 'space-y-3'} ${getSidebarPadding()}`}>
           {tabs.map((tab) => (
             tab.available && (
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
                 className={`
-                  group relative w-full flex items-center gap-3 px-2 py-1 rounded-lg text-sm font-semibold
+                  group relative w-full flex items-center gap-3 ${isMobile ? 'px-4 py-3' : 'px-2 py-1'} ${isMobile ? 'rounded-xl' : 'rounded-lg'} text-sm font-semibold transition-all duration-200
                   ${activeTab === tab.id
                     ? tab.id === 'bubix'
                       ? 'bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 text-blue-50 shadow-lg animate-metallic'
@@ -629,6 +623,7 @@ export default function SidebarNavigation({
                       ? 'text-blue-600 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 dark:text-blue-400 dark:bg-gray-800 dark:hover:bg-gray-700'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }
+                  ${isMobile ? 'hover:scale-105 hover:shadow-md' : ''}
                 `}
                 title={tab.label}
                 aria-label={tab.label}
@@ -641,11 +636,11 @@ export default function SidebarNavigation({
                     : tab.id === 'bubix'
                       ? 'bg-gradient-to-r from-blue-400 to-indigo-400 text-blue-50 shadow-lg dark:bg-gray-700 dark:text-blue-400'
                       : 'bg-gray-10 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                } w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0`}>
+                } ${isMobile ? 'w-12 h-12' : 'w-9 h-9'} ${isMobile ? 'rounded-xl' : 'rounded-lg'} flex items-center justify-center flex-shrink-0 ${isMobile ? 'shadow-md' : ''}`}>
                   {tab.icon === Cube3DIcon ? (
-                    <Cube3DIcon size={getIconSize()} colors={colors} />
+                    <Cube3DIcon size={isMobile ? getIconSize() + 4 : getIconSize()} colors={colors} />
                   ) : (
-                    <tab.icon size={getIconSize()} />
+                    <tab.icon size={isMobile ? getIconSize() + 4 : getIconSize()} />
                   )}
                 </div>
                 {!collapsed && (
@@ -682,11 +677,11 @@ export default function SidebarNavigation({
         </nav>
       </div>
 
-      {/* En-tête utilisateur */}
+      {/* En-tête utilisateur avec design mobile amélioré */}
       {!isLoading && user && (
-        <div className={`${collapsed ? 'px-2' : getSidebarPadding()} py-4 border-t border-gray-200 dark:border-gray-700`}>
+        <div className={`${collapsed ? 'px-2' : getSidebarPadding()} ${isMobile ? 'py-6' : 'py-4'} border-t border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-gray-50/50 to-white/50 dark:from-gray-800/50 dark:to-gray-900/50`}>
           <motion.div
-            className={`${collapsed ? 'flex justify-center' : 'flex items-center space-x-3'} p-3`}
+            className={`${collapsed ? 'flex justify-center' : 'flex items-center space-x-3'} ${isMobile ? 'p-4' : 'p-3'} ${isMobile ? 'rounded-xl' : 'rounded-lg'} ${isMobile ? 'bg-white/80 dark:bg-gray-800/80' : ''} ${isMobile ? 'shadow-md' : ''}`}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.3 }}
@@ -696,10 +691,10 @@ export default function SidebarNavigation({
               <img
                 src={selectedAvatar || user.avatarPath || getDefaultAvatar(user.userType)}
                 alt={`Avatar de ${user.firstName}`}
-                className={`${getAvatarSize()} rounded-full object-cover border-2 border-white shadow-md`}
+                className={`${isMobile ? 'w-16 h-16' : getAvatarSize()} rounded-full object-cover ${isMobile ? 'border-4 border-white/80' : 'border-2 border-white'} ${isMobile ? 'shadow-xl' : 'shadow-md'}`}
               />
               {/* Indicateur de statut en ligne */}
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+              <div className={`absolute -bottom-1 -right-1 ${isMobile ? 'w-5 h-5' : 'w-4 h-4'} bg-green-500 rounded-full ${isMobile ? 'border-3 border-white' : 'border-2 border-white'} ${isMobile ? 'shadow-lg' : ''}`}></div>
             </div>
 
             {/* Informations utilisateur - visible seulement en mode expanded */}
@@ -722,8 +717,8 @@ export default function SidebarNavigation({
         </div>
       )}
 
-      {/* Bouton de basculement du thème */}
-      <div className={`${getSidebarPadding()} py-2 border-t border-gray-200 dark:border-gray-700`}>
+      {/* Bouton de basculement du thème avec design mobile amélioré */}
+      <div className={`${getSidebarPadding()} ${isMobile ? 'py-4' : 'py-2'} border-t border-gray-200/50 dark:border-gray-700/50`}>
         <button
           onClick={() => {
             if (theme === 'light') {
@@ -735,8 +730,9 @@ export default function SidebarNavigation({
             }
           }}
           className={`
-            group relative w-full flex items-center gap-3 px-3 py-3
-            rounded-lg text-sm font-semibold bg-gray-50 hover:bg-gray-100 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition
+            group relative w-full flex items-center gap-3 ${isMobile ? 'px-4 py-3' : 'px-3 py-3'}
+            ${isMobile ? 'rounded-xl' : 'rounded-lg'} text-sm font-semibold bg-gray-50 hover:bg-gray-100 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-all duration-200
+            ${isMobile ? 'hover:scale-105 hover:shadow-md' : ''}
           `}
           title={`Thème actuel: ${theme === 'light' ? 'Clair' : theme === 'dark' ? 'Sombre' : 'Auto'}`}
         >
@@ -761,13 +757,14 @@ export default function SidebarNavigation({
         </button>
       </div>
 
-      {/* Actions rapides: Accueil + Déconnexion */}
-      <div className={`${getSidebarPadding()} pb-3 space-y-2`}>
+      {/* Actions rapides: Accueil + Déconnexion avec design mobile amélioré */}
+      <div className={`${getSidebarPadding()} ${isMobile ? 'pb-6' : 'pb-3'} ${isMobile ? 'space-y-3' : 'space-y-2'}`}>
         <button
           onClick={() => router.push('/')}
           className={`
-            group relative w-full flex items-center gap-3 px-3 py-3
-            rounded-lg text-sm font-semibold bg-white-100 hover:bg-gray-200 text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition
+            group relative w-full flex items-center gap-3 ${isMobile ? 'px-4 py-3' : 'px-3 py-3'}
+            ${isMobile ? 'rounded-xl' : 'rounded-lg'} text-sm font-semibold bg-white-100 hover:bg-gray-200 text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-all duration-200
+            ${isMobile ? 'hover:scale-105 hover:shadow-md' : ''}
           `}
           title="Accueil"
           aria-label=""
@@ -788,8 +785,9 @@ export default function SidebarNavigation({
         <button
           onClick={async () => { try { await (await import('@/lib/api')).authAPI.logout(); router.push('/login'); } catch (e) {} }}
           className={`
-            group relative w-full flex items-center gap-3 px-3 py-3
-            rounded-lg text-sm font-semibold bg-white-50 hover:bg-red-100 text-red-300 dark:bg-gray-800 dark:hover:bg-red-900/20 dark:text-red-400 transition
+            group relative w-full flex items-center gap-3 ${isMobile ? 'px-4 py-3' : 'px-3 py-3'}
+            ${isMobile ? 'rounded-xl' : 'rounded-lg'} text-sm font-semibold bg-white-50 hover:bg-red-100 text-red-300 dark:bg-gray-800 dark:hover:bg-red-900/20 dark:text-red-400 transition-all duration-200
+            ${isMobile ? 'hover:scale-105 hover:shadow-md' : ''}
           `}
           title="Déconnexion"
           aria-label=""
@@ -809,8 +807,8 @@ export default function SidebarNavigation({
         </button>
       </div>
 
-      {/* Footer de la sidebar */}
-      <div className={`${getSidebarPadding()} py-3 border-t border-gray-200 dark:border-gray-700`}>
+      {/* Footer de la sidebar avec design mobile amélioré */}
+      <div className={`${getSidebarPadding()} ${isMobile ? 'py-4' : 'py-3'} border-t border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-gray-50/30 to-white/30 dark:from-gray-800/30 dark:to-gray-900/30`}>
         {!collapsed && (
           <div className="text-xs text-gray-700 dark:text-gray-300 text-center font-medium hidden md:block">
             <p>Version 1.0.0</p>
