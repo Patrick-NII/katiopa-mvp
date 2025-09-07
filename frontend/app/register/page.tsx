@@ -32,7 +32,7 @@ interface RegistrationData {
   lastName: string
   password: string
   confirmPassword: string
-  subscriptionType: 'STARTER' | 'PRO' | 'PREMIUM'
+  subscriptionType: 'DECOUVERTE' | 'EXPLORATEUR' | 'MAITRE'
   familyMembers: FamilyMember[]
   acceptTerms: boolean
 
@@ -61,9 +61,9 @@ interface RegistrationData {
 }
 
 const PLAN_PRICES: Record<RegistrationData['subscriptionType'], number> = {
-  STARTER: 4.99,
-  PRO: 29.99,
-  PREMIUM: 59.99
+  DECOUVERTE: 4.99,
+  EXPLORATEUR: 29.99,
+  MAITRE: 59.99
 }
 
 function formatPrice(n: number) {
@@ -112,7 +112,7 @@ export default function RegisterPage() {
     lastName: '',
     password: '',
     confirmPassword: '',
-    subscriptionType: 'STARTER',
+    subscriptionType: 'DECOUVERTE',
     familyMembers: [
       {
         firstName: '',
@@ -138,7 +138,7 @@ export default function RegisterPage() {
   /* --------------------------------- PLANS --------------------------------- */
   const subscriptionPlans = [
     {
-      id: 'STARTER',
+      id: 'DECOUVERTE',
       name: 'Découverte',
       price: '4,99€',
       period: '/mois',
@@ -165,7 +165,7 @@ export default function RegisterPage() {
       cta: 'Choisir Découverte'
     },
     {
-      id: 'PRO',
+      id: 'EXPLORATEUR',
       name: 'Explorateur',
       price: '29,99€',
       period: '/mois',
@@ -194,7 +194,7 @@ export default function RegisterPage() {
       cta: 'Choisir Explorateur'
     },
     {
-      id: 'PREMIUM',
+      id: 'MAITRE',
       name: 'Maître',
       price: '59,99€',
       period: '/mois',
@@ -391,10 +391,35 @@ export default function RegisterPage() {
       setError('Veuillez sélectionner une méthode de paiement')
       return false
     }
-    if (formData.selectedPaymentMethod !== 'applepay' && !formData.paymentMethodId) {
-      setError('Veuillez renseigner vos informations de paiement')
-      return false
+
+    // Validation spécifique selon la méthode de paiement
+    switch (formData.selectedPaymentMethod) {
+      case 'card':
+        if (!formData.payCard?.name || !formData.payCard?.number || !formData.payCard?.expMonth || !formData.payCard?.expYear || !formData.payCard?.cvc) {
+          setError('Veuillez renseigner toutes les informations de votre carte')
+          return false
+        }
+        break
+      case 'sepa':
+        if (!formData.paySEPA?.name || !formData.paySEPA?.iban) {
+          setError('Veuillez renseigner le nom du titulaire et l\'IBAN')
+          return false
+        }
+        break
+      case 'paypal':
+        if (!formData.payPaypal?.email) {
+          setError('Veuillez renseigner votre email PayPal')
+          return false
+        }
+        break
+      case 'applepay':
+        // Apple Pay ne nécessite pas de validation supplémentaire
+        break
+      default:
+        setError('Méthode de paiement non reconnue')
+        return false
     }
+
     return true
   }
 
@@ -506,9 +531,7 @@ export default function RegisterPage() {
         lastName: formData.lastName,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
-        subscriptionType:
-          formData.subscriptionType === 'STARTER' ? 'FREE' :
-                         formData.subscriptionType === 'PRO' ? 'PRO' : 'PRO_PLUS',
+        subscriptionType: formData.subscriptionType,
         familyMembers: updatedFamilyMembers.map((member, index) => ({
           firstName: member.firstName,
           lastName: member.lastName,

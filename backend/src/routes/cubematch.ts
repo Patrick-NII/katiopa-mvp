@@ -216,20 +216,29 @@ router.post('/scores', requireAuth, async (req, res) => {
 
     const username = `${user.firstName} ${user.lastName}`;
 
-    // Sauvegarder le score
-    await prisma.$executeRaw`
-      INSERT INTO cubematch_scores (
-        user_id, username, score, level, time_played_ms, 
-        operator, target, allow_diagonals, grid_size_rows, grid_size_cols,
-        max_size, spawn_rate_min, spawn_rate_max, tick_ms, combo_max,
-        cells_cleared, hints_used, game_duration_seconds
-      ) VALUES (
-        ${req.user!.userId}, ${username}, ${score}, ${level}, ${timePlayedMs},
-        ${operator}, ${target}, ${allowDiagonals}, ${gridSizeRows}, ${gridSizeCols},
-        ${maxSize}, ${spawnRateMin}, ${spawnRateMax}, ${tickMs}, ${comboMax},
-        ${cellsCleared}, ${hintsUsed}, ${gameDurationSeconds}
-      )
-    `;
+    // Sauvegarder le score avec Prisma ORM
+    const newScore = await prisma.cubeMatchScore.create({
+      data: {
+        user_id: req.user!.userId,
+        username: username,
+        score: score,
+        level: level,
+        time_played_ms: BigInt(timePlayedMs),
+        operator: operator,
+        target: target,
+        allow_diagonals: allowDiagonals,
+        grid_size_rows: gridSizeRows,
+        grid_size_cols: gridSizeCols,
+        max_size: maxSize,
+        spawn_rate_min: spawnRateMin,
+        spawn_rate_max: spawnRateMax,
+        tick_ms: tickMs,
+        combo_max: comboMax,
+        cells_cleared: cellsCleared,
+        hints_used: hintsUsed,
+        game_duration_seconds: gameDurationSeconds
+      }
+    });
 
     res.status(201).json({ success: true, message: 'Score sauvegardé' });
   } catch (error) {
@@ -242,29 +251,48 @@ router.post('/scores', requireAuth, async (req, res) => {
 router.get('/user-scores', requireAuth, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit as string) || 10;
-    const scores = await prisma.$queryRaw`
-      SELECT 
-        cs.id,
-        cs.user_id as "userId",
-        cs.username,
-        cs.score,
-        cs.level,
-        cs.time_played_ms as "timePlayedMs",
-        cs.operator,
-        cs.target,
-        cs.allow_diagonals as "allowDiagonals",
-        cs.combo_max as "comboMax",
-        cs.cells_cleared as "cellsCleared",
-        cs.hints_used as "hintsUsed",
-        cs.game_duration_seconds as "gameDurationSeconds",
-        cs.created_at as "createdAt"
-      FROM cubematch_scores cs
-      WHERE cs.user_id = ${req.user!.userId}
-      ORDER BY cs.score DESC, cs.created_at DESC
-      LIMIT ${limit}
-    `;
-    
-    res.json(scores);
+    const scores = await prisma.cubeMatchScore.findMany({
+      where: {
+        user_id: req.user!.userId
+      },
+      orderBy: {
+        created_at: 'desc'
+      },
+      take: limit,
+      select: {
+        id: true,
+        user_id: true,
+        username: true,
+        score: true,
+        level: true,
+        time_played_ms: true,
+        operator: true,
+        target: true,
+        allow_diagonals: true,
+        combo_max: true,
+        cells_cleared: true,
+        hints_used: true,
+        game_duration_seconds: true,
+        created_at: true
+      }
+    });
+
+    res.json(scores.map(score => ({
+      id: score.id,
+      userId: score.user_id,
+      username: score.username,
+      score: score.score,
+      level: score.level,
+      timePlayedMs: Number(score.time_played_ms),
+      operator: score.operator,
+      target: score.target,
+      allowDiagonals: score.allow_diagonals,
+      comboMax: score.combo_max,
+      cellsCleared: score.cells_cleared,
+      hintsUsed: score.hints_used,
+      gameDurationSeconds: score.game_duration_seconds,
+      createdAt: score.created_at
+    })));
   } catch (error) {
     console.error('Erreur lors de la récupération des scores utilisateur:', error);
     res.status(500).json({ error: 'Erreur serveur' });
