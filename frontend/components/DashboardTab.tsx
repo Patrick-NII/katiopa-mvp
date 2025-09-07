@@ -814,7 +814,7 @@ export default function DashboardTab({
                           <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aperçu
                           </th>
-                          <th className="w-16 px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="w-20 px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Actions
                           </th>
                         </tr>
@@ -856,11 +856,11 @@ export default function DashboardTab({
                                       ...response,
                                       childName
                                     })}
-                                    className="inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors"
+                                    className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors"
                                     title="Lire l'analyse complète"
                                   >
-                                    <BookOpen className="w-3 h-3" />
-                                    <span className="hidden sm:inline">Lire</span>
+                                    <BookOpen className="w-4 h-4" />
+                                    <span>Lire</span>
                                   </button>
                                 </td>
                               </tr>
