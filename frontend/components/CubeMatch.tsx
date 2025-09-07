@@ -157,6 +157,7 @@ type Action =
   | { type: 'LEVEL_UP' }
   | { type: 'RESTART' }
   | { type: 'END_GAME' }
+  | { type: 'CLOSE_GAME_OVER' }
   | { type: 'RESUME' }
   | { type: 'TICK_TIME'; delta: number }
   | { type: 'TOGGLE_SOUND' }
@@ -634,6 +635,9 @@ function reducer(state: State, action: Action): State {
     case 'END_GAME':
       return { ...state, gameOver: true, running: false };
 
+    case 'CLOSE_GAME_OVER':
+      return { ...state, gameOver: false };
+
     case 'RESUME':
       return { ...state, paused: false, running: true };
 
@@ -844,7 +848,7 @@ export default function CubeMatch() {
     
     const interval = setInterval(async () => {
       try {
-        console.log('🔄 Sauvegarde périodique du score:', state.score);
+        console.log('Sauvegarde périodique du score:', state.score);
         await cubematchAPI.saveScore({
           score: state.score,
           level: state.level,
@@ -982,7 +986,7 @@ export default function CubeMatch() {
       if (document.hidden && state.running && !state.gameOver && state.score > 0) {
         // Sauvegarder quand la page devient cachée (changement d'onglet, etc.)
         try {
-          console.log('👁️ Sauvegarde lors du changement de visibilité:', state.score);
+          console.log(' Sauvegarde lors du changement de visibilité:', state.score);
           await cubematchAPI.saveScore({
             score: state.score,
             level: state.level,
@@ -1062,7 +1066,7 @@ export default function CubeMatch() {
     const timeRemaining = maxGameTime - state.timePlayedMs;
     
     if (timeRemaining <= 0) {
-      console.log('⏰ Temps de jeu maximum atteint - Fin de partie automatique');
+      console.log(' Temps de jeu maximum atteint - Fin de partie automatique');
       dispatch({ type: 'END_GAME' });
       return;
     }
@@ -1074,7 +1078,7 @@ export default function CubeMatch() {
     
     const timer = setTimeout(() => {
       if (state.running && !state.gameOver && !state.paused) {
-        console.log('⏰ Temps de jeu maximum atteint - Fin de partie automatique');
+        console.log('Temps de jeu maximum atteint - Fin de partie automatique');
         dispatch({ type: 'END_GAME' });
       }
     }, timeRemaining);
@@ -1315,12 +1319,20 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
               <div className="text-3xl font-bold text-indigo-600 mb-2">{state.score}</div>
               <div className="text-gray-600">Score final • Niveau {state.level}</div>
             </div>
-            <button
-              className="w-full px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg"
-              onClick={() => dispatch({ type: 'RESTART' })}
-            >
-              Nouvelle partie
-            </button>
+            <div className="space-y-3">
+              <button
+                className="w-full px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg"
+                onClick={() => dispatch({ type: 'RESTART' })}
+              >
+                Nouvelle partie
+              </button>
+              <button
+                className="w-full px-6 py-3 bg-gray-500 text-white rounded-xl font-semibold hover:bg-gray-600 transition-all duration-200 shadow-lg"
+                onClick={() => dispatch({ type: 'CLOSE_GAME_OVER' })}
+              >
+                Terminer
+              </button>
+            </div>
           </div>
         </div>
       )}
