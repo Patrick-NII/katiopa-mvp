@@ -311,7 +311,7 @@ export default function DashboardTab({
   // Fonction pour récupérer les statistiques CubeMatch d'un enfant
   const fetchCubeMatchStats = async (childId: string) => {
     try {
-      const response = await fetch(`/api/cubematch/user-stats?userId=${childId}`, {
+      const response = await fetch(`/api/cubematch/stats?childId=${childId}`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -328,7 +328,7 @@ export default function DashboardTab({
   // Fonction pour récupérer les scores CubeMatch récents d'un enfant
   const fetchCubeMatchScores = async (childId: string, limit: number = 5) => {
     try {
-      const response = await fetch(`/api/cubematch/scores?userId=${childId}&limit=${limit}`, {
+      const response = await fetch(`/api/cubematch/scores?childId=${childId}&limit=${limit}`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -1095,181 +1095,129 @@ export default function DashboardTab({
                 {expandedSessions.has(session.sessionId) && (
                   <div className="p-4 bg-white">
                     {/* Données CubeMatch */}
-                    {/* Statistiques Réelles de la Base de Données */}
-                    <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
+                    <div className="mb-6">
                       <h5 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                        <BarChart3 className="w-4 h-4 text-green-600" />
+                        <Gamepad2 className="w-4 h-4 text-blue-600" />
                         Données de jeux CubeMatch
                       </h5>
                       
-                      {/* Informations de Session */}
-                      <div className="mb-4 p-3 bg-white rounded-lg border border-gray-200">
-                        <h6 className="text-xs font-semibold text-gray-700 mb-2">Informations de Session</h6>
-                        <div className="grid grid-cols-2 gap-3 text-xs">
-                          
-                          <div>
-                            <span className="text-gray-500">Session ID:</span>
-                            <span className="ml-2 font-mono text-gray-800">{session.sessionId}</span>
+                      {cubeMatchData[session.sessionId] ? (
+                        <div className="space-y-4">
+                          {/* Informations de Session */}
+                          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3 border border-blue-200">
+                            <div className="grid grid-cols-2 gap-4 text-xs">
+                              <div>
+                                <span className="font-medium text-gray-700">Session ID:</span>
+                                <span className="ml-2 text-gray-900 font-mono">{session.sessionId}</span>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-700">Nom:</span>
+                                <span className="ml-2 text-gray-900">{session.name}</span>
+                              </div>
+                            </div>
                           </div>
-                          <div>
-                            <span className="text-gray-500">Nom:</span>
-                            <span className="ml-2 text-gray-800">{session.name}</span>
-                          </div>
-                        </div>
-                    </div>
 
-                      {/* Statistiques CubeMatch Réelles */}
-                      {cubeMatchData[session.sessionId] && cubeMatchData[session.sessionId].stats ? (
-                        <div className="mb-4 p-3 bg-white rounded-lg border border-gray-200">
-                          <h6 className="text-xs font-semibold text-gray-700 mb-2">Statistiques CubeMatch</h6>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <div className="text-center p-2 bg-blue-50 rounded">
-                              <div className="text-lg font-bold text-blue-800">
-                                {cubeMatchData[session.sessionId].stats.bestScore || 0}
+                          {/* Statistiques individuelles */}
+                          {cubeMatchData[session.sessionId].stats && (
+                            <div className="bg-white rounded-lg p-4 border border-gray-200">
+                              <h6 className="text-xs font-semibold text-gray-700 mb-3">Statistiques Personnelles</h6>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                                <div className="text-center">
+                                  <div className="font-bold text-blue-600">{cubeMatchData[session.sessionId].stats.totalGames}</div>
+                                  <div className="text-gray-500">Parties</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="font-bold text-green-600">{cubeMatchData[session.sessionId].stats.bestScore?.toLocaleString()}</div>
+                                  <div className="text-gray-500">Meilleur Score</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="font-bold text-purple-600">{Math.round(cubeMatchData[session.sessionId].stats.averageScore || 0)}</div>
+                                  <div className="text-gray-500">Score Moyen</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="font-bold text-orange-600">{cubeMatchData[session.sessionId].stats.highestLevel || 1}</div>
+                                  <div className="text-gray-500">Niveau Max</div>
+                                </div>
                               </div>
-                              <div className="text-xs text-blue-600">Meilleur score</div>
                             </div>
-                            <div className="text-center p-2 bg-purple-50 rounded">
-                              <div className="text-lg font-bold text-purple-800">
-                                {cubeMatchData[session.sessionId].stats.totalGames || 0}
+                          )}
+
+                          {/* Classement Global */}
+                          <div className="bg-white rounded-lg border border-gray-200">
+                            <div className="p-3 border-b border-gray-200">
+                              <h6 className="text-xs font-semibold text-gray-700">Classement Global</h6>
+                            </div>
+                            
+                            {top10Players.length > 0 ? (
+                              <div className="p-3">
+                                {/* En-têtes du tableau */}
+                                <div className="grid grid-cols-4 gap-2 text-xs font-semibold text-gray-600 mb-2 pb-2 border-b border-gray-100">
+                                  <div className="text-center">Rang</div>
+                                  <div className="text-center">Session</div>
+                                  <div className="text-center">Score</div>
+                                  <div className="text-center">Niveau</div>
+                                </div>
+                                
+                                {/* Liste des joueurs - Top 10 seulement */}
+                                <div className="space-y-0.5">
+                                  {top10Players.slice(0, 10).map((player, index) => (
+                                    <div key={player.userId} className={`grid grid-cols-4 gap-2 items-center py-1.5 px-2 rounded text-xs ${
+                                      index < 3 
+                                        ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200' 
+                                        : 'bg-gray-50 hover:bg-gray-100'
+                                    }`}>
+                                      {/* Rang */}
+                                      <div className="text-center">
+                                        {index < 3 ? (
+                                          <div className="flex items-center justify-center">
+                                            {index === 0 && <span className="text-yellow-500 text-sm">🥇</span>}
+                                            {index === 1 && <span className="text-gray-400 text-sm">🥈</span>}
+                                            {index === 2 && <span className="text-orange-600 text-sm">🥉</span>}
+                                          </div>
+                                        ) : (
+                                          <span className="font-semibold text-gray-700 text-xs">#{index + 1}</span>
+                                        )}
+                                      </div>
+                                      
+                                      {/* Session ID */}
+                                      <div className="text-center">
+                                        <div className="font-mono text-gray-800 text-xs truncate">
+                                          {player.sessionId || player.userId.slice(-6)}
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Score */}
+                                      <div className="text-center">
+                                        <div className="font-bold text-gray-900 text-xs">
+                                          {player.score.toLocaleString()}
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Niveau */}
+                                      <div className="text-center">
+                                        <div className="font-semibold text-gray-700 text-xs">
+                                          {player.level || 1}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
-                              <div className="text-xs text-purple-600">Parties jouées</div>
-                            </div>
-                            <div className="text-center p-2 bg-green-50 rounded">
-                              <div className="text-lg font-bold text-green-800">
-                                {cubeMatchData[session.sessionId].stats.highestLevel || 0}
+                            ) : (
+                              <div className="p-4 text-center text-gray-500 text-xs">
+                                Chargement du classement...
                               </div>
-                              <div className="text-xs text-green-600">Niveau max</div>
-                            </div>
-                            <div className="text-center p-2 bg-orange-50 rounded">
-                              <div className="text-lg font-bold text-orange-800">
-                                {cubeMatchData[session.sessionId].stats.favoriteOperator || 'N/A'}
-                              </div>
-                              <div className="text-xs text-orange-600">Opérateur préféré</div>
-                            </div>
+                            )}
                           </div>
                         </div>
                       ) : (
-                        <div className="mb-4 p-3 bg-white rounded-lg border border-gray-200">
-                          <div className="text-center text-gray-500 text-sm">
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                          <div className="text-green-700 text-sm">
                             Aucune donnée CubeMatch disponible pour cette session
                           </div>
-                        </div>
-                      )}
-
-                      {/* Scores Récents */}
-                      {cubeMatchData[session.sessionId] && cubeMatchData[session.sessionId].recentScores && cubeMatchData[session.sessionId].recentScores.length > 0 && (
-                        <div className="mb-4 p-3 bg-white rounded-lg border border-gray-200">
-                          <h6 className="text-xs font-semibold text-gray-700 mb-2">Scores Récents</h6>
-                          <div className="space-y-2">
-                            {cubeMatchData[session.sessionId].recentScores.slice(0, 3).map((score: any, index: number) => (
-                              <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded text-xs">
-                                <div>
-                                  <span className="font-medium">Score: {score.score}</span>
-                                  <span className="text-gray-500 ml-2">Niveau {score.level}</span>
-                                </div>
-                                <div className="text-gray-500">
-                                  {new Date(score.createdAt).toLocaleDateString('fr-FR')}
-                                </div>
-                              </div>
-                            ))}
+                          <div className="text-green-600 text-xs mt-1">
+                            Classement Global: #{globalRankings[session.id] || 'N/A'}
                           </div>
-                        </div>
-                      )}
-
-                      {/* Classement Global */}
-                      <div className="p-3 bg-white rounded-lg border border-gray-200">
-                        <h6 className="text-xs font-semibold text-gray-700 mb-2">Classement Global</h6>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-indigo-800 mb-1">
-                            #{globalRankings[session.id] || 'N/A'}
-                          </div>
-                          <div className="text-xs text-gray-600">Position dans le classement</div>
-                          {globalRankings[session.id] && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              Basé sur le meilleur score CubeMatch
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Statistiques Globales et Top 10 */}
-                    <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
-                      <h5 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                        <Award className="w-4 h-4 text-purple-600" />
-                        Statistiques Globales & Classement Top 10
-                      </h5>
-                      
-                      {/* Statistiques Globales */}
-                      {globalStats && (
-                        <div className="mb-4 p-3 bg-white rounded-lg border border-gray-200">
-                          <h6 className="text-xs font-semibold text-gray-700 mb-2">Statistiques Globales CubeMatch</h6>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <div className="text-center p-2 bg-blue-50 rounded">
-                              <div className="text-lg font-bold text-blue-800">
-                                {globalStats.totalGames || 0}
-                              </div>
-                              <div className="text-xs text-blue-600">Parties totales</div>
-                            </div>
-                            <div className="text-center p-2 bg-green-50 rounded">
-                              <div className="text-lg font-bold text-green-800">
-                                {globalStats.totalPlayers || 0}
-                              </div>
-                              <div className="text-xs text-green-600">Joueurs actifs</div>
-                            </div>
-                            <div className="text-center p-2 bg-purple-50 rounded">
-                              <div className="text-lg font-bold text-purple-800">
-                                {globalStats.bestScore || 0}
-                              </div>
-                              <div className="text-xs text-purple-600">Meilleur score</div>
-                            </div>
-                            <div className="text-center p-2 bg-orange-50 rounded">
-                              <div className="text-lg font-bold text-orange-800">
-                                {globalStats.averageScore || 0}
-                              </div>
-                              <div className="text-xs text-orange-600">Score moyen</div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Top 10 Classement */}
-                      {top10Players.length > 0 && (
-                        <div className="p-3 bg-white rounded-lg border border-gray-200">
-                          <h6 className="text-xs font-semibold text-gray-700 mb-2">🏆 Classement Top 10</h6>
-                          <div className="space-y-2">
-                            {top10Players.map((player, index) => (
-                              <div key={player.userId} className={`flex justify-between items-center p-2 rounded text-xs ${
-                                index < 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200' : 'bg-gray-50'
-                              }`}>
-                                <div className="flex items-center gap-2">
-                                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                                    index === 0 ? 'bg-yellow-400 text-yellow-900' :
-                                    index === 1 ? 'bg-gray-300 text-gray-700' :
-                                    index === 2 ? 'bg-orange-400 text-orange-900' :
-                                    'bg-gray-200 text-gray-600'
-                                  }`}>
-                                    {player.rank}
-                                  </div>
-                                  <div>
-                                    <div className="font-medium">{player.username}</div>
-                                    <div className="text-xs text-gray-500">({player.sessionId})</div>
-                                  </div>
-                                </div>
-                                <div className="text-right">
-                                  <div className="font-bold text-gray-800">{player.score}</div>
-                                  <div className="text-gray-500">points</div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {!globalStats && top10Players.length === 0 && (
-                        <div className="text-center text-gray-500 text-sm p-4">
-                          Chargement des statistiques globales...
                         </div>
                       )}
                     </div>
