@@ -184,6 +184,139 @@ export default function SidebarNavigation({
 
   const colors = getSubscriptionColors()
 
+  // Fonctions pour calculer les tailles adaptatives selon les breakpoints
+  const getSidebarWidth = () => {
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1200
+    
+    if (width < 480) {
+      return collapsed ? 0 : 240 // Très petit mobile
+    } else if (width < 640) {
+      return collapsed ? 0 : 260 // Petit mobile
+    } else if (width < 768) {
+      return collapsed ? 0 : 280 // Mobile standard
+    } else if (width < 1024) {
+      return collapsed ? 60 : 240 // Tablette
+    } else if (width < 1280) {
+      return collapsed ? 70 : 256 // Desktop petit
+    } else if (width < 1440) {
+      return collapsed ? 80 : 280 // Desktop moyen
+    } else if (width < 1680) {
+      return collapsed ? 90 : 300 // Desktop large
+    } else {
+      return collapsed ? 100 : 320 // Très grand écran
+    }
+  }
+
+  const getSidebarPadding = () => {
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1200
+    
+    if (width < 480) {
+      return 'px-2' // Très petit mobile
+    } else if (width < 640) {
+      return 'px-3' // Petit mobile
+    } else if (width < 768) {
+      return 'px-3' // Mobile standard
+    } else if (width < 1024) {
+      return 'px-3' // Tablette
+    } else if (width < 1280) {
+      return 'px-4' // Desktop petit
+    } else if (width < 1440) {
+      return 'px-4' // Desktop moyen
+    } else if (width < 1680) {
+      return 'px-5' // Desktop large
+    } else {
+      return 'px-6' // Très grand écran
+    }
+  }
+
+  const getIconSize = () => {
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1200
+    
+    if (width < 480) {
+      return 16 // Très petit mobile
+    } else if (width < 640) {
+      return 18 // Petit mobile
+    } else if (width < 768) {
+      return 18 // Mobile standard
+    } else if (width < 1024) {
+      return 18 // Tablette
+    } else if (width < 1280) {
+      return 20 // Desktop petit
+    } else if (width < 1440) {
+      return 20 // Desktop moyen
+    } else if (width < 1680) {
+      return 22 // Desktop large
+    } else {
+      return 24 // Très grand écran
+    }
+  }
+
+  const getAvatarSize = () => {
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1200
+    
+    if (width < 480) {
+      return 'w-8 h-8' // Très petit mobile
+    } else if (width < 640) {
+      return 'w-10 h-10' // Petit mobile
+    } else if (width < 768) {
+      return 'w-10 h-10' // Mobile standard
+    } else if (width < 1024) {
+      return 'w-10 h-10' // Tablette
+    } else if (width < 1280) {
+      return 'w-12 h-12' // Desktop petit
+    } else if (width < 1440) {
+      return 'w-12 h-12' // Desktop moyen
+    } else if (width < 1680) {
+      return 'w-14 h-14' // Desktop large
+    } else {
+      return 'w-16 h-16' // Très grand écran
+    }
+  }
+
+  const getLogoSize = () => {
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1200
+    
+    if (width < 480) {
+      return 'w-8 h-8' // Très petit mobile
+    } else if (width < 640) {
+      return 'w-9 h-9' // Petit mobile
+    } else if (width < 768) {
+      return 'w-9 h-9' // Mobile standard
+    } else if (width < 1024) {
+      return 'w-10 h-10' // Tablette
+    } else if (width < 1280) {
+      return 'w-10 h-10' // Desktop petit
+    } else if (width < 1440) {
+      return 'w-10 h-10' // Desktop moyen
+    } else if (width < 1680) {
+      return 'w-12 h-12' // Desktop large
+    } else {
+      return 'w-14 h-14' // Très grand écran
+    }
+  }
+
+  const getTextSize = () => {
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1200
+    
+    if (width < 480) {
+      return 'text-xs' // Très petit mobile
+    } else if (width < 640) {
+      return 'text-sm' // Petit mobile
+    } else if (width < 768) {
+      return 'text-sm' // Mobile standard
+    } else if (width < 1024) {
+      return 'text-sm' // Tablette
+    } else if (width < 1280) {
+      return 'text-sm' // Desktop petit
+    } else if (width < 1440) {
+      return 'text-base' // Desktop moyen
+    } else if (width < 1680) {
+      return 'text-base' // Desktop large
+    } else {
+      return 'text-lg' // Très grand écran
+    }
+  }
+
   // Charger les informations utilisateur
   useEffect(() => {
     const loadUserInfo = async () => {
@@ -202,16 +335,18 @@ export default function SidebarNavigation({
     loadUserInfo()
   }, [])
 
-  // Détecter si on est sur mobile
+  // Détecter la taille d'écran avec breakpoints étendus
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
+    const checkScreenSize = () => {
+      const width = window.innerWidth
+      // Mobile: < 768px, Desktop: >= 768px
+      setIsMobile(width < 768)
     }
     
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
     
-    return () => window.removeEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkScreenSize)
   }, [])
 
   // Obtenir l'avatar par défaut basé sur le type d'utilisateur
@@ -394,17 +529,33 @@ export default function SidebarNavigation({
 
   return (
     <>
-      {/* Menu hamburger pour mobile */}
+      {/* Menu hamburger pour mobile avec breakpoints étendus */}
       {isMobile && (
         <button
           onClick={toggleCollapsed}
-          className="fixed top-4 left-4 z-50 p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700"
+          className={`fixed top-4 left-4 z-50 p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 ${
+            typeof window !== 'undefined' && window.innerWidth < 480 ? 'p-1.5' : 'p-2'
+          }`}
           aria-label="Menu"
         >
-          <div className="w-6 h-6 flex flex-col justify-center items-center">
-            <div className={`w-5 h-1 bg-gray-600 dark:bg-gray-300 rounded-full transition-all duration-300 ${!collapsed ? 'rotate-45 translate-y-1.5' : ''}`}></div>
-            <div className={`w-5 h-1 bg-gray-600 dark:bg-gray-300 rounded-full transition-all duration-300 mt-1 ${!collapsed ? 'opacity-0' : ''}`}></div>
-            <div className={`w-5 h-1 bg-gray-600 dark:bg-gray-300 rounded-full transition-all duration-300 mt-1 ${!collapsed ? '-rotate-45 -translate-y-1.5' : ''}`}></div>
+          <div className={`flex flex-col justify-center items-center ${
+            typeof window !== 'undefined' && window.innerWidth < 480 ? 'w-5 h-5' : 'w-6 h-6'
+          }`}>
+            <div className={`bg-gray-600 dark:bg-gray-300 rounded-full transition-all duration-300 ${
+              !collapsed ? 'rotate-45 translate-y-1.5' : ''
+            } ${
+              typeof window !== 'undefined' && window.innerWidth < 480 ? 'w-4 h-0.5' : 'w-5 h-1'
+            }`}></div>
+            <div className={`bg-gray-600 dark:bg-gray-300 rounded-full transition-all duration-300 mt-1 ${
+              !collapsed ? 'opacity-0' : ''
+            } ${
+              typeof window !== 'undefined' && window.innerWidth < 480 ? 'w-4 h-0.5' : 'w-5 h-1'
+            }`}></div>
+            <div className={`bg-gray-600 dark:bg-gray-300 rounded-full transition-all duration-300 mt-1 ${
+              !collapsed ? '-rotate-45 -translate-y-1.5' : ''
+            } ${
+              typeof window !== 'undefined' && window.innerWidth < 480 ? 'w-4 h-0.5' : 'w-5 h-1'
+            }`}></div>
           </div>
         </button>
       )}
@@ -423,19 +574,19 @@ export default function SidebarNavigation({
           isMobile && collapsed ? 'w-0' : ''
         }`}
         initial={{ 
-          width: isMobile ? (collapsed ? 0 : 280) : (collapsed ? (isMobile ? 64 : 74) : 256),
-          x: isMobile && collapsed ? -280 : 0
+          width: getSidebarWidth(),
+          x: isMobile && collapsed ? -getSidebarWidth() : 0
         }}
         animate={{ 
-          width: isMobile ? (collapsed ? 0 : 280) : (collapsed ? (isMobile ? 64 : 75) : 256),
-          x: isMobile && collapsed ? -280 : 0
+          width: getSidebarWidth(),
+          x: isMobile && collapsed ? -getSidebarWidth() : 0
         }}
         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
       >
       {/* En-tête de la sidebar — branding unifié */}
-      <div className="relative h-16 px-3 pr-10 border-b border-gray-200 dark:border-gray-700 flex items-center">
+      <div className={`relative h-16 ${getSidebarPadding()} pr-10 border-b border-gray-200 dark:border-gray-700 flex items-center`}>
         <div className="flex items-center gap-3 w-full">
-          <div className={`w-10 h-10 bg-gradient-to-r ${colors.gradient} rounded-lg flex items-center justify-center shadow-lg flex-shrink-0`}>
+          <div className={`${getLogoSize()} bg-gradient-to-r ${colors.gradient} rounded-lg flex items-center justify-center shadow-lg flex-shrink-0`}>
             <span className="font-title text-white text-2xl leading-none">C</span>
           </div>
           {!collapsed && (
@@ -462,7 +613,7 @@ export default function SidebarNavigation({
 
       {/* Navigation des onglets - verticale */}
       <div className="flex-1 py-4">
-        <nav className="space-y-3 px-3">
+        <nav className={`space-y-3 ${getSidebarPadding()}`}>
           {tabs.map((tab) => (
             tab.available && (
               <button
@@ -492,9 +643,9 @@ export default function SidebarNavigation({
                       : 'bg-gray-10 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                 } w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0`}>
                   {tab.icon === Cube3DIcon ? (
-                    <Cube3DIcon size={20} colors={colors} />
+                    <Cube3DIcon size={getIconSize()} colors={colors} />
                   ) : (
-                    <tab.icon size={20} />
+                    <tab.icon size={getIconSize()} />
                   )}
                 </div>
                 {!collapsed && (
@@ -533,7 +684,7 @@ export default function SidebarNavigation({
 
       {/* En-tête utilisateur */}
       {!isLoading && user && (
-        <div className={`${collapsed ? 'px-2' : 'px-3'} py-4 border-t border-gray-200 dark:border-gray-700`}>
+        <div className={`${collapsed ? 'px-2' : getSidebarPadding()} py-4 border-t border-gray-200 dark:border-gray-700`}>
           <motion.div
             className={`${collapsed ? 'flex justify-center' : 'flex items-center space-x-3'} p-3`}
             initial={{ scale: 0.8, opacity: 0 }}
@@ -545,7 +696,7 @@ export default function SidebarNavigation({
               <img
                 src={selectedAvatar || user.avatarPath || getDefaultAvatar(user.userType)}
                 alt={`Avatar de ${user.firstName}`}
-                className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md"
+                className={`${getAvatarSize()} rounded-full object-cover border-2 border-white shadow-md`}
               />
               {/* Indicateur de statut en ligne */}
               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
@@ -555,7 +706,7 @@ export default function SidebarNavigation({
             {!collapsed && (
               <div className="text-left hidden md:block">
                 <div className="flex items-center space-x-2">
-                  <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                  <span className={`font-semibold text-gray-900 dark:text-gray-100 ${getTextSize()}`}>
                     {user.firstName} {user.lastName}
                   </span>
                 </div>
@@ -572,7 +723,7 @@ export default function SidebarNavigation({
       )}
 
       {/* Bouton de basculement du thème */}
-      <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-700">
+      <div className={`${getSidebarPadding()} py-2 border-t border-gray-200 dark:border-gray-700`}>
         <button
           onClick={() => {
             if (theme === 'light') {
@@ -590,9 +741,9 @@ export default function SidebarNavigation({
           title={`Thème actuel: ${theme === 'light' ? 'Clair' : theme === 'dark' ? 'Sombre' : 'Auto'}`}
         >
           <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-300">
-            {theme === 'light' && <Sun size={20} />}
-            {theme === 'dark' && <Moon size={20} />}
-            {theme === 'auto' && <Monitor size={20} />}
+            {theme === 'light' && <Sun size={getIconSize()} />}
+            {theme === 'dark' && <Moon size={getIconSize()} />}
+            {theme === 'auto' && <Monitor size={getIconSize()} />}
           </div>
           {!collapsed && (
             <span className="hidden md:block">
@@ -611,7 +762,7 @@ export default function SidebarNavigation({
       </div>
 
       {/* Actions rapides: Accueil + Déconnexion */}
-      <div className="px-3 pb-3 space-y-2">
+      <div className={`${getSidebarPadding()} pb-3 space-y-2`}>
         <button
           onClick={() => router.push('/')}
           className={`
@@ -622,7 +773,7 @@ export default function SidebarNavigation({
           aria-label=""
         >
           <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-300">
-            <Home size={20} />
+            <Home size={getIconSize()} />
           </div>
           {!collapsed && <span className="hidden md:block">Accueil</span>}
           {collapsed && (
@@ -644,7 +795,7 @@ export default function SidebarNavigation({
           aria-label=""
         >
           <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-red-700 shadow-sm dark:bg-gray-700 dark:text-red-400">
-            <LogOut size={20} />
+            <LogOut size={getIconSize()} />
           </div>
           {!collapsed && <span className="hidden md:block">Déconnexion</span>}
           {collapsed && (
@@ -659,7 +810,7 @@ export default function SidebarNavigation({
       </div>
 
       {/* Footer de la sidebar */}
-      <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+      <div className={`${getSidebarPadding()} py-3 border-t border-gray-200 dark:border-gray-700`}>
         {!collapsed && (
           <div className="text-xs text-gray-700 dark:text-gray-300 text-center font-medium hidden md:block">
             <p>Version 1.0.0</p>
