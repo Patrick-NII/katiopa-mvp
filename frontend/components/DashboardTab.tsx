@@ -35,7 +35,6 @@ import SavedAnalyses from './SavedAnalyses'
 import OnlineStatus from './OnlineStatus'
 import LimitationPopup from './LimitationPopup'
 import AnalysisModal from './AnalysisModal'
-import BubixProgress, { createBubixSteps } from './BubixProgress'
 import { useLimitationPopup } from '@/hooks/useLimitationPopup'
 
 interface DashboardTabProps {
@@ -96,11 +95,6 @@ export default function DashboardTab({
   const [likedAnalyses, setLikedAnalyses] = useState<Set<string>>(new Set());
   const [favoriteAnalyses, setFavoriteAnalyses] = useState<Set<string>>(new Set());
   
-  // États pour la progression Bubix
-  const [isProgressVisible, setIsProgressVisible] = useState(false);
-  const [progressSteps, setProgressSteps] = useState(createBubixSteps());
-  const [currentProgressStep, setCurrentProgressStep] = useState('');
-
   // Hook pour le statut en temps réel
   const { sessionStatuses, isLoading: statusLoading, refreshStatus } = useRealTimeStatus({
     childSessions,
@@ -419,10 +413,7 @@ export default function DashboardTab({
       setLoadingStates(prev => ({ ...prev, [`compte_rendu_${sessionId}`]: true }));
       setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: true, type: 'compte_rendu' } }));
 
-      // Initialiser la progression Bubix
-      setIsProgressVisible(true);
-      setProgressSteps(createBubixSteps());
-      setCurrentProgressStep('auth');
+      // Début de l'analyse
       
       // Bloquer si limitation locale (Découverte)
       if (user?.subscriptionType === 'FREE' && isAnalysisLimited()) {
@@ -496,7 +487,6 @@ export default function DashboardTab({
     } finally {
       setLoadingStates(prev => ({ ...prev, [`compte_rendu_${sessionId}`]: false }));
       setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'compte_rendu' } }));
-      setIsProgressVisible(false);
       
       // Déclencher le popup après l'action (avec délai pour laisser l'utilisateur voir le résultat)
       setTimeout(() => {
@@ -779,16 +769,6 @@ export default function DashboardTab({
                 <Brain className="w-4 h-4 text-purple-600" />
                 Analyses Bubix
               </h4>
-              
-              {/* Progression Bubix intégrée */}
-              {isProgressVisible && (
-                <BubixProgress
-                  isVisible={isProgressVisible}
-                  steps={progressSteps}
-                  currentStep={currentProgressStep}
-                  onComplete={() => setIsProgressVisible(false)}
-                />
-              )}
               
               {/* Tableau des réponses Bubix */}
               {Object.keys(bubixResponses).length > 0 ? (

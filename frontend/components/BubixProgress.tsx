@@ -75,95 +75,110 @@ export default function BubixProgress({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 mb-4"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
         >
-          {/* En-tête */}
-          <div className="flex items-center gap-3 mb-4">
-            <Brain className="w-6 h-6 text-purple-600" />
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Bubix en action</h3>
+          <motion.div
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.9 }}
+            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
+          >
+            {/* En-tête */}
+            <div className="text-center mb-6">
+              <div className="flex items-center justify-center gap-3 mb-3">
+                <Brain className="w-8 h-8 text-purple-600" />
+                <h2 className="text-xl font-bold text-gray-900">Bubix en action</h2>
+              </div>
               <p className="text-sm text-gray-600">
                 Analyse en cours... Veuillez patienter
               </p>
             </div>
-          </div>
 
-          {/* Barre de progression globale */}
-          <div className="mb-4">
-            <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>Progression</span>
-              <span>{Math.round(progressPercentage)}%</span>
+            {/* Barre de progression globale */}
+            <div className="mb-6">
+              <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <span>Progression</span>
+                <span>{Math.round(progressPercentage)}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <motion.div
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressPercentage}%` }}
+                  transition={{ duration: 0.5 }}
+                />
+              </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <motion.div
-                className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${progressPercentage}%` }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-          </div>
 
-          {/* Étapes détaillées - Version compacte */}
-          <div className="space-y-2">
-            {steps.map((step, index) => (
-              <motion.div
-                key={step.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className={`flex items-center gap-2 p-2 rounded-lg border transition-all duration-300 ${getStepColor(step)}`}
-              >
-                <div className="flex-shrink-0">
-                  {getStepIcon(step)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className={`text-xs font-medium ${
-                    step.status === 'completed' ? 'text-green-900' :
-                    step.status === 'loading' ? 'text-blue-900' :
-                    step.status === 'error' ? 'text-red-900' :
-                    'text-gray-900'
-                  }`}>
-                    {step.title}
-                  </h4>
-                  <p className={`text-xs ${
-                    step.status === 'completed' ? 'text-green-700' :
-                    step.status === 'loading' ? 'text-blue-700' :
-                    step.status === 'error' ? 'text-red-700' :
-                    'text-gray-600'
-                  }`}>
-                    {step.description}
+            {/* Étapes détaillées */}
+            <div className="space-y-3">
+              {steps.map((step, index) => (
+                <motion.div
+                  key={step.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-300 ${getStepColor(step)}`}
+                >
+                  <div className="flex-shrink-0">
+                    {getStepIcon(step)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className={`text-sm font-medium ${
+                      step.status === 'completed' ? 'text-green-900' :
+                      step.status === 'loading' ? 'text-blue-900' :
+                      step.status === 'error' ? 'text-red-900' :
+                      'text-gray-900'
+                    }`}>
+                      {step.title}
+                    </h4>
+                    <p className={`text-xs ${
+                      step.status === 'completed' ? 'text-green-700' :
+                      step.status === 'loading' ? 'text-blue-700' :
+                      step.status === 'error' ? 'text-red-700' :
+                      'text-gray-600'
+                    }`}>
+                      {step.description}
+                    </p>
+                    {step.status === 'loading' && step.duration && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <Clock className="w-3 h-3 text-blue-600" />
+                        <span className="text-xs text-blue-600">
+                          {step.duration}s
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  {step.status === 'loading' && (
+                    <div className="flex-shrink-0">
+                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Message de statut */}
+            <div className="mt-6 text-center">
+              {steps.every(step => step.status === 'completed') ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-green-600"
+                >
+                  <CheckCircle className="w-6 h-6 mx-auto mb-2" />
+                  <p className="text-sm font-medium">Analyse terminée !</p>
+                </motion.div>
+              ) : (
+                <div className="text-gray-600">
+                  <Clock className="w-4 h-4 mx-auto mb-1" />
+                  <p className="text-xs">
+                    {steps.find(step => step.status === 'loading')?.title || 'Préparation...'}
                   </p>
                 </div>
-                {step.status === 'loading' && (
-                  <div className="flex-shrink-0">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Message de statut */}
-          <div className="mt-4 text-center">
-            {steps.every(step => step.status === 'completed') ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-green-600"
-              >
-                <CheckCircle className="w-5 h-5 mx-auto mb-1" />
-                <p className="text-sm font-medium">Analyse terminée !</p>
-              </motion.div>
-            ) : (
-              <div className="text-gray-600">
-                <Clock className="w-4 h-4 mx-auto mb-1" />
-                <p className="text-xs">
-                  {steps.find(step => step.status === 'loading')?.title || 'Préparation...'}
-                </p>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
