@@ -802,23 +802,23 @@ export default function DashboardTab({
               {/* Tableau des réponses Bubix */}
               {Object.keys(bubixResponses).length > 0 ? (
                 <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
+                  <div className="overflow-hidden">
+                    <table className="w-full table-fixed">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="w-20 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Type
                           </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="w-24 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Enfant
                           </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="w-20 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Date
                           </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aperçu
                           </th>
-                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="w-16 px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Actions
                           </th>
                         </tr>
@@ -830,40 +830,43 @@ export default function DashboardTab({
                             const childName = childSessions.find(s => s.sessionId === response.sessionId)?.name || 'Enfant';
                             return (
                               <tr key={key} className="hover:bg-gray-50">
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <div className="flex items-center gap-2">
-                                    {response.type === 'compte_rendu' && <BookOpen className="w-4 h-4 text-blue-600" />}
-                                    <span className="text-sm font-medium text-gray-900">
+                                <td className="px-3 py-3">
+                                  <div className="flex items-center gap-1">
+                                    {response.type === 'compte_rendu' && <BookOpen className="w-3 h-3 text-blue-600 flex-shrink-0" />}
+                                    <span className="text-xs font-medium text-gray-900 truncate">
                                       {response.type === 'compte_rendu' && 'Compte rendu'}
                                     </span>
                                   </div>
                                 </td>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <div className="text-sm text-gray-900">{childName}</div>
+                                <td className="px-3 py-3">
+                                  <div className="text-xs text-gray-900 truncate" title={childName}>
+                                    {childName}
+                                  </div>
                                 </td>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <div className="text-sm text-gray-500">
-                                    {response.timestamp.toLocaleDateString('fr-FR')}
+                                <td className="px-3 py-3">
+                                  <div className="text-xs text-gray-500">
+                                    {response.timestamp.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
                                   </div>
                                   <div className="text-xs text-gray-400">
-                                    {response.timestamp.toLocaleTimeString('fr-FR')}
+                                    {response.timestamp.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                                   </div>
                                 </td>
-                                <td className="px-4 py-4">
-                                  <div className="text-sm text-gray-700 max-w-xs truncate">
-                                    {response.content.substring(0, 100)}...
+                                <td className="px-3 py-3">
+                                  <div className="text-xs text-gray-700 line-clamp-2 leading-relaxed">
+                                    {response.content.substring(0, 120)}...
                                   </div>
                                 </td>
-                                <td className="px-4 py-4 whitespace-nowrap text-center">
+                                <td className="px-3 py-3 text-center">
                                   <button
                                     onClick={() => handleOpenModal({
                                       ...response,
                                       childName
                                     })}
-                                    className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                                    className="inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors"
+                                    title="Lire l'analyse complète"
                                   >
                                     <BookOpen className="w-3 h-3" />
-                                    Lire
+                                    <span className="hidden sm:inline">Lire</span>
                                   </button>
                                 </td>
                               </tr>
@@ -887,35 +890,7 @@ export default function DashboardTab({
 
       
 
-      {/* Section des analyses sauvegardées */}
-      {user?.userType === 'PARENT' && (
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <button
-              onClick={() => setShowSavedAnalyses(!showSavedAnalyses)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
-            >
-              <Bookmark className="w-4 h-4" />
-              {showSavedAnalyses ? 'Masquer' : 'Voir'} Documents
-              <span className="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                {savedAnalyses.length}
-              </span>
-            </button>
-          </div>
-          
-          {showSavedAnalyses && (
-            <SavedAnalyses
-              childName={user?.firstName || 'Parent'}
-              onViewAnalysis={viewSavedAnalysis}
-              onDeleteAnalysis={deleteAnalysis}
-            />
-          )}
-        </motion.div>
-      )}
+      
 
       
       {/* Modal d'analyse */}
