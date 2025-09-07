@@ -1098,10 +1098,16 @@ export default function CubeMatch() {
   }
   
   return (
-    <div className="w-full h-full overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header avec informations de jeu */}
-      <div className="h-16 bg-white/80 backdrop-blur-sm border-b border-gray-200 flex items-center justify-between px-6">
+    <div className="w-full h-screen overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header avec informations de jeu et boutons */}
+      <div className="h-16 bg-white/90 backdrop-blur-sm border-b border-gray-200 flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
+          <button 
+            onClick={() => window.location.href = '/dashboard/mathcube'}
+            className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-all duration-200 flex items-center gap-2"
+          >
+            ← Retour
+          </button>
           <h1 className="text-xl font-bold text-gray-900">CubeMatch</h1>
           <div className="flex items-center gap-2">
             <div className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
@@ -1123,6 +1129,18 @@ export default function CubeMatch() {
             {formatMs(state.timePlayedMs)}
           </div>
           <button 
+            className="px-4 py-2 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 transition-all duration-200"
+            onClick={() => dispatch({ type: 'HINT' })}
+          >
+            💡 Indice
+          </button>
+          <button 
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-all duration-200"
+            onClick={() => dispatch({ type: 'RESTART' })}
+          >
+            🔄 Rejouer
+          </button>
+          <button 
             className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
               !state.paused 
                 ? 'bg-orange-500 text-white hover:bg-orange-600' 
@@ -1133,16 +1151,22 @@ export default function CubeMatch() {
             {!state.paused ? '⏸️ Pause' : '▶️ Continuer'}
           </button>
           <button 
+            className="px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-all duration-200"
+            onClick={() => dispatch({ type: 'END_GAME' })}
+          >
+            ⏹️ Stop
+          </button>
+          <button 
             className="px-4 py-2 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition-all duration-200"
             onClick={() => setShowOptions(true)}
           >
-            ⚙️
+            ⚙️ Paramètres
           </button>
         </div>
       </div>
 
       {/* Zone de jeu principale - responsive */}
-      <div className="h-[calc(100%-4rem)] flex flex-col lg:flex-row">
+      <div className="h-[calc(100vh-4rem)] flex flex-col lg:flex-row">
         <div className="flex-1 flex items-center justify-center p-4 lg:p-6 min-h-0">
           <GameArea state={state} dispatch={dispatch} />
         </div>
@@ -1293,33 +1317,8 @@ function SidePanel(props: {
         </div>
       </div>
       
-      {/* Boutons d'action */}
-      <div className="space-y-3 flex-1">
-        <div className="grid grid-cols-2 gap-3">
-          <button 
-            className="px-4 py-3 rounded-lg bg-yellow-500 text-white font-medium hover:bg-yellow-600 transition-all duration-200 shadow-sm"
-            onClick={() => dispatch({ type: 'HINT' })}
-          >
-            💡 Indice
-          </button>
-          <button 
-            className="px-4 py-3 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 transition-all duration-200 shadow-sm"
-            onClick={() => dispatch({ type: 'RESTART' })}
-          >
-            🔄 Rejouer
-          </button>
-        </div>
-        
-        <button 
-          className="w-full px-4 py-3 rounded-lg bg-gray-500 text-white font-medium hover:bg-gray-600 transition-all duration-200 shadow-sm"
-          onClick={() => setShowOptions(true)}
-        >
-          ⚙️ Paramètres
-        </button>
-      </div>
-      
-      {/* Statistiques rapides */}
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+      {/* Statistiques détaillées */}
+      <div className="flex-1 p-4 bg-gray-50 rounded-lg">
         <h3 className="text-sm font-semibold text-gray-700 mb-3">Statistiques</h3>
         <div className="space-y-2 text-xs text-gray-600">
           <div className="flex justify-between">
@@ -1327,12 +1326,20 @@ function SidePanel(props: {
             <span className="font-medium">{formatMs(state.timePlayedMs)}</span>
           </div>
           <div className="flex justify-between">
-            <span>Meilleur combo:</span>
+            <span>Combo actuel:</span>
             <span className="font-medium">{state.combo}</span>
           </div>
           <div className="flex justify-between">
             <span>Opérateur:</span>
             <span className="font-medium">{state.config.operator}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Cible:</span>
+            <span className="font-medium">{state.config.target}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Mode:</span>
+            <span className="font-medium">{state.config.allowDiagonals ? 'Diagonales' : 'Adjacentes'}</span>
           </div>
         </div>
       </div>
