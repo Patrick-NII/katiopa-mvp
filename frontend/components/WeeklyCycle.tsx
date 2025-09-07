@@ -100,7 +100,7 @@ export default function WeeklyCycle({
   showProgress = true 
 }: WeeklyCycleProps) {
   const getCurrentDayInfo = () => {
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'lowercase' }) as keyof typeof WEEKLY_CYCLE;
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase() as keyof typeof WEEKLY_CYCLE;
     return WEEKLY_CYCLE[today] || WEEKLY_CYCLE.monday;
   };
 
