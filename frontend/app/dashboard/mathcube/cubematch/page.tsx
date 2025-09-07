@@ -4,36 +4,41 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/NavBar';
 import CubeMatch from '@/components/CubeMatch';
-import DecorativeCubes from '@/components/DecorativeCubes';
-import { ArrowLeft, ChevronRight, X } from 'lucide-react';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 
 export default function CubeMatchPage() {
   const router = useRouter();
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 relative overflow-hidden">
       <Navbar />
-      <div className="h-screen pt-16">
-        {/* Boutons de navigation */}
-        <div className="absolute top-20 left-6 z-20 flex gap-3">
-          <button
-            onClick={() => router.push('/dashboard/mathcube')}
-            className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-sm border border-gray-200 hover:bg-white transition-all duration-200"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Retour
-          </button>
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg shadow-sm hover:bg-red-600 transition-all duration-200"
-          >
-            <X className="w-4 h-4" />
-            Stop
-          </button>
+      <div className="max-w-7xl mx-auto px-0 py-16 relative z-10">
+        {/* Fil d'Ariane + Retour avec effet gloss */}
+        <div className="flex items-center justify-between mb-6">
+          <nav aria-label="Fil d'Ariane" className="text-sm text-gray-600">
+            <ol className="flex items-center gap-2">
+              <li>
+                <Link href="/dashboard" className="hover:underline text-gray-700 font-medium">Dashboard</Link>
+              </li>
+              <li className="text-gray-400">
+                <ChevronRight className="inline-block w-4 h-4" />
+              </li>
+              <li>
+                <Link href="/dashboard/mathcube" className="hover:underline text-gray-700 font-medium">MathCube</Link>
+              </li>
+              <li className="text-gray-400">
+                <ChevronRight className="inline-block w-4 h-4" />
+              </li>
+              <li className="text-gray-900 font-bold text-lg">Cube Match</li>
+            </ol>
+          </nav>
         </div>
 
-        {/* Zone de jeu */}
-        <div className="h-full">
-          <CubeMatch />
+        {/* Zone de jeu avec effet gloss */}
+        <div className="relative">
+          {/* Contenu du jeu */}
+          <div className="relative z-10">
+            <CubeMatch />
+          </div>
         </div>
       </div>
     </div>
