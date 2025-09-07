@@ -612,7 +612,13 @@ export default function SidebarNavigation({
             tab.available && (
               <button
                 key={tab.id}
-                onClick={() => onTabChange(tab.id)}
+                onClick={() => {
+                  onTabChange(tab.id)
+                  // Fermer automatiquement la sidebar sur mobile après clic
+                  if (isMobile) {
+                    toggleCollapsed()
+                  }
+                }}
                 className={`
                   group relative w-full flex items-center gap-3 ${isMobile ? 'px-4 py-3' : 'px-2 py-1'} ${isMobile ? 'rounded-xl' : 'rounded-lg'} text-sm font-semibold transition-all duration-200
                   ${activeTab === tab.id
@@ -746,7 +752,13 @@ export default function SidebarNavigation({
 
             {/* Bouton Accueil */}
             <button
-              onClick={() => router.push('/')}
+              onClick={() => {
+                router.push('/')
+                // Fermer automatiquement la sidebar sur mobile après clic
+                if (isMobile) {
+                  toggleCollapsed()
+                }
+              }}
               className="flex-1 flex flex-col items-center gap-1 px-3 py-3 rounded-xl text-sm font-semibold bg-white-100 hover:bg-gray-200 text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-all duration-200 hover:scale-105 hover:shadow-md"
               title="Accueil"
             >
@@ -758,7 +770,16 @@ export default function SidebarNavigation({
 
             {/* Bouton Déconnexion */}
             <button
-              onClick={async () => { try { await (await import('@/lib/api')).authAPI.logout(); router.push('/login'); } catch (e) {} }}
+              onClick={async () => { 
+                try { 
+                  await (await import('@/lib/api')).authAPI.logout()
+                  // Fermer automatiquement la sidebar sur mobile après clic
+                  if (isMobile) {
+                    toggleCollapsed()
+                  }
+                  router.push('/login')
+                } catch (e) {} 
+              }}
               className="flex-1 flex flex-col items-center gap-1 px-3 py-3 rounded-xl text-sm font-semibold bg-white-50 hover:bg-red-100 text-red-300 dark:bg-gray-800 dark:hover:bg-red-900/20 dark:text-red-400 transition-all duration-200 hover:scale-105 hover:shadow-md"
               title="Déconnexion"
             >
@@ -804,7 +825,13 @@ export default function SidebarNavigation({
               )}
             </button>
             <button
-              onClick={() => router.push('/')}
+              onClick={() => {
+                router.push('/')
+                // Fermer automatiquement la sidebar sur mobile après clic
+                if (isMobile) {
+                  toggleCollapsed()
+                }
+              }}
               className="group relative w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-semibold bg-white-100 hover:bg-gray-200 text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-all duration-200"
               title="Accueil"
             >
@@ -822,7 +849,16 @@ export default function SidebarNavigation({
               )}
             </button>
             <button
-              onClick={async () => { try { await (await import('@/lib/api')).authAPI.logout(); router.push('/login'); } catch (e) {} }}
+              onClick={async () => { 
+                try { 
+                  await (await import('@/lib/api')).authAPI.logout()
+                  // Fermer automatiquement la sidebar sur mobile après clic
+                  if (isMobile) {
+                    toggleCollapsed()
+                  }
+                  router.push('/login')
+                } catch (e) {} 
+              }}
               className="group relative w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-semibold bg-white-50 hover:bg-red-100 text-red-300 dark:bg-gray-800 dark:hover:bg-red-900/20 dark:text-red-400 transition-all duration-200"
               title="Déconnexion"
             >
