@@ -584,8 +584,8 @@ export default function SidebarNavigation({
             <span className="font-title text-white text-2xl leading-none">C</span>
           </div>
           {!collapsed && (
-            <div className="min-w-0 hidden md:block">
-              <div className="logo-multicolor text-4xl">
+            <div className="min-w-0">
+              <div className="logo-multicolor text-2xl md:text-4xl">
                 <span>C</span><span>u</span><span>b</span><span>e</span><span>A</span><span>I</span>
               </div>
             </div>
@@ -697,17 +697,17 @@ export default function SidebarNavigation({
               <div className={`absolute -bottom-1 -right-1 ${isMobile ? 'w-5 h-5' : 'w-4 h-4'} bg-green-500 rounded-full ${isMobile ? 'border-3 border-white' : 'border-2 border-white'} ${isMobile ? 'shadow-lg' : ''}`}></div>
             </div>
 
-            {/* Informations utilisateur - visible seulement en mode expanded */}
+            {/* Informations utilisateur - visible en mode expanded */}
             {!collapsed && (
-              <div className="text-left hidden md:block">
+              <div className="text-left">
                 <div className="flex items-center space-x-2">
-                  <span className={`font-semibold text-gray-900 dark:text-gray-100 ${getTextSize()}`}>
+                  <span className={`font-semibold text-gray-900 dark:text-gray-100 ${isMobile ? 'text-base' : getTextSize()}`}>
                     {user.firstName} {user.lastName}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">ID:</span>
-                  <span className={`text-xs font-mono ${getUserSubscriptionColors().text} font-semibold multicolor-id`}>
+                  <span className={`${isMobile ? 'text-sm' : 'text-xs'} text-gray-500 dark:text-gray-400`}>ID:</span>
+                  <span className={`${isMobile ? 'text-sm' : 'text-xs'} font-mono ${getUserSubscriptionColors().text} font-semibold multicolor-id`}>
                     {user.sessionId}
                   </span>
                 </div>
@@ -717,94 +717,130 @@ export default function SidebarNavigation({
         </div>
       )}
 
-      {/* Bouton de basculement du thème avec design mobile amélioré */}
-      <div className={`${getSidebarPadding()} ${isMobile ? 'py-4' : 'py-2'} border-t border-gray-200/50 dark:border-gray-700/50`}>
-        <button
-          onClick={() => {
-            if (theme === 'light') {
-              setTheme('dark')
-            } else if (theme === 'dark') {
-              setTheme('auto')
-            } else {
-              setTheme('light')
-            }
-          }}
-          className={`
-            group relative w-full flex items-center gap-3 ${isMobile ? 'px-4 py-3' : 'px-3 py-3'}
-            ${isMobile ? 'rounded-xl' : 'rounded-lg'} text-sm font-semibold bg-gray-50 hover:bg-gray-100 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-all duration-200
-            ${isMobile ? 'hover:scale-105 hover:shadow-md' : ''}
-          `}
-          title={`Thème actuel: ${theme === 'light' ? 'Clair' : theme === 'dark' ? 'Sombre' : 'Auto'}`}
-        >
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-300">
-            {theme === 'light' && <Sun size={getIconSize()} />}
-            {theme === 'dark' && <Moon size={getIconSize()} />}
-            {theme === 'auto' && <Monitor size={getIconSize()} />}
-          </div>
-          {!collapsed && (
-            <span className="hidden md:block">
-              {theme === 'light' ? 'Mode Clair' : theme === 'dark' ? 'Mode Sombre' : 'Mode Auto'}
-            </span>
-          )}
-          {collapsed && (
-            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 pointer-events-none opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-150 delay-150">
-              <div className="relative px-2 py-1 rounded-md bg-gray-900 text-white text-xs shadow-lg whitespace-nowrap">
-                <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45 shadow-md"></div>
-                {theme === 'light' ? 'Mode Clair' : theme === 'dark' ? 'Mode Sombre' : 'Mode Auto'}
+      {/* Actions rapides: Thème + Accueil + Déconnexion sur une ligne en bas */}
+      <div className={`${getSidebarPadding()} ${isMobile ? 'pb-6' : 'pb-3'} border-t border-gray-200/50 dark:border-gray-700/50`}>
+        {isMobile ? (
+          // Layout mobile: 3 boutons sur une ligne
+          <div className="flex items-center justify-between space-x-2">
+            {/* Bouton Thème */}
+            <button
+              onClick={() => {
+                if (theme === 'light') {
+                  setTheme('dark')
+                } else if (theme === 'dark') {
+                  setTheme('auto')
+                } else {
+                  setTheme('light')
+                }
+              }}
+              className="flex-1 flex flex-col items-center gap-1 px-3 py-3 rounded-xl text-sm font-semibold bg-gray-50 hover:bg-gray-100 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-all duration-200 hover:scale-105 hover:shadow-md"
+              title={`Thème actuel: ${theme === 'light' ? 'Clair' : theme === 'dark' ? 'Sombre' : 'Auto'}`}
+            >
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-300">
+                {theme === 'light' && <Sun size={16} />}
+                {theme === 'dark' && <Moon size={16} />}
+                {theme === 'auto' && <Monitor size={16} />}
               </div>
-            </div>
-          )}
-        </button>
-      </div>
+              <span className="text-xs">Thème</span>
+            </button>
 
-      {/* Actions rapides: Accueil + Déconnexion avec design mobile amélioré */}
-      <div className={`${getSidebarPadding()} ${isMobile ? 'pb-6' : 'pb-3'} ${isMobile ? 'space-y-3' : 'space-y-2'}`}>
-        <button
-          onClick={() => router.push('/')}
-          className={`
-            group relative w-full flex items-center gap-3 ${isMobile ? 'px-4 py-3' : 'px-3 py-3'}
-            ${isMobile ? 'rounded-xl' : 'rounded-lg'} text-sm font-semibold bg-white-100 hover:bg-gray-200 text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-all duration-200
-            ${isMobile ? 'hover:scale-105 hover:shadow-md' : ''}
-          `}
-          title="Accueil"
-          aria-label=""
-        >
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-300">
-            <Home size={getIconSize()} />
-          </div>
-          {!collapsed && <span className="hidden md:block">Accueil</span>}
-          {collapsed && (
-            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 pointer-events-none opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-150 delay-150">
-              <div className="relative px-2 py-1 rounded-md bg-gray-900 text-white text-xs shadow-lg whitespace-nowrap">
-                <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45 shadow-md"></div>
-                Accueil
+            {/* Bouton Accueil */}
+            <button
+              onClick={() => router.push('/')}
+              className="flex-1 flex flex-col items-center gap-1 px-3 py-3 rounded-xl text-sm font-semibold bg-white-100 hover:bg-gray-200 text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-all duration-200 hover:scale-105 hover:shadow-md"
+              title="Accueil"
+            >
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-300">
+                <Home size={16} />
               </div>
-            </div>
-          )}
-        </button>
-        <button
-          onClick={async () => { try { await (await import('@/lib/api')).authAPI.logout(); router.push('/login'); } catch (e) {} }}
-          className={`
-            group relative w-full flex items-center gap-3 ${isMobile ? 'px-4 py-3' : 'px-3 py-3'}
-            ${isMobile ? 'rounded-xl' : 'rounded-lg'} text-sm font-semibold bg-white-50 hover:bg-red-100 text-red-300 dark:bg-gray-800 dark:hover:bg-red-900/20 dark:text-red-400 transition-all duration-200
-            ${isMobile ? 'hover:scale-105 hover:shadow-md' : ''}
-          `}
-          title="Déconnexion"
-          aria-label=""
-        >
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-red-700 shadow-sm dark:bg-gray-700 dark:text-red-400">
-            <LogOut size={getIconSize()} />
-          </div>
-          {!collapsed && <span className="hidden md:block">Déconnexion</span>}
-          {collapsed && (
-            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 pointer-events-none opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-150 delay-150">
-              <div className="relative px-2 py-1 rounded-md bg-gray-900 text-white text-xs shadow-lg whitespace-nowrap">
-                <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45 shadow-md"></div>
-                Déconnexion
+              <span className="text-xs">Accueil</span>
+            </button>
+
+            {/* Bouton Déconnexion */}
+            <button
+              onClick={async () => { try { await (await import('@/lib/api')).authAPI.logout(); router.push('/login'); } catch (e) {} }}
+              className="flex-1 flex flex-col items-center gap-1 px-3 py-3 rounded-xl text-sm font-semibold bg-white-50 hover:bg-red-100 text-red-300 dark:bg-gray-800 dark:hover:bg-red-900/20 dark:text-red-400 transition-all duration-200 hover:scale-105 hover:shadow-md"
+              title="Déconnexion"
+            >
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white text-red-700 shadow-sm dark:bg-gray-700 dark:text-red-400">
+                <LogOut size={16} />
               </div>
-            </div>
-          )}
-        </button>
+              <span className="text-xs">Déconnexion</span>
+            </button>
+          </div>
+        ) : (
+          // Layout desktop: boutons verticaux
+          <div className="space-y-2">
+            <button
+              onClick={() => {
+                if (theme === 'light') {
+                  setTheme('dark')
+                } else if (theme === 'dark') {
+                  setTheme('auto')
+                } else {
+                  setTheme('light')
+                }
+              }}
+              className="group relative w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-semibold bg-gray-50 hover:bg-gray-100 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-all duration-200"
+              title={`Thème actuel: ${theme === 'light' ? 'Clair' : theme === 'dark' ? 'Sombre' : 'Auto'}`}
+            >
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-300">
+                {theme === 'light' && <Sun size={getIconSize()} />}
+                {theme === 'dark' && <Moon size={getIconSize()} />}
+                {theme === 'auto' && <Monitor size={getIconSize()} />}
+              </div>
+              {!collapsed && (
+                <span className="hidden md:block">
+                  {theme === 'light' ? 'Mode Clair' : theme === 'dark' ? 'Mode Sombre' : 'Mode Auto'}
+                </span>
+              )}
+              {collapsed && (
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 pointer-events-none opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-150 delay-150">
+                  <div className="relative px-2 py-1 rounded-md bg-gray-900 text-white text-xs shadow-lg whitespace-nowrap">
+                    <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45 shadow-md"></div>
+                    {theme === 'light' ? 'Mode Clair' : theme === 'dark' ? 'Mode Sombre' : 'Mode Auto'}
+                  </div>
+                </div>
+              )}
+            </button>
+            <button
+              onClick={() => router.push('/')}
+              className="group relative w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-semibold bg-white-100 hover:bg-gray-200 text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-all duration-200"
+              title="Accueil"
+            >
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-300">
+                <Home size={getIconSize()} />
+              </div>
+              {!collapsed && <span className="hidden md:block">Accueil</span>}
+              {collapsed && (
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 pointer-events-none opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-150 delay-150">
+                  <div className="relative px-2 py-1 rounded-md bg-gray-900 text-white text-xs shadow-lg whitespace-nowrap">
+                    <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45 shadow-md"></div>
+                    Accueil
+                  </div>
+                </div>
+              )}
+            </button>
+            <button
+              onClick={async () => { try { await (await import('@/lib/api')).authAPI.logout(); router.push('/login'); } catch (e) {} }}
+              className="group relative w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-semibold bg-white-50 hover:bg-red-100 text-red-300 dark:bg-gray-800 dark:hover:bg-red-900/20 dark:text-red-400 transition-all duration-200"
+              title="Déconnexion"
+            >
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white text-red-700 shadow-sm dark:bg-gray-700 dark:text-red-400">
+                <LogOut size={getIconSize()} />
+              </div>
+              {!collapsed && <span className="hidden md:block">Déconnexion</span>}
+              {collapsed && (
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50 pointer-events-none opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-150 delay-150">
+                  <div className="relative px-2 py-1 rounded-md bg-gray-900 text-white text-xs shadow-lg whitespace-nowrap">
+                    <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45 shadow-md"></div>
+                    Déconnexion
+                  </div>
+                </div>
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Footer de la sidebar avec design mobile amélioré */}
