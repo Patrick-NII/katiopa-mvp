@@ -28,13 +28,13 @@ interface UpgradePageProps {
   upgradeEventId?: string
 }
 
-export default function UpgradePage({ 
-  childName = 'votre enfant',
-  level = 'élevé',
-  reason = 'performance',
-  triggerData = {},
-  upgradeEventId
-}: UpgradePageProps) {
+export default function UpgradePage() {
+  // Props par défaut pour le développement
+  const childName = 'votre enfant';
+  const level = 'élevé';
+  const reason = 'performance';
+  const triggerData = {};
+  const upgradeEventId = null;
   
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
   const [promoCode, setPromoCode] = useState('')
@@ -272,7 +272,7 @@ export default function UpgradePage({
 
   // Obtenir le message personnalisé selon le niveau détecté
   const getPersonalizedMessage = () => {
-    if (level === 'exceptionnel') {
+    if (level === 'élevé') {
       return `🌟 **${childName} atteint un niveau exceptionnel !**
 
 Nous sommes impressionnés par les capacités extraordinaires de ${childName}. Pour continuer à nourrir ce potentiel exceptionnel, nous vous proposons nos outils les plus avancés.

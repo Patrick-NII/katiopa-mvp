@@ -138,11 +138,11 @@ export async function getCubeMatchData(userId: string): Promise<any> {
     const recommendations = await generateCubeMatchRecommendations(userId);
 
     return {
-      globalStats: globalStats[0],
+      globalStats: (globalStats as any)[0],
       operatorStats,
-      insights: insights[0] || null,
+      insights: (insights as any)[0] || null,
       recentSessions,
-      performanceStats: performanceStats[0],
+      performanceStats: (performanceStats as any)[0],
       progressionTrends,
       recommendations
     };
@@ -171,7 +171,7 @@ async function generateCubeMatchRecommendations(userId: string): Promise<any[]> 
     const recommendations = [];
 
     // Analyser chaque opération
-    stats.forEach((stat: any) => {
+    (stats as any[]).forEach((stat: any) => {
       // Recommandations basées sur la précision
       if (stat.avgAccuracy < 70) {
         recommendations.push({
@@ -218,7 +218,7 @@ async function generateCubeMatchRecommendations(userId: string): Promise<any[]> 
     });
 
     // Recommandations générales
-    if (stats.length === 0) {
+    if ((stats as any[]).length === 0) {
       recommendations.push({
         type: 'start',
         operator: 'ADD',
@@ -229,9 +229,9 @@ async function generateCubeMatchRecommendations(userId: string): Promise<any[]> 
     }
 
     // Recommandations basées sur l'équilibre
-    if (stats.length > 0) {
-      const totalGames = stats.reduce((sum: number, s: any) => sum + s.games, 0);
-      const mostPlayed = stats.reduce((max: any, s: any) => s.games > max.games ? s : max, stats[0]);
+    if ((stats as any[]).length > 0) {
+      const totalGames = (stats as any[]).reduce((sum: number, s: any) => sum + s.games, 0);
+      const mostPlayed = (stats as any[]).reduce((max: any, s: any) => s.games > max.games ? s : max, (stats as any[])[0]);
       
       if (mostPlayed.games > totalGames * 0.6) {
         recommendations.push({

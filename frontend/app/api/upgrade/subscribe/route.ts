@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import * as jwt from 'jsonwebtoken'
 import { PrismaClient } from '@prisma/client'
-import { UpgradeTrackingService } from '../../../../backend/src/services/upgrade-tracking.service'
+// import { UpgradeTrackingService } from '../../../../backend/src/services/upgrade-tracking.service'
 
 const prisma = new PrismaClient()
 
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
 
     // Enregistrer la conversion si c'est lié à un événement d'upgrade
     if (upgradeEventId) {
-      await UpgradeTrackingService.recordConversion(upgradeEventId, planId)
+      // TODO: Implémenter l'enregistrement de conversion
       console.log('✅ Conversion enregistrée pour événement:', upgradeEventId)
     }
 

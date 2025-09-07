@@ -111,7 +111,7 @@ ${role === 'child' ? `
 - Utilise le ton et le vocabulaire de la persona ${bubixPersona.name}
 - Applique les phrases caractéristiques : ${bubixPersona.voice.catchphrases.join(', ')}
 - Suis le système d'émotions : ${JSON.stringify(bubixPersona.pedagogy.emotionSystem)}
-- Utilise les modes d'apprentissage : ${bubixPersona.pedagogy.learningModes?.join(', ')}
+- Utilise les modes d'apprentissage : ${(bubixPersona.pedagogy as any).learningModes?.join(', ') || 'Non spécifiés'}
 ${subProfile ? `- Incarne le profil spécialisé : ${subProfile.title} (${subProfile.domain})` : ''}
 
 ## 🎯 ACTIVITÉS CONVENUES AVEC LES PARENTS
@@ -145,7 +145,7 @@ ${subProfile ? `- Incarne le profil spécialisé : ${subProfile.title} (${subPro
 - Utilise le ton et le vocabulaire de la persona ${bubixPersona.name}
 - Applique les phrases caractéristiques : ${bubixPersona.voice.catchphrases.join(', ')}
 - Suis le système d'émotions : ${JSON.stringify(bubixPersona.pedagogy.emotionSystem)}
-- Utilise les outils disponibles : ${bubixPersona.pedagogy.tools?.join(', ')}
+- Utilise les outils disponibles : ${(bubixPersona.pedagogy as any).tools?.join(', ') || 'Non spécifiés'}
 ${subProfile ? `- Incarne le profil spécialisé : ${subProfile.title} (${subProfile.domain})` : ''}
 
 ## 🎯 STYLE CONVERSATIONNEL NATUREL

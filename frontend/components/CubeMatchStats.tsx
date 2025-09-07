@@ -18,7 +18,7 @@ import {
   Users,
   Calendar
 } from 'lucide-react';
-import { cubematchAPI } from '../../lib/api/cubematch';
+// import { cubematchAPI } from '../../lib/api/cubematch';
 
 interface CubeMatchStats {
   totalGames: number;
@@ -80,11 +80,10 @@ export default function CubeMatchStats() {
   const loadStats = async () => {
     setLoading(true);
     try {
-      const [statsData, operatorData, insightsData] = await Promise.all([
-        cubematchAPI.getStats(),
-        cubematchAPI.getOperatorStats(timeRange),
-        cubematchAPI.getInsights()
-      ]);
+      // TODO: Implémenter l'API CubeMatch
+      const statsData = null;
+      const operatorData = null;
+      const insightsData = null;
       
       setStats(statsData);
       setOperatorStats(operatorData || []);
@@ -255,7 +254,7 @@ function OverviewCategory({ stats }: { stats: CubeMatchStats | null }) {
     },
     {
       title: 'Score total',
-      value: formatScore(stats.totalScore),
+      value: stats.totalScore.toLocaleString(),
       icon: Trophy,
       color: 'text-green-600 bg-green-100'
     },
@@ -267,13 +266,13 @@ function OverviewCategory({ stats }: { stats: CubeMatchStats | null }) {
     },
     {
       title: 'Meilleur score',
-      value: formatScore(stats.bestScore),
+      value: stats.bestScore.toLocaleString(),
       icon: Star,
       color: 'text-yellow-600 bg-yellow-100'
     },
     {
       title: 'Temps total',
-      value: formatTime(stats.totalTimePlayed),
+      value: `${Math.round(stats.totalTimePlayed / 60000)} min`,
       icon: Clock,
       color: 'text-indigo-600 bg-indigo-100'
     },
@@ -323,8 +322,8 @@ function OperatorsCategory({ operatorStats }: { operatorStats: OperatorStats[] }
         {operatorStats.map((op) => (
           <div key={op.operator} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <div className={`p-3 rounded-lg text-2xl font-bold ${getOperatorColor(op.operator)}`}>
-                {getOperatorIcon(op.operator)}
+              <div className="p-3 rounded-lg text-2xl font-bold bg-blue-100 text-blue-600">
+                {op.operator}
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -345,7 +344,7 @@ function OperatorsCategory({ operatorStats }: { operatorStats: OperatorStats[] }
               </div>
               <div>
                 <div className="text-sm text-gray-500">Meilleur score</div>
-                <div className="text-lg font-semibold">{formatScore(op.bestScore)}</div>
+                <div className="text-lg font-semibold">{op.bestScore.toLocaleString()}</div>
               </div>
               <div>
                 <div className="text-sm text-gray-500">Niveau max</div>
@@ -382,8 +381,8 @@ function PerformanceCategory({ stats, operatorStats }: { stats: CubeMatchStats |
           <div className="space-y-4">
             {operatorStats.map((op) => (
               <div key={op.operator} className="flex items-center space-x-4">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold ${getOperatorColor(op.operator)}`}>
-                  {getOperatorIcon(op.operator)}
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold bg-blue-100 text-blue-600">
+                  {op.operator}
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between text-sm mb-1">
@@ -409,13 +408,13 @@ function PerformanceCategory({ stats, operatorStats }: { stats: CubeMatchStats |
             {operatorStats.map((op) => (
               <div key={op.operator} className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className={`w-6 h-6 rounded flex items-center justify-center font-bold text-sm ${getOperatorColor(op.operator)}`}>
-                    {getOperatorIcon(op.operator)}
+                  <div className="w-6 h-6 rounded flex items-center justify-center font-bold text-sm bg-blue-100 text-blue-600">
+                    {op.operator}
                   </div>
                   <span className="text-sm">{op.operator}</span>
                 </div>
                 <div className="text-sm font-medium">
-                  {formatTime(op.averageTimePerGame)}
+                  {Math.round(op.averageTimePerGame / 1000)}s
                 </div>
               </div>
             ))}

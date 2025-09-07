@@ -247,7 +247,7 @@ export class AutomaticRecommendations {
     // Analyser les sujets préférés
     const favoriteTopics = conversationData.favoriteTopics
     if (Object.keys(favoriteTopics).length > 0) {
-      const topTopic = Object.entries(favoriteTopics).sort(([,a], [,b]) => b - a)[0]
+      const topTopic = Object.entries(favoriteTopics).sort(([,a], [,b]) => (b as number) - (a as number))[0]
       
       recommendations.push({
         id: 'topic_expansion',
