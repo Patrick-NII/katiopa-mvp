@@ -193,7 +193,7 @@ export default function FamilyPage({ user, childSessions }: FamilyPageProps) {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
-                    {child.firstName.charAt(0)}{child.lastName.charAt(0)}
+                    {child.firstName?.charAt(0) || '?'}{child.lastName?.charAt(0) || '?'}
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">
