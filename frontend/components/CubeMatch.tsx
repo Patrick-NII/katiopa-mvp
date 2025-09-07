@@ -1354,7 +1354,7 @@ export default function CubeMatch() {
 function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<Action> }) {
   const theme = themePalette[(state.config.theme ?? 'classic') as keyof typeof themePalette];
   const { ref: frameRef, size: frame } = useElementSize<HTMLDivElement>();
-  const gap = window.innerWidth < 768 ? 6 : 8; // Espacement optimisé pour mobile
+  const gap = window.innerWidth < 768 ? 4 : 8; // Espacement réduit sur mobile
   const cols = state.config.cols;
   const rows = state.config.rows;
 
@@ -1362,7 +1362,7 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
     if (!frame.width || !frame.height) return 56;
     
     // Calculer l'espace disponible en tenant compte du padding et des gaps
-    const padding = window.innerWidth < 768 ? 4 : 8; // Padding réduit sur mobile
+    const padding = window.innerWidth < 768 ? 8 : 16; // p-2 lg:p-4
     const availableWidth = frame.width - (padding * 2);
     const availableHeight = frame.height - (padding * 2);
     
@@ -1372,8 +1372,8 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
     const byH = Math.floor(hForCells / rows);
     
     // Tailles optimisées pour les enfants - plus grandes sur mobile
-    const maxSize = window.innerWidth < 768 ? 55 : window.innerWidth < 1024 ? 60 : 70;
-    const minSize = window.innerWidth < 768 ? 40 : window.innerWidth < 1024 ? 40 : 45;
+    const maxSize = window.innerWidth < 768 ? 50 : window.innerWidth < 1024 ? 60 : 70;
+    const minSize = window.innerWidth < 768 ? 35 : window.innerWidth < 1024 ? 40 : 45;
     
     // Prendre le minimum pour s'assurer que la grille rentre complètement
     const optimalSize = Math.min(byW, byH);
@@ -1396,20 +1396,20 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
       window.innerWidth < 768 ? 'p-0' : 'p-1'
     }`}>
       {/* Grille de jeu avec design épuré et responsive */}
-      <div 
-        ref={frameRef} 
-        className={`rounded-2xl shadow-lg border border-gray-200 flex items-center justify-center ${
-          window.innerWidth < 768 
-            ? 'bg-transparent border-transparent shadow-none' 
-            : 'bg-white'
-        }`}
-        style={{
-          width: '100%',
-          height: '100%',
-          maxWidth: '100%',
-          maxHeight: '100%'
-        }}
-      >
+        <div 
+          ref={frameRef} 
+          className={`rounded-2xl shadow-lg border border-gray-200 flex items-center justify-center ${
+            window.innerWidth < 768 
+              ? 'bg-transparent border-transparent shadow-none' 
+              : 'bg-white'
+          }`}
+          style={{
+            width: '100%',
+            height: '100%',
+            maxWidth: '100%',
+            maxHeight: '100%'
+          }}
+        >
         <div
           className="grid"
           style={{
