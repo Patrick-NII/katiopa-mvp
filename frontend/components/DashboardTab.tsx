@@ -22,7 +22,8 @@ import {
   RefreshCw,
   Bookmark,
   Flag,
-  Trash2
+  Trash2,
+  Calendar
 } from 'lucide-react'
 import AnimatedLLMButton from './AnimatedLLMButton'
 import AdvancedLLMResults from './AdvancedLLMResults'
@@ -41,6 +42,7 @@ import AnalysisFilters from './AnalysisFilters'
 import AnalysisPagination from './AnalysisPagination'
 import ConversationAnalysis from './ConversationAnalysis'
 import { useLimitationPopup } from '@/hooks/useLimitationPopup'
+import WeeklyCycle from './WeeklyCycle'
 
 interface DashboardTabProps {
   user: any
@@ -1351,6 +1353,45 @@ export default function DashboardTab({
                 </div>
               )}
             </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Cycle d'apprentissage hebdomadaire pour les parents */}
+      {user?.userType === 'PARENT' && childSessions.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="bg-white rounded-2xl p-6 shadow-sm"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <Calendar className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-semibold text-gray-900">Cycle d'apprentissage hebdomadaire</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Cycle pour chaque enfant */}
+            {childSessions.map((session) => (
+              <div key={session.id} className="space-y-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-sm">
+                    {session.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">{session.name}</h4>
+                    <p className="text-xs text-gray-500 font-mono">ID: {session.sessionId}</p>
+                  </div>
+                </div>
+                
+                <WeeklyCycle 
+                  childName={session.name}
+                  currentDay={new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()}
+                  completedDays={['monday', 'tuesday']} // TODO: Récupérer depuis l'API
+                  showProgress={true}
+                />
+              </div>
+            ))}
           </div>
         </motion.div>
       )}

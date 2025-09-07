@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import { getCachedBubixAnalysis, cacheBubixAnalysis, getCachedSessionData, cacheSessionData } from '@/lib/cache';
 import { PredictiveAnalytics } from '@/lib/predictive-analytics';
 import { AutomaticRecommendations } from '@/lib/automatic-recommendations';
+import { PEDAGOGICAL_CHARTER, getCommunicationStyle, generatePedagogicalMessage } from '@/lib/pedagogical-charter';
 
 const prisma = new PrismaClient();
 
@@ -425,8 +426,39 @@ export async function POST(request: NextRequest) {
     // ÉTAPE 5: Traitement par l'IA
     console.log('🤖 ÉTAPE 5: Traitement par l\'IA...');
     
+    // Déterminer le style de communication pédagogique
+    const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'lowercase' });
+    const communicationStyle = getCommunicationStyle({
+      currentModule: childData.domains.includes('math') ? 'MathCube' : 
+                    childData.domains.includes('code') ? 'CodeCube' :
+                    childData.domains.includes('science') ? 'ScienceCube' : 'PlayCube',
+      dayOfWeek: currentDay,
+      childAge: childData.age,
+      childPreferences: childData.conversationAnalysis.favoriteTopics ? Object.keys(childData.conversationAnalysis.favoriteTopics) : []
+    });
+    
+    const pedagogicalContext = PEDAGOGICAL_CHARTER.principles[communicationStyle as keyof typeof PEDAGOGICAL_CHARTER.principles];
+    
     const enrichedPrompt = `
 Tu es Bubix, l'assistant IA éducatif de CubeAI. 
+
+🎓 CONTEXTE PÉDAGOGIQUE CUBEAI 🎓
+Tu appliques la charte pédagogique CubeAI qui combine :
+- **${pedagogicalContext.name}** : ${pedagogicalContext.description}
+- **Approche** : ${pedagogicalContext.approach}
+- **Style de communication** : ${pedagogicalContext.communication}
+
+📋 PRINCIPES PÉDAGOGIQUES À RESPECTER :
+- **Singapour (Rigueur)** : Apprentissage structuré concret → pictural → abstrait
+- **Finlande (Bien-être)** : Sessions courtes, choix personnels, motivation intrinsèque
+- **Estonie (Innovation)** : Compétences numériques et préparation au futur
+- **Reggio Emilia (Créativité)** : Expression multiple, projets ouverts, jeu libre
+- **IB/IPC (Transversalité)** : Connexions interdisciplinaires, vision globale
+
+💬 TON DE COMMUNICATION :
+Utilise un langage ${pedagogicalContext.communication.toLowerCase()} adapté à l'âge de ${childData.age} ans.
+Exemples de ton à adopter :
+${PEDAGOGICAL_CHARTER.communicationStyles[communicationStyle as keyof typeof PEDAGOGICAL_CHARTER.communicationStyles].examples.slice(0, 2).map(ex => `- "${ex}"`).join('\n')}
 
 ⚠️ DONNÉES STRICTEMENT VÉRIFIÉES ET RÉELLES ⚠️
 - Nom complet de l'enfant : ${childData.name}

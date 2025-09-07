@@ -178,9 +178,7 @@ export default function MathCubePage() {
 
             {/* Tableau de classement */}
             <div className="space-y-2 sm:space-y-3">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-800 text-center">
-                Classement Global
-              </h3>
+              
               
               {/* En-tête du tableau épuré */}
               <div className="bg-gray-50 rounded-lg p-2 sm:p-3">
