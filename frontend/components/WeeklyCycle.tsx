@@ -12,15 +12,19 @@ import {
   Calendar,
   Clock,
   Target,
-  Sparkles
+  Sparkles,
+  CheckCircle,
+  Circle
 } from 'lucide-react'
+import { useLearningCycles } from '@/hooks/useLearningCycles'
 
 interface WeeklyCycleProps {
   childName: string
   currentDay: string
-  completedDays?: string[]
+  childSessionId?: string
   onDayClick?: (day: string) => void
   showProgress?: boolean
+  interactive?: boolean // Permet de marquer les jours comme complétés
 }
 
 const WEEKLY_CYCLE = {
@@ -95,17 +99,71 @@ const WEEKLY_CYCLE = {
 export default function WeeklyCycle({ 
   childName, 
   currentDay, 
-  completedDays = [], 
+  childSessionId,
   onDayClick,
-  showProgress = true 
+  showProgress = true,
+  interactive = false
 }: WeeklyCycleProps) {
+  const { currentCycle, loading, error, markDayCompleted } = useLearningCycles(childSessionId);
+  
   const getCurrentDayInfo = () => {
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase() as keyof typeof WEEKLY_CYCLE;
     return WEEKLY_CYCLE[today] || WEEKLY_CYCLE.monday;
   };
 
   const currentDayInfo = getCurrentDayInfo();
+  const completedDays = currentCycle?.completedDays || [];
   const progressPercentage = (completedDays.length / 6) * 100;
+
+  const handleDayClick = async (dayKey: string) => {
+    if (interactive && !completedDays.includes(dayKey)) {
+      try {
+        await markDayCompleted(dayKey);
+        onDayClick?.(dayKey);
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour:', error);
+      }
+    } else {
+      onDayClick?.(dayKey);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <div className="inline-flex items-center gap-2 mb-2">
+            <Calendar className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-semibold text-gray-900">Cycle d'apprentissage hebdomadaire</h3>
+          </div>
+          <p className="text-sm text-gray-600">Chargement...</p>
+        </div>
+        <div className="animate-pulse space-y-4">
+          <div className="h-20 bg-gray-200 rounded-xl"></div>
+          <div className="h-16 bg-gray-200 rounded-xl"></div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-24 bg-gray-200 rounded-lg"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <div className="inline-flex items-center gap-2 mb-2">
+            <Calendar className="w-5 h-5 text-red-600" />
+            <h3 className="text-lg font-semibold text-gray-900">Cycle d'apprentissage hebdomadaire</h3>
+          </div>
+          <p className="text-sm text-red-600">Erreur: {error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -176,12 +234,12 @@ export default function WeeklyCycle({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              onClick={() => onDayClick?.(dayKey)}
+              onClick={() => handleDayClick(dayKey)}
               className={`
                 ${dayInfo.bgColor} ${dayInfo.borderColor} border rounded-lg p-3 cursor-pointer transition-all duration-200
                 ${isCompleted ? 'ring-2 ring-green-400' : ''}
                 ${isCurrentDay ? 'ring-2 ring-blue-400 shadow-md' : 'hover:shadow-sm'}
-                ${onDayClick ? 'hover:scale-105' : ''}
+                ${(onDayClick || interactive) ? 'hover:scale-105' : ''}
               `}
             >
               <div className="flex items-center gap-2 mb-2">

@@ -501,8 +501,8 @@ function ChildInterface({
         <WeeklyCycle 
           childName={firstName}
           currentDay={new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()}
-          completedDays={['monday', 'tuesday']} // TODO: Récupérer depuis l'API
           showProgress={true}
+          interactive={true}
         />
       </div>
 
