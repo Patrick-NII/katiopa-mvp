@@ -227,13 +227,13 @@ const defaultConfig: Config = {
   cascadeMode: false,
 };
 
-// Configuration adaptée au mobile - grille 5x5 max
+// Configuration adaptée au mobile - grille 7x7 max
 const getMobileOptimizedConfig = (): Config => {
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   return {
     ...defaultConfig,
-    rows: isMobile ? 5 : 10,
-    cols: isMobile ? 5 : 10,
+    rows: isMobile ? 7 : 10,
+    cols: isMobile ? 7 : 10,
   };
 };
 
@@ -809,8 +809,8 @@ export default function CubeMatch() {
   useEffect(() => {
     const handleResize = () => {
       const isMobile = window.innerWidth < 768;
-      const currentMaxRows = isMobile ? 5 : 10;
-      const currentMaxCols = isMobile ? 5 : 10;
+      const currentMaxRows = isMobile ? 7 : 10;
+      const currentMaxCols = isMobile ? 7 : 10;
       
       // Si la grille actuelle dépasse les limites mobiles, la redimensionner
       if (state.config.rows > currentMaxRows || state.config.cols > currentMaxCols) {
@@ -1792,11 +1792,11 @@ function OptionsModal({ state, dispatch, onClose }:{ state: State; dispatch: Rea
                   <input
                     type="number"
                     min={4}
-                    max={typeof window !== 'undefined' && window.innerWidth < 768 ? 5 : 10}
+                    max={typeof window !== 'undefined' && window.innerWidth < 768 ? 7 : 10}
                     step={1}
                     value={state.config.rows}
                     onChange={e => {
-                      const maxRows = typeof window !== 'undefined' && window.innerWidth < 768 ? 5 : 10;
+                      const maxRows = typeof window !== 'undefined' && window.innerWidth < 768 ? 7 : 10;
                       const rows = Math.max(4, Math.min(maxRows, parseInt(e.target.value || '10', 10)));
                       dispatch({type: 'SET_SIZE', rows, cols: state.config.cols});
                     }}
@@ -1808,11 +1808,11 @@ function OptionsModal({ state, dispatch, onClose }:{ state: State; dispatch: Rea
                   <input
                     type="number"
                     min={4}
-                    max={typeof window !== 'undefined' && window.innerWidth < 768 ? 5 : 10}
+                    max={typeof window !== 'undefined' && window.innerWidth < 768 ? 7 : 10}
                     step={1}
                     value={state.config.cols}
                     onChange={e => {
-                      const maxCols = typeof window !== 'undefined' && window.innerWidth < 768 ? 5 : 10;
+                      const maxCols = typeof window !== 'undefined' && window.innerWidth < 768 ? 7 : 10;
                       const cols = Math.max(4, Math.min(maxCols, parseInt(e.target.value || '10', 10)));
                       dispatch({type: 'SET_SIZE', rows: state.config.rows, cols});
                     }}
