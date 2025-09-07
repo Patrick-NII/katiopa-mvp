@@ -209,11 +209,21 @@ export async function POST(request: NextRequest) {
       }))
     };
     
-    // Calculer le score moyen (combinaison des activités et des scores CubeMatch)
+    // Calculer le score moyen (séparer les activités et les scores CubeMatch)
     const activityScores = activities.map(activity => activity.score).filter(Boolean);
     const cubeMatchScoreValues = cubeMatchScores.map(score => score.score).filter(Boolean);
-    const allScores = [...activityScores, ...cubeMatchScoreValues];
-    const averageScore = allScores.length > 0 ? allScores.reduce((sum, score) => sum + score, 0) / allScores.length : 0;
+    
+    // Calculer les moyennes séparément
+    const activityAverage = activityScores.length > 0 ? 
+      activityScores.reduce((sum, score) => sum + score, 0) / activityScores.length : 0;
+    
+    const cubeMatchAverage = cubeMatchScoreValues.length > 0 ? 
+      cubeMatchScoreValues.reduce((sum, score) => sum + score, 0) / cubeMatchScoreValues.length : 0;
+    
+    // Score moyen global (pondéré par le nombre d'activités)
+    const totalActivitiesCount = activityScores.length + cubeMatchScoreValues.length;
+    const averageScore = totalActivitiesCount > 0 ? 
+      ((activityAverage * activityScores.length) + (cubeMatchAverage * cubeMatchScoreValues.length)) / totalActivitiesCount : 0;
 
     // Extraire les domaines uniques
     const domains = [...new Set(activities.map(activity => activity.domain).filter(Boolean))];
@@ -227,6 +237,31 @@ export async function POST(request: NextRequest) {
         date: activity.createdAt
       };
     });
+
+    // Préparer les données CubeMatch détaillées
+    const cubeMatchAnalysis = {
+      totalGames: cubeMatchScores.length,
+      bestScore: cubeMatchScores.length > 0 ? Math.max(...cubeMatchScoreValues) : 0,
+      averageScore: cubeMatchAverage,
+      highestLevel: cubeMatchScores.length > 0 ? Math.max(...cubeMatchScores.map(s => s.level)) : 0,
+      totalTimePlayed: cubeMatchScores.reduce((sum, score) => sum + Number(score.time_played_ms), 0),
+      recentGames: cubeMatchScores.slice(-3).map(score => ({
+        score: score.score,
+        level: score.level,
+        operator: score.operator,
+        duration: Number(score.time_played_ms),
+        date: score.created_at
+      })),
+      performanceByOperator: cubeMatchScores.reduce((acc, score) => {
+        if (!acc[score.operator]) {
+          acc[score.operator] = { count: 0, totalScore: 0, bestScore: 0 };
+        }
+        acc[score.operator].count++;
+        acc[score.operator].totalScore += score.score;
+        acc[score.operator].bestScore = Math.max(acc[score.operator].bestScore, score.score);
+        return acc;
+      }, {} as Record<string, { count: number, totalScore: number, bestScore: number }>)
+    };
 
     const childData = {
       name: `${child.firstName} ${child.lastName}`,
@@ -249,6 +284,8 @@ export async function POST(request: NextRequest) {
         topic: prompt.activityType,
         date: prompt.createdAt
       })),
+      // Données CubeMatch détaillées
+      cubeMatchAnalysis,
       // Nouvelles données enrichies
       profile: child.profile ? {
         learningGoals: child.profile.learningGoals || [],
@@ -401,6 +438,21 @@ Tu es Bubix, l'assistant IA éducatif de CubeAI.
 - Temps total d'apprentissage : ${Math.round(childData.totalTime / (1000 * 60))} minutes
 - Domaines étudiés dans cette session : ${childData.domains.length > 0 ? childData.domains.join(', ') : 'Aucun domaine spécifique'}
 - Activités récentes avec scores réels : ${childData.recentActivities.length > 0 ? childData.recentActivities.map(a => `${a.domain} (${a.score}%)`).join(', ') : 'Aucune activité récente'}
+
+🎮 ANALYSE DES PERFORMANCES CUBEMATCH :
+- Nombre total de parties jouées : ${childData.cubeMatchAnalysis.totalGames}
+- Meilleur score atteint : ${childData.cubeMatchAnalysis.bestScore.toLocaleString()} points
+- Score moyen par partie : ${Math.round(childData.cubeMatchAnalysis.averageScore).toLocaleString()} points
+- Niveau maximum atteint : ${childData.cubeMatchAnalysis.highestLevel}
+- Temps total de jeu : ${Math.round(childData.cubeMatchAnalysis.totalTimePlayed / (1000 * 60))} minutes
+- Parties récentes :
+${childData.cubeMatchAnalysis.recentGames.length > 0 ? childData.cubeMatchAnalysis.recentGames.map((game, index) => `
+  ${index + 1}. Score: ${game.score.toLocaleString()} pts, Niveau: ${game.level}, Opérateur: ${game.operator} - ${new Date(game.date).toLocaleDateString('fr-FR')}
+`).join('') : '  Aucune partie récente'}
+- Performance par opérateur :
+${Object.entries(childData.cubeMatchAnalysis.performanceByOperator).length > 0 ? Object.entries(childData.cubeMatchAnalysis.performanceByOperator).map(([op, stats]) => `
+  ${op}: ${stats.count} parties, Score moyen: ${Math.round(stats.totalScore / stats.count).toLocaleString()}, Meilleur: ${stats.bestScore.toLocaleString()}
+`).join('') : '  Aucune donnée par opérateur'}
 
 📚 ANALYSE DES CONVERSATIONS AVEC BUBIX :
 - Nombre total de conversations : ${childData.conversationAnalysis.totalConversations}
