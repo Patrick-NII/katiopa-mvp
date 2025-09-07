@@ -17,7 +17,7 @@ import {
   Play,
   Zap
 } from 'lucide-react'
-import WeeklyCycle from '../../components/WeeklyCycle'
+import WeeklyCycle from '../../../components/WeeklyCycle'
 
 interface ExperiencesPageProps {
   user: any
