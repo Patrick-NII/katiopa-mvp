@@ -30,7 +30,6 @@ import { apiFetch } from '@/lib/api'
 import { childSessionsAPI, type ChildSession, type ChildActivity, type SessionAnalysis, type GlobalAnalysis, type ExerciseResponse } from '@/lib/api/sessions'
 import { useTracking } from '@/hooks/useTracking'
 import { useRealTimeStatus } from '@/hooks/useRealTimeStatus'
-import AIWritingAnimation from './AIWritingAnimation'
 import SavedAnalyses from './SavedAnalyses'
 import OnlineStatus from './OnlineStatus'
 import LimitationPopup from './LimitationPopup'
@@ -75,7 +74,6 @@ export default function DashboardTab({
   const [exerciseResponses, setExerciseResponses] = useState<Record<string, ExerciseResponse>>({});
   const [globalAnalyses, setGlobalAnalyses] = useState<Record<string, GlobalAnalysis>>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
-  const [aiWritingStates, setAiWritingStates] = useState<Record<string, { isWriting: boolean; type: 'compte_rendu' }>>({});
   const [expandedAnalyses, setExpandedAnalyses] = useState<Record<string, boolean>>({});
   const [realSummary, setRealSummary] = useState<any>(null);
   const [savedAnalyses, setSavedAnalyses] = useState<any[]>([]);
@@ -418,7 +416,6 @@ export default function DashboardTab({
   const generateCompteRendu = async (sessionId: string) => {
     try {
       setLoadingStates(prev => ({ ...prev, [`compte_rendu_${sessionId}`]: true }));
-      setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: true, type: 'compte_rendu' } }));
 
       // Initialiser les étapes Bubix
       setBubixStepsVisible(prev => ({ ...prev, [sessionId]: true }));
@@ -513,7 +510,6 @@ export default function DashboardTab({
       }));
     } finally {
       setLoadingStates(prev => ({ ...prev, [`compte_rendu_${sessionId}`]: false }));
-      setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'compte_rendu' } }));
       
       // Masquer les étapes après 3 secondes
       setTimeout(() => {
