@@ -217,6 +217,16 @@ const defaultConfig: Config = {
   cascadeMode: false,
 };
 
+// Configuration adaptée au mobile - grille 7x7 max
+const getMobileOptimizedConfig = (): Config => {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  return {
+    ...defaultConfig,
+    rows: isMobile ? 7 : 10,
+    cols: isMobile ? 7 : 10,
+  };
+};
+
 const STORAGE_KEY = 'cubeMatch:v1';
 
 // Fonction utilitaire pour nettoyer le localStorage et forcer 10x10
@@ -290,21 +300,25 @@ function loadSaved(): State | null {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
     }
     
-    // Migration automatique : si rows/cols > 10, les ramener à 10x10
-    if (savedConfig.rows && savedConfig.rows > 10) {
-      savedConfig.rows = 10;
+    // Migration automatique : si rows/cols > 10, les ramener à 10x10 (ou 7x7 sur mobile)
+    const mobileConfig = getMobileOptimizedConfig();
+    const maxRows = mobileConfig.rows;
+    const maxCols = mobileConfig.cols;
+    
+    if (savedConfig.rows && savedConfig.rows > maxRows) {
+      savedConfig.rows = maxRows;
     }
-    if (savedConfig.cols && savedConfig.cols > 10) {
-      savedConfig.cols = 10;
+    if (savedConfig.cols && savedConfig.cols > maxCols) {
+      savedConfig.cols = maxCols;
     }
     
     // Fusionner proprement avec defaultConfig en s'assurant que maxSize >= 9
     const mergedConfig = { 
-      ...defaultConfig, 
+      ...mobileConfig, 
       ...savedConfig,
       maxSize: Math.max(9, savedConfig.maxSize || defaultConfig.maxSize),
-      rows: Math.max(4, Math.min(10, savedConfig.rows || defaultConfig.rows)),
-      cols: Math.max(4, Math.min(10, savedConfig.cols || defaultConfig.cols))
+      rows: Math.max(4, Math.min(maxRows, savedConfig.rows || mobileConfig.rows)),
+      cols: Math.max(4, Math.min(maxCols, savedConfig.cols || mobileConfig.cols))
     };
     
     return {
@@ -393,7 +407,8 @@ const themePalette = {
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'INIT': {
-      const config = { ...defaultConfig, ...action.payload };
+      const mobileConfig = getMobileOptimizedConfig();
+      const config = { ...mobileConfig, ...action.payload };
       return {
         grid: emptyGrid(config.rows, config.cols),
         selected: [],
@@ -779,6 +794,25 @@ export default function CubeMatch() {
     };
     if (showLeaderboard) loadScores();
   }, [showLeaderboard]);
+
+  // Détecter les changements de taille d'écran et ajuster la grille
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      const currentMaxRows = isMobile ? 7 : 10;
+      const currentMaxCols = isMobile ? 7 : 10;
+      
+      // Si la grille actuelle dépasse les limites mobiles, la redimensionner
+      if (state.config.rows > currentMaxRows || state.config.cols > currentMaxCols) {
+        const newRows = Math.min(state.config.rows, currentMaxRows);
+        const newCols = Math.min(state.config.cols, currentMaxCols);
+        dispatch({ type: 'SET_SIZE', rows: newRows, cols: newCols });
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [state.config.rows, state.config.cols, dispatch]);
 
   // Save score quand gameOver
   useEffect(() => {
@@ -1735,11 +1769,12 @@ function OptionsModal({ state, dispatch, onClose }:{ state: State; dispatch: Rea
                   <input
                     type="number"
                     min={4}
-                    max={10}
+                    max={typeof window !== 'undefined' && window.innerWidth < 768 ? 7 : 10}
                     step={1}
                     value={state.config.rows}
                     onChange={e => {
-                      const rows = Math.max(4, Math.min(10, parseInt(e.target.value || '10', 10)));
+                      const maxRows = typeof window !== 'undefined' && window.innerWidth < 768 ? 7 : 10;
+                      const rows = Math.max(4, Math.min(maxRows, parseInt(e.target.value || '10', 10)));
                       dispatch({type: 'SET_SIZE', rows, cols: state.config.cols});
                     }}
                     className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -1750,11 +1785,12 @@ function OptionsModal({ state, dispatch, onClose }:{ state: State; dispatch: Rea
                   <input
                     type="number"
                     min={4}
-                    max={10}
+                    max={typeof window !== 'undefined' && window.innerWidth < 768 ? 7 : 10}
                     step={1}
                     value={state.config.cols}
                     onChange={e => {
-                      const cols = Math.max(4, Math.min(10, parseInt(e.target.value || '10', 10)));
+                      const maxCols = typeof window !== 'undefined' && window.innerWidth < 768 ? 7 : 10;
+                      const cols = Math.max(4, Math.min(maxCols, parseInt(e.target.value || '10', 10)));
                       dispatch({type: 'SET_SIZE', rows: state.config.rows, cols});
                     }}
                     className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
