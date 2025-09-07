@@ -5,6 +5,35 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// Fonction utilitaire pour formater le temps en millisecondes en format lisible
+function formatDuration(ms: number): string {
+  if (!ms || ms === 0) return '0 min';
+  
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  
+  if (days > 0) {
+    return `${days}j ${hours % 24}h`;
+  } else if (hours > 0) {
+    return `${hours}h ${minutes % 60}min`;
+  } else if (minutes > 0) {
+    return `${minutes}min`;
+  } else {
+    return `${seconds}s`;
+  }
+}
+
+// Fonction pour calculer le temps en ligne depuis le début de session
+function getOnlineDuration(currentSessionStartTime: Date | null): string {
+  if (!currentSessionStartTime) return '0 min';
+  
+  const now = new Date();
+  const diffMs = now.getTime() - currentSessionStartTime.getTime();
+  return formatDuration(diffMs);
+}
+
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = cookies();
@@ -43,18 +72,25 @@ export async function GET(request: NextRequest) {
     });
 
     // Transformer les données pour correspondre à l'interface ChildSession
-    const formattedSessions = childSessions.map(session => ({
-      id: session.id,
-      sessionId: session.sessionId,
-      name: `${session.firstName} ${session.lastName}`,
-      emoji: '👶', // Emoji par défaut
-      isOnline: session.currentSessionStartTime ? true : false,
-      lastActivity: session.lastLoginAt || session.currentSessionStartTime || new Date(),
-      totalTime: Number(session.totalConnectionDurationMs) || 0,
-      userType: 'CHILD' as const,
-      age: session.age,
-      grade: session.grade
-    }));
+    const formattedSessions = childSessions.map(session => {
+      const totalTimeMs = Number(session.totalConnectionDurationMs) || 0;
+      const onlineDuration = getOnlineDuration(session.currentSessionStartTime);
+      
+      return {
+        id: session.id,
+        sessionId: session.sessionId,
+        name: `${session.firstName} ${session.lastName}`,
+        emoji: '👶', // Emoji par défaut
+        isOnline: session.currentSessionStartTime ? true : false,
+        lastActivity: session.lastLoginAt || session.currentSessionStartTime || new Date(),
+        totalTime: formatDuration(totalTimeMs), // Formaté en texte lisible
+        totalTimeMs: totalTimeMs, // Garder la valeur brute en millisecondes pour les calculs
+        onlineDuration: onlineDuration, // Temps en ligne depuis le début de session
+        userType: 'CHILD' as const,
+        age: session.age,
+        grade: session.grade
+      };
+    });
 
     return NextResponse.json(formattedSessions);
 

@@ -700,7 +700,7 @@ export default function DashboardTab({
                     />
                     <div className="text-right">
                       <p className="text-sm font-semibold text-gray-900"> 
-                        {sessionStatuses[session.sessionId]?.totalTime || session.totalTime} min
+                        {sessionStatuses[session.sessionId]?.totalTime || session.totalTime}
                       </p>
                       <p className="text-xs text-gray-500">
                         {sessionStatuses[session.sessionId]?.lastActivity 
