@@ -213,7 +213,7 @@ export default function HomePage() {
         </div>
 
         {/* Cube centre-gauche et plus proche du bas avec effet miroir rapproché */}
-        <div className="absolute bottom-20 left-1/4 transform -translate-x-1/2 z-10">
+        <div className="absolute -bottom-10 left-1/4 transform -translate-x-1/2 z-10">
           <div className="relative">
             <img 
               src="/image-bg/erasebg-transformed (5).png" 

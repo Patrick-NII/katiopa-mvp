@@ -1211,7 +1211,7 @@ export default function CubeMatch() {
 
       {/* Zone de jeu principale - responsive */}
       <div className="h-[calc(100vh-3rem)] lg:h-full flex flex-col lg:flex-row">
-        <div className="flex-1 flex items-start justify-center p-2 lg:p-4 min-h-0">
+        <div className="flex-1 flex items-center justify-center p-1 lg:p-2 min-h-0">
           <GameArea state={state} dispatch={dispatch} />
         </div>
         
@@ -1324,15 +1324,26 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
 
   const cellSizePx = useMemo(() => {
     if (!frame.width || !frame.height) return 56;
-    const wForCells = frame.width - gap * (cols - 1);
-    const hForCells = frame.height - gap * (rows - 1);
+    
+    // Calculer l'espace disponible en tenant compte du padding et des gaps
+    const padding = window.innerWidth < 768 ? 8 : 16; // p-2 lg:p-4
+    const availableWidth = frame.width - (padding * 2);
+    const availableHeight = frame.height - (padding * 2);
+    
+    const wForCells = availableWidth - gap * (cols - 1);
+    const hForCells = availableHeight - gap * (rows - 1);
     const byW = Math.floor(wForCells / cols);
     const byH = Math.floor(hForCells / rows);
-    // Optimisation mobile - tailles adaptées aux petits écrans
-    const maxSize = window.innerWidth < 768 ? 35 : window.innerWidth < 1024 ? 50 : 65;
-    const minSize = window.innerWidth < 768 ? 20 : window.innerWidth < 1024 ? 30 : 35;
-    return Math.max(minSize, Math.min(maxSize, Math.min(byW, byH)));
-  }, [frame, cols, rows]);
+    
+    // Tailles optimisées pour les enfants - plus grandes sur mobile
+    const maxSize = window.innerWidth < 768 ? 50 : window.innerWidth < 1024 ? 60 : 70;
+    const minSize = window.innerWidth < 768 ? 35 : window.innerWidth < 1024 ? 40 : 45;
+    
+    // Prendre le minimum pour s'assurer que la grille rentre complètement
+    const optimalSize = Math.min(byW, byH);
+    
+    return Math.max(minSize, Math.min(maxSize, optimalSize));
+  }, [frame, cols, rows, gap]);
 
   const fontPx = Math.floor(cellSizePx * 0.55);
   const valueClass = (v: number | null) => {
@@ -1345,15 +1356,25 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
   };
 
   return (
-    <div className="flex items-start justify-center h-full w-full">
+    <div className="flex items-center justify-center h-full w-full p-1">
       {/* Grille de jeu avec design épuré et responsive */}
-      <div ref={frameRef} className="bg-white rounded-2xl p-2 lg:p-4 shadow-lg border border-gray-200 max-w-full max-h-full">
+      <div 
+        ref={frameRef} 
+        className="bg-white rounded-2xl shadow-lg border border-gray-200 flex items-center justify-center"
+        style={{
+          width: '100%',
+          height: '100%',
+          maxWidth: '100%',
+          maxHeight: '100%'
+        }}
+      >
         <div
           className="grid"
           style={{
             gridTemplateColumns: `repeat(${cols}, ${cellSizePx}px)`,
             gridTemplateRows: `repeat(${rows}, ${cellSizePx}px)`,
             gap,
+            padding: '8px'
           }}
         >
           {state.grid.flat().map(cell => {
@@ -1372,11 +1393,12 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
               <button
                 key={cell.id}
                 onClick={() => dispatch({ type: 'CLICK', at: { row: cell.row, col: cell.col } })}
-                className={`flex items-center justify-center rounded-lg font-bold transition-all duration-200 touch-manipulation
-                  ${isSel ? 'bg-blue-500 text-white shadow-lg scale-105' : 'bg-gray-100 hover:bg-gray-200'}
-                  ${isHint ? 'ring-2 ring-yellow-400 ring-offset-2' : ''}
-                  ${isPlayable ? 'bg-blue-50 border-2 border-blue-300' : ''}
+                className={`flex items-center justify-center rounded-xl font-bold transition-all duration-200 touch-manipulation select-none
+                  ${isSel ? 'bg-blue-500 text-white shadow-lg scale-105 ring-2 ring-blue-300' : 'bg-gray-100 hover:bg-gray-200 active:bg-gray-300'}
+                  ${isHint ? 'ring-2 ring-yellow-400 ring-offset-2 bg-yellow-50' : ''}
+                  ${isPlayable ? 'bg-blue-50 border-2 border-blue-300 hover:bg-blue-100' : ''}
                   ${valueClass(cell.value)}
+                  hover:scale-105 active:scale-95
                 `}
                 style={{ 
                   width: cellSizePx, 
@@ -1384,7 +1406,9 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
                   fontSize: fontPx, 
                   lineHeight: 1,
                   minWidth: cellSizePx,
-                  minHeight: cellSizePx
+                  minHeight: cellSizePx,
+                  touchAction: 'manipulation',
+                  WebkitTapHighlightColor: 'transparent'
                 }}
               >
                 {cell.value ?? '·'}
