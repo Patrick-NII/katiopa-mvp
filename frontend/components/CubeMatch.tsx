@@ -156,6 +156,7 @@ type Action =
   | { type: 'HINT' }
   | { type: 'LEVEL_UP' }
   | { type: 'RESTART' }
+  | { type: 'START_GAME' }
   | { type: 'END_GAME' }
   | { type: 'CLOSE_GAME_OVER' }
   | { type: 'RESUME' }
@@ -307,7 +308,7 @@ function loadSaved(): State | null {
       combo: data.combo || 0,
       level: data.level || 1,
       config: mergedConfig,
-      running: data.running !== undefined ? data.running : true,
+      running: data.running !== undefined ? data.running : false,
       paused: data.paused || false,
       lastTick: data.lastTick || Date.now(),
       seed: data.seed || (Math.floor(Math.random() * 0xffffffff) >>> 0) || 1,
@@ -394,7 +395,7 @@ function reducer(state: State, action: Action): State {
         combo: 0,
         level: 1,
         config,
-        running: true,
+        running: false,
         paused: false,
         lastTick: Date.now(),
         seed: (Math.floor(Math.random() * 0xffffffff) >>> 0) || 1,
@@ -535,6 +536,12 @@ function reducer(state: State, action: Action): State {
 
     case 'CLICK': {
       if (state.gameOver) return state;
+      
+      // Démarrer le jeu si ce n'est pas encore fait
+      if (!state.running) {
+        return { ...state, running: true };
+      }
+      
       const cell = state.grid[action.at.row][action.at.col];
       if (cell.value === null) return state;
 
@@ -632,11 +639,19 @@ function reducer(state: State, action: Action): State {
     case 'RESTART':
       return reducer({ ...state, gameOver: false }, { type: 'INIT', payload: state.config });
 
+    case 'START_GAME':
+      return { ...state, running: true };
+
     case 'END_GAME':
       return { ...state, gameOver: true, running: false };
 
     case 'CLOSE_GAME_OVER':
-      return { ...state, gameOver: false };
+      return { 
+        ...state, 
+        gameOver: false, 
+        running: false,
+        paused: false 
+      };
 
     case 'RESUME':
       return { ...state, paused: false, running: true };
@@ -1093,11 +1108,13 @@ export default function CubeMatch() {
     return () => clearInterval(id);
   }, [state.running, state.config.tickMs]);
 
-  // Tick temps joué
+  // Tick temps joué - seulement quand le jeu est en cours
   useEffect(() => {
+    if (!state.running || state.paused || state.gameOver) return;
+    
     const id = setInterval(() => dispatch({ type: 'TICK_TIME', delta: 1000 }), 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [state.running, state.paused, state.gameOver]);
 
   // Auto-save
   useEffect(() => {
@@ -1188,7 +1205,7 @@ export default function CubeMatch() {
           ) : (
             <button 
               className="px-4 py-2 bg-green-500 text-white rounded-lg font-bold text-lg hover:bg-green-600 transition-all duration-200 shadow-md"
-              onClick={() => dispatch({ type: 'RESTART' })}
+              onClick={() => dispatch({ type: 'START_GAME' })}
               title="Commencer à jouer"
             >
               <PlayIcon />
