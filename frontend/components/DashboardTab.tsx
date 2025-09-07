@@ -705,7 +705,6 @@ export default function DashboardTab({
                     <div className="text-2xl">{session.emoji}</div>
                     <div>
                       <p className="text-sm font-medium text-gray-900">{session.name}</p>
-                      <p className="text-xs text-gray-500">ID: {session.sessionId}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -807,10 +806,16 @@ export default function DashboardTab({
                       <thead className="bg-gray-50">
                         <tr>
                           <th className="w-20 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Type
+                            <div className="leading-tight">
+                              <div>Type</div>
+                              <div>d'analyse</div>
+                            </div>
                           </th>
                           <th className="w-24 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Enfant
+                            <div className="leading-tight">
+                              <div>Nom de</div>
+                              <div>l'enfant</div>
+                            </div>
                           </th>
                           <th className="w-20 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Date
@@ -833,14 +838,15 @@ export default function DashboardTab({
                                 <td className="px-3 py-3">
                                   <div className="flex items-center gap-1">
                                     {response.type === 'compte_rendu' && <BookOpen className="w-3 h-3 text-blue-600 flex-shrink-0" />}
-                                    <span className="text-xs font-medium text-gray-900 truncate">
-                                      {response.type === 'compte_rendu' && 'Compte rendu'}
-                                    </span>
+                                    <div className="text-xs font-medium text-gray-900 leading-tight">
+                                      <div>Compte</div>
+                                      <div>rendu</div>
+                                    </div>
                                   </div>
                                 </td>
                                 <td className="px-3 py-3">
-                                  <div className="text-xs text-gray-900 truncate" title={childName}>
-                                    {childName}
+                                  <div className="text-xs text-gray-900 leading-tight" title={childName}>
+                                    <div className="truncate">{childName}</div>
                                   </div>
                                 </td>
                                 <td className="px-3 py-3">
