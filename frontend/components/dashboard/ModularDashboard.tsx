@@ -14,7 +14,7 @@ import SubscriptionTab from '../SubscriptionTab'
 import BillingTab from '../BillingTab'
 import FamilyMembersTab from '../FamilyMembersTab'
 import { authAPI, statsAPI } from '@/lib/api'
-import DecorativeCubes from './DecorativeCubes'
+import DecorativeCubes from '../DecorativeCubes'
 import { AvatarProvider } from '@/contexts/AvatarContext'
 
 // Import des pages des cubes existantes
