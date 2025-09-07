@@ -1098,7 +1098,7 @@ export default function CubeMatch() {
   }
   
   return (
-    <div className="w-full h-screen overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="w-full h-full overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header avec informations de jeu */}
       <div className="h-16 bg-white/80 backdrop-blur-sm border-b border-gray-200 flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
@@ -1141,14 +1141,14 @@ export default function CubeMatch() {
         </div>
       </div>
 
-      {/* Zone de jeu principale */}
-      <div className="h-[calc(100vh-4rem)] flex">
-        <div className="flex-1 flex items-center justify-center p-6">
+      {/* Zone de jeu principale - responsive */}
+      <div className="h-[calc(100%-4rem)] flex flex-col lg:flex-row">
+        <div className="flex-1 flex items-center justify-center p-4 lg:p-6 min-h-0">
           <GameArea state={state} dispatch={dispatch} />
         </div>
         
-        {/* Panneau latéral compact */}
-        <div className="w-80 bg-white/90 backdrop-blur-sm border-l border-gray-200 p-6 flex flex-col">
+        {/* Panneau latéral - responsive */}
+        <div className="w-full lg:w-80 bg-white/90 backdrop-blur-sm border-t lg:border-t-0 lg:border-l border-gray-200 p-4 lg:p-6 flex flex-col lg:h-full">
           <SidePanel
             state={state}
             dispatch={dispatch}
@@ -1180,9 +1180,9 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
     const hForCells = frame.height - gap * (rows - 1);
     const byW = Math.floor(wForCells / cols);
     const byH = Math.floor(hForCells / rows);
-    // Optimisation mobile : cellules plus petites sur mobile et hauteur réduite
-    const maxSize = window.innerWidth < 768 ? 60 : 80;
-    const minSize = window.innerWidth < 768 ? 32 : 36;
+    // Responsive sizing basé sur la taille de l'écran
+    const maxSize = window.innerWidth < 768 ? 45 : window.innerWidth < 1024 ? 60 : 80;
+    const minSize = window.innerWidth < 768 ? 28 : window.innerWidth < 1024 ? 36 : 48;
     return Math.max(minSize, Math.min(maxSize, Math.min(byW, byH)));
   }, [frame, cols, rows]);
 
@@ -1197,9 +1197,9 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
   };
 
   return (
-    <div className="flex items-center justify-center h-full">
-      {/* Grille de jeu avec design épuré */}
-      <div ref={frameRef} className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+    <div className="flex items-center justify-center h-full w-full">
+      {/* Grille de jeu avec design épuré et responsive */}
+      <div ref={frameRef} className="bg-white rounded-2xl p-4 lg:p-8 shadow-lg border border-gray-200 max-w-full max-h-full">
         <div
           className="grid"
           style={{
