@@ -447,7 +447,7 @@ export default function DashboardTab({
         credentials: 'include',
         body: JSON.stringify({
           prompt,
-          sessionId,
+          sessionId: childSessions.find(s => s.sessionId === sessionId)?.id || sessionId, // Utiliser l'ID de la session au lieu du sessionId
           analysisType: 'compte_rendu',
           context: {
             childName: childSessions.find(s => s.sessionId === sessionId)?.name || 'Enfant',

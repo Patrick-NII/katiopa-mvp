@@ -40,16 +40,9 @@ export async function POST(request: NextRequest) {
         accountId: decoded.accountId
       },
       include: {
-        account: {
-          include: {
-            children: true
-          }
-        },
-        activities: {
-          include: {
-            cubeMatchScores: true
-          }
-        }
+        account: true,
+        activities: true,
+        cubeMatchScores: true
       }
     });
 
@@ -61,7 +54,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Récupérer les données de l'enfant associé à cette session
-    const child = session.account.children.find(c => c.id === session.childId);
+    // Si c'est une session enfant, utiliser directement cette session
+    // Si c'est une session parent, récupérer un enfant du même compte
+    let child;
+    if (session.userType === 'CHILD') {
+      child = session;
+    } else {
+      // C'est une session parent, récupérer un enfant du même compte
+      child = await prisma.userSession.findFirst({
+        where: {
+          accountId: decoded.accountId,
+          userType: 'CHILD',
+          isActive: true
+        }
+      });
+    }
+    
     if (!child) {
       return NextResponse.json({ 
         error: 'Enfant non trouvé pour cette session',
@@ -70,30 +78,26 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculer les statistiques réelles
-    const activities = session.activities || [];
+    const activities = child.activities || [];
+    const cubeMatchScores = child.cubeMatchScores || [];
     const totalActivities = activities.length;
-    const totalTime = activities.reduce((sum, activity) => sum + (activity.duration || 0), 0);
+    const totalTime = activities.reduce((sum, activity) => sum + (activity.durationMs || 0), 0);
     
-    // Calculer le score moyen
-    const scores = activities
-      .map(activity => activity.cubeMatchScores?.map(score => score.score).filter(Boolean) || [])
-      .flat();
-    const averageScore = scores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / scores.length : 0;
+    // Calculer le score moyen (combinaison des activités et des scores CubeMatch)
+    const activityScores = activities.map(activity => activity.score).filter(Boolean);
+    const cubeMatchScoreValues = cubeMatchScores.map(score => score.score).filter(Boolean);
+    const allScores = [...activityScores, ...cubeMatchScoreValues];
+    const averageScore = allScores.length > 0 ? allScores.reduce((sum, score) => sum + score, 0) / allScores.length : 0;
 
     // Extraire les domaines uniques
-    const domains = [...new Set(activities.map(activity => activity.cubeType).filter(Boolean))];
+    const domains = [...new Set(activities.map(activity => activity.domain).filter(Boolean))];
 
     // Préparer les activités récentes avec vraies données
     const recentActivities = activities.slice(-5).map(activity => {
-      const activityScores = activity.cubeMatchScores?.map(score => score.score) || [];
-      const avgScore = activityScores.length > 0 
-        ? activityScores.reduce((sum, score) => sum + score, 0) / activityScores.length 
-        : 0;
-      
       return {
-        domain: activity.cubeType || 'Non spécifié',
-        score: Math.round(avgScore),
-        duration: activity.duration || 0,
+        domain: activity.domain || 'Non spécifié',
+        score: activity.score || 0,
+        duration: activity.durationMs || 0,
         date: activity.createdAt
       };
     });
@@ -107,9 +111,9 @@ export async function POST(request: NextRequest) {
       totalTime,
       domains,
       recentActivities,
-      sessionId: session.id,
-      sessionStartTime: session.startTime,
-      sessionEndTime: session.endTime
+      sessionId: child.id,
+      sessionStartTime: child.currentSessionStartTime,
+      sessionEndTime: child.lastLoginAt
     };
 
     console.log('✅ ÉTAPE 2 TERMINÉE: Données réelles récupérées', {
