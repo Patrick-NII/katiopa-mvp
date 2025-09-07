@@ -384,43 +384,23 @@ export default function DashboardTab({
   // Fonction pour calculer le classement global
   const calculateGlobalRankings = async () => {
     try {
-      // Récupérer tous les scores de tous les utilisateurs
-      const response = await fetch('/api/cubematch/scores', {
-        credentials: 'include'
-      });
+      // Utiliser la route publique du leaderboard global
+      const response = await fetch('/api/cubematch/global-leaderboard?limit=100');
       
       if (response.ok) {
-        const allScores = await response.json();
-        
-        // Grouper par utilisateur et calculer le meilleur score
-        const userBestScores: Record<string, number> = {};
-        
-        allScores.forEach((score: any) => {
-          const userId = score.userId;
-          if (!userBestScores[userId] || score.score > userBestScores[userId]) {
-            userBestScores[userId] = score.score;
-          }
-        });
-        
-        // Trier par score décroissant et assigner les rangs
-        const sortedUsers = Object.entries(userBestScores)
-          .sort(([,a], [,b]) => b - a)
-          .map(([userId, score], index) => ({
-            userId,
-            score,
-            rank: index + 1
-          }));
+        const data = await response.json();
+        const leaderboard = data.data?.leaderboard || [];
         
         // Créer un mapping userId -> rank
-        const rankings: Record<string, number> = {};
-        sortedUsers.forEach(({ userId, rank }) => {
-          rankings[userId] = rank;
+        const rankingsMap: Record<string, number> = {};
+        leaderboard.forEach((player: any) => {
+          rankingsMap[player.userId] = player.rank;
         });
         
-        setGlobalRankings(rankings);
+        setGlobalRankings(rankingsMap);
       }
     } catch (error) {
-      console.error('Erreur lors du calcul du classement:', error);
+      console.error('Erreur calcul classement global:', error);
     }
   };
 
@@ -1272,7 +1252,10 @@ export default function DashboardTab({
                                   }`}>
                                     {player.rank}
                                   </div>
-                                  <span className="font-medium">{player.username}</span>
+                                  <div>
+                                    <div className="font-medium">{player.username}</div>
+                                    <div className="text-xs text-gray-500">({player.sessionId})</div>
+                                  </div>
                                 </div>
                                 <div className="text-right">
                                   <div className="font-bold text-gray-800">{player.score}</div>
