@@ -1160,25 +1160,63 @@ export default function CubeMatch() {
   
   return (
     <div className="w-full h-screen overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header mobile avec menu hamburger */}
+      {/* Header mobile avec boutons */}
       <div className="lg:hidden h-12 bg-white/90 backdrop-blur-sm border-b border-gray-200 flex items-center justify-between px-4">
         <h1 className="text-lg font-bold text-gray-900">CubeMatch</h1>
-        <button 
-          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
-          onClick={() => setShowMobileMenu(!showMobileMenu)}
-        >
-          <HamburgerIcon />
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Boutons de contrôle compacts */}
+          <button 
+            className="p-2 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 transition-all duration-200"
+            onClick={() => dispatch({ type: 'HINT' })}
+            title="Indice"
+          >
+            <LightbulbIcon />
+          </button>
+          
+          <button 
+            className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-200"
+            onClick={() => dispatch({ type: 'RESTART' })}
+            title="Nouvelle partie"
+          >
+            <RefreshIcon />
+          </button>
+          
+          {state.running && !state.gameOver ? (
+            <button 
+              className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200"
+              onClick={() => dispatch({ type: 'END_GAME' })}
+              title="Arrêter le jeu"
+            >
+              <StopIcon />
+            </button>
+          ) : (
+            <button 
+              className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all duration-200"
+              onClick={() => dispatch({ type: 'START_GAME' })}
+              title="Commencer à jouer"
+            >
+              <PlayIcon />
+            </button>
+          )}
+          
+          <button 
+            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            title="Menu"
+          >
+            <HamburgerIcon />
+          </button>
+        </div>
       </div>
 
       {/* Zone de jeu principale - responsive */}
-      <div className={`h-[calc(100vh-3rem)] lg:h-full flex flex-col lg:flex-row ${showMobileMenu ? 'lg:h-full' : ''}`}>
-        <div className={`flex-1 flex items-start justify-center p-2 lg:p-4 min-h-0 ${showMobileMenu ? 'hidden lg:flex' : ''}`}>
+      <div className="h-[calc(100vh-3rem)] lg:h-full flex flex-col lg:flex-row">
+        <div className="flex-1 flex items-start justify-center p-2 lg:p-4 min-h-0">
           <GameArea state={state} dispatch={dispatch} />
         </div>
         
-        {/* Panneau latéral - responsive */}
-        <div className={`w-full lg:w-80 bg-white/90 backdrop-blur-sm border-t lg:border-t-0 lg:border-l border-gray-200 p-2 lg:p-4 flex flex-col lg:h-full ${showMobileMenu ? 'h-full' : 'h-0 lg:h-full overflow-hidden lg:overflow-visible'}`}>
+        {/* Panneau latéral - desktop seulement */}
+        <div className="hidden lg:flex lg:w-80 bg-white/90 backdrop-blur-sm border-l border-gray-200 p-4 flex-col h-full">
           <SidePanel
             state={state}
             dispatch={dispatch}
@@ -1193,6 +1231,84 @@ export default function CubeMatch() {
       {/* Modal Paramètres */}
       {showOptions && (
         <OptionsModal state={state} dispatch={dispatch} onClose={() => setShowOptions(false)} />
+      )}
+
+      {/* Modal Mobile Menu */}
+      {showMobileMenu && (
+        <div className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 shadow-2xl max-w-sm w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Menu CubeMatch</h2>
+              <button 
+                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Barre de progression */}
+            <div className="mb-6">
+              <ProgressBar state={state} />
+            </div>
+            
+            {/* Instructions rapides */}
+            <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h3 className="text-sm font-semibold text-blue-900 mb-2">Comment jouer</h3>
+              <div className="text-xs text-blue-700 space-y-1">
+                <div>• Sélectionnez des cases adjacentes</div>
+                <div>• Formez des calculs avec l'opérateur</div>
+                <div>• Atteignez la cible pour marquer des points</div>
+              </div>
+            </div>
+            
+            {/* Statistiques détaillées */}
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Statistiques</h3>
+              <div className="space-y-2 text-xs text-gray-600">
+                <div className="flex justify-between">
+                  <span>Niveau:</span>
+                  <span className="font-medium">{state.level}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Score:</span>
+                  <span className="font-medium">{state.score.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Temps de jeu:</span>
+                  <span className="font-medium">{formatMs(state.timePlayedMs)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Combo actuel:</span>
+                  <span className="font-medium">{state.combo}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Opérateur:</span>
+                  <span className="font-medium">{state.config.operator}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Cible:</span>
+                  <span className="font-medium">{state.config.target}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Mode:</span>
+                  <span className="font-medium">{state.config.allowDiagonals ? 'Diagonales' : 'Adjacentes'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bouton Paramètres */}
+            <button 
+              className="w-full px-4 py-3 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-all duration-200 shadow-lg"
+              onClick={() => {
+                setShowMobileMenu(false);
+                setShowOptions(true);
+              }}
+            >
+              ⚙️ Paramètres
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -1317,19 +1433,9 @@ function SidePanel(props: {
   showMobileMenu: boolean;
   setShowMobileMenu: (v: boolean)=>void;
 }) {
-  const { state, dispatch, setShowOptions, showMobileMenu, setShowMobileMenu } = props;
+  const { state, dispatch, setShowOptions } = props;
   return (
     <div className="flex flex-col h-full">
-      {/* Bouton fermer mobile */}
-      <div className="lg:hidden flex justify-end mb-4">
-        <button 
-          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
-          onClick={() => setShowMobileMenu(false)}
-        >
-          <X className="w-6 h-6" />
-        </button>
-      </div>
-
       {/* Boutons de contrôle */}
       <div className="mb-6">
         <h3 className="text-sm font-semibold text-gray-700 mb-3">Contrôles</h3>
