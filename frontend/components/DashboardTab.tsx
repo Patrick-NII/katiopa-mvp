@@ -703,9 +703,9 @@ export default function DashboardTab({
                 <div className="flex items-center justify-between p-4 bg-gray-50">
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">{session.emoji}</div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{session.name}</p>
-                    </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{session.name}</p>
+                      </div>
                   </div>
                   <div className="flex items-center gap-4">
                     {/* Statut en ligne/hors ligne en temps réel */}
@@ -805,17 +805,8 @@ export default function DashboardTab({
                     <table className="w-full table-fixed">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="w-20 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <div className="leading-tight">
-                              <div>Type</div>
-                              <div>d'analyse</div>
-                            </div>
-                          </th>
-                          <th className="w-24 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <div className="leading-tight">
-                              <div>Nom de</div>
-                              <div>l'enfant</div>
-                            </div>
+                          <th className="w-32 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Enfant
                           </th>
                           <th className="w-20 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Date
@@ -833,20 +824,17 @@ export default function DashboardTab({
                           .sort(([,a], [,b]) => b.timestamp.getTime() - a.timestamp.getTime())
                           .map(([key, response]) => {
                             const childName = childSessions.find(s => s.sessionId === response.sessionId)?.name || 'Enfant';
+                            // Séparer le nom et prénom
+                            const nameParts = childName.split(' ');
+                            const firstName = nameParts[0] || '';
+                            const lastName = nameParts.slice(1).join(' ') || '';
+                            
                             return (
                               <tr key={key} className="hover:bg-gray-50">
                                 <td className="px-3 py-3">
-                                  <div className="flex items-center gap-1">
-                                    {response.type === 'compte_rendu' && <BookOpen className="w-3 h-3 text-blue-600 flex-shrink-0" />}
-                                    <div className="text-xs font-medium text-gray-900 leading-tight">
-                                      <div>Compte</div>
-                                      <div>rendu</div>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td className="px-3 py-3">
-                                  <div className="text-xs text-gray-900 leading-tight" title={childName}>
-                                    <div className="truncate">{childName}</div>
+                                  <div className="text-xs text-gray-900 leading-tight">
+                                    <div className="font-medium">{lastName}</div>
+                                    <div className="text-gray-600">{firstName}</div>
                                   </div>
                                 </td>
                                 <td className="px-3 py-3">
