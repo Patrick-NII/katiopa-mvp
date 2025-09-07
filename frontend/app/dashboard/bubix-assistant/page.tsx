@@ -216,7 +216,7 @@ export default function BubixAssistantPage({
         {activeTab === 'chat' && (
           <div className="space-y-4">
             {/* Sélection d'enfant pour les parents */}
-            {!isChild && childSessions.length > 0 && (
+            {!isChild && childSessions && childSessions.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">
                   Sélectionner un enfant pour la conversation
@@ -263,7 +263,7 @@ export default function BubixAssistantPage({
                     {isChild 
                       ? "Votre assistant personnel" 
                       : selectedChild 
-                        ? `Assistant pour ${childSessions.find(c => c.id === selectedChild)?.firstName}`
+                        ? `Assistant pour ${childSessions?.find(c => c.id === selectedChild)?.firstName}`
                         : "Sélectionnez un enfant pour commencer"
                     }
                   </p>
@@ -278,7 +278,7 @@ export default function BubixAssistantPage({
                     {isChild 
                       ? "Bonjour ! Comment puis-je vous aider aujourd'hui ?" 
                       : selectedChild 
-                        ? `Prêt à discuter avec Bubix pour ${childSessions.find(c => c.id === selectedChild)?.firstName}`
+                        ? `Prêt à discuter avec Bubix pour ${childSessions?.find(c => c.id === selectedChild)?.firstName}`
                         : "Sélectionnez un enfant pour commencer la conversation"
                     }
                   </p>

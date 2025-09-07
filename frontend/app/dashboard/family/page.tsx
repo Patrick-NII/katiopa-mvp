@@ -34,15 +34,15 @@ export default function FamilyPage({ user, childSessions }: FamilyPageProps) {
 
   // Statistiques familiales
   const familyStats = {
-    totalChildren: childSessions.length,
-    activeChildren: childSessions.filter(child => child.isActive !== false).length,
+    totalChildren: childSessions?.length || 0,
+    activeChildren: childSessions?.filter(child => child.isActive !== false).length || 0,
     totalTime: 0,
     averageScore: 0,
     weeklyProgress: 0
   }
 
   // Filtrer les enfants selon les critères
-  const filteredChildren = childSessions.filter(child => {
+  const filteredChildren = childSessions?.filter(child => {
     const matchesSearch = `${child.firstName} ${child.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesFilter = filterStatus === 'all' || 
       (filterStatus === 'active' && child.isActive !== false) ||
@@ -287,7 +287,7 @@ export default function FamilyPage({ user, childSessions }: FamilyPageProps) {
           className="space-y-6"
         >
           {(() => {
-            const child = childSessions.find(c => c.id === selectedChild)
+            const child = childSessions?.find(c => c.id === selectedChild)
             if (!child) return null
             
             return (

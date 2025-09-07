@@ -35,7 +35,7 @@ export default function AnalyticsPage({ user, childSessions }: AnalyticsPageProp
     totalActivities: 0,
     completionRate: 0,
     weeklyProgress: 0,
-    activeChildren: childSessions.length
+    activeChildren: childSessions?.length || 0
   }
 
   const timeRangeOptions = [
@@ -167,7 +167,7 @@ export default function AnalyticsPage({ user, childSessions }: AnalyticsPageProp
       </motion.div>
 
       {/* Sélection d'enfant */}
-      {childSessions.length > 0 && (
+      {childSessions && childSessions.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -206,7 +206,7 @@ export default function AnalyticsPage({ user, childSessions }: AnalyticsPageProp
       )}
 
       {/* Cycles d'apprentissage par enfant */}
-      {childSessions.length > 0 && (
+      {childSessions && childSessions.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -234,7 +234,7 @@ export default function AnalyticsPage({ user, childSessions }: AnalyticsPageProp
       )}
 
       {/* Analytics de communication */}
-      {childSessions.length > 0 && (
+      {childSessions && childSessions.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
