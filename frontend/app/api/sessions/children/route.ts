@@ -79,6 +79,8 @@ export async function GET(request: NextRequest) {
       return {
         id: session.id,
         sessionId: session.sessionId,
+        firstName: session.firstName,
+        lastName: session.lastName,
         name: `${session.firstName} ${session.lastName}`,
         emoji: '👶', // Emoji par défaut
         isOnline: session.currentSessionStartTime ? true : false,
