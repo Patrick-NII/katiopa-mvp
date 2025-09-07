@@ -717,21 +717,13 @@ Comment puis-je vous aider aujourd'hui ?`;
         {/* Header */}
         <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 px-4 py-3 flex-shrink-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 ">
               {!showSidebar && (
                 <button onClick={() => setShowSidebar(true)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                   <Bot size={20} />
                 </button>
               )}
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Bot size={20} className="text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold text-blue-900">Bubix {subscriptionType}</h1>
-                <p className="text-sm text-blue-600">
-                  {userType === 'CHILD' ? "Assistant d'apprentissage" : 'Assistant parental'}
-                </p>
-              </div>
+              
             </div>
           </div>
         </header>
