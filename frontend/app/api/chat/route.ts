@@ -2073,6 +2073,63 @@ export async function POST(request: NextRequest) {
       userContext.childrenData?.[0]?.gender     // Genre du premier enfant
     )
 
+    // Sauvegarder automatiquement les conversations enfant-Bubix
+    if (userInfo.userType === 'CHILD' && text && userQuery) {
+      try {
+        // Récupérer l'accountId depuis la base de données
+        const userSession = await prisma.userSession.findUnique({
+          where: { id: userInfo.id },
+          select: { accountId: true }
+        })
+
+        if (userSession?.accountId) {
+          // Analyser l'engagement basé sur la longueur et le contenu
+          let engagement = 'MEDIUM'
+          if (userQuery.length > 50 || text.length > 200) {
+            engagement = 'HIGH'
+          } else if (userQuery.length < 10) {
+            engagement = 'LOW'
+          }
+
+          // Déterminer le type d'activité si possible
+          let activityType = null
+          if (userQuery.toLowerCase().includes('math') || userQuery.toLowerCase().includes('calcul')) {
+            activityType = 'MATH'
+          } else if (userQuery.toLowerCase().includes('français') || userQuery.toLowerCase().includes('francais')) {
+            activityType = 'FRENCH'
+          } else if (userQuery.toLowerCase().includes('science')) {
+            activityType = 'SCIENCE'
+          }
+
+          // Sauvegarder dans ChildPrompt
+          await prisma.childPrompt.create({
+            data: {
+              childMessage: userQuery,
+              bubixResponse: text,
+              promptType: 'CHILD_CHAT',
+              activityType,
+              difficulty: 'MEDIUM',
+              engagement,
+              childSessionId: userInfo.id,
+              accountId: userSession.accountId,
+              status: 'PROCESSED'
+            }
+          })
+
+          console.log('✅ Conversation enfant-Bubix sauvegardée:', {
+            childId: userInfo.id,
+            messageLength: userQuery.length,
+            responseLength: text.length,
+            engagement,
+            activityType
+          })
+        }
+      } catch (error) {
+        console.error('❌ Erreur sauvegarde ChildPrompt:', error)
+        // Ne pas faire échouer la requête pour une erreur de sauvegarde
+      }
+    }
+
     return NextResponse.json({
       text,
       actions,

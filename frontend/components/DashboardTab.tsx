@@ -20,7 +20,9 @@ import {
   Gamepad2,
   Plus,
   RefreshCw,
-  Bookmark
+  Bookmark,
+  Flag,
+  Trash2
 } from 'lucide-react'
 import AnimatedLLMButton from './AnimatedLLMButton'
 import AdvancedLLMResults from './AdvancedLLMResults'
@@ -35,6 +37,9 @@ import OnlineStatus from './OnlineStatus'
 import LimitationPopup from './LimitationPopup'
 import AnalysisModal from './AnalysisModal'
 import BubixSteps from './BubixSteps'
+import AnalysisFilters from './AnalysisFilters'
+import AnalysisPagination from './AnalysisPagination'
+import ConversationAnalysis from './ConversationAnalysis'
 import { useLimitationPopup } from '@/hooks/useLimitationPopup'
 
 interface DashboardTabProps {
@@ -86,6 +91,7 @@ export default function DashboardTab({
     content: string;
     timestamp: Date;
     sessionId: string;
+    childName?: string;
   }>>({});
   
   // États pour le modal d'analyse
@@ -99,6 +105,24 @@ export default function DashboardTab({
   const [bubixCurrentStep, setBubixCurrentStep] = useState<Record<string, string>>({});
   const [bubixCompleted, setBubixCompleted] = useState<Record<string, boolean>>({});
   const [bubixError, setBubixError] = useState<Record<string, string>>({});
+
+  // États pour les filtres et pagination
+  const [filters, setFilters] = useState({
+    search: '',
+    childFilter: '',
+    dateFilter: '',
+    typeFilter: ''
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
+  // États pour les données CubeMatch
+  const [cubeMatchData, setCubeMatchData] = useState<Record<string, any>>({});
+  const [cubeMatchLoading, setCubeMatchLoading] = useState(false);
+
+  // États pour les données ChildPrompts
+  const [childPromptsData, setChildPromptsData] = useState<Record<string, any>>({});
+  const [childPromptsLoading, setChildPromptsLoading] = useState(false);
   
   // Hook pour le statut en temps réel
   const { sessionStatuses, isLoading: statusLoading, refreshStatus } = useRealTimeStatus({
@@ -226,29 +250,259 @@ export default function DashboardTab({
     setSelectedAnalysis(null);
   };
 
-  const handleSaveAnalysis = (analysis: any) => {
-    // Sauvegarder l'analyse
-    const savedAnalysis = {
-      ...analysis,
-      savedAt: new Date(),
-      id: `${analysis.type}_${analysis.sessionId}_${Date.now()}`
-    };
-    setSavedAnalyses(prev => [...prev, savedAnalysis]);
-    console.log('Analyse sauvegardée:', savedAnalysis);
+  const handleSaveAnalysis = async (analysis: any) => {
+    try {
+      // L'analyse est déjà sauvegardée par l'API dans le modal
+      // On récupère les analyses sauvegardées pour mettre à jour l'affichage
+      await fetchSavedAnalyses();
+      console.log('Analyse sauvegardée avec succès:', analysis);
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
+    }
+  };
+
+  const handleFlagAnalysis = async (analysisKey: string) => {
+    try {
+      // TODO: Implémenter l'API pour signaler une analyse
+      console.log('Signalement de l\'analyse:', analysisKey);
+      // Pour l'instant, on affiche juste un message
+      alert('Analyse signalée avec succès');
+    } catch (error) {
+      console.error('Erreur lors du signalement:', error);
+    }
+  };
+
+  // Fonction pour récupérer les analyses sauvegardées
+  const fetchSavedAnalyses = async () => {
+    try {
+      const response = await fetch('/api/analyses/history');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          // Convertir les analyses sauvegardées au format attendu par le tableau
+          const formattedAnalyses = data.analyses.reduce((acc: any, analysis: any) => {
+            acc[analysis.id] = {
+              type: analysis.analysisType,
+              content: analysis.content,
+              timestamp: new Date(analysis.createdAt),
+              sessionId: analysis.sessionId,
+              childName: analysis.childName,
+              saved: true
+            };
+            return acc;
+          }, {});
+          
+          setBubixResponses(prev => ({ ...prev, ...formattedAnalyses }));
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération des analyses sauvegardées:', error);
+    }
+  };
+
+  // Fonction pour récupérer les statistiques CubeMatch d'un enfant
+  const fetchCubeMatchStats = async (childId: string) => {
+    try {
+      const response = await fetch(`/api/cubematch/stats?childId=${childId}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data.data.stats;
+      }
+      return null;
+    } catch (error) {
+      console.error('Erreur récupération stats CubeMatch:', error);
+      return null;
+    }
+  };
+
+  // Fonction pour récupérer les scores CubeMatch récents d'un enfant
+  const fetchCubeMatchScores = async (childId: string, limit: number = 5) => {
+    try {
+      const response = await fetch(`/api/cubematch/scores?childId=${childId}&limit=${limit}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data.data.scores;
+      }
+      return [];
+    } catch (error) {
+      console.error('Erreur récupération scores CubeMatch:', error);
+      return [];
+    }
+  };
+
+  // Fonction pour charger toutes les données CubeMatch des enfants
+  const loadCubeMatchData = async () => {
+    if (!childSessions || childSessions.length === 0) return;
+    
+    setCubeMatchLoading(true);
+    try {
+      const cubeMatchPromises = childSessions.map(async (session) => {
+        const [stats, scores] = await Promise.all([
+          fetchCubeMatchStats(session.id),
+          fetchCubeMatchScores(session.id, 3)
+        ]);
+        
+        return {
+          sessionId: session.sessionId,
+          childId: session.id,
+          childName: session.name,
+          stats,
+          recentScores: scores
+        };
+      });
+      
+      const cubeMatchResults = await Promise.all(cubeMatchPromises);
+      const cubeMatchMap = cubeMatchResults.reduce((acc, data) => {
+        acc[data.sessionId] = data;
+        return acc;
+      }, {} as Record<string, any>);
+      
+      setCubeMatchData(cubeMatchMap);
+    } catch (error) {
+      console.error('Erreur chargement données CubeMatch:', error);
+    } finally {
+      setCubeMatchLoading(false);
+    }
+  };
+
+  // Fonction pour récupérer les ChildPrompts d'un enfant
+  const fetchChildPrompts = async (childId: string, limit: number = 5) => {
+    try {
+      const response = await fetch(`/api/childprompts/save?childSessionId=${childId}&limit=${limit}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data.data.prompts || [];
+      }
+      return [];
+    } catch (error) {
+      console.error('Erreur récupération ChildPrompts:', error);
+      return [];
+    }
+  };
+
+  // Fonction pour charger toutes les données ChildPrompts des enfants
+  const loadChildPromptsData = async () => {
+    if (!childSessions || childSessions.length === 0) return;
+    
+    try {
+      const childPromptsPromises = childSessions.map(async (session) => {
+        const prompts = await fetchChildPrompts(session.id, 3);
+        
+        return {
+          sessionId: session.sessionId,
+          childId: session.id,
+          childName: session.name,
+          recentPrompts: prompts
+        };
+      });
+      
+      const childPromptsResults = await Promise.all(childPromptsPromises);
+      const childPromptsMap = childPromptsResults.reduce((acc, data) => {
+        acc[data.sessionId] = data;
+        return acc;
+      }, {} as Record<string, any>);
+      
+      setChildPromptsData(childPromptsMap);
+    } catch (error) {
+      console.error('Erreur chargement données ChildPrompts:', error);
+    }
+  };
+
+  // Fonction de filtrage des analyses
+  const getFilteredAnalyses = () => {
+    const analyses = Object.entries(bubixResponses);
+    
+    return analyses.filter(([key, response]) => {
+      // Filtre par recherche textuelle
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        const contentMatch = response.content.toLowerCase().includes(searchLower);
+        const childMatch = response.childName?.toLowerCase().includes(searchLower);
+        if (!contentMatch && !childMatch) return false;
+      }
+
+      // Filtre par enfant
+      if (filters.childFilter && response.childName !== filters.childFilter) {
+        return false;
+      }
+
+      // Filtre par type
+      if (filters.typeFilter && response.type !== filters.typeFilter) {
+        return false;
+      }
+
+      // Filtre par date
+      if (filters.dateFilter) {
+        const now = new Date();
+        const analysisDate = new Date(response.timestamp);
+        
+        switch (filters.dateFilter) {
+          case 'today':
+            if (analysisDate.toDateString() !== now.toDateString()) return false;
+            break;
+          case 'week':
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            if (analysisDate < weekAgo) return false;
+            break;
+          case 'month':
+            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            if (analysisDate < monthAgo) return false;
+            break;
+          case 'quarter':
+            const quarterAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+            if (analysisDate < quarterAgo) return false;
+            break;
+          case 'year':
+            const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+            if (analysisDate < yearAgo) return false;
+            break;
+        }
+      }
+
+      return true;
+    });
+  };
+
+  // Fonction de pagination
+  const getPaginatedAnalyses = () => {
+    const filtered = getFilteredAnalyses();
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filtered.slice(startIndex, endIndex);
+  };
+
+  // Fonction pour gérer les changements de filtres
+  const handleFiltersChange = (newFilters: typeof filters) => {
+    setFilters(newFilters);
+    setCurrentPage(1); // Reset à la première page
+  };
+
+  // Fonction pour effacer les filtres
+  const handleClearFilters = () => {
+    setCurrentPage(1);
+  };
+
+  // Fonction pour changer de page
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   const handleDeleteAnalysis = (analysisId: string) => {
-    // Supprimer l'analyse
-    setBubixResponses(prev => {
-      const newResponses = { ...prev };
-      Object.keys(newResponses).forEach(key => {
-        if (key.includes(analysisId)) {
-          delete newResponses[key];
-        }
+    // Confirmation avant suppression
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette analyse ?')) {
+      // Supprimer l'analyse
+      setBubixResponses(prev => {
+        const newResponses = { ...prev };
+        Object.keys(newResponses).forEach(key => {
+          if (key.includes(analysisId)) {
+            delete newResponses[key];
+          }
+        });
+        return newResponses;
       });
-      return newResponses;
-    });
-    handleCloseModal();
+      handleCloseModal();
+      alert('Analyse supprimée avec succès');
+    }
   };
 
   const handleLikeAnalysis = (analysisId: string) => {
@@ -298,6 +552,13 @@ export default function DashboardTab({
     }
   }, [user?.subscriptionType, childSessions])
 
+  // Chargement des analyses sauvegardées au démarrage
+  useEffect(() => {
+    if (user?.userType === 'PARENT') {
+      fetchSavedAnalyses();
+    }
+  }, [user?.userType]);
+
   // Récupération des vraies données depuis l'API
   useEffect(() => {
     const loadRealData = async () => {
@@ -332,6 +593,12 @@ export default function DashboardTab({
           // S'assurer que data est un tableau
           const sessions = Array.isArray(data) ? data : [];
           setChildSessions(sessions);
+          
+          // Charger les données CubeMatch et ChildPrompts après avoir chargé les sessions
+          if (sessions.length > 0) {
+            loadCubeMatchData();
+            loadChildPromptsData();
+          }
         } else {
           console.error('Erreur lors du chargement des sessions enfants:', response.status);
           setChildSessions([]);
@@ -415,6 +682,12 @@ export default function DashboardTab({
   // Compte rendu précis et concis de l'ensemble
   const generateCompteRendu = async (sessionId: string) => {
     try {
+      // Vérifier que les données sont chargées
+      if (!childSessions || childSessions.length === 0) {
+        console.error('❌ childSessions non chargées:', childSessions);
+        throw new Error('Sessions enfants non chargées');
+      }
+
       setLoadingStates(prev => ({ ...prev, [`compte_rendu_${sessionId}`]: true }));
 
       // Initialiser les étapes Bubix
@@ -442,6 +715,14 @@ export default function DashboardTab({
       
       Sois précis, constructif et encourageant.`;
 
+      // Trouver la session correspondante
+      const foundSession = childSessions.find(s => s.sessionId === sessionId);
+      const sessionIdToSend = foundSession?.id || sessionId;
+      
+      if (!foundSession) {
+        throw new Error(`Session ${sessionId} non trouvée dans les données chargées`);
+      }
+
       // Simuler les étapes de progression
       const steps = ['auth', 'parent', 'child', 'security', 'data', 'ai'];
       for (let i = 0; i < steps.length; i++) {
@@ -455,10 +736,10 @@ export default function DashboardTab({
         credentials: 'include',
         body: JSON.stringify({
           prompt,
-          sessionId: childSessions.find(s => s.sessionId === sessionId)?.id || sessionId, // Utiliser l'ID de la session au lieu du sessionId
+          sessionId: sessionIdToSend, // Utiliser l'ID de la base de données
           analysisType: 'compte_rendu',
           context: {
-            childName: childSessions.find(s => s.sessionId === sessionId)?.name || 'Enfant',
+            childName: foundSession.name,
             activities: sessionActivities[sessionId] || [],
             subscriptionType: user?.subscriptionType
           }
@@ -614,13 +895,13 @@ export default function DashboardTab({
         </div>
         <p className="text-lg text-gray-700 max-w-3xl mx-auto">
           {user?.userType === 'PARENT' 
-            ? "Suivez la progression de vos enfants et leurs performances en temps réel"
+            ? "Suivez la progression de vos enfants et leurs avancées en temps réel"
             : "Découvre ton potentiel avec l'intelligence artificielle !"
           }
         </p>
       </motion.div>
 
-      {/* Section temps total depuis l'inscription pour les parents */}
+      {/* Section informations compte pour les parents */}
       {user?.userType === 'PARENT' && realSummary?.totalTimeSinceRegistration && (
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -628,49 +909,39 @@ export default function DashboardTab({
           transition={{ duration: 0.5, delay: 0.3 }}
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-blue-600" />
-              Temps total 
-            </h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-8">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {user?.firstName} {user?.lastName}
+                </h3>
+                <p className="text-sm text-gray-600">Administrateur du compte</p>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <div className="text-sm text-gray-600">Temps total :</div>
+                <div className="text-lg font-bold text-gray-800">
+                  {realSummary.totalTimeSinceRegistration.formatted}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <div className="text-sm text-gray-600">Créé le :</div>
+                <div className="text-sm font-semibold text-gray-800">
+                  {new Date(realSummary.accountCreatedAt).toLocaleDateString('fr-FR')}
+                </div>
+              </div>
+            </div>
+            
             <button
               onClick={refreshAllData}
               disabled={refreshing}
-              className="flex items-center gap-2 px-3 py-2  text-blue-600 rounded-lg hover:bg-grey-100 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-3 py-2 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               title="Rafraîchir les données"
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-              {refreshing ? 'Actualisation...' : ''}
+              {refreshing ? 'Actualisation...' : 'Actualiser'}
             </button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-blue-800">
-                {realSummary.totalTimeSinceRegistration.formatted}
-              </div>
-              <div className="text-sm text-blue-600 font-medium">
-                Temps total de connexion
-              </div>
-            </div>
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-green-800">
-                {realSummary.totalTimeSinceRegistration.totalDays} jours
-              </div>
-              <div className="text-sm text-green-600 font-medium">
-                Depuis l'inscription
-              </div>
-            </div>
-            <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-purple-800">
-                {realSummary.totalTimeSinceRegistration.totalHours} heures
-              </div>
-              <div className="text-sm text-purple-600 font-medium">
-                Temps cumulé
-              </div>
-            </div>
-          </div>
-          <div className="mt-4 text-sm text-gray-600">
-            <p>Compte créé le : {new Date(realSummary.accountCreatedAt).toLocaleDateString('fr-FR')}</p>
           </div>
         </motion.div>
       )}
@@ -684,7 +955,7 @@ export default function DashboardTab({
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Sessions et Analyses</h3>
+            <h3 className="text-lg font-semibold text-gray-900"></h3>
           </div>
           
           {/* Layout en deux colonnes */}
@@ -693,7 +964,7 @@ export default function DashboardTab({
             <div className="lg:col-span-2">
               <h4 className="text-md font-medium text-gray-800 mb-4 flex items-center gap-2">
                 <Users className="w-4 h-4 text-blue-600" />
-                Sessions Enfants
+                Sessions actives
               </h4>
               <div className="space-y-4">
             {childSessions && childSessions.length > 0 ? (
@@ -702,7 +973,6 @@ export default function DashboardTab({
                 {/* En-tête de la session */}
                 <div className="flex items-center justify-between p-4 bg-gray-50">
                   <div className="flex items-center gap-3">
-                    <div className="text-2xl">{session.emoji}</div>
                       <div>
                         <p className="text-sm font-medium text-gray-900">{session.name}</p>
                       </div>
@@ -743,6 +1013,119 @@ export default function DashboardTab({
                 {/* Contenu déplié */}
                 {expandedSessions.has(session.sessionId) && (
                   <div className="p-4 bg-white">
+                    {/* Données CubeMatch */}
+                    {cubeMatchData[session.sessionId] && (
+                      <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                        <h5 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                          <Gamepad2 className="w-4 h-4 text-blue-600" />
+                          Statistiques CubeMatch
+                        </h5>
+                        {cubeMatchData[session.sessionId].stats ? (
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="text-center">
+                              <div className="text-lg font-bold text-blue-800">
+                                {cubeMatchData[session.sessionId].stats.bestScore}
+                              </div>
+                              <div className="text-xs text-blue-600">Meilleur score</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-lg font-bold text-purple-800">
+                                {cubeMatchData[session.sessionId].stats.totalGames}
+                              </div>
+                              <div className="text-xs text-purple-600">Parties jouées</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-lg font-bold text-green-800">
+                                {cubeMatchData[session.sessionId].stats.highestLevel}
+                              </div>
+                              <div className="text-xs text-green-600">Niveau max</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-lg font-bold text-orange-800">
+                                {cubeMatchData[session.sessionId].stats.favoriteOperator}
+                              </div>
+                              <div className="text-xs text-orange-600">Opérateur préféré</div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-center text-gray-500 text-sm">
+                            Aucune donnée CubeMatch disponible
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Analyse des Conversations */}
+                    {childPromptsData[session.sessionId] && childPromptsData[session.sessionId].recentPrompts?.length > 0 && (
+                      <div className="mb-6">
+                        <ConversationAnalysis 
+                          analysis={{
+                            totalConversations: childPromptsData[session.sessionId].recentPrompts.length,
+                            averageEngagement: childPromptsData[session.sessionId].recentPrompts.reduce((sum: number, prompt: any) => {
+                              const engagementValue = prompt.engagement === 'HIGH' ? 3 : prompt.engagement === 'MEDIUM' ? 2 : 1;
+                              return sum + engagementValue;
+                            }, 0) / childPromptsData[session.sessionId].recentPrompts.length,
+                            favoriteTopics: childPromptsData[session.sessionId].recentPrompts.reduce((acc: Record<string, number>, prompt: any) => {
+                              if (prompt.activityType) {
+                                acc[prompt.activityType] = (acc[prompt.activityType] || 0) + 1;
+                              }
+                              return acc;
+                            }, {}),
+                            recentEngagement: childPromptsData[session.sessionId].recentPrompts.slice(0, 5).map((prompt: any) => ({
+                              engagement: prompt.engagement,
+                              topic: prompt.activityType,
+                              date: new Date(prompt.createdAt)
+                            }))
+                          }}
+                          childName={session.name}
+                        />
+                      </div>
+                    )}
+
+                    {/* Conversations Bubix détaillées */}
+                    {childPromptsData[session.sessionId] && childPromptsData[session.sessionId].recentPrompts?.length > 0 && (
+                      <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
+                        <h5 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                          <Brain className="w-4 h-4 text-green-600" />
+                          Conversations récentes avec Bubix
+                        </h5>
+                        <div className="space-y-3">
+                          {childPromptsData[session.sessionId].recentPrompts.slice(0, 3).map((prompt: any, index: number) => (
+                            <div key={prompt.id} className="bg-white rounded-md p-3 border border-gray-200">
+                              <div className="flex items-start gap-2 mb-2">
+                                <div className="text-xs text-gray-500">
+                                  {new Date(prompt.createdAt).toLocaleDateString('fr-FR', { 
+                                    day: '2-digit', 
+                                    month: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </div>
+                                {prompt.engagement && (
+                                  <div className={`text-xs px-2 py-1 rounded-full ${
+                                    prompt.engagement === 'HIGH' ? 'bg-green-100 text-green-700' :
+                                    prompt.engagement === 'MEDIUM' ? 'bg-yellow-100 text-yellow-700' :
+                                    'bg-gray-100 text-gray-700'
+                                  }`}>
+                                    {prompt.engagement === 'HIGH' ? 'Élevé' : 
+                                     prompt.engagement === 'MEDIUM' ? 'Moyen' : 'Faible'}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-700 mb-1">
+                                <strong>Enfant:</strong> {prompt.childMessage.substring(0, 100)}
+                                {prompt.childMessage.length > 100 && '...'}
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                <strong>Bubix:</strong> {prompt.bubixResponse.substring(0, 80)}
+                                {prompt.bubixResponse.length > 80 && '...'}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Actions rapides — style aligné sur la page login */}
                     <div className="mb-6">
                       <div className="flex flex-wrap items-center gap-3">
@@ -798,6 +1181,13 @@ export default function DashboardTab({
                 Analyses Bubix
               </h4>
               
+              {/* Filtres et recherche */}
+              <AnalysisFilters
+                onFiltersChange={handleFiltersChange}
+                children={childSessions.map(s => s.name)}
+                onClearFilters={handleClearFilters}
+              />
+              
               {/* Tableau des réponses Bubix */}
               {Object.keys(bubixResponses).length > 0 ? (
                 <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -814,16 +1204,16 @@ export default function DashboardTab({
                           <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aperçu
                           </th>
-                          <th className="w-24 px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="w-40 px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Actions
                           </th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {Object.entries(bubixResponses)
+                        {getPaginatedAnalyses()
                           .sort(([,a], [,b]) => b.timestamp.getTime() - a.timestamp.getTime())
                           .map(([key, response]) => {
-                            const childName = childSessions.find(s => s.sessionId === response.sessionId)?.name || 'Enfant';
+                            const childName = childSessions.find(s => s.sessionId === response.sessionId)?.name || response.childName || 'Enfant';
                             // Séparer le nom et prénom
                             const nameParts = childName.split(' ');
                             const firstName = nameParts[0] || '';
@@ -851,17 +1241,37 @@ export default function DashboardTab({
                                   </div>
                                 </td>
                                 <td className="px-3 py-3 text-center">
-                                  <button
-                                    onClick={() => handleOpenModal({
-                                      ...response,
-                                      childName
-                                    })}
-                                    className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                                    title="Lire l'analyse complète"
-                                  >
-                                    <BookOpen className="w-4 h-4" />
-                                    <span>Lire</span>
-                                  </button>
+                                  <div className="flex items-center justify-center gap-2">
+                                    <button
+                                      onClick={() => handleOpenModal({
+                                        ...response,
+                                        childName
+                                      })}
+                                      className="inline-flex items-center gap-0 px-2 py-1 text-white text-xs font-medium rounded-md transition-colors"
+                                      title="Lire l'analyse complète"
+                                    >
+                                      <BookOpen className="w-4 h-4 text-gray-900" />
+                                      <span></span>
+                                    </button>
+                                    
+                                    <button
+                                      onClick={() => handleFlagAnalysis(key)}
+                                      className="inline-flex items-center gap-0 px-2 py-1 text-white text-xs font-medium rounded-md transition-colors"
+                                      title="Flag"
+                                    >
+                                      <Flag className="w-4 h-4 text-gray-900" />
+                                      <span></span>
+                                    </button>
+                                    
+                                    <button
+                                      onClick={() => handleDeleteAnalysis(key)}
+                                      className="inline-flex items-center gap-0 px-2 py-1 text-white text-xs font-medium rounded-md transition-colors"
+                                      title="Supprimer"
+                                    >
+                                      <Trash2 className="w-4 h-4 text-red-600" />
+                                      <span></span>
+                                    </button>
+                                  </div>
                                 </td>
                               </tr>
                             );
@@ -869,6 +1279,15 @@ export default function DashboardTab({
                       </tbody>
                     </table>
                   </div>
+                  
+                  {/* Pagination */}
+                  <AnalysisPagination
+                    currentPage={currentPage}
+                    totalPages={Math.ceil(getFilteredAnalyses().length / itemsPerPage)}
+                    totalItems={getFilteredAnalyses().length}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={handlePageChange}
+                  />
                 </div>
               ) : (
                 <div className="text-center py-8 text-gray-500">

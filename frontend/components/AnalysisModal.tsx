@@ -152,6 +152,58 @@ export default function AnalysisModal({
     }
   };
 
+  const handleSave = async () => {
+    try {
+      setActionState('save', true);
+      
+      const response = await fetch('/api/analyses/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId: analysis.sessionId,
+          analysisType: analysis.type,
+          content: analysis.content,
+          prompt: `Analyse ${analysis.type} pour ${analysis.childName}`,
+          context: {
+            childName: analysis.childName,
+            timestamp: analysis.timestamp,
+            type: analysis.type
+          },
+          metadata: {
+            savedAt: new Date().toISOString(),
+            source: 'dashboard_modal'
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la sauvegarde');
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        animateButton('save', 'success');
+        playSuccessSound();
+        
+        // Appeler la fonction onSave si elle existe
+        if (onSave) {
+          onSave(result.analysis);
+        }
+      } else {
+        throw new Error(result.error || 'Erreur lors de la sauvegarde');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
+      animateButton('save', 'error');
+      playErrorSound();
+    } finally {
+      setActionState('save', false);
+    }
+  };
+
   const handleCopy = async () => {
     try {
       setActionState('copy', true);
@@ -347,12 +399,7 @@ export default function AnalysisModal({
                 <div className="flex items-center gap-4">
                   <AnimatedButton
                     action="save"
-                    onClick={() => {
-                      setActionState('save', true);
-                      onSave?.(analysis);
-                      animateButton('save', 'success');
-                      setActionState('save', false);
-                    }}
+                    onClick={handleSave}
                     className="p-3 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
                     title="Sauvegarder"
                   >
