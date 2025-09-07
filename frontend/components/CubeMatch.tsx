@@ -1153,56 +1153,8 @@ export default function CubeMatch() {
   
   return (
     <div className="w-full h-screen overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header compact avec boutons seulement */}
-      <div className="h-12 bg-white/90 backdrop-blur-sm border-b border-gray-200 flex items-center justify-end px-6">
-        <div className="flex items-center gap-3">
-          {/* Boutons simplifiés pour enfants */}
-          <button 
-            className="px-4 py-2 bg-yellow-400 text-white rounded-lg font-bold text-lg hover:bg-yellow-500 transition-all duration-200 shadow-md"
-            onClick={() => dispatch({ type: 'HINT' })}
-            title="Indice"
-          >
-            <LightbulbIcon />
-          </button>
-          
-          <button 
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg font-bold text-lg hover:bg-blue-600 transition-all duration-200 shadow-md"
-            onClick={() => dispatch({ type: 'RESTART' })}
-            title="Nouvelle partie"
-          >
-            <RefreshIcon />
-          </button>
-          
-          {state.running && !state.gameOver ? (
-            <button 
-              className="px-4 py-2 bg-red-500 text-white rounded-lg font-bold text-lg hover:bg-red-600 transition-all duration-200 shadow-md"
-              onClick={() => dispatch({ type: 'END_GAME' })}
-              title="Arrêter le jeu"
-            >
-              <StopIcon />
-            </button>
-          ) : (
-            <button 
-              className="px-4 py-2 bg-green-500 text-white rounded-lg font-bold text-lg hover:bg-green-600 transition-all duration-200 shadow-md"
-              onClick={() => dispatch({ type: 'START_GAME' })}
-              title="Commencer à jouer"
-            >
-              <PlayIcon />
-            </button>
-          )}
-          
-          <button 
-            className="px-4 py-2 bg-gray-500 text-white rounded-lg font-bold text-lg hover:bg-gray-600 transition-all duration-200 shadow-md"
-            onClick={() => setShowOptions(true)}
-            title="Paramètres"
-          >
-            <SettingsIcon />
-          </button>
-        </div>
-      </div>
-
       {/* Zone de jeu principale - responsive */}
-      <div className="h-[calc(100vh-3rem)] flex flex-col lg:flex-row">
+      <div className="h-full flex flex-col lg:flex-row">
         <div className="flex-1 flex items-center justify-center p-4 lg:p-6 min-h-0">
           <GameArea state={state} dispatch={dispatch} />
         </div>
@@ -1346,6 +1298,59 @@ function SidePanel(props: {
   const { state, dispatch, setShowOptions } = props;
   return (
     <div className="flex flex-col h-full">
+      {/* Boutons de contrôle */}
+      <div className="mb-6">
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">Contrôles</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <button 
+            className="px-3 py-2 bg-yellow-400 text-white rounded-lg font-bold text-sm hover:bg-yellow-500 transition-all duration-200 shadow-md flex items-center justify-center gap-2"
+            onClick={() => dispatch({ type: 'HINT' })}
+            title="Indice"
+          >
+            <LightbulbIcon />
+            <span>Indice</span>
+          </button>
+          
+          <button 
+            className="px-3 py-2 bg-blue-500 text-white rounded-lg font-bold text-sm hover:bg-blue-600 transition-all duration-200 shadow-md flex items-center justify-center gap-2"
+            onClick={() => dispatch({ type: 'RESTART' })}
+            title="Nouvelle partie"
+          >
+            <RefreshIcon />
+            <span>Rejouer</span>
+          </button>
+          
+          {state.running && !state.gameOver ? (
+            <button 
+              className="px-3 py-2 bg-red-500 text-white rounded-lg font-bold text-sm hover:bg-red-600 transition-all duration-200 shadow-md flex items-center justify-center gap-2"
+              onClick={() => dispatch({ type: 'END_GAME' })}
+              title="Arrêter le jeu"
+            >
+              <StopIcon />
+              <span>Arrêter</span>
+            </button>
+          ) : (
+            <button 
+              className="px-3 py-2 bg-green-500 text-white rounded-lg font-bold text-sm hover:bg-green-600 transition-all duration-200 shadow-md flex items-center justify-center gap-2"
+              onClick={() => dispatch({ type: 'START_GAME' })}
+              title="Commencer à jouer"
+            >
+              <PlayIcon />
+              <span>Jouer</span>
+            </button>
+          )}
+          
+          <button 
+            className="px-3 py-2 bg-gray-500 text-white rounded-lg font-bold text-sm hover:bg-gray-600 transition-all duration-200 shadow-md flex items-center justify-center gap-2"
+            onClick={() => setShowOptions(true)}
+            title="Paramètres"
+          >
+            <SettingsIcon />
+            <span>Options</span>
+          </button>
+        </div>
+      </div>
+      
       {/* Barre de progression */}
       <div className="mb-6">
         <ProgressBar state={state} />
