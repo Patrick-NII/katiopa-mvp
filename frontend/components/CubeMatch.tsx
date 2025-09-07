@@ -84,7 +84,7 @@ const useLockViewport = () => {
   return mounted;
 };
 
-// Mesure d’un élément (width/height)
+// Mesure d'un élément (width/height)
 function useElementSize<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -94,6 +94,16 @@ function useElementSize<T extends HTMLElement>() {
     setMounted(true);
     if (!ref.current) return;
     const el = ref.current;
+    
+    // Mesure initiale
+    const updateSize = () => {
+      if (el) {
+        setSize({ width: el.clientWidth, height: el.clientHeight });
+      }
+    };
+    
+    updateSize();
+    
     const ro = new ResizeObserver(entries => {
       const cr = entries[0].contentRect;
       setSize({ width: cr.width, height: cr.height });
@@ -102,7 +112,7 @@ function useElementSize<T extends HTMLElement>() {
     return () => ro.disconnect();
   }, []);
   
-  return { ref, size: mounted ? size : { width: 0, height: 0 } };
+  return { ref, size: mounted ? size : { width: 300, height: 300 } }; // Valeurs par défaut plus réalistes
 }
 
 /* ---------------------------
@@ -1352,15 +1362,18 @@ export default function CubeMatch() {
 function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<Action> }) {
   const theme = themePalette[(state.config.theme ?? 'classic') as keyof typeof themePalette];
   const { ref: frameRef, size: frame } = useElementSize<HTMLDivElement>();
-  const gap = window.innerWidth < 768 ? 4 : 8; // Espacement réduit sur mobile
+  const gap = 4; // Espacement fixe pour éviter les problèmes SSR
   const cols = state.config.cols;
   const rows = state.config.rows;
 
   const cellSizePx = useMemo(() => {
-    if (!frame.width || !frame.height) return 56;
+    // Valeurs par défaut si pas encore monté
+    if (!frame.width || !frame.height || frame.width === 0 || frame.height === 0) {
+      return 45; // Taille par défaut pour mobile
+    }
     
     // Calculer l'espace disponible en tenant compte du padding et des gaps
-    const padding = window.innerWidth < 768 ? 8 : 16; // p-2 lg:p-4
+    const padding = 8;
     const availableWidth = frame.width - (padding * 2);
     const availableHeight = frame.height - (padding * 2);
     
@@ -1369,14 +1382,24 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
     const byW = Math.floor(wForCells / cols);
     const byH = Math.floor(hForCells / rows);
     
-    // Tailles optimisées pour les enfants - plus grandes sur mobile
-    const maxSize = window.innerWidth < 768 ? 50 : window.innerWidth < 1024 ? 60 : 70;
-    const minSize = window.innerWidth < 768 ? 35 : window.innerWidth < 1024 ? 40 : 45;
+    // Tailles optimisées pour les enfants
+    const maxSize = 50;
+    const minSize = 35;
     
     // Prendre le minimum pour s'assurer que la grille rentre complètement
     const optimalSize = Math.min(byW, byH);
     
-    return Math.max(minSize, Math.min(maxSize, optimalSize));
+    const finalSize = Math.max(minSize, Math.min(maxSize, optimalSize));
+    
+    // Debug log pour identifier les problèmes
+    console.log('Grid calculation:', {
+      frame: { width: frame.width, height: frame.height },
+      cols, rows, gap, padding,
+      availableWidth, availableHeight,
+      byW, byH, optimalSize, finalSize
+    });
+    
+    return finalSize;
   }, [frame, cols, rows, gap]);
 
   const fontPx = Math.floor(cellSizePx * 0.55);
