@@ -173,9 +173,7 @@ router.post('/register', async (req, res) => {
       data: {
         email: normalizedEmail,
         subscriptionType,
-        maxSessions,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        maxSessions
       }
     });
 
@@ -195,9 +193,7 @@ router.post('/register', async (req, res) => {
         lastName,
         gender: 'UNKNOWN',
         userType: 'PARENT',
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        isActive: true
       }
     });
     
@@ -217,9 +213,7 @@ router.post('/register', async (req, res) => {
           interests: [],
           specialNeeds: parentPrompts.concerns ? [parentPrompts.concerns] : [],
           customNotes: parentPrompts.additionalInfo || null,
-          parentWishes: parentPrompts.needs || null,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          parentWishes: parentPrompts.needs || null
         }
       });
       console.log(`✅ Profil parent créé pour ${firstName} ${lastName}`);
@@ -261,9 +255,7 @@ router.post('/register', async (req, res) => {
           userType,
           age: dateOfBirth ? calculateAge(dateOfBirth) : null,
           grade,
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          isActive: true
         }
       });
 
@@ -282,9 +274,7 @@ router.post('/register', async (req, res) => {
             interests: [],
             specialNeeds: parentPrompts.concerns ? [parentPrompts.concerns] : [],
             customNotes: parentPrompts.additionalInfo || null,
-            parentWishes: parentPrompts.needs || null,
-            createdAt: new Date(),
-            updatedAt: new Date()
+            parentWishes: parentPrompts.needs || null
           }
         });
         console.log(`✅ Profil parent créé pour ${firstName} ${lastName}`);
@@ -296,9 +286,7 @@ router.post('/register', async (req, res) => {
             learningGoals: [],
             preferredSubjects: [],
             interests: [],
-            specialNeeds: [],
-            createdAt: new Date(),
-            updatedAt: new Date()
+            specialNeeds: []
           }
         });
         console.log(`✅ Profil enfant créé pour ${firstName} ${lastName}`);

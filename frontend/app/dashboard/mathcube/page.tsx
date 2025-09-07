@@ -186,7 +186,7 @@ export default function MathCubePage() {
               <div className="bg-gray-50 rounded-lg p-3">
                 <div className="grid grid-cols-12 gap-2 text-sm font-medium text-gray-600">
                   <div className="col-span-2 text-center">Rang</div>
-                  <div className="col-span-3 text-center">Session</div>
+                  <div className="col-span-3 text-center">Pseudo</div>
                   <div className="col-span-4 text-center">Score</div>
                   <div className="col-span-3 text-center">Niveau</div>
                 </div>
@@ -230,6 +230,8 @@ export default function MathCubePage() {
                           {player.sessionId || player.userId.slice(-6)}
                         </div>
                       </div>
+
+                      
                       
                       {/* Score simple */}
                       <div className="col-span-4 text-center">
