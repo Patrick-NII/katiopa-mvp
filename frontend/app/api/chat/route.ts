@@ -5,12 +5,13 @@ import * as jwt from 'jsonwebtoken'
 import { PrismaClient } from '@prisma/client'
 import OpenAI from 'openai'
 import { buildPrompts } from './buildPrompts'
-import { 
-  BehavioralTrackingService, 
-  UpgradeTrackingService, 
-  ChildPerformanceAnalysisService,
-  PopupTrackingService 
-} from '../../../backend/src/services/upgrade-tracking.service'
+// Services backend temporairement désactivés - à réimplémenter si nécessaire
+// import { 
+//   BehavioralTrackingService, 
+//   UpgradeTrackingService, 
+//   ChildPerformanceAnalysisService,
+//   PopupTrackingService 
+// } from '../../../backend/src/services/upgrade-tracking.service'
 
 const prisma = new PrismaClient()
 
@@ -73,17 +74,21 @@ async function analyzeChildInsistence(childId: string): Promise<{
 
     const insistenceScore = Math.min(recentConversations.length / 20, 1) // Max 1.0 avec 20+ conversations
     
-    // Enregistrer la métrique
-    await BehavioralTrackingService.recordMetric(
-      childId,
-      'insistence',
-      insistenceScore,
-      { conversationsCount: recentConversations.length },
-      childId
-    )
+    // Services temporairement désactivés - simulation des données
+    // await BehavioralTrackingService.recordMetric(
+    //   childId,
+    //   'insistence',
+    //   insistenceScore,
+    //   { conversationsCount: recentConversations.length },
+    //   childId
+    // )
 
-    // Analyser l'insistance
-    const insistenceAnalysis = await BehavioralTrackingService.analyzeChildInsistence(childId, 24)
+    // Analyser l'insistance (simulation)
+    const insistenceAnalysis = {
+      insistenceLevel: insistenceScore > 0.7 ? 'high' : insistenceScore > 0.4 ? 'medium' : 'low',
+      trend: 'stable',
+      score: insistenceScore
+    }
     
     // Déterminer si on doit déclencher un upgrade
     const shouldTriggerUpgrade = 
@@ -112,18 +117,27 @@ async function analyzeChildPerformance(childId: string): Promise<{
   analysis: any
 }> {
   try {
-    // Analyser le niveau de performance
-    const performanceAnalysis = await ChildPerformanceAnalysisService.analyzeChildLevel(childId)
+    // Services temporairement désactivés - simulation des données
+    // const performanceAnalysis = await ChildPerformanceAnalysisService.analyzeChildLevel(childId)
     
-    // Enregistrer la métrique de performance
+    // Simulation de l'analyse de performance
+    const performanceAnalysis = {
+      performanceLevel: 'basic',
+      confidence: 0.5,
+      analysisData: {
+        performanceScore: 0.6
+      }
+    }
+    
+    // Enregistrer la métrique de performance (simulation)
     const performanceScore = performanceAnalysis.analysisData.performanceScore || 0
-    await BehavioralTrackingService.recordMetric(
-      childId,
-      'performance',
-      performanceScore,
-      performanceAnalysis.analysisData,
-      childId
-    )
+    // await BehavioralTrackingService.recordMetric(
+    //   childId,
+    //   'performance',
+    //   performanceScore,
+    //   performanceAnalysis.analysisData,
+    //   childId
+    // )
 
     // Déterminer si on doit déclencher un upgrade
     const shouldTriggerUpgrade = 
@@ -153,7 +167,7 @@ async function checkAndCreateUpgradeEvent(
 ) {
   try {
     // Vérifier si l'utilisateur est éligible pour un upgrade
-    if (userInfo.subscriptionType === 'PRO' || userInfo.subscriptionType === 'PRO_PLUS' || userInfo.subscriptionType === 'ENTERPRISE') {
+    if (userInfo.subscriptionType === 'MAITRE' || userInfo.subscriptionType === 'ENTERPRISE') {
       return null // Pas besoin d'upgrade
     }
 
@@ -171,15 +185,25 @@ async function checkAndCreateUpgradeEvent(
     }
 
     if (shouldTrigger) {
-      // Créer l'événement d'upgrade
-      const upgradeEvent = await UpgradeTrackingService.createUpgradeEvent(
-        userInfo.id,
+      // Services temporairement désactivés - simulation de l'événement d'upgrade
+      // const upgradeEvent = await UpgradeTrackingService.createUpgradeEvent(
+      //   userInfo.id,
+      //   triggerType,
+      //   triggerData,
+      //   childId
+      // )
+
+      // Simulation de l'événement d'upgrade
+      const upgradeEvent = {
+        id: `upgrade_${Date.now()}`,
+        userId: userInfo.id,
         triggerType,
         triggerData,
-        childId
-      )
+        childId,
+        createdAt: new Date()
+      }
 
-      console.log(`🎯 Événement d'upgrade créé pour ${userInfo.firstName}:`, {
+      console.log(`🎯 Événement d'upgrade simulé pour ${userInfo.firstName}:`, {
         triggerType,
         childId,
         upgradeEventId: upgradeEvent.id
@@ -228,7 +252,7 @@ async function verifyAuthServerSide(): Promise<UserInfo | null> {
           lastName: parent.lastName,
           email: parent.account.email,
           userType: parent.userType as 'PARENT' | 'CHILD',
-          subscriptionType: parent.account.subscriptionType as 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE',
+          subscriptionType: parent.account.subscriptionType as 'FREE' | 'DECOUVERTE' | 'EXPLORATEUR' | 'MAITRE' | 'ENTERPRISE',
           isActive: parent.isActive
         }
       } else {
@@ -277,7 +301,7 @@ async function verifyAuthServerSide(): Promise<UserInfo | null> {
       lastName: userSession.lastName,
       email: userSession.account.email,
       userType: userSession.userType as 'PARENT' | 'CHILD',
-      subscriptionType: userSession.account.subscriptionType as 'FREE' | 'PRO' | 'PRO_PLUS' | 'ENTERPRISE',
+      subscriptionType: userSession.account.subscriptionType as 'FREE' | 'DECOUVERTE' | 'EXPLORATEUR' | 'MAITRE' | 'ENTERPRISE',
       isActive: userSession.isActive
     }
 
@@ -434,16 +458,11 @@ async function getChildrenData(accountId: string, subscriptionType: string = 'FR
     })
 
     // Récupérer tous les prompts pour ce compte
-    const allPrompts = await prisma.ParentPrompt.findMany({
+    const allPrompts = await prisma.parentPrompt.findMany({
       where: {
-        userSession: {
-          accountId: accountId
-        }
+        accountId: accountId
       },
-      orderBy: { createdAt: 'desc' },
-      include: {
-        userSession: true
-      }
+      orderBy: { createdAt: 'desc' }
     })
 
     console.log('📝 Prompts trouvés:', allPrompts.length)
@@ -542,13 +561,13 @@ async function getChildrenData(accountId: string, subscriptionType: string = 'FR
       prompts: allPrompts.map(prompt => ({
         id: prompt.id,
         content: prompt.content,
-        type: prompt.type,
+        type: prompt.promptType,
         status: prompt.status,
         createdAt: prompt.createdAt,
         updatedAt: prompt.updatedAt,
-        metadata: prompt.metadata,
+        metadata: null,
         childSessionId: prompt.childSessionId,
-        parentName: prompt.userSession?.firstName + ' ' + prompt.userSession?.lastName
+        parentName: 'Parent' // Nom du parent non disponible dans cette structure
       }))
     }
   } catch (error) {
@@ -721,16 +740,16 @@ async function getUserContext(userInfo: UserInfo): Promise<UserContext> {
       if (userSession?.accountId) {
         console.log('🔍 Appel de getChildrenData avec accountId:', userSession.accountId)
         const dataResult = await getChildrenData(userSession.accountId, userInfo.subscriptionType)
-        childrenData = dataResult.children
+        childrenData = dataResult.children || []
         console.log('📊 Données enfants récupérées:', childrenData.length, 'enfants')
-        console.log('📝 Prompts récupérés:', dataResult.prompts.length, 'prompts')
+        console.log('📝 Prompts récupérés:', dataResult.prompts?.length || 0, 'prompts')
         
         // Récupérer les connexions actives
         activeConnections = await getActiveConnections(userSession.accountId)
         
         if (childrenData.length > 0) {
           childrenData.forEach((child, index) => {
-            console.log(`   Enfant ${index + 1}: ${child.firstName} (${child.activities.length} activités)`)
+            console.log(`   Enfant ${index + 1}: ${child.firstName} (${child.activities?.length || 0} activités)`)
           })
         } else {
           console.log('❌ Aucune donnée d\'enfant récupérée')
@@ -743,7 +762,7 @@ async function getUserContext(userInfo: UserInfo): Promise<UserContext> {
     }
     
     // Générer des insights basés sur les données réelles
-    const dataInsights = role === 'parent' ? generateDataInsights(childrenData, activeConnections, dataResult?.prompts || []) : ""
+    const dataInsights = role === 'parent' ? generateDataInsights(childrenData, activeConnections, []) : ""
     
     console.log('💡 Insights générés:', dataInsights ? 'Oui' : 'Non')
     console.log('📊 Données enfants disponibles:', childrenData.length, 'enfants')
@@ -1749,7 +1768,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Si c'est un parent, vérifier s'il y a des enfants avec des niveaux élevés
-    if (userInfo.userType === 'PARENT' && userContext.childrenData?.length > 0) {
+    if (userInfo.userType === 'PARENT' && userContext.childrenData && userContext.childrenData.length > 0) {
       console.log('👨‍👩‍👧‍👦 Analyse des enfants pour parent:', userInfo.firstName)
       
       // Analyser chaque enfant
