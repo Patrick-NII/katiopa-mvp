@@ -35,6 +35,7 @@ import SavedAnalyses from './SavedAnalyses'
 import OnlineStatus from './OnlineStatus'
 import LimitationPopup from './LimitationPopup'
 import AnalysisModal from './AnalysisModal'
+import BubixSteps from './BubixSteps'
 import { useLimitationPopup } from '@/hooks/useLimitationPopup'
 
 interface DashboardTabProps {
@@ -94,6 +95,12 @@ export default function DashboardTab({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [likedAnalyses, setLikedAnalyses] = useState<Set<string>>(new Set());
   const [favoriteAnalyses, setFavoriteAnalyses] = useState<Set<string>>(new Set());
+  
+  // États pour les étapes Bubix
+  const [bubixStepsVisible, setBubixStepsVisible] = useState<Record<string, boolean>>({});
+  const [bubixCurrentStep, setBubixCurrentStep] = useState<Record<string, string>>({});
+  const [bubixCompleted, setBubixCompleted] = useState<Record<string, boolean>>({});
+  const [bubixError, setBubixError] = useState<Record<string, string>>({});
   
   // Hook pour le statut en temps réel
   const { sessionStatuses, isLoading: statusLoading, refreshStatus } = useRealTimeStatus({
@@ -413,6 +420,12 @@ export default function DashboardTab({
       setLoadingStates(prev => ({ ...prev, [`compte_rendu_${sessionId}`]: true }));
       setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: true, type: 'compte_rendu' } }));
 
+      // Initialiser les étapes Bubix
+      setBubixStepsVisible(prev => ({ ...prev, [sessionId]: true }));
+      setBubixCurrentStep(prev => ({ ...prev, [sessionId]: 'auth' }));
+      setBubixCompleted(prev => ({ ...prev, [sessionId]: false }));
+      setBubixError(prev => ({ ...prev, [sessionId]: '' }));
+
       // Début de l'analyse
       
       // Bloquer si limitation locale (Découverte)
@@ -431,6 +444,13 @@ export default function DashboardTab({
       - Recommandations pour la suite
       
       Sois précis, constructif et encourageant.`;
+
+      // Simuler les étapes de progression
+      const steps = ['auth', 'parent', 'child', 'security', 'data', 'ai'];
+      for (let i = 0; i < steps.length; i++) {
+        setBubixCurrentStep(prev => ({ ...prev, [sessionId]: steps[i] }));
+        await new Promise(resolve => setTimeout(resolve, 500)); // Délai entre chaque étape
+      }
 
       const response = await fetch('/api/bubix/analyze', {
         method: 'POST',
@@ -460,6 +480,9 @@ export default function DashboardTab({
       const data = await response.json();
       const analysisText = data.response || data.content || 'Aucune réponse de Bubix';
 
+      // Marquer comme terminé
+      setBubixCompleted(prev => ({ ...prev, [sessionId]: true }));
+
       // Stocker la réponse de Bubix
       setBubixResponses(prev => ({
         ...prev,
@@ -474,6 +497,10 @@ export default function DashboardTab({
       if (user?.subscriptionType === 'FREE') setLastAnalysisTs()
     } catch (error) {
       console.error('Erreur lors de la génération du compte rendu:', error);
+      setBubixError(prev => ({ 
+        ...prev, 
+        [sessionId]: error instanceof Error ? error.message : 'Erreur inconnue' 
+      }));
       // Stocker l'erreur dans BubixResponses au lieu de sessionAnalyses
       setBubixResponses(prev => ({
         ...prev,
@@ -487,6 +514,11 @@ export default function DashboardTab({
     } finally {
       setLoadingStates(prev => ({ ...prev, [`compte_rendu_${sessionId}`]: false }));
       setAiWritingStates(prev => ({ ...prev, [sessionId]: { isWriting: false, type: 'compte_rendu' } }));
+      
+      // Masquer les étapes après 3 secondes
+      setTimeout(() => {
+        setBubixStepsVisible(prev => ({ ...prev, [sessionId]: false }));
+      }, 3000);
       
       // Déclencher le popup après l'action (avec délai pour laisser l'utilisateur voir le résultat)
       setTimeout(() => {
@@ -735,12 +767,13 @@ export default function DashboardTab({
                       </div>
                     </div>
 
-                    {/* Animation IA en train d'écrire */}
-                    {aiWritingStates[session.sessionId]?.isWriting && (
-                      <AIWritingAnimation
-                        isWriting={aiWritingStates[session.sessionId].isWriting}
-                        childName={session.name.split(' ')[0]}
-                        analysisType={aiWritingStates[session.sessionId].type}
+                    {/* Étapes Bubix en cours */}
+                    {bubixStepsVisible[session.sessionId] && (
+                      <BubixSteps
+                        isVisible={bubixStepsVisible[session.sessionId]}
+                        currentStep={bubixCurrentStep[session.sessionId] || 'auth'}
+                        isCompleted={bubixCompleted[session.sessionId] || false}
+                        error={bubixError[session.sessionId]}
                       />
                     )}
 
