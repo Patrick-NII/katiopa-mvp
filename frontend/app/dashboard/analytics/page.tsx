@@ -14,8 +14,8 @@ import {
   Download,
   Filter
 } from 'lucide-react'
-import CommunicationAnalytics from '../CommunicationAnalytics'
-import WeeklyCycle from '../WeeklyCycle'
+import CommunicationAnalytics from '../../../components/CommunicationAnalytics'
+import WeeklyCycle from '../../../components/WeeklyCycle'
 
 interface AnalyticsPageProps {
   user: any

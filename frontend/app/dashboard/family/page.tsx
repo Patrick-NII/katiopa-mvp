@@ -18,8 +18,8 @@ import {
   Search,
   Filter
 } from 'lucide-react'
-import WeeklyCycle from '../../components/WeeklyCycle'
-import CommunicationAnalytics from '../../components/CommunicationAnalytics'
+import WeeklyCycle from '../../../components/WeeklyCycle'
+import CommunicationAnalytics from '../../../components/CommunicationAnalytics'
 
 interface FamilyPageProps {
   user: any

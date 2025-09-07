@@ -20,7 +20,7 @@ import {
   Star,
   Filter
 } from 'lucide-react'
-import BubixTab from '../../components/BubixTab'
+import BubixTab from '../../../components/BubixTab'
 
 interface BubixAssistantPageProps {
   user: any
