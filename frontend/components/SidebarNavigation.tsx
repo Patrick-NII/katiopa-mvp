@@ -533,7 +533,7 @@ export default function SidebarNavigation({
       {isMobile && (
         <button
           onClick={toggleCollapsed}
-          className="fixed top-4 left-4 z-50 p-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 hover:shadow-2xl transition-all duration-300 hover:scale-105"
+          className="fixed top-1 left-2 z-50 p-3 bg-white/10 dark:bg-gray-900/15 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 hover:shadow-2xl transition-all duration-300 hover:scale-105"
           aria-label="Menu"
         >
           <div className="w-6 h-6 flex flex-col justify-center items-center">
@@ -606,7 +606,7 @@ export default function SidebarNavigation({
       </div>
 
       {/* Navigation des onglets - verticale avec design mobile amélioré */}
-      <div className={`flex-1 ${isMobile ? 'py-6' : 'py-4'} overflow-y-auto ${isMobile ? 'scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent' : ''}`}>
+      <div className={`flex-1 ${isMobile ? 'py-6' : 'py-4'}`}>
         <nav className={`${isMobile ? 'space-y-4' : 'space-y-3'} ${getSidebarPadding()}`}>
           {tabs.map((tab) => (
             tab.available && (
