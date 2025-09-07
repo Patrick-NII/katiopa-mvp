@@ -540,84 +540,40 @@ Comment puis-je vous aider aujourd'hui ?`;
   }
 
   return (
-    <div className={getMainLayoutClass()} style={{ 
-      width: '100vw', 
-      height: '100vh', 
-      margin: '0',
-      borderRadius: '0',
-      overflow: 'hidden'
-    }}>
-      {/* Overlay pour tous les écrans */}
-      {showSidebar && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-          onClick={() => setShowSidebar(false)}
-        />
-      )}
-
+    <div className="w-full h-full flex bg-gradient-to-br from-blue-50 to-indigo-50">
       {/* Sidebar */}
       <AnimatePresence>
         {showSidebar && (
           <motion.aside
             initial={{ width: 0 }}
-            animate={{ width: 320 }}
+            animate={{ width: 280 }}
             exit={{ width: 0 }}
-            className="bg-white/80 backdrop-blur-sm border-r border-gray-200/50 flex flex-col h-full min-w-0 shadow-lg z-50 fixed inset-0"
+            className="bg-white/80 backdrop-blur-sm border-r border-gray-200/50 flex flex-col h-full min-w-0 shadow-lg"
           >
             {/* Header */}
             <div className="border-b border-gray-200/50 flex-shrink-0">
-              <div className="flex items-center justify-between p-3 sm:p-4">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg">
-                    <Bot size={16} className="sm:w-5 sm:h-5 text-white" />
+              <div className="flex items-center justify-between p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Bot size={20} className="text-white" />
                   </div>
-                  <div>
-                    <h2 className="text-sm sm:text-base font-bold text-blue-900">Bubix</h2>
-                    <p className="text-xs sm:text-sm text-blue-600 hidden sm:block">
-                      {userType === 'CHILD' ? "Assistant d'apprentissage" : 'Assistant parental'}
-                    </p>
-                    {/* Indicateur de synchronisation */}
-                    {!isMobile && (
-                      <div className="flex items-center gap-1 mt-1">
-                        <div className={`w-2 h-2 rounded-full ${
-                          mainSidebarCollapsed ? 'bg-green-500' : 'bg-orange-500'
-                        }`}></div>
-                        <span className="text-xs text-gray-500">
-                          {mainSidebarCollapsed ? 'Sync' : 'Mode compact'}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                  <h2 className="text-lg font-bold text-blue-900">Bubix</h2>
                 </div>
-                <button 
-                  onClick={() => setShowSidebar(false)} 
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors bg-white/50 backdrop-blur-sm border border-gray-200/50 shadow-sm"
-                >
-                  <X size={16} className="sm:w-5 sm:h-5 text-red-600" />
+                <button onClick={() => setShowSidebar(false)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                  <X size={18} />
                 </button>
               </div>
             </div>
 
-            {/* Barre d'actions "Partager / Exporter" */}
-            <div className="border-b border-gray-200/50 flex-shrink-0 p-2 sm:p-3">
-              <div className="grid grid-cols-2 gap-1 sm:gap-2">
-                <button
-                  onClick={shareCurrentConversation}
-                  className="flex items-center justify-center gap-1 text-blue-900 px-2 sm:px-3 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium hover:bg-blue-50 transition-colors"
-                  title="Partager la conversation"
-                >
-                  <Share2 size={14} className="sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Partager</span>
-                </button>
-                <button
-                  onClick={exportCurrentConversation}
-                  className="flex items-center justify-center gap-1 text-blue-900 px-2 sm:px-3 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium hover:bg-blue-50 transition-colors"
-                  title="Exporter en JSON"
-                >
-                  <Download size={14} className="sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Exporter</span>
-                </button>
-              </div>
+            {/* Bouton Nouvelle conversation */}
+            <div className="border-b border-gray-200/50 flex-shrink-0 p-3">
+              <button
+                onClick={createNewConversation}
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                <Plus size={18} />
+                Nouvelle conversation
+              </button>
             </div>
             {/* bouton search */}
             <div className="border-b border-gray-200/50 flex-shrink-0 p-2 sm:p-3">
