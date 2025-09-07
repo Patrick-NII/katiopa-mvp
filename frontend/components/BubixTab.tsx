@@ -28,10 +28,9 @@ interface BubixTabProps {
   childSessions: any[]
   userType: 'CHILD' | 'PARENT'
   subscriptionType: string
-  mainSidebarCollapsed?: boolean
 }
 
-export default function BubixTab({ user, childSessions, userType, subscriptionType, mainSidebarCollapsed = false }: BubixTabProps) {
+export default function BubixTab({ user, childSessions, userType, subscriptionType }: BubixTabProps) {
   const { selectedAvatar } = useAvatar()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null)
@@ -40,43 +39,6 @@ export default function BubixTab({ user, childSessions, userType, subscriptionTy
   const [showSidebar, setShowSidebar] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-
-  // Détecter si on est sur mobile
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024)
-      // Sur mobile, fermer la sidebar par défaut
-      if (window.innerWidth < 1024) {
-        setShowSidebar(false)
-      }
-    }
-    
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
-
-  // Synchroniser avec la sidebar principale
-  useEffect(() => {
-    if (!isMobile) {
-      // Sur desktop, toujours permettre l'ouverture de la sidebar BubixTab
-      // car elle est maintenant en overlay et ne conflit plus avec la sidebar principale
-      if (mainSidebarCollapsed) {
-        // Si la sidebar principale est fermée, on peut ouvrir la sidebar BubixTab
-        setShowSidebar(true)
-      } else {
-        // Si la sidebar principale est ouverte, on peut quand même ouvrir la sidebar BubixTab
-        // car elle est en overlay et ne prend pas d'espace dans le layout
-        setShowSidebar(true)
-      }
-    }
-  }, [mainSidebarCollapsed, isMobile])
-
-  // Layout simple et propre - style PublicBubix
-  const getMainLayoutClass = () => {
-    return "w-full h-full flex bg-gradient-to-br from-blue-50 to-indigo-50"
-  }
 
   // États pour les limites de caractères
   const [characterLimits, setCharacterLimits] = useState({
@@ -393,13 +355,7 @@ Comment puis-je vous aider aujourd'hui ?`;
     }
   }
 
-  // Fonction pour sélectionner une conversation (avec fermeture auto sur mobile)
-  const selectConversation = (conversation: Conversation) => {
-    setCurrentConversation(conversation)
-    if (isMobile) {
-      setShowSidebar(false)
-    }
-  }
+  // ---------- 5) Suppression conversation ----------
   const deleteConversation = (conversationId: string) => {
     setConversations(prev => prev.filter(conv => conv.id !== conversationId))
     if (currentConversation?.id === conversationId) {
@@ -535,21 +491,13 @@ Comment puis-je vous aider aujourd'hui ?`;
   }
 
   return (
-    <div className={getMainLayoutClass()} style={{ 
-      width: '100vw', 
-      height: '100vh', 
+    <div className="w-full h-full flex bg-gradient-to-br from-blue-50 to-indigo-50" style={{ 
+      width: '90vw', 
+      height: '95vh', 
       margin: '0',
       borderRadius: '0',
       overflow: 'hidden'
     }}>
-      {/* Overlay pour tous les écrans */}
-      {showSidebar && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-          onClick={() => setShowSidebar(false)}
-        />
-      )}
-
       {/* Sidebar */}
       <AnimatePresence>
         {showSidebar && (
@@ -557,55 +505,46 @@ Comment puis-je vous aider aujourd'hui ?`;
             initial={{ width: 0 }}
             animate={{ width: 280 }}
             exit={{ width: 0 }}
-            className="bg-white/80 backdrop-blur-sm border-r border-gray-200/50 flex flex-col h-full min-w-0 shadow-lg z-50 fixed inset-0"
+            className="bg-white/80 backdrop-blur-sm border-r border-gray-200/50 flex flex-col h-full min-w-0 shadow-lg"
           >
             {/* Header */}
             <div className="border-b border-gray-200/50 flex-shrink-0">
               <div className="flex items-center justify-between p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <Bot size={20} className="text-white" />
-                  </div>
-                  <h2 className="text-lg font-bold text-blue-900">Bubix</h2>
-                </div>
-                <button 
-                  onClick={() => setShowSidebar(false)} 
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                {/* Barre d'actions "Partager / Exporter" */}
+            <div className="border-b border-gray-200/50 flex-shrink-0 p-3">
+              <div className="grid grid-cols-2 gap-0">
+                <button
+                  onClick={shareCurrentConversation}
+                  className="flex items-center justify-center gap-1 text-blue-900 px-3 py-2 rounded-xl text-sm font-medium"
+                  title="Partager la conversation"
                 >
+                  <Share2 size={16} />
+                  Partager
+                </button>
+                <button
+                  onClick={exportCurrentConversation}
+                  className="flex items-center justify-center gap-1 text-blue-900 px-3 py-2 rounded-xl text-sm font-medium"
+                  title="Exporter en JSON"
+                >
+                  <Download size={16} />
+                  Exporter
+                </button>
+              </div>
+            </div>
+                <button onClick={() => setShowSidebar(false)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                   <X size={18} />
                 </button>
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="border-b border-gray-200/50 flex-shrink-0 p-3">
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={shareCurrentConversation}
-                  className="flex items-center justify-center gap-1 text-blue-900 px-3 py-2 rounded-xl text-sm font-medium hover:bg-blue-50 transition-colors"
-                  title="Partager la conversation"
-                >
-                  <Share2 size={16} />
-                  <span className="hidden sm:inline">Partager</span>
-                </button>
-                <button
-                  onClick={exportCurrentConversation}
-                  className="flex items-center justify-center gap-1 text-blue-900 px-3 py-2 rounded-xl text-sm font-medium hover:bg-blue-50 transition-colors"
-                  title="Exporter en JSON"
-                >
-                  <Download size={16} />
-                  <span className="hidden sm:inline">Exporter</span>
-                </button>
-              </div>
-            </div>
-            {/* Recherche */}
+            {/* bouton search */}
             <div className="border-b border-gray-200/50 flex-shrink-0 p-3">
               <button
                 onClick={() => setShowSearch(!showSearch)}
                 className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <Search size={18} />
-                <span className="text-sm">{showSearch ? 'Masquer' : 'Rechercher'}</span>
+                {showSearch ? 'Masquer' : 'Rechercher'}
               </button>
             </div>
 
@@ -625,14 +564,14 @@ Comment puis-je vous aider aujourd'hui ?`;
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Rechercher dans les conversations..."
-                        className="w-full px-3 py-2 pr-8 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        className="w-full px-4 py-3 pr-10 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                       />
                       {searchQuery && (
                         <button
                           onClick={() => setSearchQuery('')}
-                          className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"
                         >
-                          <X size={14} />
+                          <X size={16} />
                         </button>
                       )}
                     </div>
@@ -655,12 +594,12 @@ Comment puis-je vous aider aujourd'hui ?`;
                 className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <Plus size={18} />
-                <span className="text-sm">Nouvelle conversation</span>
+                Nouvelle conversation
               </button>
             </div>
 
             {/* Liste des conversations */}
-            <div className="flex-1 overflow-y-auto min-h-0 p-2">
+            <div className="flex-1 overflow-y-auto min-h-0">
               {filteredConversations.length === 0 ? (
                 <div className="p-4 text-center">
                   {searchQuery ? (
@@ -681,12 +620,12 @@ Comment puis-je vous aider aujourd'hui ?`;
                 filteredConversations.map((conversation) => (
                   <div
                     key={conversation.id}
-                    className={`mb-2 p-3 rounded-xl cursor-pointer transition-all duration-200 ${
+                    className={`w-full p-3 cursor-pointer transition-all duration-200 border-b border-gray-100/50 ${
                       currentConversation?.id === conversation.id 
-                        ? 'bg-gradient-to-r from-blue-100 to-purple-100 border border-blue-200 shadow-md' 
-                        : 'bg-white/60 hover:bg-white/80 border border-transparent hover:border-gray-200'
+                        ? 'bg-gradient-to-r from-blue-100 to-purple-100 border-blue-200' 
+                        : 'bg-white/60 hover:bg-white/80'
                     }`}
-                    onClick={() => selectConversation(conversation)}
+                    onClick={() => setCurrentConversation(conversation)}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
@@ -713,17 +652,28 @@ Comment puis-je vous aider aujourd'hui ?`;
       </AnimatePresence>
 
       {/* Main */}
-      <section className="flex-1 flex flex-col h-full min-h-0 min-w-0 bg-white/50 backdrop-blur-sm">
+      <section className="flex-1 flex flex-col h-full min-h-0 min-w-0">
         {/* Header */}
         <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 px-4 py-3 flex-shrink-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 ">
+            <div className="flex items-center gap-3">
               {!showSidebar && (
                 <button onClick={() => setShowSidebar(true)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                   <Bot size={20} />
                 </button>
               )}
-              
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Bot size={29} className="text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-blue-900">Bubix {subscriptionType}</h1>
+                <div className="flex items-center gap-2">
+                  
+                  <p className="text-sm text-blue-600">
+                    {userType === 'CHILD' ? "Assistant d'apprentissage" : 'Assistant parental'}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </header>
@@ -736,7 +686,7 @@ Comment puis-je vous aider aujourd'hui ?`;
                 <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
                   <Sparkles size={32} className="text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-blue-900 mb-3">Bienvenue chez Bubix !</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Bienvenue chez Bubix !</h3>
                 <p className="text-gray-600 mb-6">
                   {userType === 'CHILD'
                     ? "Je suis ton assistant d'apprentissage. Pose-moi des questions sur tes exercices ou demande-moi de l'aide !"
@@ -781,18 +731,18 @@ Comment puis-je vous aider aujourd'hui ?`;
                         <img
                           src={selectedAvatar || user?.avatarPath || '/avatar/46634418-D597-4138-A12C-ED6DB610C8BD_1_105_c.jpeg'}
                           alt={`Avatar de ${user?.firstName || 'Utilisateur'}`}
-                          className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm"
+                          className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-lg"
                         />
                       ) : (
-                        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-sm">
-                          <Bot size={16} className="text-white" />
+                        <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
+                          <Bot size={20} className="text-white" />
                         </div>
                       )}
                     </div>
 
                     {/* Message */}
                     <div
-                      className={`px-4 py-3 rounded-lg shadow-sm ${
+                      className={`px-4 py-3 rounded-2xl shadow-sm ${
                         message.sender === 'user'
                           ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
                           : 'bg-white text-gray-900 border border-gray-200/50'
@@ -812,10 +762,10 @@ Comment puis-je vous aider aujourd'hui ?`;
               {isLoading && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
                   <div className="flex gap-3">
-                    <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-sm">
-                      <Bot size={16} className="text-white" />
+                    <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
+                      <Bot size={20} className="text-white" />
                     </div>
-                    <div className="bg-white border border-gray-200/50 px-4 py-3 rounded-lg shadow-sm">
+                    <div className="bg-white border border-gray-200/50 px-4 py-3 rounded-2xl shadow-sm">
                       <div className="flex items-center gap-2">
                         <div className="flex space-x-1">
                           <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
@@ -844,7 +794,7 @@ Comment puis-je vous aider aujourd'hui ?`;
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder={userType === 'CHILD' ? 'Pose ta question à Bubix...' : 'Posez votre question à Bubix...'}
-                  className="w-full resize-none border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm leading-5 bg-white/50 backdrop-blur-sm"
+                  className="w-full resize-none border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm leading-5 bg-white/50 backdrop-blur-sm"
                   rows={1}
                   disabled={isLoading}
                   maxLength={characterLimits.max}
@@ -865,7 +815,7 @@ Comment puis-je vous aider aujourd'hui ?`;
               <button
                 onClick={sendMessage}
                 disabled={!inputValue.trim() || isLoading || characterLimits.remaining < 0}
-                className="px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <Send size={18} />
               </button>

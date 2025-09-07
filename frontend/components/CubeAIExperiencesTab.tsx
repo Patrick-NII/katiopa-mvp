@@ -29,6 +29,7 @@ import {
   getDifficultyColor,
   getGameTypeIcon
 } from '@/lib/api/experiences'
+import WeeklyCycle from './WeeklyCycle'
 
 interface CubeAIExperiencesTabProps {
   userType: 'CHILD' | 'PARENT'
@@ -493,6 +494,16 @@ function ChildInterface({
           </div>
           <h3 className="font-semibold text-gray-900 text-sm">Planning</h3>
         </div>
+      </div>
+
+      {/* Cycle d'apprentissage hebdomadaire */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <WeeklyCycle 
+          childName={firstName}
+          currentDay={new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()}
+          completedDays={['monday', 'tuesday']} // TODO: Récupérer depuis l'API
+          showProgress={true}
+        />
       </div>
 
       {/* Top exercices */}
