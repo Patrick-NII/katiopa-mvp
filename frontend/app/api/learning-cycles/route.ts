@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     const weekStart = getWeekStart(targetDate);
     const weekEnd = getWeekEnd(targetDate);
 
-    let sessionId = decoded.sessionId;
+    let sessionId = decoded.userId;
     
     // Si c'est un parent qui demande les données d'un enfant spécifique
     if (decoded.userType === 'PARENT' && childSessionId) {
