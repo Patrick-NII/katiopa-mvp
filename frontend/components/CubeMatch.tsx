@@ -4,6 +4,39 @@ import { Zap, X } from 'lucide-react';
 import { cubematchAPI, CubeMatchScore, CubeMatchStats } from '../lib/api/cubematch';
 
 /* ---------------------------
+   Icônes simples pour enfants
+----------------------------*/
+const LightbulbIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7zM9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1z"/>
+  </svg>
+);
+
+const RefreshIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+  </svg>
+);
+
+const StopIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M6 6h12v12H6z"/>
+  </svg>
+);
+
+const PlayIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M8 5v14l11-7z"/>
+  </svg>
+);
+
+const SettingsIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+  </svg>
+);
+
+/* ---------------------------
    Hooks viewport & vh réel
 ----------------------------*/
 const useViewportSize = () => {
@@ -1102,12 +1135,6 @@ export default function CubeMatch() {
       {/* Header avec informations de jeu et boutons */}
       <div className="h-16 bg-white/90 backdrop-blur-sm border-b border-gray-200 flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
-          <button 
-            onClick={() => window.location.href = '/dashboard/mathcube'}
-            className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-all duration-200 flex items-center gap-2"
-          >
-            ← Retour
-          </button>
           <h1 className="text-xl font-bold text-gray-900">CubeMatch</h1>
           <div className="flex items-center gap-2">
             <div className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
@@ -1128,39 +1155,48 @@ export default function CubeMatch() {
           <div className="text-sm text-gray-500">
             {formatMs(state.timePlayedMs)}
           </div>
+          
+          {/* Boutons simplifiés pour enfants */}
           <button 
-            className="px-4 py-2 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 transition-all duration-200"
+            className="px-4 py-2 bg-yellow-400 text-white rounded-lg font-bold text-lg hover:bg-yellow-500 transition-all duration-200 shadow-md"
             onClick={() => dispatch({ type: 'HINT' })}
+            title="Indice"
           >
-            💡 Indice
+            <LightbulbIcon />
           </button>
+          
           <button 
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-all duration-200"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg font-bold text-lg hover:bg-blue-600 transition-all duration-200 shadow-md"
             onClick={() => dispatch({ type: 'RESTART' })}
+            title="Nouvelle partie"
           >
-            🔄 Rejouer
+            <RefreshIcon />
           </button>
+          
+          {state.running && !state.gameOver ? (
+            <button 
+              className="px-4 py-2 bg-red-500 text-white rounded-lg font-bold text-lg hover:bg-red-600 transition-all duration-200 shadow-md"
+              onClick={() => dispatch({ type: 'END_GAME' })}
+              title="Arrêter le jeu"
+            >
+              <StopIcon />
+            </button>
+          ) : (
+            <button 
+              className="px-4 py-2 bg-green-500 text-white rounded-lg font-bold text-lg hover:bg-green-600 transition-all duration-200 shadow-md"
+              onClick={() => dispatch({ type: 'RESTART' })}
+              title="Commencer à jouer"
+            >
+              <PlayIcon />
+            </button>
+          )}
+          
           <button 
-            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-              !state.paused 
-                ? 'bg-orange-500 text-white hover:bg-orange-600' 
-                : 'bg-green-500 text-white hover:bg-green-600'
-            }`}
-            onClick={() => dispatch({ type: 'PAUSE_TOGGLE' })}
-          >
-            {!state.paused ? '⏸️ Pause' : '▶️ Continuer'}
-          </button>
-          <button 
-            className="px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-all duration-200"
-            onClick={() => dispatch({ type: 'END_GAME' })}
-          >
-            ⏹️ Stop
-          </button>
-          <button 
-            className="px-4 py-2 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition-all duration-200"
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg font-bold text-lg hover:bg-gray-600 transition-all duration-200 shadow-md"
             onClick={() => setShowOptions(true)}
+            title="Paramètres"
           >
-            ⚙️ Paramètres
+            <SettingsIcon />
           </button>
         </div>
       </div>
