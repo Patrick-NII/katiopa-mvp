@@ -8,7 +8,6 @@ import {
   Copy, 
   Printer, 
   Share2, 
-  Heart, 
   ThumbsUp, 
   Download, 
   Trash2,
@@ -54,19 +53,87 @@ export default function AnalysisModal({
   const [isCopied, setIsCopied] = useState(false);
   const [showDialogue, setShowDialogue] = useState(false);
   const [dialogueMessage, setDialogueMessage] = useState('');
+  const [actionStates, setActionStates] = useState<{[key: string]: boolean}>({});
+  const [buttonAnimations, setButtonAnimations] = useState<{[key: string]: 'success' | 'error' | null}>({});
+
+  // Fonction pour jouer un son de confirmation
+  const playSuccessSound = () => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    } catch (error) {
+      console.log('Audio non disponible');
+    }
+  };
+
+  const playErrorSound = () => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(200, audioContext.currentTime + 0.2);
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.4);
+    } catch (error) {
+      console.log('Audio non disponible');
+    }
+  };
+
+  // Fonction pour animer un bouton
+  const animateButton = (action: string, type: 'success' | 'error') => {
+    setButtonAnimations(prev => ({ ...prev, [action]: type }));
+    
+    if (type === 'success') {
+      playSuccessSound();
+    } else {
+      playErrorSound();
+    }
+    
+    setTimeout(() => {
+      setButtonAnimations(prev => ({ ...prev, [action]: null }));
+    }, 1500);
+  };
+
+  // Fonction pour gérer les états des actions
+  const setActionState = (action: string, isLoading: boolean) => {
+    setActionStates(prev => ({ ...prev, [action]: isLoading }));
+  };
+
 
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'compte_rendu':
-        return '📊';
+        return '';
       case 'appreciation':
         return '🎯';
       case 'conseils':
-        return '⏰';
+        return '';
       case 'vigilance':
-        return '👁️';
+        return '';
       default:
-        return '📝';
+        return '';
     }
   };
 
@@ -87,42 +154,98 @@ export default function AnalysisModal({
 
   const handleCopy = async () => {
     try {
+      setActionState('copy', true);
       await navigator.clipboard.writeText(analysis.content);
       setIsCopied(true);
+      animateButton('copy', 'success');
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
-      console.error('Erreur lors de la copie:', err);
+      animateButton('copy', 'error');
+    } finally {
+      setActionState('copy', false);
     }
   };
 
   const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Analyse Bubix - ${getTypeTitle(analysis.type)}</title>
-            <style>
-              body { font-family: Arial, sans-serif; margin: 20px; }
-              .header { border-bottom: 2px solid #3B82F6; padding-bottom: 10px; margin-bottom: 20px; }
-              .content { line-height: 1.6; }
-            </style>
-          </head>
-          <body>
-            <div class="header">
-              <h1>${getTypeTitle(analysis.type)}</h1>
-              <p><strong>Enfant:</strong> ${analysis.childName || 'Non spécifié'}</p>
-              <p><strong>Date:</strong> ${analysis.timestamp.toLocaleString('fr-FR')}</p>
-            </div>
-            <div class="content">
-              ${analysis.content.replace(/\n/g, '<br>')}
-            </div>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
+    try {
+      setActionState('print', true);
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Analyse Bubix - ${getTypeTitle(analysis.type)}</title>
+              <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .header { border-bottom: 2px solid #3B82F6; padding-bottom: 10px; margin-bottom: 20px; }
+                .content { line-height: 1.6; }
+              </style>
+            </head>
+            <body>
+              <div class="header">
+                <h1>${getTypeTitle(analysis.type)}</h1>
+                <p><strong>Enfant:</strong> ${analysis.childName || 'Non spécifié'}</p>
+                <p><strong>Date:</strong> ${analysis.timestamp.toLocaleString('fr-FR')}</p>
+              </div>
+              <div class="content">
+                ${analysis.content.replace(/\n/g, '<br>')}
+              </div>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+        animateButton('print', 'success');
+      }
+    } catch (error) {
+      animateButton('print', 'error');
+    } finally {
+      setActionState('print', false);
     }
+  };
+
+  // Composant de bouton animé
+  const AnimatedButton = ({ 
+    action, 
+    onClick, 
+    disabled, 
+    children, 
+    className, 
+    title 
+  }: {
+    action: string;
+    onClick: () => void;
+    disabled?: boolean;
+    children: React.ReactNode;
+    className: string;
+    title: string;
+  }) => {
+    const animation = buttonAnimations[action];
+    const isLoading = actionStates[action];
+    
+    return (
+      <motion.button
+        onClick={onClick}
+        disabled={disabled || isLoading}
+        className={className}
+        title={title}
+        whileTap={{ scale: 0.95 }}
+        animate={{
+          scale: animation === 'success' ? [1, 1.1, 1] : 1,
+          backgroundColor: animation === 'success' ? ['#dbeafe', '#3b82f6', '#dbeafe'] : undefined,
+        }}
+        transition={{
+          duration: animation === 'success' ? 0.6 : 0.1,
+          times: animation === 'success' ? [0, 0.5, 1] : undefined,
+        }}
+      >
+        {isLoading ? (
+          <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+        ) : (
+          children
+        )}
+      </motion.button>
+    );
   };
 
   const handleShare = async () => {
@@ -188,11 +311,11 @@ export default function AnalysisModal({
                   <div>
                     <h2 className="text-xl font-bold">{getTypeTitle(analysis.type)}</h2>
                     <div className="flex items-center gap-4 text-sm text-blue-100">
-                      <div className="flex items-center gap-1">
-                        <User className="w-4 h-4" />
+                      <div className="flex items-center gap-1 text-white">
+                        <User className="w-4 h-4 text-white" />
                         {analysis.childName || 'Enfant'}
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 text-white">
                         <Clock className="w-4 h-4" />
                         {analysis.timestamp.toLocaleString('fr-FR')}
                       </div>
@@ -203,7 +326,7 @@ export default function AnalysisModal({
                   onClick={onClose}
                   className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-6 h-6 text-white" />
                 </button>
               </div>
             </div>
@@ -217,95 +340,142 @@ export default function AnalysisModal({
               </div>
             </div>
 
-            {/* Actions du modal */}
+            {/* Actions du modal - Réorganisées par logique d'utilisation */}
             <div className="border-t bg-gray-50 p-6">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                {/* Actions principales */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => onSave?.(analysis)}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              <div className="flex items-center justify-center gap-8">
+                {/* Actions principales - Sauvegarde et export */}
+                <div className="flex items-center gap-4">
+                  <AnimatedButton
+                    action="save"
+                    onClick={() => {
+                      setActionState('save', true);
+                      onSave?.(analysis);
+                      animateButton('save', 'success');
+                      setActionState('save', false);
+                    }}
+                    className="p-3 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                    title="Sauvegarder"
                   >
-                    <Save className="w-4 h-4" />
-                    Sauvegarder
-                  </button>
+                    <Save className="w-5 h-5" />
+                  </AnimatedButton>
                   
-                  <button
-                    onClick={handleCopy}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                      isCopied 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
+                  <AnimatedButton
+                    action="download"
+                    onClick={handleDownload}
+                    className="p-3 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                    title="Télécharger"
                   >
-                    <Copy className="w-4 h-4" />
-                    {isCopied ? 'Copié!' : 'Copier'}
-                  </button>
-                  
-                  <button
-                    onClick={handlePrint}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-                  >
-                    <Printer className="w-4 h-4" />
-                    Imprimer
-                  </button>
-                  
-                  <button
-                    onClick={handleShare}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    <Share2 className="w-4 h-4" />
-                    Partager
-                  </button>
+                    <Download className="w-5 h-5" />
+                  </AnimatedButton>
                 </div>
 
-                {/* Actions secondaires */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => onLike?.(analysis.sessionId)}
-                    className={`p-2 rounded-lg transition-colors ${
+                {/* Séparateur visuel */}
+                <div className="w-px h-8 bg-gray-300"></div>
+
+                {/* Actions de partage et communication */}
+                <div className="flex items-center gap-4">
+                  <AnimatedButton
+                    action="copy"
+                    onClick={handleCopy}
+                    className={`p-3 rounded-lg transition-all duration-200 ${
+                      isCopied 
+                        ? 'text-blue-600 bg-blue-50' 
+                        : 'text-blue-600 hover:text-blue-700 hover:bg-blue-50'
+                    }`}
+                    title={isCopied ? 'Copié!' : 'Copier'}
+                  >
+                    <Copy className="w-5 h-5" />
+                  </AnimatedButton>
+                  
+                  <AnimatedButton
+                    action="share"
+                    onClick={handleShare}
+                    className="p-3 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                    title="Partager"
+                  >
+                    <Share2 className="w-5 h-5" />
+                  </AnimatedButton>
+                  
+                  <AnimatedButton
+                    action="print"
+                    onClick={handlePrint}
+                    className="p-3 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                    title="Imprimer"
+                  >
+                    <Printer className="w-5 h-5" />
+                  </AnimatedButton>
+                </div>
+
+                {/* Séparateur visuel */}
+                <div className="w-px h-8 bg-gray-300"></div>
+
+                {/* Actions d'interaction et feedback */}
+                <div className="flex items-center gap-4">
+                  <AnimatedButton
+                    action="like"
+                    onClick={() => {
+                      onLike?.(analysis.sessionId);
+                      animateButton('like', 'success');
+                    }}
+                    className={`p-3 rounded-lg transition-all duration-200 ${
                       isLiked 
-                        ? 'bg-red-100 text-red-600' 
-                        : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                        ? 'text-blue-600 bg-blue-50' 
+                        : 'text-blue-600 hover:text-blue-700 hover:bg-blue-50'
                     }`}
+                    title={isLiked ? 'Retirer le like' : 'J\'aime'}
                   >
-                    <ThumbsUp className="w-4 h-4" />
-                  </button>
+                    <ThumbsUp className="w-5 h-5" />
+                  </AnimatedButton>
                   
-                  <button
-                    onClick={() => onFavorite?.(analysis.sessionId)}
-                    className={`p-2 rounded-lg transition-colors ${
+                  <AnimatedButton
+                    action="favorite"
+                    onClick={() => {
+                      onFavorite?.(analysis.sessionId);
+                      animateButton('favorite', 'success');
+                    }}
+                    className={`p-3 rounded-lg transition-all duration-200 ${
                       isFavorite 
-                        ? 'bg-yellow-100 text-yellow-600' 
-                        : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                        ? 'text-blue-600 bg-blue-50' 
+                        : 'text-blue-600 hover:text-blue-700 hover:bg-blue-50'
                     }`}
+                    title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
                   >
-                    <Star className="w-4 h-4" />
-                  </button>
-                  
-                  <button
-                    onClick={handleDownload}
-                    className="p-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                  </button>
+                    <Star className="w-5 h-5" />
+                  </AnimatedButton>
                   
                   {canDialogue && (
-                    <button
-                      onClick={() => setShowDialogue(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    <AnimatedButton
+                      action="dialogue"
+                      onClick={() => {
+                        setShowDialogue(true);
+                        animateButton('dialogue', 'success');
+                      }}
+                      className="p-3 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                      title="Dialogue Bubix Pro"
                     >
-                      <MessageCircle className="w-4 h-4" />
-                      Dialogue Bubix Pro
-                    </button>
+                      <MessageCircle className="w-5 h-5" />
+                    </AnimatedButton>
                   )}
-                  
-                  <button
-                    onClick={() => onDelete?.(analysis.sessionId)}
-                    className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                </div>
+
+                {/* Séparateur visuel */}
+                <div className="w-px h-8 bg-gray-300"></div>
+
+                {/* Action de suppression (isolée pour éviter les clics accidentels) */}
+                <div className="flex items-center gap-4">
+                  <AnimatedButton
+                    action="delete"
+                    onClick={() => {
+                      if (confirm('Êtes-vous sûr de vouloir supprimer cette analyse ?')) {
+                        onDelete?.(analysis.sessionId);
+                        animateButton('delete', 'success');
+                      }
+                    }}
+                    className="p-3 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200"
+                    title="Supprimer"
                   >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    <Trash2 className="w-5 h-5" />
+                  </AnimatedButton>
                 </div>
               </div>
             </div>
