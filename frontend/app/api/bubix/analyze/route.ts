@@ -441,18 +441,28 @@ Tu es Bubix, l'assistant IA éducatif de CubeAI.
 
 🎮 ANALYSE DES PERFORMANCES CUBEMATCH :
 - Nombre total de parties jouées : ${childData.cubeMatchAnalysis.totalGames}
-- Meilleur score atteint : ${childData.cubeMatchAnalysis.bestScore.toLocaleString()} points
-- Score moyen par partie : ${Math.round(childData.cubeMatchAnalysis.averageScore).toLocaleString()} points
-- Niveau maximum atteint : ${childData.cubeMatchAnalysis.highestLevel}
+- MEILLEUR SCORE (record personnel) : ${childData.cubeMatchAnalysis.bestScore.toLocaleString()} points
+- SCORE MOYEN (moyenne de toutes les parties) : ${Math.round(childData.cubeMatchAnalysis.averageScore).toLocaleString()} points
+- NIVEAU MAXIMUM atteint : ${childData.cubeMatchAnalysis.highestLevel}
 - Temps total de jeu : ${Math.round(childData.cubeMatchAnalysis.totalTimePlayed / (1000 * 60))} minutes
-- Parties récentes :
+- Parties récentes (3 dernières) :
 ${childData.cubeMatchAnalysis.recentGames.length > 0 ? childData.cubeMatchAnalysis.recentGames.map((game, index) => `
   ${index + 1}. Score: ${game.score.toLocaleString()} pts, Niveau: ${game.level}, Opérateur: ${game.operator} - ${new Date(game.date).toLocaleDateString('fr-FR')}
 `).join('') : '  Aucune partie récente'}
 - Performance par opérateur :
 ${Object.entries(childData.cubeMatchAnalysis.performanceByOperator).length > 0 ? Object.entries(childData.cubeMatchAnalysis.performanceByOperator).map(([op, stats]) => `
-  ${op}: ${stats.count} parties, Score moyen: ${Math.round(stats.totalScore / stats.count).toLocaleString()}, Meilleur: ${stats.bestScore.toLocaleString()}
+  ${op}: ${stats.count} parties, Moyenne: ${Math.round(stats.totalScore / stats.count).toLocaleString()} pts, Record: ${stats.bestScore.toLocaleString()} pts
 `).join('') : '  Aucune donnée par opérateur'}
+
+⚠️ IMPORTANT : Ne pas confondre "meilleur score" (record personnel) avec "score moyen" (moyenne de toutes les parties)
+
+📋 INSTRUCTIONS POUR L'ANALYSE :
+- MEILLEUR SCORE = Record personnel, performance maximale atteinte
+- SCORE MOYEN = Moyenne arithmétique de toutes les parties jouées
+- NIVEAU MAXIMUM = Le niveau le plus élevé atteint dans une partie
+- Utilise ces données pour évaluer la progression et les capacités de l'enfant
+- Mentionne les performances exceptionnelles (meilleurs scores) comme des réussites
+- Analyse la régularité via le score moyen pour évaluer la constance
 
 📚 ANALYSE DES CONVERSATIONS AVEC BUBIX :
 - Nombre total de conversations : ${childData.conversationAnalysis.totalConversations}
