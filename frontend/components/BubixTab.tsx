@@ -60,13 +60,15 @@ export default function BubixTab({ user, childSessions, userType, subscriptionTy
   // Synchroniser avec la sidebar principale
   useEffect(() => {
     if (!isMobile) {
-      // Sur desktop, ajuster la sidebar BubixTab selon l'état de la sidebar principale
+      // Sur desktop, toujours permettre l'ouverture de la sidebar BubixTab
+      // car elle est maintenant en overlay et ne conflit plus avec la sidebar principale
       if (mainSidebarCollapsed) {
         // Si la sidebar principale est fermée, on peut ouvrir la sidebar BubixTab
         setShowSidebar(true)
       } else {
-        // Si la sidebar principale est ouverte, on ferme la sidebar BubixTab pour éviter le conflit
-        setShowSidebar(false)
+        // Si la sidebar principale est ouverte, on peut quand même ouvrir la sidebar BubixTab
+        // car elle est en overlay et ne prend pas d'espace dans le layout
+        setShowSidebar(true)
       }
     }
   }, [mainSidebarCollapsed, isMobile])
@@ -77,17 +79,8 @@ export default function BubixTab({ user, childSessions, userType, subscriptionTy
       return "w-full h-full flex flex-col bg-gradient-to-br from-blue-50 to-indigo-50"
     }
     
-    // Sur desktop, ajuster selon l'état des sidebars
-    if (mainSidebarCollapsed && showSidebar) {
-      // Sidebar principale fermée + sidebar BubixTab ouverte = layout côte à côte
-      return "w-full h-full flex flex-col xl:flex-row bg-gradient-to-br from-blue-50 to-indigo-50"
-    } else if (!mainSidebarCollapsed) {
-      // Sidebar principale ouverte = layout vertical pour éviter le conflit
-      return "w-full h-full flex flex-col bg-gradient-to-br from-blue-50 to-indigo-50"
-    } else {
-      // Sidebar principale fermée + sidebar BubixTab fermée = layout vertical
-      return "w-full h-full flex flex-col bg-gradient-to-br from-blue-50 to-indigo-50"
-    }
+    // Sur desktop, toujours utiliser un layout vertical pour que le chat prenne toute la largeur
+    return "w-full h-full flex flex-col bg-gradient-to-br from-blue-50 to-indigo-50"
   }
 
   // États pour les limites de caractères
@@ -554,10 +547,10 @@ Comment puis-je vous aider aujourd'hui ?`;
       borderRadius: '0',
       overflow: 'hidden'
     }}>
-      {/* Overlay pour mobile */}
-      {showSidebar && isMobile && (
+      {/* Overlay pour tous les écrans */}
+      {showSidebar && (
         <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
           onClick={() => setShowSidebar(false)}
         />
       )}
@@ -569,7 +562,7 @@ Comment puis-je vous aider aujourd'hui ?`;
             initial={{ width: 0 }}
             animate={{ width: 320 }}
             exit={{ width: 0 }}
-            className="bg-white/80 backdrop-blur-sm border-r border-gray-200/50 flex flex-col h-full min-w-0 shadow-lg lg:relative lg:z-auto z-50 fixed lg:static inset-0 lg:inset-auto"
+            className="bg-white/80 backdrop-blur-sm border-r border-gray-200/50 flex flex-col h-full min-w-0 shadow-lg z-50 fixed inset-0"
           >
             {/* Header */}
             <div className="border-b border-gray-200/50 flex-shrink-0">
@@ -758,21 +751,9 @@ Comment puis-je vous aider aujourd'hui ?`;
             {/* Bouton conversations intégré subtilement */}
             {!showSidebar && (
               <button
-                onClick={() => {
-                  // Sur desktop, vérifier si on peut ouvrir la sidebar
-                  if (!isMobile && !mainSidebarCollapsed) {
-                    // Si la sidebar principale est ouverte, on ne peut pas ouvrir la sidebar BubixTab
-                    return
-                  }
-                  setShowSidebar(true)
-                }}
-                className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
-                  !isMobile && !mainSidebarCollapsed 
-                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                    : 'bg-gradient-to-r from-emerald-500 to-blue-500 text-white hover:from-emerald-600 hover:to-blue-600'
-                }`}
-                disabled={!isMobile && !mainSidebarCollapsed}
-                title={!isMobile && !mainSidebarCollapsed ? 'Fermez la sidebar principale pour ouvrir les conversations' : 'Ouvrir les conversations'}
+                onClick={() => setShowSidebar(true)}
+                className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg hover:from-emerald-600 hover:to-blue-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                title="Ouvrir les conversations"
               >
                 <MessageCircle size={16} className="sm:w-5 sm:h-5" />
                 <span className="text-sm sm:text-base font-medium">
