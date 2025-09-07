@@ -115,19 +115,7 @@ export default function WeeklyCycle({
   const completedDays = currentCycle?.completedDays || [];
   const progressPercentage = (completedDays.length / 6) * 100;
 
-  const handleDayClick = async (dayKey: string) => {
-    if (interactive && !completedDays.includes(dayKey)) {
-      try {
-        await markDayCompleted(dayKey);
-        onDayClick?.(dayKey);
-      } catch (error) {
-        console.error('Erreur lors de la mise à jour:', error);
-      }
-    } else {
-      onDayClick?.(dayKey);
-    }
-  };
-
+  // Vérification de sécurité pour éviter les erreurs de rendu
   if (loading) {
     return (
       <div className="space-y-6">
@@ -164,6 +152,19 @@ export default function WeeklyCycle({
       </div>
     );
   }
+
+  const handleDayClick = async (dayKey: string) => {
+    if (interactive && !completedDays.includes(dayKey)) {
+      try {
+        await markDayCompleted(dayKey);
+        onDayClick?.(dayKey);
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour:', error);
+      }
+    } else {
+      onDayClick?.(dayKey);
+    }
+  };
 
   return (
     <div className="space-y-6">
