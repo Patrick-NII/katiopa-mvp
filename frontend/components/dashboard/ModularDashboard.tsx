@@ -153,12 +153,15 @@ export default function ModularDashboard() {
   const renderTabContent = () => {
     console.log('🎯 Rendu du contenu pour l\'onglet:', activeTab)
     console.log('👤 Utilisateur:', user)
-    console.log('👶 Sessions enfants:', childSessions)
+        console.log('👶 Sessions enfants:', childSessions)
+        console.log('👶 Détail première session:', childSessions?.[0])
+        console.log('👶 Détail deuxième session:', childSessions?.[1])
     
     if (!user) return null
 
     switch (activeTab) {
       case 'dashboard':
+        console.log('🎯 Retour du composant DashboardOverview')
         return (
           <DashboardOverview 
             user={user}
@@ -262,7 +265,11 @@ export default function ModularDashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                {renderTabContent()}
+                {(() => {
+                  const content = renderTabContent()
+                  console.log('🎭 Contenu rendu:', content)
+                  return content
+                })()}
               </motion.div>
             ) : (
               <div className="flex items-center justify-center h-64">

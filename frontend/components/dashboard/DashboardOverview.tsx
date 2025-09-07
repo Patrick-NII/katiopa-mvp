@@ -28,6 +28,7 @@ export default function DashboardOverview({
   childSessions = [],
   onNavigate 
 }: DashboardOverviewProps) {
+  console.log('🎨 DashboardOverview rendu avec:', { user, userType, childSessions })
   const [quickStats, setQuickStats] = useState({
     todayProgress: 0,
     weeklyGoal: 5,
