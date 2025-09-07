@@ -181,29 +181,29 @@ export default function MathCubePage() {
               
               {/* En-tête du tableau */}
               <div className="bg-gray-100 rounded-xl p-3">
-                <div className="grid grid-cols-12 gap-3 text-sm font-semibold text-gray-700">
+                <div className="grid grid-cols-12 gap-2 text-sm font-semibold text-gray-700">
                   <div className="col-span-2 text-center">Rang</div>
-                  <div className="col-span-4 text-center">Nom</div>
-                  <div className="col-span-3 text-center">Score</div>
                   <div className="col-span-3 text-center">Session</div>
+                  <div className="col-span-4 text-center">Score</div>
+                  <div className="col-span-3 text-center">Niveau</div>
                 </div>
               </div>
               
               {loading ? (
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {[...Array(10)].map((_, i) => (
-                    <div key={i} className="grid grid-cols-12 gap-3 p-3 bg-gray-50 rounded-lg animate-pulse">
-                      <div className="col-span-2 h-6 bg-gray-200 rounded"></div>
-                      <div className="col-span-4 h-4 bg-gray-200 rounded"></div>
+                    <div key={i} className="grid grid-cols-12 gap-2 p-2 bg-gray-50 rounded-lg animate-pulse">
+                      <div className="col-span-2 h-5 bg-gray-200 rounded"></div>
                       <div className="col-span-3 h-4 bg-gray-200 rounded"></div>
+                      <div className="col-span-4 h-4 bg-gray-200 rounded"></div>
                       <div className="col-span-3 h-4 bg-gray-200 rounded"></div>
                     </div>
                   ))}
                 </div>
               ) : top10Players.length > 0 ? (
-                <div className="space-y-2 max-h-80 overflow-y-auto">
+                <div className="space-y-1">
                   {top10Players.slice(0, 10).map((player, index) => (
-                    <div key={player.userId} className={`grid grid-cols-12 gap-3 items-center p-3 rounded-lg transition-all duration-200 ${
+                    <div key={player.userId} className={`grid grid-cols-12 gap-2 items-center p-2 rounded-lg transition-all duration-200 ${
                       index < 3 
                         ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200' 
                         : 'bg-gray-50 hover:bg-gray-100'
@@ -211,13 +211,13 @@ export default function MathCubePage() {
                       {/* Rang */}
                       <div className="col-span-2 text-center">
                         {index < 3 ? (
-                          <div className="flex flex-col items-center gap-1">
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                          <div className="flex flex-col items-center gap-0.5">
+                            <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
                               index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900' :
                               index === 1 ? 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-700' :
                               'bg-gradient-to-r from-orange-400 to-orange-500 text-orange-900'
                             }`}>
-                              <Medal className="w-4 h-4" />
+                              <Medal className="w-3 h-3" />
                             </div>
                             <div className={`text-xs font-bold ${
                               index === 0 ? 'text-yellow-600' :
@@ -228,30 +228,30 @@ export default function MathCubePage() {
                             </div>
                           </div>
                         ) : (
-                          <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mx-auto bg-gray-200 text-gray-600">
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs mx-auto bg-gray-200 text-gray-600">
                             {player.rank}
                           </div>
                         )}
                       </div>
                       
-                      {/* Nom */}
-                      <div className="col-span-4 text-center">
-                        <div className="font-semibold text-gray-900 truncate">
-                          {player.username}
+                      {/* Session ID */}
+                      <div className="col-span-3 text-center">
+                        <div className="text-sm font-semibold text-gray-900 font-mono">
+                          {player.sessionId || player.userId.slice(-6)}
                         </div>
                       </div>
                       
                       {/* Score */}
-                      <div className="col-span-3 text-center">
-                        <div className="font-bold text-gray-900">
+                      <div className="col-span-4 text-center">
+                        <div className="font-bold text-gray-900 text-sm">
                           {player.score.toLocaleString()}
                         </div>
                       </div>
                       
-                      {/* Session ID (user-friendly) */}
+                      {/* Niveau */}
                       <div className="col-span-3 text-center">
-                        <div className="text-sm text-gray-500 font-mono">
-                          {player.sessionId || player.userId.slice(-6)}
+                        <div className="text-sm font-semibold text-gray-700">
+                          {player.level || 'N/A'}
                         </div>
                       </div>
                     </div>
