@@ -1253,14 +1253,14 @@ export default function CubeMatch() {
         </div>
       </div>
 
-      {/* Zone de jeu principale - responsive */}
+      {/* Zone de jeu principale - responsive avec breakpoints étendus */}
       <div className="h-[calc(100vh-3rem)] lg:h-full flex flex-col lg:flex-row">
-        <div className="flex-1 flex items-center justify-center p-1 lg:p-2 min-h-0">
+        <div className="flex-1 flex items-center justify-center p-1 sm:p-2 md:p-3 lg:p-4 xl:p-6 2xl:p-8 min-h-0">
           <GameArea state={state} dispatch={dispatch} />
         </div>
         
-        {/* Panneau latéral - desktop seulement */}
-        <div className="hidden lg:flex lg:w-80 bg-white/90 backdrop-blur-sm border-l border-gray-200 p-4 flex-col h-full">
+        {/* Panneau latéral - desktop seulement avec breakpoints étendus */}
+        <div className="hidden lg:flex lg:w-80 xl:w-96 2xl:w-[28rem] bg-white/90 backdrop-blur-sm border-l border-gray-200 p-4 xl:p-6 2xl:p-8 flex-col h-full">
           <SidePanel
             state={state}
             dispatch={dispatch}
@@ -1363,28 +1363,46 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
   const theme = themePalette[(state.config.theme ?? 'classic') as keyof typeof themePalette];
   const { ref: frameRef, size: frame } = useElementSize<HTMLDivElement>();
   const gap = useMemo(() => {
-    const isLargeScreen = typeof window !== 'undefined' && window.innerWidth >= 1440;
-    const isTablet = typeof window !== 'undefined' && window.innerWidth < 1024;
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1200;
     
-    if (isLargeScreen) {
-      return 8; // Espacement plus grand sur grand écran
-    } else if (isTablet) {
-      return 6; // Espacement moyen sur tablette
+    if (width < 480) {
+      return 2; // Très petit mobile
+    } else if (width < 640) {
+      return 3; // Petit mobile
+    } else if (width < 768) {
+      return 4; // Mobile standard
+    } else if (width < 1024) {
+      return 5; // Tablette
+    } else if (width < 1280) {
+      return 6; // Desktop petit
+    } else if (width < 1440) {
+      return 7; // Desktop moyen
+    } else if (width < 1680) {
+      return 8; // Desktop large
     } else {
-      return 4; // Espacement normal sur mobile et desktop standard
+      return 10; // Très grand écran
     }
   }, []);
   
   const containerPadding = useMemo(() => {
-    const isLargeScreen = typeof window !== 'undefined' && window.innerWidth >= 1440;
-    const isTablet = typeof window !== 'undefined' && window.innerWidth < 1024;
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1200;
     
-    if (isLargeScreen) {
-      return 16; // Padding plus grand sur grand écran
-    } else if (isTablet) {
-      return 12; // Padding moyen sur tablette
+    if (width < 480) {
+      return 4; // Très petit mobile
+    } else if (width < 640) {
+      return 6; // Petit mobile
+    } else if (width < 768) {
+      return 8; // Mobile standard
+    } else if (width < 1024) {
+      return 10; // Tablette
+    } else if (width < 1280) {
+      return 12; // Desktop petit
+    } else if (width < 1440) {
+      return 14; // Desktop moyen
+    } else if (width < 1680) {
+      return 16; // Desktop large
     } else {
-      return 8; // Padding normal sur mobile et desktop standard
+      return 20; // Très grand écran
     }
   }, []);
   
@@ -1407,24 +1425,34 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
     const byW = Math.floor(wForCells / cols);
     const byH = Math.floor(hForCells / rows);
     
-    // Tailles optimisées selon la taille d'écran
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-    const isTablet = typeof window !== 'undefined' && window.innerWidth < 1024;
-    const isLargeScreen = typeof window !== 'undefined' && window.innerWidth >= 1440;
+    // Tailles optimisées selon la taille d'écran avec plus de breakpoints
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1200;
     
     let maxSize, minSize;
-    if (isMobile) {
-      maxSize = 50;
-      minSize = 35;
-    } else if (isTablet) {
-      maxSize = 70;
-      minSize = 45;
-    } else if (isLargeScreen) {
-      maxSize = 100; // Plus grand sur grand écran
-      minSize = 60;
+    if (width < 480) {
+      // Très petit mobile (iPhone SE, etc.)
+      maxSize = 40; minSize = 25;
+    } else if (width < 640) {
+      // Petit mobile
+      maxSize = 45; minSize = 30;
+    } else if (width < 768) {
+      // Mobile standard
+      maxSize = 50; minSize = 35;
+    } else if (width < 1024) {
+      // Tablette
+      maxSize = 65; minSize = 45;
+    } else if (width < 1280) {
+      // Desktop petit (13" laptop)
+      maxSize = 75; minSize = 50;
+    } else if (width < 1440) {
+      // Desktop moyen (15" laptop)
+      maxSize = 85; minSize = 55;
+    } else if (width < 1680) {
+      // Desktop large (17" laptop, petit moniteur)
+      maxSize = 95; minSize = 60;
     } else {
-      maxSize = 80;
-      minSize = 50;
+      // Très grand écran (moniteur 4K, etc.)
+      maxSize = 110; minSize = 70;
     }
     
     // Prendre le minimum pour s'assurer que la grille rentre complètement
@@ -1438,7 +1466,10 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
       cols, rows, gap, padding,
       availableWidth, availableHeight,
       byW, byH, optimalSize, finalSize,
-      screenType: isMobile ? 'mobile' : isTablet ? 'tablet' : isLargeScreen ? 'large' : 'desktop'
+      screenWidth: width,
+      breakpoint: width < 480 ? 'xs' : width < 640 ? 'sm' : width < 768 ? 'md' : 
+                  width < 1024 ? 'lg' : width < 1280 ? 'xl' : width < 1440 ? '2xl' : 
+                  width < 1680 ? '3xl' : '4xl'
     });
     
     return finalSize;
@@ -1446,17 +1477,25 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
 
   const fontPx = useMemo(() => {
     const baseFontSize = Math.floor(cellSizePx * 0.55);
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1200;
     
-    // Augmenter la taille de police sur grand écran
-    const isLargeScreen = typeof window !== 'undefined' && window.innerWidth >= 1440;
-    const isTablet = typeof window !== 'undefined' && window.innerWidth < 1024;
-    
-    if (isLargeScreen) {
-      return Math.floor(cellSizePx * 0.65); // Police plus grande sur grand écran
-    } else if (isTablet) {
-      return Math.floor(cellSizePx * 0.6); // Police légèrement plus grande sur tablette
+    // Taille de police adaptative selon les breakpoints
+    if (width < 480) {
+      return Math.floor(cellSizePx * 0.5); // Police plus petite sur très petit mobile
+    } else if (width < 640) {
+      return Math.floor(cellSizePx * 0.52); // Police légèrement plus petite
+    } else if (width < 768) {
+      return Math.floor(cellSizePx * 0.55); // Police normale sur mobile
+    } else if (width < 1024) {
+      return Math.floor(cellSizePx * 0.58); // Police légèrement plus grande sur tablette
+    } else if (width < 1280) {
+      return Math.floor(cellSizePx * 0.6); // Police plus grande sur desktop petit
+    } else if (width < 1440) {
+      return Math.floor(cellSizePx * 0.62); // Police encore plus grande
+    } else if (width < 1680) {
+      return Math.floor(cellSizePx * 0.65); // Police grande sur desktop large
     } else {
-      return baseFontSize; // Taille normale sur desktop standard
+      return Math.floor(cellSizePx * 0.7); // Police très grande sur très grand écran
     }
   }, [cellSizePx]);
   const valueClass = (v: number | null) => {
@@ -1469,7 +1508,7 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
   };
 
   return (
-    <div className="flex items-center justify-center h-full w-full p-1">
+    <div className="flex items-center justify-center h-full w-full p-1 sm:p-2 md:p-3 lg:p-4 xl:p-6 2xl:p-8">
       {/* Grille de jeu avec design épuré et responsive */}
       <div 
         ref={frameRef} 
