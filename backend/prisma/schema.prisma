@@ -72,6 +72,9 @@ model UserSession {
   rewardTracking            RewardTracking[]           @relation("RewardTrackingUser")
   upgradeTrackingChild      UpgradeTracking[]          @relation("UpgradeTrackingChild")
   upgradeTracking           UpgradeTracking[]          @relation("UpgradeTrackingUser")
+  learningCycles            LearningCycle[]
+  communicationAnalytics    CommunicationAnalytics[]
+  childPreferences          ChildPreferences?
 }
 
 model UserProfile {
@@ -760,4 +763,55 @@ enum PromptStatus {
   PENDING
   PROCESSED
   ERROR
+}
+
+// Nouveaux modèles pour les cycles d'apprentissage et analytics
+model LearningCycle {
+  id            String   @id @default(cuid())
+  userSessionId String
+  weekStartDate DateTime
+  weekEndDate   DateTime
+  mondayCompleted    Boolean @default(false)
+  tuesdayCompleted   Boolean @default(false)
+  wednesdayCompleted Boolean @default(false)
+  thursdayCompleted  Boolean @default(false)
+  fridayCompleted    Boolean @default(false)
+  weekendCompleted   Boolean @default(false)
+  totalProgress      Int     @default(0) // 0-6
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  userSession   UserSession @relation(fields: [userSessionId], references: [id], onDelete: Cascade)
+  
+  @@unique([userSessionId, weekStartDate])
+}
+
+model CommunicationAnalytics {
+  id            String   @id @default(cuid())
+  userSessionId String
+  communicationStyle String // singapore, finland, estonia, reggio, ib
+  module        String?   // MathCube, CodeCube, PlayCube, etc.
+  dayOfWeek     String?   // monday, tuesday, etc.
+  messageType   String    // achievement, challenge, suggestion, default
+  effectiveness Float     // 0-1 score based on user engagement
+  responseTime  Int?      // Time in ms for user to respond
+  userSatisfaction Int?   // 1-5 rating if provided
+  context       Json?     // Additional context data
+  createdAt     DateTime @default(now())
+  userSession   UserSession @relation(fields: [userSessionId], references: [id], onDelete: Cascade)
+}
+
+model ChildPreferences {
+  id            String   @id @default(cuid())
+  userSessionId String   @unique
+  learningStyle String[] // visual, auditory, kinesthetic, reading
+  interests     String[] // math, science, art, music, coding, etc.
+  preferredModules String[] // MathCube, CodeCube, PlayCube, etc.
+  communicationStyle String? // Preferred communication style
+  difficultyPreference String? // easy, medium, hard, adaptive
+  sessionLength Int?     // Preferred session length in minutes
+  timeOfDay     String[] // morning, afternoon, evening
+  weeklyGoals   Json?    // Custom weekly goals
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  userSession   UserSession @relation(fields: [userSessionId], references: [id], onDelete: Cascade)
 }

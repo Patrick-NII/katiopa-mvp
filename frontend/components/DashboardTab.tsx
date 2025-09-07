@@ -43,6 +43,7 @@ import AnalysisPagination from './AnalysisPagination'
 import ConversationAnalysis from './ConversationAnalysis'
 import { useLimitationPopup } from '@/hooks/useLimitationPopup'
 import WeeklyCycle from './WeeklyCycle'
+import CommunicationAnalytics from './CommunicationAnalytics'
 
 interface DashboardTabProps {
   user: any
@@ -1387,10 +1388,32 @@ export default function DashboardTab({
                 <WeeklyCycle 
                   childName={session.name}
                   currentDay={new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()}
-                  completedDays={['monday', 'tuesday']} // TODO: Récupérer depuis l'API
+                  childSessionId={session.id}
                   showProgress={true}
                 />
               </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Analytics de communication pour les parents */}
+      {user?.userType === 'PARENT' && childSessions.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="space-y-6"
+        >
+          <h3 className="text-lg font-semibold text-gray-900">Analytics de Communication</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {childSessions.map((session) => (
+              <CommunicationAnalytics
+                key={session.id}
+                childSessionId={session.id}
+                childName={session.name}
+                timeRange={30}
+              />
             ))}
           </div>
         </motion.div>
