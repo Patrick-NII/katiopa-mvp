@@ -36,6 +36,12 @@ const SettingsIcon = () => (
   </svg>
 );
 
+const HamburgerIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+  </svg>
+);
+
 /* ---------------------------
    Hooks viewport & vh réel
 ----------------------------*/
@@ -687,6 +693,7 @@ export default function CubeMatch() {
   useViewportSize(); // garde à jour --vh même si on n’en a pas besoin ici directement
 
   const [showOptions, setShowOptions] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(true);
   const [topScores, setTopScores] = useState<CubeMatchScore[]>([]);
   const [stats, setStats] = useState<CubeMatchStats | null>(null);
@@ -1153,19 +1160,32 @@ export default function CubeMatch() {
   
   return (
     <div className="w-full h-screen overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header mobile avec menu hamburger */}
+      <div className="lg:hidden h-12 bg-white/90 backdrop-blur-sm border-b border-gray-200 flex items-center justify-between px-4">
+        <h1 className="text-lg font-bold text-gray-900">CubeMatch</h1>
+        <button 
+          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
+          onClick={() => setShowMobileMenu(!showMobileMenu)}
+        >
+          <HamburgerIcon />
+        </button>
+      </div>
+
       {/* Zone de jeu principale - responsive */}
-      <div className="h-full flex flex-col lg:flex-row">
-        <div className="flex-1 flex items-start justify-center p-2 lg:p-4 min-h-0">
+      <div className={`h-[calc(100vh-3rem)] lg:h-full flex flex-col lg:flex-row ${showMobileMenu ? 'lg:h-full' : ''}`}>
+        <div className={`flex-1 flex items-start justify-center p-2 lg:p-4 min-h-0 ${showMobileMenu ? 'hidden lg:flex' : ''}`}>
           <GameArea state={state} dispatch={dispatch} />
         </div>
         
         {/* Panneau latéral - responsive */}
-        <div className="w-full lg:w-80 bg-white/90 backdrop-blur-sm border-t lg:border-t-0 lg:border-l border-gray-200 p-2 lg:p-4 flex flex-col lg:h-full">
+        <div className={`w-full lg:w-80 bg-white/90 backdrop-blur-sm border-t lg:border-t-0 lg:border-l border-gray-200 p-2 lg:p-4 flex flex-col lg:h-full ${showMobileMenu ? 'h-full' : 'h-0 lg:h-full overflow-hidden lg:overflow-visible'}`}>
           <SidePanel
             state={state}
             dispatch={dispatch}
             showOptions={showOptions}
             setShowOptions={setShowOptions}
+            showMobileMenu={showMobileMenu}
+            setShowMobileMenu={setShowMobileMenu}
           />
         </div>
       </div>
@@ -1192,9 +1212,9 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
     const hForCells = frame.height - gap * (rows - 1);
     const byW = Math.floor(wForCells / cols);
     const byH = Math.floor(hForCells / rows);
-    // Optimisation pour éviter le débordement - taille plus conservatrice
-    const maxSize = window.innerWidth < 768 ? 40 : window.innerWidth < 1024 ? 50 : 65;
-    const minSize = window.innerWidth < 768 ? 25 : window.innerWidth < 1024 ? 30 : 35;
+    // Optimisation mobile - tailles adaptées aux petits écrans
+    const maxSize = window.innerWidth < 768 ? 35 : window.innerWidth < 1024 ? 50 : 65;
+    const minSize = window.innerWidth < 768 ? 20 : window.innerWidth < 1024 ? 30 : 35;
     return Math.max(minSize, Math.min(maxSize, Math.min(byW, byH)));
   }, [frame, cols, rows]);
 
@@ -1294,10 +1314,22 @@ function SidePanel(props: {
   dispatch: React.Dispatch<Action>;
   showOptions: boolean;
   setShowOptions: (v: boolean)=>void;
+  showMobileMenu: boolean;
+  setShowMobileMenu: (v: boolean)=>void;
 }) {
-  const { state, dispatch, setShowOptions } = props;
+  const { state, dispatch, setShowOptions, showMobileMenu, setShowMobileMenu } = props;
   return (
     <div className="flex flex-col h-full">
+      {/* Bouton fermer mobile */}
+      <div className="lg:hidden flex justify-end mb-4">
+        <button 
+          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
+          onClick={() => setShowMobileMenu(false)}
+        >
+          <X className="w-6 h-6" />
+        </button>
+      </div>
+
       {/* Boutons de contrôle */}
       <div className="mb-6">
         <h3 className="text-sm font-semibold text-gray-700 mb-3">Contrôles</h3>
