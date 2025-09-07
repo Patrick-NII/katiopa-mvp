@@ -67,50 +67,29 @@ export default function MathCubePage() {
   // Fonction pour charger le top 10
   const loadTop10 = async () => {
     try {
-      const response = await fetch('/api/cubematch/scores?limit=10', {
+      const response = await fetch('/api/cubematch/global-leaderboard?limit=10', {
         credentials: 'include'
       })
       
       if (response.ok) {
-        const allScores = await response.json()
+        const responseData = await response.json()
         
-        // Grouper par utilisateur et calculer le meilleur score
-        const userBestScores: Record<string, { score: number, username: string, userId: string }> = {}
-        
-        allScores.forEach((score: any) => {
-          const userId = score.userId
-          if (!userBestScores[userId] || score.score > userBestScores[userId].score) {
-            userBestScores[userId] = {
-              score: score.score,
-              username: score.username,
-              userId: userId
-            }
-          }
-        })
-        
-        // Trier par score décroissant et prendre le top 10
-        const top10 = Object.values(userBestScores)
-          .sort((a, b) => b.score - a.score)
-          .slice(0, 10)
-          .map((player, index) => ({
-            ...player,
-            rank: index + 1
-          }))
-        
-        setTop10Players(top10)
-        
-        // Calculer le rang de l'utilisateur actuel
-        const currentUser = await fetch('/api/auth/verify', {
-          credentials: 'include'
-        })
-        if (currentUser.ok) {
-          const userData = await currentUser.json()
-          const userScore = userBestScores[userData.user?.id]
-          if (userScore) {
-            const userRank = top10.findIndex(player => player.userId === userData.user?.id) + 1
+        if (responseData.success && responseData.data.leaderboard) {
+          const top10 = responseData.data.leaderboard
+          setTop10Players(top10)
+          
+          // Calculer le rang de l'utilisateur actuel
+          const currentUser = await fetch('/api/auth/verify', {
+            credentials: 'include'
+          })
+          if (currentUser.ok) {
+            const userData = await currentUser.json()
+            const userRank = top10.findIndex((player: any) => player.userId === userData.user?.id) + 1
             setUserRanking(userRank || null)
           }
         }
+      } else {
+        console.error('Erreur chargement leaderboard:', response.status)
       }
     } catch (error) {
       console.error('Erreur chargement top 10:', error)
@@ -198,52 +177,47 @@ export default function MathCubePage() {
 
             {/* Tableau de classement */}
             <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-6">
-                <Trophy className="w-8 h-8 text-yellow-500" />
-                <h3 className="text-2xl font-bold text-gray-900">Classement des joueurs</h3>
-              </div>
+              
               
               {/* En-tête du tableau */}
-              <div className="bg-gray-100 rounded-xl p-4">
-                <div className="grid grid-cols-12 gap-4 text-sm font-semibold text-gray-700">
+              <div className="bg-gray-100 rounded-xl p-3">
+                <div className="grid grid-cols-12 gap-3 text-sm font-semibold text-gray-700">
                   <div className="col-span-2 text-center">Rang</div>
+                  <div className="col-span-4 text-center">Nom</div>
                   <div className="col-span-3 text-center">Score</div>
-                  <div className="col-span-2 text-center">Niveau</div>
-                  <div className="col-span-5 text-center">Session ID</div>
+                  <div className="col-span-3 text-center">Session</div>
                 </div>
               </div>
               
               {loading ? (
-                <div className="space-y-3">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl animate-pulse">
-                      <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-                      <div className="flex-1">
-                        <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                      </div>
-                      <div className="h-6 bg-gray-200 rounded w-16"></div>
+                <div className="space-y-2">
+                  {[...Array(10)].map((_, i) => (
+                    <div key={i} className="grid grid-cols-12 gap-3 p-3 bg-gray-50 rounded-lg animate-pulse">
+                      <div className="col-span-2 h-6 bg-gray-200 rounded"></div>
+                      <div className="col-span-4 h-4 bg-gray-200 rounded"></div>
+                      <div className="col-span-3 h-4 bg-gray-200 rounded"></div>
+                      <div className="col-span-3 h-4 bg-gray-200 rounded"></div>
                     </div>
                   ))}
                 </div>
               ) : top10Players.length > 0 ? (
-                <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {top10Players.map((player, index) => (
-                    <div key={player.userId} className={`grid grid-cols-12 gap-4 items-center p-4 rounded-xl transition-all duration-200 ${
+                <div className="space-y-2 max-h-80 overflow-y-auto">
+                  {top10Players.slice(0, 10).map((player, index) => (
+                    <div key={player.userId} className={`grid grid-cols-12 gap-3 items-center p-3 rounded-lg transition-all duration-200 ${
                       index < 3 
-                        ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 shadow-lg' 
+                        ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200' 
                         : 'bg-gray-50 hover:bg-gray-100'
                     }`}>
                       {/* Rang */}
                       <div className="col-span-2 text-center">
                         {index < 3 ? (
                           <div className="flex flex-col items-center gap-1">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
                               index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900' :
                               index === 1 ? 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-700' :
                               'bg-gradient-to-r from-orange-400 to-orange-500 text-orange-900'
                             }`}>
-                              <Medal className="w-5 h-5" />
+                              <Medal className="w-4 h-4" />
                             </div>
                             <div className={`text-xs font-bold ${
                               index === 0 ? 'text-yellow-600' :
@@ -254,40 +228,39 @@ export default function MathCubePage() {
                             </div>
                           </div>
                         ) : (
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mx-auto bg-gray-200 text-gray-600">
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mx-auto bg-gray-200 text-gray-600">
                             {player.rank}
                           </div>
                         )}
                       </div>
                       
+                      {/* Nom */}
+                      <div className="col-span-4 text-center">
+                        <div className="font-semibold text-gray-900 truncate">
+                          {player.username}
+                        </div>
+                      </div>
+                      
                       {/* Score */}
                       <div className="col-span-3 text-center">
-                        <div className="font-bold text-lg text-gray-900">
+                        <div className="font-bold text-gray-900">
                           {player.score.toLocaleString()}
                         </div>
                       </div>
                       
-                      {/* Niveau */}
-                      <div className="col-span-2 text-center">
-                        <div className="text-sm font-semibold text-gray-700">
-                          {Math.floor(player.score / 100) + 1}
-                        </div>
-                      </div>
-                      
-                      {/* Session ID */}
-                      <div className="col-span-5 text-center">
+                      {/* Session ID (user-friendly) */}
+                      <div className="col-span-3 text-center">
                         <div className="text-sm text-gray-500 font-mono">
-                          {player.userId}
+                          {player.sessionId || player.userId.slice(-6)}
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-xl">
-                  <Trophy className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                  <p className="text-lg">Aucun joueur pour le moment</p>
-                  <p className="text-sm">Soyez le premier à jouer !</p>
+                <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+                  <Trophy className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <p className="text-sm">Aucun joueur pour le moment</p>
                 </div>
               )}
             </div>
