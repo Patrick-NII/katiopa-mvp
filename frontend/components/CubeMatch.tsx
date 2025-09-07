@@ -1153,30 +1153,9 @@ export default function CubeMatch() {
   
   return (
     <div className="w-full h-screen overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header avec informations de jeu et boutons */}
-      <div className="h-16 bg-white/90 backdrop-blur-sm border-b border-gray-200 flex items-center justify-between px-6">
-        <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-gray-900">CubeMatch</h1>
-          <div className="flex items-center gap-2">
-            <div className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
-              Niveau {state.level}
-            </div>
-            <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">
-              Score {state.score.toLocaleString()}
-            </div>
-            {state.combo > 1 && (
-              <div className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
-                Combo ×{state.combo}
-              </div>
-            )}
-          </div>
-        </div>
-        
+      {/* Header compact avec boutons seulement */}
+      <div className="h-12 bg-white/90 backdrop-blur-sm border-b border-gray-200 flex items-center justify-end px-6">
         <div className="flex items-center gap-3">
-          <div className="text-sm text-gray-500">
-            {formatMs(state.timePlayedMs)}
-          </div>
-          
           {/* Boutons simplifiés pour enfants */}
           <button 
             className="px-4 py-2 bg-yellow-400 text-white rounded-lg font-bold text-lg hover:bg-yellow-500 transition-all duration-200 shadow-md"
@@ -1223,7 +1202,7 @@ export default function CubeMatch() {
       </div>
 
       {/* Zone de jeu principale - responsive */}
-      <div className="h-[calc(100vh-4rem)] flex flex-col lg:flex-row">
+      <div className="h-[calc(100vh-3rem)] flex flex-col lg:flex-row">
         <div className="flex-1 flex items-center justify-center p-4 lg:p-6 min-h-0">
           <GameArea state={state} dispatch={dispatch} />
         </div>
@@ -1386,6 +1365,14 @@ function SidePanel(props: {
       <div className="flex-1 p-4 bg-gray-50 rounded-lg">
         <h3 className="text-sm font-semibold text-gray-700 mb-3">Statistiques</h3>
         <div className="space-y-2 text-xs text-gray-600">
+          <div className="flex justify-between">
+            <span>Niveau:</span>
+            <span className="font-medium">{state.level}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Score:</span>
+            <span className="font-medium">{state.score.toLocaleString()}</span>
+          </div>
           <div className="flex justify-between">
             <span>Temps de jeu:</span>
             <span className="font-medium">{formatMs(state.timePlayedMs)}</span>
