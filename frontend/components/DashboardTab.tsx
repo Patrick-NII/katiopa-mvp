@@ -995,8 +995,9 @@ export default function DashboardTab({
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">
                   {user?.firstName} {user?.lastName}
-            </h3>
+                </h3>
                 <p className="text-sm text-gray-600">Administrateur du compte</p>
+                <p className="text-xs text-gray-500 font-mono">ID: {user?.sessionId}</p>
               </div>
               
               <div className="flex items-center gap-2">
@@ -1010,6 +1011,13 @@ export default function DashboardTab({
                 <div className="text-sm text-gray-600">Créé le :</div>
                 <div className="text-sm font-semibold text-gray-800">
                   {new Date(realSummary.accountCreatedAt).toLocaleDateString('fr-FR')}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <div className="text-sm text-gray-600">Dernière connexion :</div>
+                <div className="text-sm font-semibold text-gray-800">
+                  {user?.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString('fr-FR') : 'Jamais'}
                 </div>
               </div>
             </div>
