@@ -16,205 +16,213 @@ interface Step {
   title: string
   description: string
   icon: React.ComponentType<any>
-  status: 'pending' | 'active' | 'completed' | 'error'
+  percentage: number
 }
 
 export default function BubixSteps({ isVisible, currentStep, isCompleted, error }: BubixStepsProps) {
-  const [steps, setSteps] = useState<Step[]>([
+  const [currentStepData, setCurrentStepData] = useState<Step | null>(null);
+  const [progressPercentage, setProgressPercentage] = useState(0);
+
+  const steps: Step[] = [
     {
       id: 'auth',
       title: 'Vérification d\'authentification',
       description: 'Validation du token JWT et des permissions',
       icon: Shield,
-      status: 'pending'
+      percentage: 16
     },
     {
       id: 'parent',
       title: 'Vérification du compte parent',
       description: 'Contrôle de l\'email et du statut du compte',
       icon: Shield,
-      status: 'pending'
+      percentage: 33
     },
     {
       id: 'child',
       title: 'Vérification de la session enfant',
       description: 'Validation de l\'appartenance et du statut',
       icon: Shield,
-      status: 'pending'
+      percentage: 50
     },
     {
       id: 'security',
       title: 'Contrôle de sécurité avancé',
       description: 'Détection des conflits et vérifications croisées',
       icon: Shield,
-      status: 'pending'
+      percentage: 66
     },
     {
       id: 'data',
       title: 'Récupération des données',
       description: 'Collecte des informations réelles de l\'enfant',
       icon: Database,
-      status: 'pending'
+      percentage: 83
     },
     {
       id: 'ai',
       title: 'Traitement par l\'IA',
       description: 'Analyse et génération du rapport par Bubix',
       icon: Brain,
-      status: 'pending'
+      percentage: 100
     }
-  ])
+  ];
 
   useEffect(() => {
     if (!isVisible) {
-      // Reset all steps when not visible
-      setSteps(prev => prev.map(step => ({ ...step, status: 'pending' })))
-      return
+      setCurrentStepData(null);
+      setProgressPercentage(0);
+      return;
     }
 
-    // Update steps based on current step
-    setSteps(prev => prev.map(step => {
-      if (step.id === currentStep) {
-        return { ...step, status: 'active' }
-      } else if (prev.findIndex(s => s.id === step.id) < prev.findIndex(s => s.id === currentStep)) {
-        return { ...step, status: 'completed' }
-      } else {
-        return { ...step, status: 'pending' }
-      }
-    }))
-  }, [isVisible, currentStep])
-
-  useEffect(() => {
-    if (error) {
-      setSteps(prev => prev.map(step => 
-        step.id === currentStep ? { ...step, status: 'error' } : step
-      ))
+    const step = steps.find(s => s.id === currentStep);
+    if (step) {
+      setCurrentStepData(step);
+      setProgressPercentage(step.percentage);
     }
-  }, [error, currentStep])
+  }, [isVisible, currentStep]);
 
-  if (!isVisible) return null
+  if (!isVisible) return null;
+
+  const IconComponent = currentStepData?.icon || Brain;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mt-3"
+      className="bg-gradient-to-r from-sky-50 to-violet-50 border border-sky-200 rounded-xl p-4 mt-3 shadow-sm"
     >
-      <div className="flex items-center gap-2 mb-3">
-        <Brain className="w-5 h-5 text-blue-600" />
-        <h4 className="font-semibold text-blue-800">Bubix en action</h4>
-        {isCompleted && (
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <motion.div
+              animate={{ 
+                scale: isCompleted ? 1 : [1, 1.1, 1],
+                rotate: isCompleted ? 0 : [0, 5, -5, 0]
+              }}
+              transition={{ 
+                duration: 2, 
+                repeat: isCompleted ? 0 : Infinity, 
+                ease: "easeInOut" 
+              }}
+              className={`p-2 rounded-lg ${
+                isCompleted 
+                  ? 'bg-mint-100 text-mint-600' 
+                  : error
+                  ? 'bg-red-100 text-red-600'
+                  : 'bg-sky-100 text-sky-600'
+              }`}
+            >
+              {isCompleted ? (
+                <CheckCircle className="w-5 h-5" />
+              ) : error ? (
+                <AlertCircle className="w-5 h-5" />
+              ) : (
+                <IconComponent className="w-5 h-5" />
+              )}
+            </motion.div>
+          </div>
+          
+          <div className="flex-1">
+            <h4 className="font-semibold text-gray-800 text-sm">
+              {isCompleted ? 'Analyse terminée' : error ? 'Erreur détectée' : 'Bubix en action'}
+            </h4>
+            <p className="text-xs text-gray-600">
+              {isCompleted ? 'Rapport généré avec succès' : error ? 'Une erreur est survenue' : 'Traitement en cours...'}
+            </p>
+          </div>
+        </div>
+
+        <div className="text-right">
+          <div className="text-lg font-bold text-sky-600">
+            {progressPercentage}%
+          </div>
+          <div className="text-xs text-gray-500">
+            Progression
+          </div>
+        </div>
+      </div>
+
+      {/* Barre de progression */}
+      <div className="mb-3">
+        <div className="w-full bg-gray-200 rounded-full h-2">
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="ml-auto"
+            className={`h-2 rounded-full ${
+              isCompleted 
+                ? 'bg-gradient-to-r from-mint-400 to-mint-600' 
+                : error
+                ? 'bg-gradient-to-r from-red-400 to-red-600'
+                : 'bg-gradient-to-r from-sky-400 to-violet-500'
+            }`}
+            initial={{ width: 0 }}
+            animate={{ width: `${progressPercentage}%` }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          />
+        </div>
+      </div>
+
+      {/* Étape actuelle */}
+      <AnimatePresence mode="wait">
+        {currentStepData && !isCompleted && !error && (
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white/60 backdrop-blur-sm rounded-lg p-3 border border-white/50"
           >
-            <CheckCircle className="w-5 h-5 text-green-600" />
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="text-sky-600"
+                >
+                  <Clock className="w-4 h-4" />
+                </motion.div>
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-800">
+                  {currentStepData.title}
+                </p>
+                <p className="text-xs text-gray-600">
+                  {currentStepData.description}
+                </p>
+              </div>
+            </div>
           </motion.div>
         )}
-      </div>
+      </AnimatePresence>
 
-      <div className="space-y-2">
-        <AnimatePresence>
-          {steps.map((step, index) => {
-            const IconComponent = step.icon
-            
-            return (
-              <motion.div
-                key={step.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className={`flex items-center gap-3 p-2 rounded-md transition-all duration-300 ${
-                  step.status === 'active' 
-                    ? 'bg-blue-100 border border-blue-300' 
-                    : step.status === 'completed'
-                    ? 'bg-green-50 border border-green-200'
-                    : step.status === 'error'
-                    ? 'bg-red-50 border border-red-200'
-                    : 'bg-gray-50'
-                }`}
-              >
-                <div className={`flex-shrink-0 ${
-                  step.status === 'active' 
-                    ? 'text-blue-600' 
-                    : step.status === 'completed'
-                    ? 'text-green-600'
-                    : step.status === 'error'
-                    ? 'text-red-600'
-                    : 'text-gray-400'
-                }`}>
-                  {step.status === 'completed' ? (
-                    <CheckCircle className="w-4 h-4" />
-                  ) : step.status === 'error' ? (
-                    <AlertCircle className="w-4 h-4" />
-                  ) : step.status === 'active' ? (
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    >
-                      <Clock className="w-4 h-4" />
-                    </motion.div>
-                  ) : (
-                    <IconComponent className="w-4 h-4" />
-                  )}
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium ${
-                    step.status === 'active' 
-                      ? 'text-blue-800' 
-                      : step.status === 'completed'
-                      ? 'text-green-800'
-                      : step.status === 'error'
-                      ? 'text-red-800'
-                      : 'text-gray-600'
-                  }`}>
-                    {step.title}
-                  </p>
-                  <p className={`text-xs ${
-                    step.status === 'active' 
-                      ? 'text-blue-600' 
-                      : step.status === 'completed'
-                      ? 'text-green-600'
-                      : step.status === 'error'
-                      ? 'text-red-600'
-                      : 'text-gray-500'
-                  }`}>
-                    {step.description}
-                  </p>
-                </div>
-              </motion.div>
-            )
-          })}
-        </AnimatePresence>
-      </div>
+      {/* Message de succès */}
+      {isCompleted && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-mint-50 border border-mint-200 rounded-lg p-3"
+        >
+          <div className="flex items-center gap-2">
+            <CheckCircle className="w-4 h-4 text-mint-600" />
+            <p className="text-sm text-mint-800 font-medium">Analyse terminée avec succès !</p>
+          </div>
+        </motion.div>
+      )}
 
+      {/* Message d'erreur */}
       {error && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-red-50 border border-red-200 rounded-lg p-3"
         >
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-red-600" />
             <p className="text-sm text-red-800 font-medium">Erreur détectée</p>
           </div>
           <p className="text-xs text-red-600 mt-1">{error}</p>
-        </motion.div>
-      )}
-
-      {isCompleted && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md"
-        >
-          <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-green-600" />
-            <p className="text-sm text-green-800 font-medium">Analyse terminée avec succès !</p>
-          </div>
         </motion.div>
       )}
     </motion.div>
