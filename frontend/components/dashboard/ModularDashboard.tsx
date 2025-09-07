@@ -57,9 +57,11 @@ export default function ModularDashboard() {
 
   // Chargement des données
   const loadData = async () => {
+    console.log('🔄 Chargement des données...')
     try {
       // Récupération de l'utilisateur connecté
       const userResponse = await authAPI.verify()
+      console.log('👤 Réponse utilisateur:', userResponse)
       if (userResponse.success && userResponse.user) {
         setUser(userResponse.user)
         if (userResponse.user.userType === 'CHILD') {
@@ -98,6 +100,7 @@ export default function ModularDashboard() {
         }
       }
 
+      console.log('✅ Données chargées avec succès')
       setReady(true)
     } catch (error) {
       console.error('❌ Erreur lors du chargement des données:', error)
@@ -148,6 +151,10 @@ export default function ModularDashboard() {
 
   // Fonction pour rendre le contenu des onglets
   const renderTabContent = () => {
+    console.log('🎯 Rendu du contenu pour l\'onglet:', activeTab)
+    console.log('👤 Utilisateur:', user)
+    console.log('👶 Sessions enfants:', childSessions)
+    
     if (!user) return null
 
     switch (activeTab) {
