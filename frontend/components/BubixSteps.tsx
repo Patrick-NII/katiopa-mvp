@@ -29,35 +29,35 @@ export default function BubixSteps({ isVisible, currentStep, isCompleted, error 
       title: 'Vérification d\'authentification',
       description: 'Validation du token JWT et des permissions',
       icon: Shield,
-      percentage: 10
+      percentage: 15
     },
     {
       id: 'parent',
       title: 'Vérification du compte parent',
       description: 'Contrôle de l\'email et du statut du compte',
       icon: Shield,
-      percentage: 20
+      percentage: 25
     },
     {
       id: 'child',
       title: 'Vérification de la session enfant',
       description: 'Validation de l\'appartenance et du statut',
       icon: Shield,
-      percentage: 30
+      percentage: 35
     },
     {
       id: 'security',
       title: 'Contrôle de sécurité avancé',
       description: 'Détection des conflits et vérifications croisées',
       icon: Shield,
-      percentage: 40
+      percentage: 45
     },
     {
       id: 'data',
       title: 'Récupération des données',
       description: 'Collecte des informations réelles de l\'enfant',
       icon: Database,
-      percentage: 60
+      percentage: 70
     },
     {
       id: 'ai',
