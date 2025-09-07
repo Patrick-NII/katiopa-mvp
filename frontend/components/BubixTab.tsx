@@ -39,6 +39,22 @@ export default function BubixTab({ user, childSessions, userType, subscriptionTy
   const [showSidebar, setShowSidebar] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Détecter si on est sur mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024)
+      // Sur mobile, fermer la sidebar par défaut
+      if (window.innerWidth < 1024) {
+        setShowSidebar(false)
+      }
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // États pour les limites de caractères
   const [characterLimits, setCharacterLimits] = useState({
@@ -355,7 +371,13 @@ Comment puis-je vous aider aujourd'hui ?`;
     }
   }
 
-  // ---------- 5) Suppression conversation ----------
+  // Fonction pour sélectionner une conversation (avec fermeture auto sur mobile)
+  const selectConversation = (conversation: Conversation) => {
+    setCurrentConversation(conversation)
+    if (isMobile) {
+      setShowSidebar(false)
+    }
+  }
   const deleteConversation = (conversationId: string) => {
     setConversations(prev => prev.filter(conv => conv.id !== conversationId))
     if (currentConversation?.id === conversationId) {
@@ -491,13 +513,21 @@ Comment puis-je vous aider aujourd'hui ?`;
   }
 
   return (
-    <div className="w-full h-full flex bg-gradient-to-br from-blue-50 to-indigo-50" style={{ 
-      width: '90vw', 
-      height: '95vh', 
+    <div className="w-full h-full flex flex-col lg:flex-row bg-gradient-to-br from-blue-50 to-indigo-50" style={{ 
+      width: '100vw', 
+      height: '100vh', 
       margin: '0',
       borderRadius: '0',
       overflow: 'hidden'
     }}>
+      {/* Overlay pour mobile */}
+      {showSidebar && isMobile && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setShowSidebar(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <AnimatePresence>
         {showSidebar && (
@@ -505,46 +535,60 @@ Comment puis-je vous aider aujourd'hui ?`;
             initial={{ width: 0 }}
             animate={{ width: 280 }}
             exit={{ width: 0 }}
-            className="bg-white/80 backdrop-blur-sm border-r border-gray-200/50 flex flex-col h-full min-w-0 shadow-lg"
+            className="bg-white/80 backdrop-blur-sm border-r border-gray-200/50 flex flex-col h-full min-w-0 shadow-lg lg:relative lg:z-auto z-50 fixed lg:static inset-0 lg:inset-auto"
           >
             {/* Header */}
             <div className="border-b border-gray-200/50 flex-shrink-0">
-              <div className="flex items-center justify-between p-4">
-                {/* Barre d'actions "Partager / Exporter" */}
-            <div className="border-b border-gray-200/50 flex-shrink-0 p-3">
-              <div className="grid grid-cols-2 gap-0">
-                <button
-                  onClick={shareCurrentConversation}
-                  className="flex items-center justify-center gap-1 text-blue-900 px-3 py-2 rounded-xl text-sm font-medium"
-                  title="Partager la conversation"
+              <div className="flex items-center justify-between p-3 sm:p-4">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg">
+                    <Bot size={16} className="sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm sm:text-base font-bold text-blue-900">Bubix</h2>
+                    <p className="text-xs sm:text-sm text-blue-600 hidden sm:block">
+                      {userType === 'CHILD' ? "Assistant d'apprentissage" : 'Assistant parental'}
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setShowSidebar(false)} 
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <Share2 size={16} />
-                  Partager
-                </button>
-                <button
-                  onClick={exportCurrentConversation}
-                  className="flex items-center justify-center gap-1 text-blue-900 px-3 py-2 rounded-xl text-sm font-medium"
-                  title="Exporter en JSON"
-                >
-                  <Download size={16} />
-                  Exporter
-                </button>
-              </div>
-            </div>
-                <button onClick={() => setShowSidebar(false)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                  <X size={18} />
+                  <X size={16} className="sm:w-5 sm:h-5" />
                 </button>
               </div>
             </div>
 
+            {/* Barre d'actions "Partager / Exporter" */}
+            <div className="border-b border-gray-200/50 flex-shrink-0 p-2 sm:p-3">
+              <div className="grid grid-cols-2 gap-1 sm:gap-2">
+                <button
+                  onClick={shareCurrentConversation}
+                  className="flex items-center justify-center gap-1 text-blue-900 px-2 sm:px-3 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium hover:bg-blue-50 transition-colors"
+                  title="Partager la conversation"
+                >
+                  <Share2 size={14} className="sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Partager</span>
+                </button>
+                <button
+                  onClick={exportCurrentConversation}
+                  className="flex items-center justify-center gap-1 text-blue-900 px-2 sm:px-3 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium hover:bg-blue-50 transition-colors"
+                  title="Exporter en JSON"
+                >
+                  <Download size={14} className="sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Exporter</span>
+                </button>
+              </div>
+            </div>
             {/* bouton search */}
-            <div className="border-b border-gray-200/50 flex-shrink-0 p-3">
+            <div className="border-b border-gray-200/50 flex-shrink-0 p-2 sm:p-3">
               <button
                 onClick={() => setShowSearch(!showSearch)}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
-                <Search size={18} />
-                {showSearch ? 'Masquer' : 'Rechercher'}
+                <Search size={16} className="sm:w-5 sm:h-5" />
+                <span className="text-sm sm:text-base">{showSearch ? 'Masquer' : 'Rechercher'}</span>
               </button>
             </div>
 
@@ -557,21 +601,21 @@ Comment puis-je vous aider aujourd'hui ?`;
                   exit={{ height: 0, opacity: 0 }}
                   className="border-b border-gray-200/50 flex-shrink-0 overflow-hidden"
                 >
-                  <div className="p-3">
+                  <div className="p-2 sm:p-3">
                     <div className="relative">
                       <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Rechercher dans les conversations..."
-                        className="w-full px-4 py-3 pr-10 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 pr-8 sm:pr-10 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm"
                       />
                       {searchQuery && (
                         <button
                           onClick={() => setSearchQuery('')}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"
+                          className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"
                         >
-                          <X size={16} />
+                          <X size={14} className="sm:w-4 sm:h-4" />
                         </button>
                       )}
                     </div>
@@ -588,48 +632,48 @@ Comment puis-je vous aider aujourd'hui ?`;
             
 
             {/* Bouton Nouvelle conversation */}
-            <div className="border-b border-gray-200/50 flex-shrink-0 p-3">
+            <div className="border-b border-gray-200/50 flex-shrink-0 p-2 sm:p-3">
               <button
                 onClick={createNewConversation}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-blue-600 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:from-emerald-700 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
-                <Plus size={18} />
-                Nouvelle conversation
+                <Plus size={16} className="sm:w-5 sm:h-5" />
+                <span className="text-sm sm:text-base">Nouvelle conversation</span>
               </button>
             </div>
 
             {/* Liste des conversations */}
-            <div className="flex-1 overflow-y-auto min-h-0">
+            <div className="flex-1 overflow-y-auto min-h-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
               {filteredConversations.length === 0 ? (
-                <div className="p-4 text-center">
+                <div className="p-3 sm:p-4 text-center">
                   {searchQuery ? (
                     <div className="text-gray-500">
-                      <p className="text-sm">Aucune conversation trouvée pour "{searchQuery}"</p>
+                      <p className="text-xs sm:text-sm">Aucune conversation trouvée pour "{searchQuery}"</p>
                       <button
                         onClick={() => setSearchQuery('')}
-                        className="mt-2 text-blue-600 hover:text-blue-700 text-sm"
+                        className="mt-2 text-blue-600 hover:text-blue-700 text-xs sm:text-sm"
                       >
                         Effacer la recherche
                       </button>
                     </div>
                   ) : (
-                    <p className="text-gray-500 text-sm">Aucune conversation</p>
+                    <p className="text-gray-500 text-xs sm:text-sm">Aucune conversation</p>
                   )}
                 </div>
               ) : (
                 filteredConversations.map((conversation) => (
                   <div
                     key={conversation.id}
-                    className={`w-full p-3 cursor-pointer transition-all duration-200 border-b border-gray-100/50 ${
+                    className={`w-full p-2 sm:p-3 cursor-pointer transition-all duration-200 border-b border-gray-100/50 ${
                       currentConversation?.id === conversation.id 
                         ? 'bg-gradient-to-r from-blue-100 to-purple-100 border-blue-200' 
                         : 'bg-white/60 hover:bg-white/80'
                     }`}
-                    onClick={() => setCurrentConversation(conversation)}
+                    onClick={() => selectConversation(conversation)}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-blue-900 truncate">{conversation.title}</h3>
+                        <h3 className="text-xs sm:text-sm font-semibold text-blue-900 truncate">{conversation.title}</h3>
                         <p className="text-xs text-gray-500 mt-1">{formatDate(conversation.lastUpdated)}</p>
                       </div>
                       <button
@@ -640,7 +684,7 @@ Comment puis-je vous aider aujourd'hui ?`;
                         className="p-1 hover:bg-red-100 rounded-lg text-red-500 transition-colors"
                         title="Supprimer"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={12} className="sm:w-4 sm:h-4" />
                       </button>
                     </div>
                   </div>
@@ -652,24 +696,26 @@ Comment puis-je vous aider aujourd'hui ?`;
       </AnimatePresence>
 
       {/* Main */}
-      <section className="flex-1 flex flex-col h-full min-h-0 min-w-0">
+      <section className="flex-1 flex flex-col h-full min-h-0 min-w-0 bg-white/50 backdrop-blur-sm">
         {/* Header */}
-        <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 px-4 py-3 flex-shrink-0">
+        <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 px-3 sm:px-4 py-2 sm:py-3 flex-shrink-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               {!showSidebar && (
-                <button onClick={() => setShowSidebar(true)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                  <Bot size={20} />
+                <button 
+                  onClick={() => setShowSidebar(true)} 
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <Bot size={18} className="sm:w-5 sm:h-5" />
                 </button>
               )}
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Bot size={29} className="text-white" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg">
+                <Bot size={20} className="sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-blue-900">Bubix {subscriptionType}</h1>
+                <h1 className="text-base sm:text-lg font-bold text-blue-900">Bubix {subscriptionType}</h1>
                 <div className="flex items-center gap-2">
-                  
-                  <p className="text-sm text-blue-600">
+                  <p className="text-xs sm:text-sm text-blue-600">
                     {userType === 'CHILD' ? "Assistant d'apprentissage" : 'Assistant parental'}
                   </p>
                 </div>
@@ -679,21 +725,21 @@ Comment puis-je vous aider aujourd'hui ?`;
         </header>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 min-h-0">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 min-h-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
           {currentConversation?.messages.length === 0 ? (
             <div className="h-full flex items-center justify-center">
-              <div className="text-center max-w-md">
-                <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
-                  <Sparkles size={32} className="text-white" />
+              <div className="text-center max-w-md px-4">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-xl">
+                  <Sparkles size={24} className="sm:w-8 sm:h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Bienvenue chez Bubix !</h3>
-                <p className="text-gray-600 mb-6">
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">Bienvenue chez Bubix !</h3>
+                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
                   {userType === 'CHILD'
                     ? "Je suis ton assistant d'apprentissage. Pose-moi des questions sur tes exercices ou demande-moi de l'aide !"
                     : "Je suis votre assistant parental. Je peux vous aider à suivre les progrès de vos enfants et répondre à vos questions."}
                 </p>
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-500">💡 Essayez de me demander :</p>
+                  <p className="text-xs sm:text-sm text-gray-500">💡 Essayez de me demander :</p>
                   <div className="flex flex-wrap gap-2 justify-center">
                     {(userType === 'CHILD' 
                       ? ['Aide-moi avec les maths', 'Explique-moi la programmation', 'Comment bien réviser ?', 'Je suis bloqué']
@@ -702,7 +748,7 @@ Comment puis-je vous aider aujourd'hui ?`;
                       <button
                         key={suggestion}
                         onClick={() => setInputValue(suggestion)}
-                        className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition-colors"
+                        className="px-2 sm:px-3 py-1 sm:py-2 bg-blue-100 text-blue-700 rounded-full text-xs sm:text-sm hover:bg-blue-200 transition-colors"
                       >
                         {suggestion}
                       </button>
@@ -712,7 +758,7 @@ Comment puis-je vous aider aujourd'hui ?`;
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {currentConversation?.messages.map((message) => (
                 <motion.div
                   key={message.id}
@@ -721,7 +767,7 @@ Comment puis-je vous aider aujourd'hui ?`;
                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[80%] flex gap-3 ${
+                    className={`max-w-[85%] sm:max-w-[80%] flex gap-2 sm:gap-3 ${
                       message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'
                     }`}
                   >
@@ -731,25 +777,25 @@ Comment puis-je vous aider aujourd'hui ?`;
                         <img
                           src={selectedAvatar || user?.avatarPath || '/avatar/46634418-D597-4138-A12C-ED6DB610C8BD_1_105_c.jpeg'}
                           alt={`Avatar de ${user?.firstName || 'Utilisateur'}`}
-                          className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-lg"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-white shadow-lg"
                         />
                       ) : (
-                        <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
-                          <Bot size={20} className="text-white" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
+                          <Bot size={16} className="sm:w-5 sm:h-5 text-white" />
                         </div>
                       )}
                     </div>
 
                     {/* Message */}
                     <div
-                      className={`px-4 py-3 rounded-2xl shadow-sm ${
+                      className={`px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl shadow-sm ${
                         message.sender === 'user'
                           ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
                           : 'bg-white text-gray-900 border border-gray-200/50'
                       }`}
                     >
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                      <p className={`text-xs mt-2 ${
+                      <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                      <p className={`text-xs mt-1 sm:mt-2 ${
                         message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
                       }`}>
                         {formatDate(message.timestamp)}
@@ -761,18 +807,18 @@ Comment puis-je vous aider aujourd'hui ?`;
 
               {isLoading && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
-                  <div className="flex gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
-                      <Bot size={20} className="text-white" />
+                  <div className="flex gap-2 sm:gap-3">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
+                      <Bot size={16} className="sm:w-5 sm:h-5 text-white" />
                     </div>
-                    <div className="bg-white border border-gray-200/50 px-4 py-3 rounded-2xl shadow-sm">
+                    <div className="bg-white border border-gray-200/50 px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl shadow-sm">
                       <div className="flex items-center gap-2">
                         <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce" />
+                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
                         </div>
-                        <span className="text-sm text-gray-500">Bubix réfléchit...</span>
+                        <span className="text-xs sm:text-sm text-gray-500">Bubix réfléchit...</span>
                       </div>
                     </div>
                   </div>
@@ -784,9 +830,9 @@ Comment puis-je vous aider aujourd'hui ?`;
         </div>
 
         {/* Input */}
-        <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200/50 p-4 flex-shrink-0">
+        <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200/50 p-3 sm:p-4 flex-shrink-0">
           <div className="max-w-4xl mx-auto">
-            <div className="flex gap-3 items-end">
+            <div className="flex gap-2 sm:gap-3 items-end">
               <div className="flex-1 relative">
                 <textarea
                   ref={inputRef}
@@ -794,13 +840,13 @@ Comment puis-je vous aider aujourd'hui ?`;
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder={userType === 'CHILD' ? 'Pose ta question à Bubix...' : 'Posez votre question à Bubix...'}
-                  className="w-full resize-none border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm leading-5 bg-white/50 backdrop-blur-sm"
+                  className="w-full resize-none border border-gray-300 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm leading-5 bg-white/50 backdrop-blur-sm"
                   rows={1}
                   disabled={isLoading}
                   maxLength={characterLimits.max}
                 />
                 {/* Compteur de caractères */}
-                <div className="absolute bottom-2 right-3 flex items-center gap-1 text-xs">
+                <div className="absolute bottom-1 sm:bottom-2 right-2 sm:right-3 flex items-center gap-1 text-xs">
                   <span className={`${
                     characterLimits.remaining < 100 ? 'text-red-500' : 
                     characterLimits.remaining < 300 ? 'text-orange-500' : 'text-gray-400'
@@ -815,9 +861,9 @@ Comment puis-je vous aider aujourd'hui ?`;
               <button
                 onClick={sendMessage}
                 disabled={!inputValue.trim() || isLoading || characterLimits.remaining < 0}
-                className="px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg sm:rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
               >
-                <Send size={18} />
+                <Send size={16} className="sm:w-5 sm:h-5" />
               </button>
             </div>
             <div className="flex justify-between items-center mt-2">
