@@ -1362,7 +1362,32 @@ export default function CubeMatch() {
 function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<Action> }) {
   const theme = themePalette[(state.config.theme ?? 'classic') as keyof typeof themePalette];
   const { ref: frameRef, size: frame } = useElementSize<HTMLDivElement>();
-  const gap = 4; // Espacement fixe pour éviter les problèmes SSR
+  const gap = useMemo(() => {
+    const isLargeScreen = typeof window !== 'undefined' && window.innerWidth >= 1440;
+    const isTablet = typeof window !== 'undefined' && window.innerWidth < 1024;
+    
+    if (isLargeScreen) {
+      return 8; // Espacement plus grand sur grand écran
+    } else if (isTablet) {
+      return 6; // Espacement moyen sur tablette
+    } else {
+      return 4; // Espacement normal sur mobile et desktop standard
+    }
+  }, []);
+  
+  const containerPadding = useMemo(() => {
+    const isLargeScreen = typeof window !== 'undefined' && window.innerWidth >= 1440;
+    const isTablet = typeof window !== 'undefined' && window.innerWidth < 1024;
+    
+    if (isLargeScreen) {
+      return 16; // Padding plus grand sur grand écran
+    } else if (isTablet) {
+      return 12; // Padding moyen sur tablette
+    } else {
+      return 8; // Padding normal sur mobile et desktop standard
+    }
+  }, []);
+  
   const cols = state.config.cols;
   const rows = state.config.rows;
 
@@ -1373,7 +1398,7 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
     }
     
     // Calculer l'espace disponible en tenant compte du padding et des gaps
-    const padding = 8;
+    const padding = containerPadding;
     const availableWidth = frame.width - (padding * 2);
     const availableHeight = frame.height - (padding * 2);
     
@@ -1382,9 +1407,25 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
     const byW = Math.floor(wForCells / cols);
     const byH = Math.floor(hForCells / rows);
     
-    // Tailles optimisées pour les enfants
-    const maxSize = 50;
-    const minSize = 35;
+    // Tailles optimisées selon la taille d'écran
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const isTablet = typeof window !== 'undefined' && window.innerWidth < 1024;
+    const isLargeScreen = typeof window !== 'undefined' && window.innerWidth >= 1440;
+    
+    let maxSize, minSize;
+    if (isMobile) {
+      maxSize = 50;
+      minSize = 35;
+    } else if (isTablet) {
+      maxSize = 70;
+      minSize = 45;
+    } else if (isLargeScreen) {
+      maxSize = 100; // Plus grand sur grand écran
+      minSize = 60;
+    } else {
+      maxSize = 80;
+      minSize = 50;
+    }
     
     // Prendre le minimum pour s'assurer que la grille rentre complètement
     const optimalSize = Math.min(byW, byH);
@@ -1396,13 +1437,28 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
       frame: { width: frame.width, height: frame.height },
       cols, rows, gap, padding,
       availableWidth, availableHeight,
-      byW, byH, optimalSize, finalSize
+      byW, byH, optimalSize, finalSize,
+      screenType: isMobile ? 'mobile' : isTablet ? 'tablet' : isLargeScreen ? 'large' : 'desktop'
     });
     
     return finalSize;
-  }, [frame, cols, rows, gap]);
+  }, [frame, cols, rows, gap, containerPadding]);
 
-  const fontPx = Math.floor(cellSizePx * 0.55);
+  const fontPx = useMemo(() => {
+    const baseFontSize = Math.floor(cellSizePx * 0.55);
+    
+    // Augmenter la taille de police sur grand écran
+    const isLargeScreen = typeof window !== 'undefined' && window.innerWidth >= 1440;
+    const isTablet = typeof window !== 'undefined' && window.innerWidth < 1024;
+    
+    if (isLargeScreen) {
+      return Math.floor(cellSizePx * 0.65); // Police plus grande sur grand écran
+    } else if (isTablet) {
+      return Math.floor(cellSizePx * 0.6); // Police légèrement plus grande sur tablette
+    } else {
+      return baseFontSize; // Taille normale sur desktop standard
+    }
+  }, [cellSizePx]);
   const valueClass = (v: number | null) => {
     if (v == null) return 'text-gray-300';
     if (v <= 2) return 'text-sky-700';
@@ -1431,7 +1487,7 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
             gridTemplateColumns: `repeat(${cols}, ${cellSizePx}px)`,
             gridTemplateRows: `repeat(${rows}, ${cellSizePx}px)`,
             gap,
-            padding: '8px'
+            padding: `${containerPadding}px`
           }}
         >
           {state.grid.flat().map(cell => {
