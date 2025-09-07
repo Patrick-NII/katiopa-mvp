@@ -209,6 +209,7 @@ export default function DashboardPage() {
           childSessions={childSessions}
           userType={user.userType as 'CHILD' | 'PARENT'}
           subscriptionType={user.subscriptionType}
+          mainSidebarCollapsed={sidebarCollapsed}
         />;
       case 'reglages':
         return <SettingsTab userType={user.userType as 'CHILD' | 'PARENT' | 'TEACHER' | 'ADMIN'} />;
