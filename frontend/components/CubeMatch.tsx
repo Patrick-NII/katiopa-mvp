@@ -97,6 +97,7 @@ type State = {
   level: number;
   config: Config;
   running: boolean;
+  paused: boolean;
   lastTick: number;
   seed: number;
   hint: Coords[] | null;
@@ -122,6 +123,8 @@ type Action =
   | { type: 'HINT' }
   | { type: 'LEVEL_UP' }
   | { type: 'RESTART' }
+  | { type: 'END_GAME' }
+  | { type: 'RESUME' }
   | { type: 'TICK_TIME'; delta: number }
   | { type: 'TOGGLE_SOUND' }
   | { type: 'TOGGLE_MULTIPLE_PAIRS' }
@@ -271,6 +274,7 @@ function loadSaved(): State | null {
       level: data.level || 1,
       config: mergedConfig,
       running: data.running !== undefined ? data.running : true,
+      paused: data.paused || false,
       lastTick: data.lastTick || Date.now(),
       seed: data.seed || (Math.floor(Math.random() * 0xffffffff) >>> 0) || 1,
       hint: data.hint || null,
@@ -293,6 +297,7 @@ function projectForSave(state: State): Partial<State> {
     combo: state.combo,
     config: state.config,
     running: state.running,
+    paused: state.paused,
     lastTick: state.lastTick,
     seed: state.seed,
     hint: state.hint,
@@ -356,6 +361,7 @@ function reducer(state: State, action: Action): State {
         level: 1,
         config,
         running: true,
+        paused: false,
         lastTick: Date.now(),
         seed: (Math.floor(Math.random() * 0xffffffff) >>> 0) || 1,
         hint: null,
@@ -368,6 +374,49 @@ function reducer(state: State, action: Action): State {
 
     case 'TICK': {
       if (!state.running || state.gameOver) return state;
+
+      // Vérifier si la grille est pleine (condition de fin de partie)
+      const emptyCells = state.grid.flat().filter(cell => cell.value === null).length;
+      if (emptyCells === 0) {
+        console.log('🎯 Grille pleine - Fin de partie automatique');
+        return { ...state, gameOver: true, running: false };
+      }
+
+      // Vérifier si aucun mouvement possible (grille bloquée)
+      const hasValidMove = state.grid.some((row, rowIndex) => 
+        row.some((cell, colIndex) => {
+          if (cell.value === null) return false;
+          const currentValue = cell.value;
+          
+          // Vérifier les cellules adjacentes
+          const directions = [
+            [-1, 0], [1, 0], [0, -1], [0, 1] // haut, bas, gauche, droite
+          ];
+          
+          if (state.config.allowDiagonals) {
+            directions.push([-1, -1], [-1, 1], [1, -1], [1, 1]); // diagonales
+          }
+          
+          return directions.some(([dr, dc]) => {
+            const newRow = rowIndex + dr;
+            const newCol = colIndex + dc;
+            if (newRow < 0 || newRow >= state.config.rows || newCol < 0 || newCol >= state.config.cols) {
+              return false;
+            }
+            const adjacentCell = state.grid[newRow][newCol];
+            if (adjacentCell.value === null) return false;
+            
+            // Vérifier si la somme égale la cible
+            const sum = currentValue + adjacentCell.value;
+            return sum === state.config.target;
+          });
+        })
+      );
+      
+      if (!hasValidMove && emptyCells < 5) {
+        console.log('🚫 Aucun mouvement possible - Fin de partie automatique');
+        return { ...state, gameOver: true, running: false };
+      }
 
       let { seed } = state;
       const newGrid = state.grid.map(row => [...row]);
@@ -529,7 +578,7 @@ function reducer(state: State, action: Action): State {
       return { ...state, config: { ...state.config, assistOnSelect: !state.config.assistOnSelect } };
 
     case 'PAUSE_TOGGLE':
-      return { ...state, running: !state.running };
+      return { ...state, paused: !state.paused, running: !state.paused };
 
     case 'TOGGLE_DIAG':
       return { ...state, config: { ...state.config, allowDiagonals: !state.config.allowDiagonals } };
@@ -548,6 +597,12 @@ function reducer(state: State, action: Action): State {
 
     case 'RESTART':
       return reducer({ ...state, gameOver: false }, { type: 'INIT', payload: state.config });
+
+    case 'END_GAME':
+      return { ...state, gameOver: true, running: false };
+
+    case 'RESUME':
+      return { ...state, paused: false, running: true };
 
     case 'TICK_TIME':
       return { ...state, timePlayedMs: state.timePlayedMs + action.delta };
@@ -631,12 +686,9 @@ export default function CubeMatch() {
     try {
       const scores = await cubematchAPI.getTopScores(5);
       setStreamingScores(scores);
-    } catch {
-      const fallback = [
-        { id: '1', userId: 'user1', username: 'Joueur 1', score: 1250, level: 8, timePlayedMs: 45000, operator: 'ADD', target: 10, allowDiagonals: false, createdAt: new Date().toISOString() },
-        { id: '2', userId: 'user2', username: 'Joueur 2', score: 980, level: 6, timePlayedMs: 38000, operator: 'ADD', target: 10, allowDiagonals: false, createdAt: new Date().toISOString() },
-      ] as any;
-      setStreamingScores(fallback);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des scores:', error);
+      setStreamingScores([]);
     } finally {
       setIsStreaming(false);
     }
@@ -658,21 +710,10 @@ export default function CubeMatch() {
         ]);
         setTopScores(scores);
         setStats(gameStats);
-      } catch {
-        const fallback = [
-          { id: '1', userId: 'user1', username: 'Joueur 1', score: 1250, level: 8, timePlayedMs: 45000, operator: 'ADD', target: 10, allowDiagonals: false, createdAt: new Date().toISOString() },
-        ] as any;
-        const defaultStats = {
-          totalGames: 150,
-          totalScore: 125000,
-          averageScore: 833,
-          bestScore: 1250,
-          totalTimePlayed: 5400000,
-          averageTimePlayed: 36000,
-          highestLevel: 8
-        } as any;
-        setTopScores(fallback);
-        setStats(defaultStats);
+      } catch (error) {
+        console.error('Erreur lors du chargement des données:', error);
+        setTopScores([]);
+        setStats(null);
       } finally {
         setLoading(false);
       }
@@ -685,6 +726,230 @@ export default function CubeMatch() {
     if (state.gameOver && state.score > 0) {
       const saveScore = async () => {
         try {
+          console.log('🎮 Sauvegarde du score CubeMatch:', {
+            score: state.score,
+            level: state.level,
+            timePlayedMs: state.timePlayedMs,
+            operator: state.config.operator,
+            target: state.config.target,
+            allowDiagonals: state.config.allowDiagonals
+          });
+          
+          const success = await cubematchAPI.saveScore({
+            score: state.score,
+            level: state.level,
+            timePlayedMs: state.timePlayedMs,
+            operator: state.config.operator,
+            target: state.config.target,
+            allowDiagonals: state.config.allowDiagonals,
+            comboMax: state.combo,
+            cellsCleared: 0, // À calculer si nécessaire
+            hintsUsed: 0, // À calculer si nécessaire
+            gameDurationSeconds: Math.floor(state.timePlayedMs / 1000),
+            gridSizeRows: state.config.rows,
+            gridSizeCols: state.config.cols,
+            maxSize: state.config.maxSize,
+            spawnRateMin: state.config.spawnPerTick[0],
+            spawnRateMax: state.config.spawnPerTick[1],
+            tickMs: state.config.tickMs,
+            gameMode: 'classic',
+            difficultyLevel: state.level > 5 ? 'hard' : state.level > 3 ? 'normal' : 'easy',
+            totalMoves: 0, // À calculer si nécessaire
+            successfulMoves: 0, // À calculer si nécessaire
+            failedMoves: 0, // À calculer si nécessaire
+            accuracyRate: 0, // À calculer si nécessaire
+            averageMoveTimeMs: 0, // À calculer si nécessaire
+            fastestMoveTimeMs: 0, // À calculer si nécessaire
+            slowestMoveTimeMs: 0, // À calculer si nécessaire
+            additionsCount: state.config.operator === 'ADD' ? 1 : 0,
+            subtractionsCount: state.config.operator === 'SUB' ? 1 : 0,
+            multiplicationsCount: state.config.operator === 'MUL' ? 1 : 0,
+            divisionsCount: state.config.operator === 'DIV' ? 1 : 0,
+            additionsScore: state.config.operator === 'ADD' ? state.score : 0,
+            subtractionsScore: state.config.operator === 'SUB' ? state.score : 0,
+            multiplicationsScore: state.config.operator === 'MUL' ? state.score : 0,
+            divisionsScore: state.config.operator === 'DIV' ? state.score : 0,
+            gridCompletionRate: 0, // À calculer si nécessaire
+            maxConsecutiveHits: state.combo,
+            maxConsecutiveMisses: 0, // À calculer si nécessaire
+            longestComboChain: state.combo,
+            targetNumbersUsed: JSON.stringify([state.config.target]),
+            operatorSequence: JSON.stringify([state.config.operator]),
+            timeSpentOnAdditionsMs: state.config.operator === 'ADD' ? state.timePlayedMs : 0,
+            timeSpentOnSubtractionsMs: state.config.operator === 'SUB' ? state.timePlayedMs : 0,
+            timeSpentOnMultiplicationsMs: state.config.operator === 'MUL' ? state.timePlayedMs : 0,
+            timeSpentOnDivisionsMs: state.config.operator === 'DIV' ? state.timePlayedMs : 0,
+            sessionStartTime: new Date(Date.now() - state.timePlayedMs).toISOString(),
+            sessionEndTime: new Date().toISOString(),
+            breaksTaken: 0, // À calculer si nécessaire
+            totalBreakTimeMs: 0, // À calculer si nécessaire
+            engagementScore: Math.min(100, Math.max(0, (state.score / state.level) * 10)), // Score d'engagement basé sur score/niveau
+            focusTimePercentage: 95, // Estimation haute pour un jeu engageant
+            difficultyAdjustments: 0, // À calculer si nécessaire
+            themeUsed: state.config.theme || 'classic',
+            soundEnabled: state.soundEnabled,
+            assistEnabled: state.config.assistOnSelect || false,
+            hintsEnabled: true // Toujours disponible
+          });
+          
+          if (success) {
+            console.log('✅ Score sauvegardé avec succès');
+          } else {
+            console.error('❌ Échec de la sauvegarde du score');
+          }
+        } catch (error) {
+          console.error('❌ Erreur lors de la sauvegarde:', error);
+        }
+      };
+      saveScore();
+    }
+  }, [state.gameOver, state.score, state.level, state.timePlayedMs, state.config, state.combo]);
+
+  // Sauvegarde périodique des scores (toutes les 30 secondes)
+  useEffect(() => {
+    if (!state.running || state.gameOver || state.score === 0) return;
+    
+    const interval = setInterval(async () => {
+      try {
+        console.log('🔄 Sauvegarde périodique du score:', state.score);
+        await cubematchAPI.saveScore({
+          score: state.score,
+          level: state.level,
+          timePlayedMs: state.timePlayedMs,
+          operator: state.config.operator,
+          target: state.config.target,
+          allowDiagonals: state.config.allowDiagonals,
+          comboMax: state.combo,
+          cellsCleared: 0,
+          hintsUsed: 0,
+          gameDurationSeconds: Math.floor(state.timePlayedMs / 1000),
+          gridSizeRows: state.config.rows,
+          gridSizeCols: state.config.cols,
+          maxSize: state.config.maxSize,
+          spawnRateMin: state.config.spawnPerTick[0],
+          spawnRateMax: state.config.spawnPerTick[1],
+          tickMs: state.config.tickMs,
+          gameMode: 'classic',
+          difficultyLevel: state.level > 5 ? 'hard' : state.level > 3 ? 'normal' : 'easy',
+          totalMoves: 0,
+          successfulMoves: 0,
+          failedMoves: 0,
+          accuracyRate: 0,
+          averageMoveTimeMs: 0,
+          fastestMoveTimeMs: 0,
+          slowestMoveTimeMs: 0,
+          additionsCount: state.config.operator === 'ADD' ? 1 : 0,
+          subtractionsCount: state.config.operator === 'SUB' ? 1 : 0,
+          multiplicationsCount: state.config.operator === 'MUL' ? 1 : 0,
+          divisionsCount: state.config.operator === 'DIV' ? 1 : 0,
+          additionsScore: state.config.operator === 'ADD' ? state.score : 0,
+          subtractionsScore: state.config.operator === 'SUB' ? state.score : 0,
+          multiplicationsScore: state.config.operator === 'MUL' ? state.score : 0,
+          divisionsScore: state.config.operator === 'DIV' ? state.score : 0,
+          gridCompletionRate: 0,
+          maxConsecutiveHits: state.combo,
+          maxConsecutiveMisses: 0,
+          longestComboChain: state.combo,
+          targetNumbersUsed: JSON.stringify([state.config.target]),
+          operatorSequence: JSON.stringify([state.config.operator]),
+          timeSpentOnAdditionsMs: state.config.operator === 'ADD' ? state.timePlayedMs : 0,
+          timeSpentOnSubtractionsMs: state.config.operator === 'SUB' ? state.timePlayedMs : 0,
+          timeSpentOnMultiplicationsMs: state.config.operator === 'MUL' ? state.timePlayedMs : 0,
+          timeSpentOnDivisionsMs: state.config.operator === 'DIV' ? state.timePlayedMs : 0,
+          sessionStartTime: new Date(Date.now() - state.timePlayedMs).toISOString(),
+          sessionEndTime: new Date().toISOString(),
+          breaksTaken: 0,
+          totalBreakTimeMs: 0,
+          engagementScore: Math.min(100, Math.max(0, (state.score / state.level) * 10)),
+          focusTimePercentage: 95,
+          difficultyAdjustments: 0,
+          themeUsed: state.config.theme || 'classic',
+          soundEnabled: state.soundEnabled,
+          assistEnabled: state.config.assistOnSelect || false,
+          hintsEnabled: true
+        });
+      } catch (error) {
+        console.error('❌ Erreur sauvegarde périodique:', error);
+      }
+    }, 30000); // Toutes les 30 secondes
+
+    return () => clearInterval(interval);
+  }, [state.running, state.gameOver, state.score, state.level, state.timePlayedMs, state.config, state.combo]);
+
+  // Fin de partie automatique en quittant la page
+  useEffect(() => {
+    if (!state.running || state.gameOver || state.score === 0) return;
+
+    const handleBeforeUnload = async (event: BeforeUnloadEvent) => {
+      // Sauvegarder le score avant de quitter
+      try {
+        console.log('🚪 Sauvegarde avant fermeture de la page:', state.score);
+        await cubematchAPI.saveScore({
+          score: state.score,
+          level: state.level,
+          timePlayedMs: state.timePlayedMs,
+          operator: state.config.operator,
+          target: state.config.target,
+          allowDiagonals: state.config.allowDiagonals,
+          comboMax: state.combo,
+          cellsCleared: 0,
+          hintsUsed: 0,
+          gameDurationSeconds: Math.floor(state.timePlayedMs / 1000),
+          gridSizeRows: state.config.rows,
+          gridSizeCols: state.config.cols,
+          maxSize: state.config.maxSize,
+          spawnRateMin: state.config.spawnPerTick[0],
+          spawnRateMax: state.config.spawnPerTick[1],
+          tickMs: state.config.tickMs,
+          gameMode: 'classic',
+          difficultyLevel: state.level > 5 ? 'hard' : state.level > 3 ? 'normal' : 'easy',
+          totalMoves: 0,
+          successfulMoves: 0,
+          failedMoves: 0,
+          accuracyRate: 0,
+          averageMoveTimeMs: 0,
+          fastestMoveTimeMs: 0,
+          slowestMoveTimeMs: 0,
+          additionsCount: state.config.operator === 'ADD' ? 1 : 0,
+          subtractionsCount: state.config.operator === 'SUB' ? 1 : 0,
+          multiplicationsCount: state.config.operator === 'MUL' ? 1 : 0,
+          divisionsCount: state.config.operator === 'DIV' ? 1 : 0,
+          additionsScore: state.config.operator === 'ADD' ? state.score : 0,
+          subtractionsScore: state.config.operator === 'SUB' ? state.score : 0,
+          multiplicationsScore: state.config.operator === 'MUL' ? state.score : 0,
+          divisionsScore: state.config.operator === 'DIV' ? state.score : 0,
+          gridCompletionRate: 0,
+          maxConsecutiveHits: state.combo,
+          maxConsecutiveMisses: 0,
+          longestComboChain: state.combo,
+          targetNumbersUsed: JSON.stringify([state.config.target]),
+          operatorSequence: JSON.stringify([state.config.operator]),
+          timeSpentOnAdditionsMs: state.config.operator === 'ADD' ? state.timePlayedMs : 0,
+          timeSpentOnSubtractionsMs: state.config.operator === 'SUB' ? state.timePlayedMs : 0,
+          timeSpentOnMultiplicationsMs: state.config.operator === 'MUL' ? state.timePlayedMs : 0,
+          timeSpentOnDivisionsMs: state.config.operator === 'DIV' ? state.timePlayedMs : 0,
+          sessionStartTime: new Date(Date.now() - state.timePlayedMs).toISOString(),
+          sessionEndTime: new Date().toISOString(),
+          breaksTaken: 0,
+          totalBreakTimeMs: 0,
+          engagementScore: Math.min(100, Math.max(0, (state.score / state.level) * 10)),
+          focusTimePercentage: 95,
+          difficultyAdjustments: 0,
+          themeUsed: state.config.theme || 'classic',
+          soundEnabled: state.soundEnabled,
+          assistEnabled: state.config.assistOnSelect || false,
+          hintsEnabled: true
+        });
+      } catch (error) {
+        console.error('❌ Erreur sauvegarde avant fermeture:', error);
+      }
+    };
+
+    const handleVisibilityChange = async () => {
+      if (document.hidden && state.running && !state.gameOver && state.score > 0) {
+        // Sauvegarder quand la page devient cachée (changement d'onglet, etc.)
+        try {
+          console.log('👁️ Sauvegarde lors du changement de visibilité:', state.score);
           await cubematchAPI.saveScore({
             score: state.score,
             level: state.level,
@@ -692,22 +957,97 @@ export default function CubeMatch() {
             operator: state.config.operator,
             target: state.config.target,
             allowDiagonals: state.config.allowDiagonals,
+            comboMax: state.combo,
+            cellsCleared: 0,
+            hintsUsed: 0,
+            gameDurationSeconds: Math.floor(state.timePlayedMs / 1000),
             gridSizeRows: state.config.rows,
             gridSizeCols: state.config.cols,
             maxSize: state.config.maxSize,
             spawnRateMin: state.config.spawnPerTick[0],
             spawnRateMax: state.config.spawnPerTick[1],
             tickMs: state.config.tickMs,
-            comboMax: state.combo,
-            cellsCleared: 0,
-            hintsUsed: 0,
-            gameDurationSeconds: Math.floor(state.timePlayedMs / 1000)
+            gameMode: 'classic',
+            difficultyLevel: state.level > 5 ? 'hard' : state.level > 3 ? 'normal' : 'easy',
+            totalMoves: 0,
+            successfulMoves: 0,
+            failedMoves: 0,
+            accuracyRate: 0,
+            averageMoveTimeMs: 0,
+            fastestMoveTimeMs: 0,
+            slowestMoveTimeMs: 0,
+            additionsCount: state.config.operator === 'ADD' ? 1 : 0,
+            subtractionsCount: state.config.operator === 'SUB' ? 1 : 0,
+            multiplicationsCount: state.config.operator === 'MUL' ? 1 : 0,
+            divisionsCount: state.config.operator === 'DIV' ? 1 : 0,
+            additionsScore: state.config.operator === 'ADD' ? state.score : 0,
+            subtractionsScore: state.config.operator === 'SUB' ? state.score : 0,
+            multiplicationsScore: state.config.operator === 'MUL' ? state.score : 0,
+            divisionsScore: state.config.operator === 'DIV' ? state.score : 0,
+            gridCompletionRate: 0,
+            maxConsecutiveHits: state.combo,
+            maxConsecutiveMisses: 0,
+            longestComboChain: state.combo,
+            targetNumbersUsed: JSON.stringify([state.config.target]),
+            operatorSequence: JSON.stringify([state.config.operator]),
+            timeSpentOnAdditionsMs: state.config.operator === 'ADD' ? state.timePlayedMs : 0,
+            timeSpentOnSubtractionsMs: state.config.operator === 'SUB' ? state.timePlayedMs : 0,
+            timeSpentOnMultiplicationsMs: state.config.operator === 'MUL' ? state.timePlayedMs : 0,
+            timeSpentOnDivisionsMs: state.config.operator === 'DIV' ? state.timePlayedMs : 0,
+            sessionStartTime: new Date(Date.now() - state.timePlayedMs).toISOString(),
+            sessionEndTime: new Date().toISOString(),
+            breaksTaken: 0,
+            totalBreakTimeMs: 0,
+            engagementScore: Math.min(100, Math.max(0, (state.score / state.level) * 10)),
+            focusTimePercentage: 95,
+            difficultyAdjustments: 0,
+            themeUsed: state.config.theme || 'classic',
+            soundEnabled: state.soundEnabled,
+            assistEnabled: state.config.assistOnSelect || false,
+            hintsEnabled: true
           });
-        } catch {}
-      };
-      saveScore();
+        } catch (error) {
+          console.error('❌ Erreur sauvegarde changement visibilité:', error);
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [state.running, state.gameOver, state.score, state.level, state.timePlayedMs, state.config, state.combo]);
+
+  // Fin de partie automatique après 10 minutes (600 secondes)
+  useEffect(() => {
+    if (!state.running || state.gameOver || state.paused) return;
+    
+    const maxGameTime = 10 * 60 * 1000; // 10 minutes en millisecondes
+    const timeRemaining = maxGameTime - state.timePlayedMs;
+    
+    if (timeRemaining <= 0) {
+      console.log('⏰ Temps de jeu maximum atteint - Fin de partie automatique');
+      dispatch({ type: 'END_GAME' });
+      return;
     }
-  }, [state.gameOver, state.score, state.level, state.timePlayedMs, state.config, state.combo]);
+    
+    // Avertir 1 minute avant la fin
+    if (timeRemaining <= 60000 && timeRemaining > 59000) {
+      console.log('⚠️ Attention: Fin de partie dans 1 minute !');
+    }
+    
+    const timer = setTimeout(() => {
+      if (state.running && !state.gameOver && !state.paused) {
+        console.log('⏰ Temps de jeu maximum atteint - Fin de partie automatique');
+        dispatch({ type: 'END_GAME' });
+      }
+    }, timeRemaining);
+    
+    return () => clearTimeout(timer);
+  }, [state.running, state.gameOver, state.paused, state.timePlayedMs]);
 
   // Tick principal (apparitions)
   useEffect(() => {
@@ -758,18 +1098,64 @@ export default function CubeMatch() {
   }
   
   return (
-    <div className="w-full h-screen overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-      <div className="w-full h-full grid grid-cols-1 md:grid-cols-[1fr,300px] max-w-7xl mx-auto">
-        {/* Zone de jeu principale */}
-        <GameArea state={state} dispatch={dispatch} />
+    <div className="w-full h-screen overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header avec informations de jeu */}
+      <div className="h-16 bg-white/80 backdrop-blur-sm border-b border-gray-200 flex items-center justify-between px-6">
+        <div className="flex items-center gap-4">
+          <h1 className="text-xl font-bold text-gray-900">CubeMatch</h1>
+          <div className="flex items-center gap-2">
+            <div className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
+              Niveau {state.level}
+            </div>
+            <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">
+              Score {state.score.toLocaleString()}
+            </div>
+            {state.combo > 1 && (
+              <div className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
+                Combo ×{state.combo}
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          <div className="text-sm text-gray-500">
+            {formatMs(state.timePlayedMs)}
+          </div>
+          <button 
+            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+              !state.paused 
+                ? 'bg-orange-500 text-white hover:bg-orange-600' 
+                : 'bg-green-500 text-white hover:bg-green-600'
+            }`}
+            onClick={() => dispatch({ type: 'PAUSE_TOGGLE' })}
+          >
+            {!state.paused ? '⏸️ Pause' : '▶️ Continuer'}
+          </button>
+          <button 
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition-all duration-200"
+            onClick={() => setShowOptions(true)}
+          >
+            ⚙️
+          </button>
+        </div>
+      </div>
 
-        {/* Panneau latéral */}
-        <SidePanel
-          state={state}
-          dispatch={dispatch}
-          showOptions={showOptions}
-          setShowOptions={setShowOptions}
-        />
+      {/* Zone de jeu principale */}
+      <div className="h-[calc(100vh-4rem)] flex">
+        <div className="flex-1 flex items-center justify-center p-6">
+          <GameArea state={state} dispatch={dispatch} />
+        </div>
+        
+        {/* Panneau latéral compact */}
+        <div className="w-80 bg-white/90 backdrop-blur-sm border-l border-gray-200 p-6 flex flex-col">
+          <SidePanel
+            state={state}
+            dispatch={dispatch}
+            showOptions={showOptions}
+            setShowOptions={setShowOptions}
+          />
+        </div>
       </div>
 
       {/* Modal Paramètres */}
@@ -811,9 +1197,9 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
   };
 
   return (
-    <div className="flex items-center justify-center h-full p-4">
-      {/* Grille de jeu avec effet glossy - centrée directement */}
-      <div ref={frameRef} className="glossy-game-area rounded-3xl p-6 shadow-2xl min-h-[400px] min-w-[400px]">
+    <div className="flex items-center justify-center h-full">
+      {/* Grille de jeu avec design épuré */}
+      <div ref={frameRef} className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
         <div
           className="grid"
           style={{
@@ -838,11 +1224,10 @@ function GameArea({ state, dispatch }: { state: State; dispatch: React.Dispatch<
               <button
                 key={cell.id}
                 onClick={() => dispatch({ type: 'CLICK', at: { row: cell.row, col: cell.col } })}
-                className={`flex items-center justify-center rounded-xl font-extrabold transition-all duration-200 touch-manipulation
-                  cell-no-animation
-                  ${isSel ? 'cell-selected' : ''}
-                  ${isHint ? `outline outline-2 ${theme.outline}` : ''}
-                  ${isPlayable ? 'bg-blue-50 border-blue-300' : ''}
+                className={`flex items-center justify-center rounded-lg font-bold transition-all duration-200 touch-manipulation
+                  ${isSel ? 'bg-blue-500 text-white shadow-lg scale-105' : 'bg-gray-100 hover:bg-gray-200'}
+                  ${isHint ? 'ring-2 ring-yellow-400 ring-offset-2' : ''}
+                  ${isPlayable ? 'bg-blue-50 border-2 border-blue-300' : ''}
                   ${valueClass(cell.value)}
                 `}
                 style={{ 
@@ -892,55 +1277,66 @@ function SidePanel(props: {
 }) {
   const { state, dispatch, setShowOptions } = props;
   return (
-    <aside className="flex items-center justify-center h-full p-4">
-      <div className="glossy-game-area rounded-3xl p-6 shadow-2xl w-full max-w-sm min-h-[400px] flex flex-col justify-center">
-        {/* Header avec KPI */}
-        <div className="mb-6">
-          <HeaderKPI state={state} />
-        </div>
-        
-        {/* Barre de progression */}
-        <div className="mb-6">
-          <ProgressBar state={state} />
-        </div>
-        
-        {/* Boutons de contrôle */}
-        <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <button 
-              className="px-4 py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold hover:from-yellow-500 hover:to-orange-600 transition-all duration-200 shadow-lg"
-              onClick={() => dispatch({ type: 'HINT' })}
-            >
-              💡 Indice
-            </button>
-            <button 
-              className="px-4 py-3 rounded-xl bg-gradient-to-r from-blue-400 to-indigo-500 text-white font-semibold hover:from-blue-500 hover:to-indigo-600 transition-all duration-200 shadow-lg"
-              onClick={() => dispatch({ type: 'RESTART' })}
-            >
-              🔄 Rejouer
-            </button>
-          </div>
-          
-          <button 
-            className={`w-full px-4 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg ${
-              state.running 
-                ? 'bg-gradient-to-r from-orange-400 to-red-500 text-white hover:from-orange-500 hover:to-red-600' 
-                : 'bg-gradient-to-r from-green-400 to-emerald-500 text-white hover:from-green-500 hover:to-emerald-600'
-            }`}
-            onClick={() => dispatch({ type: 'PAUSE_TOGGLE' })}
-          >
-            {state.running ? '⏸️ Pause' : '▶️ Continuer'}
-          </button>
-          
-          <button 
-            className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-gray-400 to-gray-500 text-white font-semibold hover:from-gray-500 hover:to-gray-600 transition-all duration-200 shadow-lg"
-            onClick={() => setShowOptions(true)}
-          >
-            ⚙️ Paramètres
-          </button>
+    <div className="flex flex-col h-full">
+      {/* Barre de progression */}
+      <div className="mb-6">
+        <ProgressBar state={state} />
+      </div>
+      
+      {/* Instructions rapides */}
+      <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <h3 className="text-sm font-semibold text-blue-900 mb-2">Comment jouer</h3>
+        <div className="text-xs text-blue-700 space-y-1">
+          <div>• Sélectionnez des cases adjacentes</div>
+          <div>• Formez des calculs avec l'opérateur</div>
+          <div>• Atteignez la cible pour marquer des points</div>
         </div>
       </div>
-    </aside>
+      
+      {/* Boutons d'action */}
+      <div className="space-y-3 flex-1">
+        <div className="grid grid-cols-2 gap-3">
+          <button 
+            className="px-4 py-3 rounded-lg bg-yellow-500 text-white font-medium hover:bg-yellow-600 transition-all duration-200 shadow-sm"
+            onClick={() => dispatch({ type: 'HINT' })}
+          >
+            💡 Indice
+          </button>
+          <button 
+            className="px-4 py-3 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 transition-all duration-200 shadow-sm"
+            onClick={() => dispatch({ type: 'RESTART' })}
+          >
+            🔄 Rejouer
+          </button>
+        </div>
+        
+        <button 
+          className="w-full px-4 py-3 rounded-lg bg-gray-500 text-white font-medium hover:bg-gray-600 transition-all duration-200 shadow-sm"
+          onClick={() => setShowOptions(true)}
+        >
+          ⚙️ Paramètres
+        </button>
+      </div>
+      
+      {/* Statistiques rapides */}
+      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">Statistiques</h3>
+        <div className="space-y-2 text-xs text-gray-600">
+          <div className="flex justify-between">
+            <span>Temps de jeu:</span>
+            <span className="font-medium">{formatMs(state.timePlayedMs)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Meilleur combo:</span>
+            <span className="font-medium">{state.combo}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Opérateur:</span>
+            <span className="font-medium">{state.config.operator}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -972,16 +1368,16 @@ function ProgressBar({ state }: { state: State }) {
   const pct = Math.min(100, Math.round((progress / 50) * 100));
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-semibold text-gray-700 text-center">Progression</h3>
-      <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+      <h3 className="text-sm font-semibold text-gray-700 text-center">Progression vers le niveau suivant</h3>
+      <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
         <div 
-          className="h-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500 transition-all duration-500 ease-out rounded-full shadow-lg" 
+          className="h-3 bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500 ease-out rounded-full" 
           style={{ width: `${pct}%` }} 
         />
       </div>
       <div className="text-center">
         <span className="text-lg font-bold text-indigo-600">{progress}</span>
-        <span className="text-sm text-gray-500"> / 50</span>
+        <span className="text-sm text-gray-500"> / 50 points</span>
       </div>
     </div>
   );
