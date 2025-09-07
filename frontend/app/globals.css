@@ -889,3 +889,11 @@ label, input, textarea, select {
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
+/* Classes utilitaires pour le texte tronqué */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
