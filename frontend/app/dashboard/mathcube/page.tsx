@@ -16,7 +16,8 @@ import {
   Play,
   Award,
   BarChart3,
-  Medal
+  Medal,
+  User
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -176,16 +177,36 @@ export default function MathCubePage() {
             </div>
 
             {/* Tableau de classement */}
-            <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <Trophy className="w-6 h-6 text-yellow-500" />
+                  Classement Global
+                </h3>
+                <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                  Top {top10Players.length} joueurs
+                </div>
+              </div>
               
-              
-              {/* En-tête du tableau */}
-              <div className="bg-gray-100 rounded-xl p-3">
-                <div className="grid grid-cols-12 gap-2 text-sm font-semibold text-gray-700">
-                  <div className="col-span-2 text-center">Rang</div>
-                  <div className="col-span-3 text-center">Session</div>
-                  <div className="col-span-4 text-center">Score</div>
-                  <div className="col-span-3 text-center">Niveau</div>
+              {/* En-tête du tableau avec design amélioré */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200 shadow-sm">
+                <div className="grid grid-cols-12 gap-2 text-sm font-bold text-gray-800">
+                  <div className="col-span-2 text-center flex items-center justify-center gap-1">
+                    <Award className="w-4 h-4 text-yellow-600" />
+                    Rang
+                  </div>
+                  <div className="col-span-3 text-center flex items-center justify-center gap-1">
+                    <User className="w-4 h-4 text-blue-600" />
+                    Session
+                  </div>
+                  <div className="col-span-4 text-center flex items-center justify-center gap-1">
+                    <Target className="w-4 h-4 text-green-600" />
+                    Score
+                  </div>
+                  <div className="col-span-3 text-center flex items-center justify-center gap-1">
+                    <TrendingUp className="w-4 h-4 text-purple-600" />
+                    Niveau
+                  </div>
                 </div>
               </div>
               
@@ -201,57 +222,63 @@ export default function MathCubePage() {
                   ))}
                 </div>
               ) : top10Players.length > 0 ? (
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {top10Players.slice(0, 10).map((player, index) => (
-                    <div key={player.userId} className={`grid grid-cols-12 gap-2 items-center p-2 rounded-lg transition-all duration-200 ${
+                    <div key={player.userId} className={`group grid grid-cols-12 gap-2 items-center p-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-sm ${
                       index < 3 
-                        ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200' 
-                        : 'bg-gray-50 hover:bg-gray-100'
+                        ? index === 0 
+                          ? 'bg-gradient-to-r from-yellow-50 via-yellow-100 to-orange-50 border-2 border-yellow-300 shadow-lg' 
+                          : index === 1
+                          ? 'bg-gradient-to-r from-gray-50 via-gray-100 to-slate-50 border-2 border-gray-300 shadow-md'
+                          : 'bg-gradient-to-r from-orange-50 via-orange-100 to-red-50 border-2 border-orange-300 shadow-md'
+                        : 'bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-300 hover:shadow-md'
                     }`}>
-                      {/* Rang */}
+                      {/* Rang avec design amélioré */}
                       <div className="col-span-2 text-center">
                         {index < 3 ? (
-                          <div className="flex flex-col items-center gap-0.5">
-                            <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                          <div className="flex flex-col items-center gap-1">
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center shadow-lg ${
                               index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900' :
                               index === 1 ? 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-700' :
                               'bg-gradient-to-r from-orange-400 to-orange-500 text-orange-900'
                             }`}>
-                              <Medal className="w-3 h-3" />
+                              <Medal className="w-4 h-4" />
                             </div>
-                            <div className={`text-xs font-bold ${
-                              index === 0 ? 'text-yellow-600' :
-                              index === 1 ? 'text-gray-600' :
-                              'text-orange-600'
+                            <div className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                              index === 0 ? 'bg-yellow-200 text-yellow-800' :
+                              index === 1 ? 'bg-gray-200 text-gray-700' :
+                              'bg-orange-200 text-orange-800'
                             }`}>
-                              {index === 0 ? 'OR' : index === 1 ? 'ARGENT' : 'BRONZE'}
+                              {index === 0 ? '🥇 OR' : index === 1 ? '🥈 ARGENT' : '🥉 BRONZE'}
                             </div>
                           </div>
                         ) : (
-                          <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs mx-auto bg-gray-200 text-gray-600">
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mx-auto bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 border-2 border-blue-200 shadow-sm">
                             {player.rank}
                           </div>
                         )}
                       </div>
                       
-                      {/* Session ID */}
+                      {/* Session ID avec style amélioré */}
                       <div className="col-span-3 text-center">
-                        <div className="text-sm font-semibold text-gray-900 font-mono">
+                        <div className="text-sm font-bold text-gray-900 font-mono bg-gray-100 px-2 py-1 rounded-lg border">
                           {player.sessionId || player.userId.slice(-6)}
                         </div>
                       </div>
                       
-                      {/* Score */}
+                      {/* Score avec effet visuel */}
                       <div className="col-span-4 text-center">
-                        <div className="font-bold text-gray-900 text-sm">
+                        <div className="font-bold text-lg bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                           {player.score.toLocaleString()}
                         </div>
+                        <div className="text-xs text-gray-500">points</div>
                       </div>
                       
-                      {/* Niveau */}
+                      {/* Niveau avec badge */}
                       <div className="col-span-3 text-center">
-                        <div className="text-sm font-semibold text-gray-700">
-                          {player.level || 'N/A'}
+                        <div className="inline-flex items-center gap-1 bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-bold border border-purple-200">
+                          <TrendingUp className="w-3 h-3" />
+                          Niv. {player.level || 'N/A'}
                         </div>
                       </div>
                     </div>
