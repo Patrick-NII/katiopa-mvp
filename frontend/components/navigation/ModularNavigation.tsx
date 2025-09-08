@@ -490,6 +490,14 @@ export default function ModularNavigation({
           </button>
           
           <button
+            onClick={() => router.push('/')}
+            className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            title="Retour à l'accueil"
+          >
+            <Home className="w-4 h-4" />
+          </button>
+          
+          <button
             onClick={handleLogout}
             className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             title="Déconnexion"
