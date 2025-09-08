@@ -54,12 +54,12 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
-      <DecorativeCubes variant="minimal" />
+      <DecorativeCubes variant="glassmorphism" />
       {/* Navigation */}
       <Navbar />
 
-      <div className="flex items-center justify-center p-4 md:p-8">
-        <div className="w-full max-w-md">
+      <div className="flex items-center justify-center h-screen p-3 md:p-4 lg:p-5">
+        <div className="w-full max-w-md mx-auto">
         {/* Logo et titre */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -75,7 +75,7 @@ export default function LoginPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8"
+          className="backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-2xl p-6 md:p-8"
         >
           <h2 className="font-subtitle-xl text-gray-800 dark:text-gray-200 mb-6 text-center">Connexion</h2>
           
@@ -83,7 +83,7 @@ export default function LoginPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg mb-6 font-body"
+              className="backdrop-blur-sm bg-red-500/20 dark:bg-red-900/20 border border-red-300/50 dark:border-red-700/50 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg mb-6 font-body"
             >
               {error}
             </motion.div>
@@ -171,10 +171,10 @@ export default function LoginPage() {
             </div>
 
             {/* Bouton retour landing page */}
-            <div className="text-center pt-4 border-t border-gray-200 dark:border-gray-600">
+            <div className="text-center pt-4 border-t border-white/20 dark:border-gray-600/50">
               <a 
                 href="/" 
-                className="inline-flex items-center space-x-2 text-sm md:text-base text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 font-medium transition-colors"
+                className="inline-flex items-center space-x-2 text-sm md:text-base text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 font-medium transition-colors backdrop-blur-sm bg-white/20 dark:bg-gray-800/20 px-4 py-2 rounded-lg border border-white/30 dark:border-gray-700/50"
               >
                 <Home className="h-4 w-4" />
                 <span>Retour à l'accueil</span>

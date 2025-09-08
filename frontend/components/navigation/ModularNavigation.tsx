@@ -369,25 +369,33 @@ export default function ModularNavigation({
 
   return (
     <motion.div
-      initial={{ width: collapsedProp ? 80 : 256 }}
-      animate={{ width: collapsedProp ? 80 : 256 }}
-      className={`fixed left-0 top-0 z-50 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-screen flex flex-col transition-all duration-300 ${
-        collapsedProp ? 'w-20' : 'w-64'
-      }`}
+      initial={{ width: collapsedProp ? 64 : 224 }}
+      animate={{ width: collapsedProp ? 64 : 224 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="fixed left-0 top-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 border-r border-white/20 dark:border-gray-700/50 h-screen flex flex-col shadow-2xl"
     >
       {/* En-tête */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-b border-white/20 dark:border-gray-700/50 backdrop-blur-sm">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+          <button
+            onClick={() => router.push('/')}
+            className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
+            title="Retour à l'accueil"
+          >
             <span className="text-white font-bold text-sm">C</span>
-          </div>
+          </button>
           {!collapsedProp && (
-            <div>
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
+            >
               <h1 className="text-lg font-bold text-gray-900 dark:text-white">CubeAI</h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-600 dark:text-gray-300">
                 {isChild ? 'Espace Enfant' : 'Espace Parent'}
               </p>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
@@ -399,18 +407,34 @@ export default function ModularNavigation({
             {/* En-tête de section */}
             <button
               onClick={() => toggleSection(section.id)}
-              className="w-full flex items-center justify-between p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="w-full flex items-center justify-between p-2 text-gray-700 dark:text-gray-200 hover:bg-white/50 dark:hover:bg-gray-800/50 rounded-lg transition-all duration-200 backdrop-blur-sm"
             >
               <div className="flex items-center gap-2">
-                <section.icon className="w-4 h-4" />
+                <section.icon className="w-4 h-4 text-gray-800 dark:text-gray-100" />
                 {!collapsedProp && (
-                  <span className="text-sm font-medium">{section.title}</span>
+                  <motion.span 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    transition={{ duration: 0.2, delay: 0.1 }}
+                    className="text-sm font-medium"
+                  >
+                    {section.title}
+                  </motion.span>
                 )}
               </div>
               {!collapsedProp && (
-                expandedSections.has(section.id) ? 
-                  <ChevronUp className="w-4 h-4" /> : 
-                  <ChevronDown className="w-4 h-4" />
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2, delay: 0.1 }}
+                >
+                  {expandedSections.has(section.id) ? 
+                    <ChevronUp className="w-4 h-4 text-gray-800 dark:text-gray-100" /> : 
+                    <ChevronDown className="w-4 h-4 text-gray-800 dark:text-gray-100" />
+                  }
+                </motion.div>
               )}
             </button>
 
@@ -427,32 +451,42 @@ export default function ModularNavigation({
                     key={item.id}
                     onClick={() => onTabChange(item.id)}
                     disabled={!item.available}
-                    className={`w-full flex items-center gap-3 p-2 rounded-lg transition-all duration-200 ${
+                    className={`w-full flex items-center gap-3 p-2 rounded-lg transition-all duration-200 backdrop-blur-sm ${
                       activeTab === item.id
-                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        ? 'bg-blue-500/20 dark:bg-blue-400/20 text-blue-800 dark:text-blue-200 border border-blue-300/30 dark:border-blue-500/30'
+                        : 'text-gray-700 dark:text-gray-200 hover:bg-white/50 dark:hover:bg-gray-800/50'
                     } ${!item.available ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                   >
-                    <item.icon className="w-4 h-4 flex-shrink-0" />
+                    <item.icon className={`w-4 h-4 flex-shrink-0 ${
+                      activeTab === item.id 
+                        ? 'text-blue-700 dark:text-blue-300' 
+                        : 'text-gray-800 dark:text-gray-100'
+                    }`} />
                     {!collapsedProp && (
-                      <div className="flex-1 text-left">
+                      <motion.div 
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ duration: 0.2, delay: 0.1 }}
+                        className="flex-1 text-left"
+                      >
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium">{item.label}</span>
                           {item.isNew && (
-                            <span className="px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                            <span className="px-1.5 py-0.5 bg-green-500/20 text-green-700 dark:text-green-300 text-xs rounded-full backdrop-blur-sm border border-green-300/30">
                               Nouveau
                             </span>
                           )}
                           {item.badge && (
-                            <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+                            <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-700 dark:text-blue-300 text-xs rounded-full backdrop-blur-sm border border-blue-300/30">
                               {item.badge}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-600 dark:text-gray-300">
                           {item.description}
                         </p>
-                      </div>
+                      </motion.div>
                     )}
                   </button>
                 ))}
@@ -463,47 +497,55 @@ export default function ModularNavigation({
       </div>
 
       {/* Pied de page */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-t border-white/20 dark:border-gray-700/50 backdrop-blur-sm">
         {!collapsedProp && user && (
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.2, delay: 0.1 }}
+            className="flex items-center gap-3 mb-4"
+          >
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-lg">
               {user.firstName.charAt(0)}
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-900 dark:text-white">
                 {user.firstName} {user.lastName}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-600 dark:text-gray-300">
                 {planTier}
               </p>
             </div>
-          </div>
+          </motion.div>
         )}
         
-        <div className="flex gap-2">
-          <button
+        <div className="flex items-center justify-between">
+          <motion.button
             onClick={() => onCollapsedChange?.(!collapsedProp)}
-            className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-3 text-gray-800 dark:text-gray-100 hover:bg-white/50 dark:hover:bg-gray-800/50 rounded-lg transition-all duration-200 backdrop-blur-sm"
             title={collapsedProp ? 'Développer' : 'Réduire'}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <ChevronRight className={`w-4 h-4 transition-transform ${collapsedProp ? '' : 'rotate-180'}`} />
-          </button>
+            <ChevronRight className={`w-5 h-5 transition-transform ${collapsedProp ? '' : 'rotate-180'}`} />
+          </motion.button>
           
-          <button
-            onClick={() => router.push('/')}
-            className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            title="Retour à l'accueil"
-          >
-            <Home className="w-4 h-4" />
-          </button>
-          
-          <button
-            onClick={handleLogout}
-            className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            title="Déconnexion"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+          {!collapsedProp && (
+            <motion.button
+              onClick={handleLogout}
+              className="p-3 text-gray-800 dark:text-gray-100 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-all duration-200 backdrop-blur-sm"
+              title="Déconnexion"
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <LogOut className="w-5 h-5" />
+            </motion.button>
+          )}
         </div>
       </div>
     </motion.div>

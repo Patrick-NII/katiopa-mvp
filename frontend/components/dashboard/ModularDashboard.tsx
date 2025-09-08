@@ -10,6 +10,8 @@ import FamilyPage from '../../app/dashboard/family/page'
 import BubixAssistantPage from '../../app/dashboard/bubix-assistant/page'
 import BubixTab from '../BubixTab'
 import SettingsTab from '../SettingsTab'
+import SettingsTabNoScroll from '../settings/SettingsTabNoScroll'
+import AnalyticsPageNoScroll from '../analytics/AnalyticsPageNoScroll'
 import { SubscriptionTab } from '../SubscriptionTab'
 import { BillingTab } from '../BillingTab'
 import FamilyMembersTab from '../FamilyMembersTab'
@@ -172,7 +174,7 @@ export default function ModularDashboard() {
         )
       
       case 'analytics':
-        return <AnalyticsPage user={user} childSessions={childSessions} />
+        return <AnalyticsPageNoScroll user={user} childSessions={childSessions} />
       
       case 'experiences':
         return (
@@ -219,7 +221,7 @@ export default function ModularDashboard() {
           />
         )
       case 'reglages':
-        return <SettingsTab userType={user.userType as 'CHILD' | 'PARENT' | 'TEACHER' | 'ADMIN'} />
+        return <SettingsTabNoScroll userType={user.userType as 'CHILD' | 'PARENT' | 'TEACHER' | 'ADMIN'} />
       case 'abonnements':
         return <SubscriptionTab user={user} />
       case 'family-members':
@@ -241,8 +243,8 @@ export default function ModularDashboard() {
 
   return (
     <AvatarProvider>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
-        <DecorativeCubes variant="default" />
+      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 relative overflow-hidden">
+        <DecorativeCubes variant="glassmorphism" />
         
         {/* Sidebar de navigation modulaire */}
         <ModularNavigation
@@ -254,16 +256,19 @@ export default function ModularDashboard() {
           onCollapsedChange={setSidebarCollapsed}
         />
 
-        {/* Contenu principal */}
-        <div className={`transition-all duration-300 min-h-screen ${
-          sidebarCollapsed ? 'ml-20' : 'ml-64'
-        }`}>
-          <main className="p-2 md:p-4 lg:p-6 min-h-screen">
+        {/* Contenu principal avec glassmorphisme optimisé */}
+        <motion.div 
+          animate={{ marginLeft: sidebarCollapsed ? 64 : 224 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="h-screen"
+        >
+          <main className="w-full h-full p-3 md:p-4 lg:p-5">
             {ready ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
+                className="backdrop-blur-xl bg-white/10 dark:bg-gray-900/10 rounded-3xl border border-white/20 dark:border-gray-700/50 shadow-2xl p-4 md:p-5 lg:p-6 h-full flex flex-col w-full overflow-y-auto"
               >
                 {(() => {
                   const content = renderTabContent()
@@ -272,13 +277,13 @@ export default function ModularDashboard() {
                 })()}
               </motion.div>
             ) : (
-              <div className="flex items-center justify-center h-64">
+              <div className="flex items-center justify-center h-full backdrop-blur-xl bg-white/10 dark:bg-gray-900/10 rounded-3xl border border-white/20 dark:border-gray-700/50 shadow-2xl w-full">
                 <div className="animate-spin rounded-full h-8 w-8 md:h-12 md:w-12 border-b-2 border-blue-600 dark:border-blue-400"></div>
-                <span className="ml-3 text-gray-600 dark:text-gray-300 text-sm md:text-base">Chargement...</span>
+                <span className="ml-3 text-gray-200 dark:text-gray-300 text-sm md:text-base">Chargement...</span>
               </div>
             )}
           </main>
-        </div>
+        </motion.div>
       </div>
     </AvatarProvider>
   )
