@@ -20,6 +20,7 @@ import { AvatarProvider } from '@/contexts/AvatarContext'
 import { useModals } from '@/hooks/useModals'
 import ModalSystem from '../modals/ModalSystem'
 import BubixDedicatedWindow from '../bubix/BubixDedicatedWindow'
+import BubixChildWindow from '../bubix/BubixChildWindow'
 
 // Import des pages des cubes existantes
 import MathCubePage from '../../app/dashboard/mathcube/page'
@@ -222,7 +223,12 @@ export default function ModularDashboard() {
       
       // Pages de gestion (parents uniquement)
       case 'bubix':
-        return (
+        return user.userType === 'CHILD' ? (
+          <BubixChildWindow 
+            user={user}
+            userType={user.userType as 'CHILD' | 'PARENT'}
+          />
+        ) : (
           <BubixDedicatedWindow 
             user={user}
             userType={user.userType as 'CHILD' | 'PARENT'}
