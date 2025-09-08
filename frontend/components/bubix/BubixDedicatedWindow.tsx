@@ -64,7 +64,7 @@ export default function BubixDedicatedWindow({ user, userType }: BubixDedicatedW
   }
 
   return (
-    <div className="h-full w-full flex bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-white/30 dark:border-gray-700/30 rounded-3xl shadow-2xl overflow-hidden">
+    <div className="absolute inset-0 flex bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl  dark:border-gray-700/30 rounded-2xl shadow-2xl overflow-hidden">
       {/* Sidebar pliable */}
       <motion.div
         initial={{ width: sidebarCollapsed ? 0 : 250 }}
