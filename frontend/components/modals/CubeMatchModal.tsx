@@ -179,6 +179,18 @@ export default function CubeMatchModal({
       }
     }
 
+    // Mode mobile : prendre tout l'écran
+    if (window.innerWidth <= 768) {
+      return {
+        position: 'fixed' as const,
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        zIndex: zIndex
+      }
+    }
+
     return {
       position: 'fixed' as const,
       left: position.x,
@@ -214,27 +226,31 @@ export default function CubeMatchModal({
         </div>
         
         <div className="flex items-center gap-2">
-          <button
-            onClick={onMinimize}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-            title="Réduire"
-          >
-            <Minimize2 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={onMaximize}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-            title="Agrandir"
-          >
-            <Maximize2 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={onFullscreen}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-            title="Plein écran"
-          >
-            <Square className="w-4 h-4" />
-          </button>
+          {/* Boutons de contrôle - masqués sur mobile */}
+          <div className="hidden md:flex items-center gap-2">
+            <button
+              onClick={onMinimize}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              title="Réduire"
+            >
+              <Minimize2 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={onMaximize}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              title="Agrandir"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={onFullscreen}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              title="Plein écran"
+            >
+              <Square className="w-4 h-4" />
+            </button>
+          </div>
+          {/* Bouton fermer - toujours visible */}
           <button
             onClick={onClose}
             className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
@@ -246,64 +262,64 @@ export default function CubeMatchModal({
       </div>
 
       {/* Contenu principal */}
-      <div className="h-full overflow-y-auto p-6">
+      <div className="h-full overflow-y-auto p-3 md:p-6">
         {gameState === 'menu' && (
-          <div className="flex flex-col items-center justify-center h-full space-y-8">
+          <div className="flex flex-col items-center justify-center h-full space-y-4 md:space-y-8">
             <div className="text-center">
-              <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 md:mb-4">
                 Bienvenue dans CubeMatch ! 🎮
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-lg max-w-md">
+              <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg max-w-md px-4">
                 Sélectionnez des cases adjacentes pour atteindre la cible et marquer des points !
               </p>
             </div>
             
-            <div className="grid grid-cols-3 gap-4 mb-8">
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 text-center">
-                <Target className="w-8 h-8 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Atteignez la cible</p>
+            <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-8">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-2 md:p-4 text-center">
+                <Target className="w-6 h-6 md:w-8 md:h-8 text-blue-600 dark:text-blue-400 mx-auto mb-1 md:mb-2" />
+                <p className="text-xs md:text-sm font-medium text-gray-900 dark:text-white">Atteignez la cible</p>
               </div>
-              <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 text-center">
-                <Trophy className="w-8 h-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Marquez des points</p>
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-2 md:p-4 text-center">
+                <Trophy className="w-6 h-6 md:w-8 md:h-8 text-green-600 dark:text-green-400 mx-auto mb-1 md:mb-2" />
+                <p className="text-xs md:text-sm font-medium text-gray-900 dark:text-white">Marquez des points</p>
               </div>
-              <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4 text-center">
-                <Star className="w-8 h-8 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Montez de niveau</p>
+              <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-2 md:p-4 text-center">
+                <Star className="w-6 h-6 md:w-8 md:h-8 text-purple-600 dark:text-purple-400 mx-auto mb-1 md:mb-2" />
+                <p className="text-xs md:text-sm font-medium text-gray-900 dark:text-white">Montez de niveau</p>
               </div>
             </div>
             
             <button
               onClick={startGame}
-              className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-xl font-bold text-lg hover:from-emerald-600 hover:to-blue-600 transition-all duration-300 transform hover:scale-105"
+              className="px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-xl font-bold text-base md:text-lg hover:from-emerald-600 hover:to-blue-600 transition-all duration-300 transform hover:scale-105"
             >
-              <Play className="w-6 h-6 inline mr-2" />
+              <Play className="w-5 h-5 md:w-6 md:h-6 inline mr-2" />
               Commencer le jeu
             </button>
           </div>
         )}
 
         {gameState === 'playing' && (
-          <div className="space-y-6">
+          <div className="space-y-3 md:space-y-6">
             {/* Statistiques de jeu */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{score}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Score</div>
+            <div className="grid grid-cols-3 gap-2 md:gap-4">
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-2 md:p-4 text-center">
+                <div className="text-lg md:text-2xl font-bold text-blue-600 dark:text-blue-400">{score}</div>
+                <div className="text-xs md:text-sm text-gray-600 dark:text-gray-300">Score</div>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">{target}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Cible</div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-2 md:p-4 text-center">
+                <div className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">{target}</div>
+                <div className="text-xs md:text-sm text-gray-600 dark:text-gray-300">Cible</div>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{level}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-300">Niveau</div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-2 md:p-4 text-center">
+                <div className="text-lg md:text-2xl font-bold text-purple-600 dark:text-purple-400">{level}</div>
+                <div className="text-xs md:text-sm text-gray-600 dark:text-gray-300">Niveau</div>
               </div>
             </div>
 
             {/* Plateau de jeu */}
             <div className="flex justify-center">
-              <div className="grid grid-cols-6 gap-2 p-4 bg-gray-100 dark:bg-gray-700 rounded-xl">
+              <div className="grid grid-cols-6 gap-1 md:gap-2 p-2 md:p-4 bg-gray-100 dark:bg-gray-700 rounded-xl">
                 {gameBoard.map((row, rowIndex) =>
                   row.map((cell, colIndex) => {
                     const isSelected = selectedCells.some(cell => cell.row === rowIndex && cell.col === colIndex)
@@ -311,7 +327,7 @@ export default function CubeMatchModal({
                       <button
                         key={`${rowIndex}-${colIndex}`}
                         onClick={() => handleCellClick(rowIndex, colIndex)}
-                        className={`w-12 h-12 rounded-lg font-bold text-lg transition-all duration-200 ${
+                        className={`w-8 h-8 md:w-12 md:h-12 rounded-lg font-bold text-sm md:text-lg transition-all duration-200 ${
                           isSelected
                             ? 'bg-yellow-400 text-yellow-900 transform scale-110'
                             : 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-500'
@@ -326,26 +342,26 @@ export default function CubeMatchModal({
             </div>
 
             {/* Contrôles de jeu */}
-            <div className="flex justify-center gap-4">
+            <div className="flex flex-col md:flex-row justify-center gap-2 md:gap-4">
               <button
                 onClick={submitSelection}
                 disabled={selectedCells.length === 0}
-                className="px-6 py-3 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 md:px-6 py-2 md:py-3 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm md:text-base"
               >
                 Valider ({calculateSelectedSum()})
               </button>
               <button
                 onClick={pauseGame}
-                className="px-6 py-3 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 transition-colors"
+                className="px-4 md:px-6 py-2 md:py-3 bg-yellow-500 text-white rounded-lg font-medium hover:bg-yellow-600 transition-colors text-sm md:text-base"
               >
-                <Pause className="w-4 h-4 inline mr-2" />
+                <Pause className="w-3 h-3 md:w-4 md:h-4 inline mr-1 md:mr-2" />
                 Pause
               </button>
               <button
                 onClick={resetGame}
-                className="px-6 py-3 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors"
+                className="px-4 md:px-6 py-2 md:py-3 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors text-sm md:text-base"
               >
-                <RotateCcw className="w-4 h-4 inline mr-2" />
+                <RotateCcw className="w-3 h-3 md:w-4 md:h-4 inline mr-1 md:mr-2" />
                 Recommencer
               </button>
             </div>
