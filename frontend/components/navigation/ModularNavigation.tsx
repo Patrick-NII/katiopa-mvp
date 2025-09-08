@@ -203,23 +203,6 @@ export default function ModularNavigation({
               isNew: true
             },
             {
-              id: 'abonnements',
-              label: 'Abonnements & Facturation',
-              icon: Crown,
-              description: 'Plans, fonctionnalités et historique des paiements',
-              available: true,
-              badge: planTier === 'DECOUVERTE' ? 'Découverte' : 
-                     planTier === 'EXPLORATEUR' ? 'Explorateur' : 
-                     planTier === 'MAITRE' ? 'Maître' : 'Entreprise'
-            },
-            {
-              id: 'reglages',
-              label: 'Configuration',
-              icon: Settings,
-              description: 'Configuration personnelle',
-              available: true
-            },
-            {
               id: 'mathcube',
               label: 'MathCube',
               icon: BookOpen,
