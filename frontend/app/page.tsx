@@ -107,9 +107,13 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2 md:space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <button
+                onClick={() => router.push('/')}
+                className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center hover:shadow-xl transition-all duration-200 cursor-pointer"
+                title="Accueil"
+              >
                 <span className="font-title text-white text-2xl">C</span>
-              </div>
+              </button>
               <CubeAILogo className="text-2xl md:text-4xl" />
             </div>
             <div className="flex items-center space-x-2 md:space-x-4">
@@ -884,9 +888,13 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <button
+                  onClick={() => router.push('/')}
+                  className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center hover:shadow-xl transition-all duration-200 cursor-pointer"
+                  title="Accueil"
+                >
                   <span className="font-title text-white text-lg">C</span>
-                </div>
+                </button>
                 <CubeAILogo className="text-xl" />
               </div>
               <p className="font-body text-gray-300 mb-4">

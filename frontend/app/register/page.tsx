@@ -826,12 +826,12 @@ const SummarySidebar = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
-      <DecorativeCubes variant="minimal" />
+      <DecorativeCubes variant="glassmorphism" />
       {/* Navigation */}
       <Navbar />
 
       {/* Main */}
-      <div className="w-full">
+      <div className="w-full h-screen overflow-y-auto">
         <AnimatePresence mode="wait">
           {/* ------------------------- SUBSCRIPTION STEP ------------------------ */}
           {step === 'subscription' && (
@@ -1011,7 +1011,7 @@ const SummarySidebar = () => {
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-stretch">
                   {/* Col gauche (2/3) */}
                   <div className="xl:col-span-2">
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white/80 backdrop-blur rounded-3xl shadow-xl p-8 lg:p-10 min-h-[700px] h-full flex flex-col">
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 rounded-3xl border border-white/20 dark:border-gray-700/50 shadow-2xl p-8 lg:p-10 min-h-[700px] h-full flex flex-col">
                       <div className="text-center mb-8">
                         <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Créez votre espace famille</h1>
                         <p className="text-lg text-gray-600">Enregistrez vos informations en tant que propriétaire du compte</p>
@@ -1265,7 +1265,7 @@ const SummarySidebar = () => {
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-stretch">
                   {/* Col gauche (2/3) */}
                   <div className="xl:col-span-2">
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white/80 backdrop-blur rounded-3xl shadow-xl p-8 lg:p-10 min-h-[700px] h-full flex flex-col">
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 rounded-3xl border border-white/20 dark:border-gray-700/50 shadow-2xl p-8 lg:p-10 min-h-[700px] h-full flex flex-col">
                       <div className="text-center mb-8">
                         <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Membres de la famille</h1>
                         <p className="text-lg text-gray-600">
@@ -1466,7 +1466,7 @@ const SummarySidebar = () => {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                      className="bg-white/80 backdrop-blur rounded-3xl shadow-xl p-8 lg:p-10 min-h-[700px] flex flex-col h-full"
+                      className="backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 rounded-3xl border border-white/20 dark:border-gray-700/50 shadow-2xl p-8 lg:p-10 min-h-[700px] flex flex-col h-full"
                     >
                       <div className="text-center mb-8">
                         <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Paiement & vérification</h1>
@@ -1689,7 +1689,7 @@ const SummarySidebar = () => {
 
           {/* ----------------------------- SUCCESS ------------------------------ */}
           {step === 'success' && (
-            <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="min-h-screen py-12 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+            <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="h-screen py-3 md:py-4 lg:py-5 overflow-y-auto bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
               <div className="w-full px-4 sm:px-6 lg:px-8">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl p-12 text-center">
                   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring', stiffness: 200 }} className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8">
@@ -1705,10 +1705,10 @@ const SummarySidebar = () => {
                     </motion.button>
                     
                     {/* Bouton retour landing page */}
-                    <div className="text-center pt-4 border-t border-gray-200">
+                    <div className="text-center pt-4 border-t border-white/20 dark:border-gray-600/50">
                       <a 
                         href="/" 
-                        className="inline-flex items-center space-x-2 text-sm text-gray-500 hover:text-gray-700 font-medium transition-colors"
+                        className="inline-flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 font-medium transition-colors backdrop-blur-sm bg-white/20 dark:bg-gray-800/20 px-4 py-2 rounded-lg border border-white/30 dark:border-gray-700/50"
                       >
                         <Home className="h-4 w-4" />
                         <span>Retour à l'accueil</span>
