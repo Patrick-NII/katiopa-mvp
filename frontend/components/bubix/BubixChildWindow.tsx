@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { 
   MessageCircle, Send, Bot, User, ChevronLeft, ChevronRight, Settings, History, Star, Search,
-  Plus, Calculator, BookOpen, Globe, Lightbulb, Palette, Microscope, Users, Zap, Heart, Code, Gamepad2
+  Plus, Calculator, BookOpen, Globe, Lightbulb, Palette, Microscope, Users, Zap, Heart, Code, Gamepad2, Archive
 } from 'lucide-react'
 
 interface Message {
@@ -148,8 +148,8 @@ export default function BubixChildWindow({ user, userType }: BubixChildWindowPro
     <div className="absolute inset-0 flex bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl dark:border-gray-700/30 rounded-2xl shadow-2xl overflow-hidden">
       {/* Sidebar pliable */}
       <motion.div
-        initial={{ width: sidebarCollapsed ? 0 : 250 }}
-        animate={{ width: sidebarCollapsed ? 0 : 250 }}
+        initial={{ width: sidebarCollapsed ? 0 : (window.innerWidth <= 768 ? 200 : 250) }}
+        animate={{ width: sidebarCollapsed ? 0 : (window.innerWidth <= 768 ? 200 : 250) }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="bg-gradient-to-b from-purple-500 to-pink-500 text-white overflow-hidden"
       >
@@ -158,48 +158,45 @@ export default function BubixChildWindow({ user, userType }: BubixChildWindowPro
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="p-4 h-full flex flex-col"
+            className="p-3 md:p-4 h-full flex flex-col"
           >
             {/* Header avec nouvelle conversation */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                <Search className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-2 md:gap-3 mb-4">
+              <div className="w-6 h-6 md:w-8 md:h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                <Search className="w-4 h-4 md:w-5 md:h-5 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-medium text-white text-sm">Recherche</h3>
+                <h3 className="font-medium text-white text-xs md:text-sm hidden md:block">Recherche</h3>
               </div>
               <button
                 onClick={startNewConversation}
-                className="p-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+                className="p-1 md:p-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
                 title="Nouvelle conversation"
               >
-                <Plus className="w-4 h-4 text-white" />
+                <Plus className="w-3 h-3 md:w-4 md:h-4 text-white" />
               </button>
             </div>
 
             {/* Sections Live - Version compacte */}
-            <div className="mb-3">
-              <h4 className="text-xs font-semibold text-purple-100 mb-2 flex items-center gap-1">
-                <Zap className="w-3 h-3" />
-                Sessions Live
-              </h4>
-              <div className="grid grid-cols-2 gap-1">
+            <div className="mt-6 mb-8">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
                 {LIVE_SUBJECTS.map((subject) => {
                   const IconComponent = subject.icon
                   return (
                     <button
                       key={subject.id}
                       onClick={() => selectSubject(subject.id)}
-                      className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
+                      className={`flex items-center md:flex-col gap-1 md:gap-1 p-1 md:p-2 rounded-lg transition-colors ${
                         activeSubject === subject.id 
                           ? 'bg-white/30' 
                           : 'hover:bg-white/20'
                       }`}
                     >
-                      <div className={`w-6 h-6 rounded-lg bg-gradient-to-r ${subject.color} flex items-center justify-center`}>
-                        <IconComponent className="w-3 h-3 text-white" />
+                      <div >
+                        <IconComponent className="w-5 h-5 text-white mb-2" />
                       </div>
-                      <span className="text-xs text-white text-center leading-tight">{subject.name}</span>
+                      <span className="text-xs text-white text-center leading-tight hidden md:inline">{subject.name}</span>
                     </button>
                   )
                 })}
@@ -210,13 +207,13 @@ export default function BubixChildWindow({ user, userType }: BubixChildWindowPro
             <div className="flex-1">
               <h4 className="text-xs font-semibold text-purple-100 mb-2 flex items-center gap-1">
                 <History className="w-3 h-3" />
-                Conversations
+                <span className="hidden md:inline">Conversations</span>
               </h4>
               <div className="space-y-1">
                 {conversations.slice(0, 3).map((conv) => (
                   <button
                     key={conv.id}
-                    className="w-full text-left p-2 rounded-lg hover:bg-white/20 transition-colors"
+                    className="w-full text-left p-1.5 md:p-2 rounded-lg hover:bg-white/20 transition-colors"
                   >
                     <div className="text-xs text-white font-medium truncate">{conv.title}</div>
                     <div className="text-xs text-purple-200 truncate">{conv.lastMessage}</div>
@@ -227,10 +224,10 @@ export default function BubixChildWindow({ user, userType }: BubixChildWindowPro
 
             {/* Statut - Version compacte */}
             <div className="mt-auto">
-              <div className="bg-white/20 rounded-lg p-2">
+              <div className="bg-white/20 rounded-lg p-1.5 md:p-2">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-white">En ligne</span>
+                  <span className="text-xs text-white hidden md:inline">En ligne</span>
                 </div>
               </div>
             </div>
@@ -241,20 +238,13 @@ export default function BubixChildWindow({ user, userType }: BubixChildWindowPro
       {/* Zone principale */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-500 to-blue-800 text-white p-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="p-1.5 hover:bg-white/20 rounded-lg transition-colors"
-              title={sidebarCollapsed ? "Développer la sidebar" : "Réduire la sidebar"}
-            >
-              {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-            </button>
+        <div className="bg-gradient-to-r from-purple-500 to-blue-800 text-white p-2 md:p-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 md:gap-3">
             <div className="relative">
-              <MessageCircle className="w-5 h-5 text-white" />
+              <MessageCircle className="w-4 h-4 md:w-5 md:h-5 text-white" />
               <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
             </div>
-            <div>
+            <div className="hidden md:block">
               <h3 className="font-bold text-base">Bubix Assistant</h3>
               <p className="text-purple-100 text-xs">
                 {activeSubject 
@@ -263,12 +253,33 @@ export default function BubixChildWindow({ user, userType }: BubixChildWindowPro
                 }
               </p>
             </div>
+            <div className="md:hidden">
+              <h3 className="font-bold text-sm">Bubix</h3>
+            </div>
+          </div>
+          
+          {/* Boutons en haut à droite */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={startNewConversation}
+              className="p-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+              title="Nouvelle conversation"
+            >
+              <Plus className="w-4 h-4 text-white" />
+            </button>
+            <button
+              onClick={() => {/* Fonction pour ouvrir les conversations archivées */}}
+              className="p-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+              title="Conversations archivées"
+            >
+              <Archive className="w-4 h-4 text-white" />
+            </button>
           </div>
         </div>
 
         {/* Messages Area - Optimisé pour éviter le scroll */}
-        <div className="flex-1 overflow-hidden p-3 space-y-3 bg-gray-50/50 dark:bg-gray-800/50">
-          <div className="h-full overflow-y-auto space-y-3">
+        <div className="flex-1 overflow-hidden p-2 md:p-3 space-y-2 md:space-y-3 bg-gray-50/50 dark:bg-gray-800/50">
+          <div className="h-full overflow-y-auto space-y-2 md:space-y-3">
             {messages.map((message) => (
               <motion.div
                 key={message.id}
@@ -331,20 +342,29 @@ export default function BubixChildWindow({ user, userType }: BubixChildWindowPro
         </div>
 
         {/* Input Area - Version compacte */}
-        <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900/50">
+        <div className="p-2 md:p-3 border-t border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900/50">
           <div className="flex items-center gap-2">
+            {/* Bouton chevron pour mobile uniquement */}
+            <button
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="md:hidden p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              title={sidebarCollapsed ? "Développer la sidebar" : "Réduire la sidebar"}
+            >
+              {sidebarCollapsed ? <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-300" /> : <ChevronLeft className="w-4 h-4 text-gray-600 dark:text-gray-300" />}
+            </button>
+            
             <input
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={activeSubject ? `Question sur ${LIVE_SUBJECTS.find(s => s.id === activeSubject)?.name}...` : "Tape ton message..."}
-              className="flex-1 p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-800 dark:text-white"
+              className="flex-1 p-1.5 md:p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-800 dark:text-white"
             />
             <button
               onClick={handleSendMessage}
               disabled={!newMessage.trim()}
-              className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              className="p-1.5 md:p-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               <Send className="w-4 h-4" />
             </button>

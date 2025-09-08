@@ -31,7 +31,8 @@ import {
   Moon,
   Monitor,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Search
 } from 'lucide-react'
 import { authAPI } from '@/lib/api'
 import { useAvatar } from '@/contexts/AvatarContext'
@@ -151,8 +152,14 @@ export default function ModularNavigation({
   // Détecter si on est sur mobile
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-      if (window.innerWidth < 768) {
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      
+      // Sur mobile : soit totalement replié (collapsed=true) soit totalement déplié (collapsed=false)
+      // Pas d'état intermédiaire sur mobile
+      if (mobile) {
+        // Sur mobile, on force toujours collapsed=true par défaut
+        // L'utilisateur peut cliquer pour déplier complètement
         onCollapsedChange?.(true)
       }
     }
@@ -306,11 +313,15 @@ export default function ModularNavigation({
   }
 
   return (
+    <>
     <motion.div
-      initial={{ width: collapsedProp ? 64 : 224 }}
-      animate={{ width: collapsedProp ? 64 : 224 }}
+      initial={{ width: collapsedProp ? (isMobile ? 0 : 64) : (isMobile ? '100vw' : 224) }}
+      animate={{ width: collapsedProp ? (isMobile ? 0 : 64) : (isMobile ? '100vw' : 224) }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="fixed left-0 top-0 z-50 backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 border-r border-white/30 dark:border-gray-700/30 h-screen flex flex-col shadow-2xl"
+      className={`fixed left-0 top-0 z-50 backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 border-r border-white/30 dark:border-gray-700/30 h-screen flex flex-col shadow-2xl ${
+        isMobile && collapsedProp ? 'overflow-hidden pointer-events-none opacity-0' : ''
+      }`}
+      style={isMobile && collapsedProp ? { display: 'none' } : {}}
     >
       {/* En-tête */}
       <div className="p-4 border-b border-white/30 dark:border-gray-700/30">
@@ -341,8 +352,14 @@ export default function ModularNavigation({
       {/* Onglet Bubix Spécial */}
       <div className="px-2 pb-4">
         <motion.button
-          onClick={() => onTabChange('bubix')}
-          className={`w-full ${collapsedProp ? 'p-3' : 'p-4'} bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95`}
+          onClick={() => {
+            onTabChange('bubix')
+            // Fermer automatiquement la navbar après clic sur onglet
+            if (isMobile) {
+              onCollapsedChange?.(true)
+            }
+          }}
+          className={`w-full ${collapsedProp ? 'p-2 md:p-3' : 'p-3 md:p-4'} bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -418,9 +435,15 @@ export default function ModularNavigation({
                 {section.items.map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => onTabChange(item.id)}
+                    onClick={() => {
+                      onTabChange(item.id)
+                      // Fermer automatiquement la navbar après clic sur onglet
+                      if (isMobile) {
+                        onCollapsedChange?.(true)
+                      }
+                    }}
                     disabled={!item.available}
-                    className={`w-full flex items-center ${collapsedProp ? 'justify-center p-2' : 'gap-3 p-3'} rounded-xl transition-all duration-200 ${
+                    className={`w-full flex items-center ${collapsedProp ? 'justify-center p-1.5 md:p-2' : 'gap-3 p-2 md:p-3'} rounded-xl transition-all duration-200 ${
                       activeTab === item.id
                         ? 'bg-blue-500/20 dark:bg-blue-400/20 text-blue-800 dark:text-blue-200 border border-blue-300/30 dark:border-blue-500/30'
                         : 'text-gray-700 dark:text-gray-200 hover:bg-white/60 dark:hover:bg-gray-800/60'
@@ -491,7 +514,15 @@ export default function ModularNavigation({
         
         <div className={`flex items-center ${collapsedProp ? 'justify-center' : 'justify-between'}`}>
           <motion.button
-            onClick={() => onCollapsedChange?.(!collapsedProp)}
+            onClick={() => {
+              if (isMobile) {
+                // Sur mobile : basculer entre totalement replié et totalement déplié
+                onCollapsedChange?.(!collapsedProp)
+              } else {
+                // Sur desktop : comportement normal
+                onCollapsedChange?.(!collapsedProp)
+              }
+            }}
             className={`${collapsedProp ? 'p-2 justify-center' : 'p-3'} flex items-center text-gray-800 dark:text-gray-100 hover:bg-white/60 dark:hover:bg-gray-800/60 rounded-xl transition-all duration-200`}
             title={collapsedProp ? 'Développer' : 'Réduire'}
             whileHover={{ scale: 1.05 }}
@@ -518,5 +549,21 @@ export default function ModularNavigation({
         </div>
       </div>
     </motion.div>
-  )
+    
+    {/* Bouton flottant pour mobile quand navbar repliée */}
+    {isMobile && collapsedProp && (
+      <motion.button
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0 }}
+        onClick={() => onCollapsedChange?.(false)}
+        className="fixed top-4 left-4 z-50 w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-full shadow-lg flex items-center justify-center text-white transition-all duration-300"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+      >
+        <LayoutDashboard className="w-6 h-6" />
+      </motion.button>
+    )}
+  </>
+)
 }

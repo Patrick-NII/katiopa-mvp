@@ -64,6 +64,18 @@ export default function ModularDashboard() {
   // Hook pour les modals
   const { modals, modalStates, closeModal, minimizeModal, maximizeModal, updateModal, openCubeMatchModal } = useModals()
 
+  // Détecter si on est sur mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   // Fonction pour gérer les changements d'onglets
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId)
@@ -269,7 +281,11 @@ export default function ModularDashboard() {
 
         {/* Contenu principal avec glassmorphisme optimisé */}
         <motion.div 
-          animate={{ marginLeft: sidebarCollapsed ? 64 : 224 }}
+          animate={{ 
+            marginLeft: sidebarCollapsed 
+              ? (isMobile ? 0 : 64) 
+              : (isMobile ? 0 : 224) 
+          }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className="h-screen"
         >
