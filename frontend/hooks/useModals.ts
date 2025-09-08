@@ -7,6 +7,7 @@ export interface UseModalsReturn {
   modals: ModalProps[]
   modalStates: Record<string, ModalState>
   openModal: (modal: ModalProps) => void
+  openBubixModal: () => void
   closeModal: (id: string) => void
   updateModal: (id: string, updates: Partial<ModalState>) => void
   minimizeModal: (id: string) => void
@@ -62,6 +63,51 @@ export const useModals = (): UseModalsReturn => {
     }))
   }, [])
 
+  const openBubixModal = useCallback(() => {
+    const bubixModal: ModalProps = {
+      id: 'bubix',
+      title: 'Bubix Assistant',
+      content: null, // Will be handled by BubixModal component
+      size: 'large'
+    }
+    
+    setModals(prev => {
+      const exists = prev.find(m => m.id === 'bubix')
+      if (exists) return prev
+      return [...prev, bubixModal]
+    })
+
+    // Calculer la taille pour prendre tout l'espace de la section
+    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight
+    const sidebarWidth = 224 // Largeur de la sidebar étendue
+    
+    const bubixSize = { 
+      width: Math.min(viewportWidth - sidebarWidth - 100, 1000), // -100 pour padding
+      height: Math.min(viewportHeight - 100, 800) // -100 pour padding
+    }
+    
+    const centerPosition = {
+      x: Math.max(50, (viewportWidth - bubixSize.width) / 2),
+      y: Math.max(50, (viewportHeight - bubixSize.height) / 2)
+    }
+
+    setModalStates(prev => ({
+      ...prev,
+      bubix: {
+        isOpen: true,
+        isMinimized: false,
+        isMaximized: false,
+        isFullscreen: false,
+        position: centerPosition,
+        size: bubixSize,
+        originalSize: bubixSize,
+        originalPosition: centerPosition,
+        zIndex: 1000 + Object.keys(prev).length
+      }
+    }))
+  }, [])
+
   const closeModal = useCallback((id: string) => {
     setModals(prev => prev.filter(m => m.id !== id))
     setModalStates(prev => {
@@ -102,6 +148,7 @@ export const useModals = (): UseModalsReturn => {
     modals,
     modalStates,
     openModal,
+    openBubixModal,
     closeModal,
     updateModal,
     minimizeModal,

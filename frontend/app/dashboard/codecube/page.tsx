@@ -32,7 +32,7 @@ export default function CodeCubePage() {
           <span className="font-bold text-xl">CodeCube</span>
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          💻 Initiation à la Programmation
+          Initiation à la Programmation
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Découvre le monde fascinant du code ! Apprends à programmer avec des exercices ludiques et progressifs.

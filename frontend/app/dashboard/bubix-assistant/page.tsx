@@ -106,7 +106,7 @@ export default function BubixAssistantPage({
             <MessageCircle className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Bubix Assistant IA 🤖
+            Bubix Assistant IA
           </h1>
         </div>
         <p className="text-gray-600">

@@ -45,7 +45,6 @@ export type NavigationTab =
   | 'bubix-assistant'
   | 'bubix'
   | 'reglages'
-  | 'facturation'
   | 'abonnements'
   | 'family-members'
   | 'mathcube'
@@ -204,20 +203,22 @@ export default function ModularNavigation({
               isNew: true
             },
             {
-              id: 'bubix',
-              label: 'Bubix',
-              icon: MessageCircle,
-              description: 'Assistant IA',
+              id: 'abonnements',
+              label: 'Abonnements & Facturation',
+              icon: Crown,
+              description: 'Plans, fonctionnalités et historique des paiements',
+              available: true,
+              badge: planTier === 'DECOUVERTE' ? 'Découverte' : 
+                     planTier === 'EXPLORATEUR' ? 'Explorateur' : 
+                     planTier === 'MAITRE' ? 'Maître' : 'Entreprise'
+            },
+            {
+              id: 'reglages',
+              label: 'Configuration',
+              icon: Settings,
+              description: 'Configuration personnelle',
               available: true
-            }
-          ]
-        },
-        {
-          id: 'learning',
-          title: 'Modules d\'Apprentissage',
-          icon: BookOpen,
-          available: true,
-          items: [
+            },
             {
               id: 'mathcube',
               label: 'MathCube',
@@ -251,21 +252,6 @@ export default function ModularNavigation({
               label: 'DreamCube',
               icon: Heart,
               description: 'Créativité et émotions',
-              available: true
-            }
-          ]
-        },
-        {
-          id: 'settings',
-          title: 'Paramètres',
-          icon: Settings,
-          available: true,
-          items: [
-            {
-              id: 'reglages',
-              label: 'Réglages',
-              icon: Settings,
-              description: 'Configuration personnelle',
               available: true
             }
           ]
@@ -304,49 +290,18 @@ export default function ModularNavigation({
               isNew: true
             },
             {
-              id: 'bubix-assistant',
-              label: 'Bubix Assistant',
-              icon: MessageCircle,
-              description: 'Analyses pédagogiques',
-              available: true,
-              isNew: true
-            }
-          ]
-        },
-        {
-          id: 'subscription',
-          title: 'Abonnement',
-          icon: Crown,
-          available: true,
-          items: [
-            {
               id: 'abonnements',
-              label: 'Abonnements',
+              label: 'Abonnements & Facturation',
               icon: Crown,
-              description: 'Plans et fonctionnalités',
+              description: 'Plans, fonctionnalités et historique des paiements',
               available: true,
               badge: planTier === 'DECOUVERTE' ? 'Découverte' : 
                      planTier === 'EXPLORATEUR' ? 'Explorateur' : 
                      planTier === 'MAITRE' ? 'Maître' : 'Entreprise'
             },
             {
-              id: 'facturation',
-              label: 'Facturation',
-              icon: CreditCard,
-              description: 'Historique et paiements',
-              available: true
-            }
-          ]
-        },
-        {
-          id: 'settings',
-          title: 'Paramètres',
-          icon: Settings,
-          available: true,
-          items: [
-            {
               id: 'reglages',
-              label: 'Réglages',
+              label: 'Configuration',
               icon: Settings,
               description: 'Configuration et sécurité',
               available: true
@@ -372,17 +327,17 @@ export default function ModularNavigation({
       initial={{ width: collapsedProp ? 64 : 224 }}
       animate={{ width: collapsedProp ? 64 : 224 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="fixed left-0 top-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 border-r border-white/20 dark:border-gray-700/50 h-screen flex flex-col shadow-2xl"
+      className="fixed left-0 top-0 z-50 backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 border-r border-white/30 dark:border-gray-700/30 h-screen flex flex-col shadow-2xl"
     >
       {/* En-tête */}
-      <div className="p-4 border-b border-white/20 dark:border-gray-700/50 backdrop-blur-sm">
+      <div className="p-4 border-b border-white/30 dark:border-gray-700/30">
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push('/')}
-            className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
+            className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
             title="Retour à l'accueil"
           >
-            <span className="text-white font-bold text-sm">C</span>
+            <span className="text-white font-bold text-lg">C</span>
           </button>
           {!collapsedProp && (
             <motion.div
@@ -391,13 +346,44 @@ export default function ModularNavigation({
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.2, delay: 0.1 }}
             >
-              <h1 className="text-lg font-bold text-gray-900 dark:text-white">CubeAI</h1>
-              <p className="text-xs text-gray-600 dark:text-gray-300">
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">CubeAI</h1>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {isChild ? 'Espace Enfant' : 'Espace Parent'}
               </p>
             </motion.div>
           )}
         </div>
+      </div>
+
+      {/* Onglet Bubix Spécial */}
+      <div className="px-2 pb-4">
+        <motion.button
+          onClick={() => onTabChange('bubix')}
+          className={`w-full ${collapsedProp ? 'p-3' : 'p-4'} bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95`}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <div className={`flex items-center ${collapsedProp ? 'justify-center' : 'gap-3'}`}>
+            <div className="relative">
+              <MessageCircle className={`${collapsedProp ? 'w-7 h-7' : 'w-6 h-6'} text-white`} />
+              {!collapsedProp && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+              )}
+            </div>
+            {!collapsedProp && (
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2, delay: 0.1 }}
+                className="text-left"
+              >
+                <div className="text-white font-bold text-sm">Bubix</div>
+                <div className="text-purple-100 text-xs">Assistant IA</div>
+              </motion.div>
+            )}
+          </div>
+        </motion.button>
       </div>
 
       {/* Navigation */}
@@ -407,17 +393,17 @@ export default function ModularNavigation({
             {/* En-tête de section */}
             <button
               onClick={() => toggleSection(section.id)}
-              className="w-full flex items-center justify-between p-2 text-gray-700 dark:text-gray-200 hover:bg-white/50 dark:hover:bg-gray-800/50 rounded-lg transition-all duration-200 backdrop-blur-sm"
+              className="w-full flex items-center justify-between p-3 text-gray-700 dark:text-gray-200 hover:bg-white/60 dark:hover:bg-gray-800/60 rounded-xl transition-all duration-200"
             >
-              <div className="flex items-center gap-2">
-                <section.icon className="w-4 h-4 text-gray-800 dark:text-gray-100" />
+              <div className="flex items-center gap-3">
+                <section.icon className="w-5 h-5 text-gray-800 dark:text-gray-100" />
                 {!collapsedProp && (
                   <motion.span 
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -10 }}
                     transition={{ duration: 0.2, delay: 0.1 }}
-                    className="text-sm font-medium"
+                    className="text-sm font-semibold"
                   >
                     {section.title}
                   </motion.span>
@@ -444,20 +430,20 @@ export default function ModularNavigation({
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="ml-2 space-y-1"
+                className={`${collapsedProp ? 'space-y-2' : 'ml-2 space-y-1'}`}
               >
                 {section.items.map((item) => (
                   <button
                     key={item.id}
                     onClick={() => onTabChange(item.id)}
                     disabled={!item.available}
-                    className={`w-full flex items-center gap-3 p-2 rounded-lg transition-all duration-200 backdrop-blur-sm ${
+                    className={`w-full flex items-center ${collapsedProp ? 'justify-center p-2' : 'gap-3 p-3'} rounded-xl transition-all duration-200 ${
                       activeTab === item.id
                         ? 'bg-blue-500/20 dark:bg-blue-400/20 text-blue-800 dark:text-blue-200 border border-blue-300/30 dark:border-blue-500/30'
-                        : 'text-gray-700 dark:text-gray-200 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                        : 'text-gray-700 dark:text-gray-200 hover:bg-white/60 dark:hover:bg-gray-800/60'
                     } ${!item.available ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                   >
-                    <item.icon className={`w-4 h-4 flex-shrink-0 ${
+                    <item.icon className={`${collapsedProp ? 'w-6 h-6' : 'w-5 h-5'} flex-shrink-0 ${
                       activeTab === item.id 
                         ? 'text-blue-700 dark:text-blue-300' 
                         : 'text-gray-800 dark:text-gray-100'
@@ -473,17 +459,17 @@ export default function ModularNavigation({
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium">{item.label}</span>
                           {item.isNew && (
-                            <span className="px-1.5 py-0.5 bg-green-500/20 text-green-700 dark:text-green-300 text-xs rounded-full backdrop-blur-sm border border-green-300/30">
+                            <span className="px-2 py-1 bg-green-500/20 text-green-700 dark:text-green-300 text-xs rounded-full border border-green-300/30">
                               Nouveau
                             </span>
                           )}
                           {item.badge && (
-                            <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-700 dark:text-blue-300 text-xs rounded-full backdrop-blur-sm border border-blue-300/30">
+                            <span className="px-2 py-1 bg-blue-500/20 text-blue-700 dark:text-blue-300 text-xs rounded-full border border-blue-300/30">
                               {item.badge}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-gray-600 dark:text-gray-300">
+                        <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
                           {item.description}
                         </p>
                       </motion.div>
@@ -497,7 +483,7 @@ export default function ModularNavigation({
       </div>
 
       {/* Pied de page */}
-      <div className="p-4 border-t border-white/20 dark:border-gray-700/50 backdrop-blur-sm">
+      <div className="p-4 border-t border-white/30 dark:border-gray-700/30">
         {!collapsedProp && user && (
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
@@ -506,11 +492,11 @@ export default function ModularNavigation({
             transition={{ duration: 0.2, delay: 0.1 }}
             className="flex items-center gap-3 mb-4"
           >
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-lg">
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-white text-sm font-semibold shadow-lg">
               {user.firstName.charAt(0)}
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">
                 {user.firstName} {user.lastName}
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-300">
@@ -520,21 +506,21 @@ export default function ModularNavigation({
           </motion.div>
         )}
         
-        <div className="flex items-center justify-between">
+        <div className={`flex items-center ${collapsedProp ? 'justify-center' : 'justify-between'}`}>
           <motion.button
             onClick={() => onCollapsedChange?.(!collapsedProp)}
-            className="p-3 text-gray-800 dark:text-gray-100 hover:bg-white/50 dark:hover:bg-gray-800/50 rounded-lg transition-all duration-200 backdrop-blur-sm"
+            className={`${collapsedProp ? 'p-2 justify-center' : 'p-3'} flex items-center text-gray-800 dark:text-gray-100 hover:bg-white/60 dark:hover:bg-gray-800/60 rounded-xl transition-all duration-200`}
             title={collapsedProp ? 'Développer' : 'Réduire'}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <ChevronRight className={`w-5 h-5 transition-transform ${collapsedProp ? '' : 'rotate-180'}`} />
+            <ChevronRight className={`${collapsedProp ? 'w-6 h-6' : 'w-5 h-5'} transition-transform ${collapsedProp ? '' : 'rotate-180'}`} />
           </motion.button>
           
           {!collapsedProp && (
             <motion.button
               onClick={handleLogout}
-              className="p-3 text-gray-800 dark:text-gray-100 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-all duration-200 backdrop-blur-sm"
+              className="p-3 text-gray-800 dark:text-gray-100 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 rounded-xl transition-all duration-200"
               title="Déconnexion"
               initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
