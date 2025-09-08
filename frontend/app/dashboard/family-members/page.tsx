@@ -205,34 +205,8 @@ export default function FamilyMembersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Navigation */}
-      <nav className="bg-white/90 border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => router.push('/')}
-                className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center hover:shadow-xl transition-all duration-200 cursor-pointer"
-                title="Accueil"
-              >
-                <span className="font-title text-white text-2xl">C</span>
-              </button>
-              <CubeAILogo className="text-4xl" />
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="font-body text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100">
-                Tableau de bord
-              </Link>
-              <Link href="/login" className="font-button bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105">
-                Se connecter
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="absolute inset-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
+      <div className="h-full overflow-y-auto p-4 md:p-5 lg:p-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Gestion des membres de famille</h1>
           <p className="text-gray-600">Ajoutez et gérez les membres de votre famille selon votre plan d'abonnement</p>

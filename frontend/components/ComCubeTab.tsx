@@ -130,35 +130,37 @@ export default function ComCubeTab({
   }
 
   return (
-    <div className="space-y-6">
-      {/* En-tête de la communauté */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-            <Globe className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Communauté CubeAI</h1>
-            <p className="text-gray-600">Connectez-vous avec d'autres parents et partagez vos expériences</p>
-          </div>
-        </div>
-        
-        {/* Statistiques de la communauté */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-xl p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">{communityStats?.totalMembers}</div>
-            <div className="text-sm text-gray-600">Membres</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">{communityStats?.activeToday}</div>
-            <div className="text-sm text-gray-600">Actifs aujourd'hui</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">{communityStats?.totalPosts}</div>
-            <div className="text-sm text-gray-600">Publications</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 text-center">
-            <div className="text-2xl font-bold text-pink-600">{communityStats?.totalLikes}</div>
+    <div className="absolute inset-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
+      <div className="h-full overflow-y-auto p-4 md:p-5 lg:p-6">
+        <div className="space-y-6">
+          {/* En-tête de la communauté */}
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl p-6">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                <Globe className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Communauté CubeAI</h1>
+                <p className="text-gray-600 dark:text-gray-300">Connectez-vous avec d'autres parents et partagez vos expériences</p>
+              </div>
+            </div>
+            
+            {/* Statistiques de la communauté */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{communityStats?.totalMembers}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Membres</div>
+              </div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 text-center">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">{communityStats?.activeToday}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Actifs aujourd'hui</div>
+              </div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 text-center">
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{communityStats?.totalPosts}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Publications</div>
+              </div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 text-center">
+                <div className="text-2xl font-bold text-pink-600 dark:text-pink-400">{communityStats?.totalLikes}</div>
             <div className="text-sm text-gray-600">J'aime</div>
           </div>
         </div>
@@ -279,6 +281,8 @@ export default function ComCubeTab({
             <Bell className="w-6 h-6 text-orange-600" />
             <span className="text-sm font-medium">Notifications</span>
           </button>
+        </div>
+      </div>
         </div>
       </div>
     </div>

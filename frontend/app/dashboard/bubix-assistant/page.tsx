@@ -94,35 +94,37 @@ export default function BubixAssistantPage({
   }
 
   return (
-    <div className="space-y-6">
-      {/* En-tête */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center"
-      >
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full">
-            <MessageCircle className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Bubix Assistant IA
-          </h1>
-        </div>
-        <p className="text-gray-600">
-          {isChild 
-            ? "Votre assistant personnel pour l'apprentissage" 
-            : "Assistant IA pour le suivi pédagogique de vos enfants"
-          }
-        </p>
-      </motion.div>
+    <div className="absolute inset-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
+      <div className="h-full overflow-y-auto p-4 md:p-5 lg:p-6">
+        <div className="space-y-6">
+          {/* En-tête */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full">
+                <MessageCircle className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                Bubix Assistant IA
+              </h1>
+            </div>
+            <p className="text-gray-600 dark:text-gray-300">
+              {isChild 
+                ? "Votre assistant personnel pour l'apprentissage" 
+                : "Assistant IA pour le suivi pédagogique de vos enfants"
+              }
+            </p>
+          </motion.div>
 
-      {/* Statistiques Bubix */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="grid grid-cols-2 md:grid-cols-4 gap-4"
+          {/* Statistiques Bubix */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-4"
       >
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
@@ -432,6 +434,8 @@ export default function BubixAssistantPage({
           />
         </motion.div>
       )}
+        </div>
+      </div>
     </div>
   )
 }

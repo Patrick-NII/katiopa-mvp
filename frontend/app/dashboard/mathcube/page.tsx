@@ -20,8 +20,13 @@ import {
   User
 } from 'lucide-react'
 import Link from 'next/link'
+import { useModals } from '@/hooks/useModals'
 
-export default function MathCubePage() {
+interface MathCubePageProps {
+  onOpenCubeMatch?: () => void
+}
+
+export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps = {}) {
   const [currentLevel, setCurrentLevel] = useState(1)
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
@@ -32,6 +37,18 @@ export default function MathCubePage() {
   const [top10Players, setTop10Players] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [userRanking, setUserRanking] = useState<number | null>(null)
+
+  // Hook pour les modals (fallback si pas de props)
+  const { openCubeMatchModal } = useModals()
+  
+  // Fonction pour ouvrir CubeMatch (props ou fallback)
+  const handleOpenCubeMatch = () => {
+    if (onOpenCubeMatch) {
+      onOpenCubeMatch()
+    } else {
+      openCubeMatchModal()
+    }
+  }
 
   // Fonction pour charger les statistiques utilisateur
   const loadUserStats = async () => {
@@ -258,13 +275,13 @@ export default function MathCubePage() {
 
           {/* Bouton de jeu principal */}
           <div className="text-center">
-            <Link 
-              href="/dashboard/mathcube/cubematch" 
+            <button 
+              onClick={handleOpenCubeMatch}
               className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 md:px-10 lg:px-12 py-4 sm:py-5 md:py-6 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-xl sm:rounded-2xl font-bold text-lg sm:text-xl hover:from-emerald-600 hover:to-blue-600 transition-all duration-300 transform hover:scale-105 shadow-xl"
             >
               <Play className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
               <span className="text-sm sm:text-base md:text-lg lg:text-xl">Jouer maintenant</span>
-            </Link>
+            </button>
           </div>
         </div>
       </div>

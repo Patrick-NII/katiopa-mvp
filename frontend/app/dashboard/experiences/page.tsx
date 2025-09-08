@@ -175,36 +175,38 @@ export default function ExperiencesPage({ user, userType }: ExperiencesPageProps
   ]
 
   return (
-    <div className="space-y-6">
-      {/* En-tête */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center"
-      >
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Mes Expériences d'Apprentissage 🎯
-        </h1>
-        <p className="text-gray-600">
-          {isChild 
-            ? "Explorez, apprenez et progressez à votre rythme !" 
-            : "Suivez les expériences d'apprentissage de vos enfants"
-          }
-        </p>
-      </motion.div>
+    <div className="absolute inset-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
+      <div className="h-full overflow-y-auto p-4 md:p-5 lg:p-6">
+        <div className="space-y-6">
+          {/* En-tête */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Mes Expériences d'Apprentissage 🎯
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300">
+              {isChild 
+                ? "Explorez, apprenez et progressez à votre rythme !" 
+                : "Suivez les expériences d'apprentissage de vos enfants"
+              }
+            </p>
+          </motion.div>
 
-      {/* Cycle d'apprentissage hebdomadaire */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-      >
-        <WeeklyCycle
-          childName={user?.firstName || 'Utilisateur'}
-          currentDay={new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()}
-          interactive={isChild}
-        />
-      </motion.div>
+          {/* Cycle d'apprentissage hebdomadaire */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <WeeklyCycle
+              childName={user?.firstName || 'Utilisateur'}
+              currentDay={new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()}
+              interactive={isChild}
+            />
+          </motion.div>
 
       {/* Recommandations du jour */}
       <motion.div
@@ -404,6 +406,8 @@ export default function ExperiencesPage({ user, userType }: ExperiencesPageProps
           <div className="text-sm text-gray-600">Score moyen</div>
         </div>
       </motion.div>
+        </div>
+      </div>
     </div>
   )
 }

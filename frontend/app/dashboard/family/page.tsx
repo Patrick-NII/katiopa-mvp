@@ -66,35 +66,37 @@ export default function FamilyPage({ user, childSessions }: FamilyPageProps) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* En-tête */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-      >
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Gestion Familiale 👨‍👩‍👧‍👦
-          </h1>
-          <p className="text-gray-600">
-            Suivez et gérez les comptes de vos enfants
-          </p>
-        </div>
-        
-        <button
-          onClick={handleAddChild}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-        >
-          <UserPlus className="w-4 h-4" />
-          Ajouter un enfant
-        </button>
-      </motion.div>
+    <div className="absolute inset-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
+      <div className="h-full overflow-y-auto p-4 md:p-5 lg:p-6">
+        <div className="space-y-6">
+          {/* En-tête */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+          >
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                Gestion Familiale 👨‍👩‍👧‍👦
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300">
+                Suivez et gérez les comptes de vos enfants
+              </p>
+            </div>
+            
+            <button
+              onClick={handleAddChild}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+            >
+              <UserPlus className="w-4 h-4" />
+              Ajouter un enfant
+            </button>
+          </motion.div>
 
-      {/* Statistiques familiales */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+          {/* Statistiques familiales */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className="grid grid-cols-2 md:grid-cols-4 gap-4"
       >
@@ -330,6 +332,8 @@ export default function FamilyPage({ user, childSessions }: FamilyPageProps) {
           })()}
         </motion.div>
       )}
+        </div>
+      </div>
     </div>
   )
 }

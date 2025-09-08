@@ -21,6 +21,7 @@ import { useModals } from '@/hooks/useModals'
 import ModalSystem from '../modals/ModalSystem'
 import BubixDedicatedWindow from '../bubix/BubixDedicatedWindow'
 import BubixChildWindow from '../bubix/BubixChildWindow'
+import CubeMatchModal from '../modals/CubeMatchModal'
 
 // Import des pages des cubes existantes
 import MathCubePage from '../../app/dashboard/mathcube/page'
@@ -61,7 +62,7 @@ export default function ModularDashboard() {
   const [isMobile, setIsMobile] = useState(false)
   
   // Hook pour les modals
-  const { modals, modalStates, closeModal, minimizeModal, maximizeModal, updateModal } = useModals()
+  const { modals, modalStates, closeModal, minimizeModal, maximizeModal, updateModal, openCubeMatchModal } = useModals()
 
   // Fonction pour gérer les changements d'onglets
   const handleTabChange = (tabId: string) => {
@@ -209,7 +210,7 @@ export default function ModularDashboard() {
       
       // Pages des cubes d'apprentissage
       case 'mathcube':
-        return <MathCubePage />
+        return <MathCubePage onOpenCubeMatch={openCubeMatchModal} />
       case 'codecube':
         return <CodeCubePage />
       case 'playcube':
@@ -301,6 +302,23 @@ export default function ModularDashboard() {
           modalStates={modalStates}
           onModalChange={(id, updates) => updateModal(id, updates)}
         />
+        
+        {/* CubeMatch Modal */}
+        {modalStates.cubematch && (
+          <CubeMatchModal
+            isOpen={modalStates.cubematch.isOpen}
+            onClose={() => closeModal('cubematch')}
+            onMinimize={() => minimizeModal('cubematch')}
+            onMaximize={() => maximizeModal('cubematch')}
+            onFullscreen={() => updateModal('cubematch', { isFullscreen: true, isMaximized: false })}
+            isMinimized={modalStates.cubematch.isMinimized}
+            isMaximized={modalStates.cubematch.isMaximized}
+            isFullscreen={modalStates.cubematch.isFullscreen}
+            zIndex={modalStates.cubematch.zIndex}
+            position={modalStates.cubematch.position}
+            size={modalStates.cubematch.size}
+          />
+        )}
       </div>
     </AvatarProvider>
   )
