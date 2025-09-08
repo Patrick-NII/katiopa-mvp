@@ -78,34 +78,36 @@ export default function AnalyticsPage({ user, childSessions }: AnalyticsPageProp
   }, [timeRange, selectedChild])
 
   return (
-    <div className="space-y-6">
-      {/* En-tête */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-      >
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Analytics & Statistiques
-          </h1>
-          <p className="text-gray-600">
-            Suivi détaillé des performances et de la progression
-          </p>
-        </div>
-        
-        <div className="flex gap-2">
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value as any)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    <div className="absolute inset-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
+      <div className="h-full overflow-y-auto p-4 md:p-5 lg:p-6">
+        <div className="space-y-6">
+          {/* En-tête */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
           >
-            {timeRangeOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                Analytics & Statistiques
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300">
+                Suivi détaillé des performances et de la progression
+              </p>
+            </div>
+            
+            <div className="flex gap-2">
+              <select
+                value={timeRange}
+                onChange={(e) => setTimeRange(e.target.value as any)}
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+              >
+                {timeRangeOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
           
           <button
             onClick={loadAnalytics}
@@ -318,6 +320,8 @@ export default function AnalyticsPage({ user, childSessions }: AnalyticsPageProp
           </div>
         </motion.div>
       )}
+        </div>
+      </div>
     </div>
   )
 }

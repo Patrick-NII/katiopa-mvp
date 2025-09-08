@@ -24,31 +24,32 @@ export default function ScienceCubePage() {
   const [streak, setStreak] = useState(0)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-100 p-6 relative overflow-hidden">
-      <DecorativeCubes variant="default" />
-      {/* En-tête ScienceCube */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg mb-4">
-          <Lightbulb className="w-6 h-6 mr-2" />
-          <span className="font-bold text-xl">ScienceCube</span>
-        </div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          Découvertes Scientifiques
-        </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Explore le monde fascinant des sciences ! Découvre la nature, l'espace et les phénomènes qui nous entourent.
-        </p>
-      </div>
-
-      {/* Statistiques rapides */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
-          <div className="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Target className="w-6 h-6 text-cyan-600" />
+    <div className="absolute inset-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
+      <div className="h-full overflow-y-auto p-4 md:p-5 lg:p-6">
+        <DecorativeCubes variant="default" />
+        {/* En-tête ScienceCube */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg mb-4">
+            <Lightbulb className="w-6 h-6 mr-2" />
+            <span className="font-bold text-xl">ScienceCube</span>
           </div>
-          <p className="text-sm font-medium text-gray-600">Niveau actuel</p>
-          <p className="text-2xl font-bold text-gray-900">{currentLevel}</p>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            Découvertes Scientifiques
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            Explore le monde fascinant des sciences ! Découvre la nature, l'espace et les phénomènes qui nous entourent.
+          </p>
         </div>
+
+        {/* Statistiques rapides */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 text-center">
+            <div className="w-12 h-12 bg-cyan-100 dark:bg-cyan-900/20 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Target className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
+            </div>
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Niveau actuel</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{currentLevel}</p>
+          </div>
 
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
           <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -311,6 +312,7 @@ export default function ScienceCubePage() {
             <p className="text-xs text-gray-400">Niveau 2</p>
           </div>
         </div>
+      </div>
       </div>
     </div>
   )

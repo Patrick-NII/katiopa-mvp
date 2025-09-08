@@ -8,6 +8,7 @@ export interface UseModalsReturn {
   modalStates: Record<string, ModalState>
   openModal: (modal: ModalProps) => void
   openBubixModal: () => void
+  openCubeMatchModal: () => void
   closeModal: (id: string) => void
   updateModal: (id: string, updates: Partial<ModalState>) => void
   minimizeModal: (id: string) => void
@@ -108,6 +109,37 @@ export const useModals = (): UseModalsReturn => {
     }))
   }, [])
 
+  const openCubeMatchModal = useCallback(() => {
+    setModals(prev => {
+      const exists = prev.find(m => m.id === 'cubematch')
+      if (exists) return prev
+      return [...prev, {
+        id: 'cubematch',
+        title: 'CubeMatch',
+        size: 'large',
+        component: 'CubeMatchModal'
+      }]
+    })
+
+    const cubematchSize = { width: 900, height: 700 }
+    const centerPosition = getDefaultPosition(cubematchSize)
+
+    setModalStates(prev => ({
+      ...prev,
+      cubematch: {
+        isOpen: true,
+        isMinimized: false,
+        isMaximized: false,
+        isFullscreen: false,
+        position: centerPosition,
+        size: cubematchSize,
+        originalSize: cubematchSize,
+        originalPosition: centerPosition,
+        zIndex: 1000 + Object.keys(prev).length
+      }
+    }))
+  }, [])
+
   const closeModal = useCallback((id: string) => {
     setModals(prev => prev.filter(m => m.id !== id))
     setModalStates(prev => {
@@ -149,6 +181,7 @@ export const useModals = (): UseModalsReturn => {
     modalStates,
     openModal,
     openBubixModal,
+    openCubeMatchModal,
     closeModal,
     updateModal,
     minimizeModal,
