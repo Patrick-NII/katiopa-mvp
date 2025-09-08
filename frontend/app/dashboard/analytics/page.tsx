@@ -87,7 +87,7 @@ export default function AnalyticsPage({ user, childSessions }: AnalyticsPageProp
       >
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Analytics & Statistiques 📊
+            Analytics & Statistiques
           </h1>
           <p className="text-gray-600">
             Suivi détaillé des performances et de la progression

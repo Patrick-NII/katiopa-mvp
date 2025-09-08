@@ -34,7 +34,7 @@ export default function DreamCubePage() {
           <span className="font-bold text-xl">DreamCube</span>
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          💫 Espace de Rêve & Objectifs
+          Espace de Rêve & Objectifs
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Rêve grand et fixe-toi des objectifs ! Découvre des métiers passionnants et construis ton avenir.

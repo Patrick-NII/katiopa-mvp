@@ -32,7 +32,7 @@ export default function PlayCubePage() {
           <span className="font-bold text-xl">PlayCube</span>
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          🎮 Jeux de Détente & Éducatifs
+          Jeux de Détente & Éducatifs
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Amuse-toi tout en apprenant ! Découvre des jeux captivants qui stimulent ton cerveau.

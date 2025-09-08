@@ -33,7 +33,7 @@ export default function ScienceCubePage() {
           <span className="font-bold text-xl">ScienceCube</span>
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          🔬 Découvertes Scientifiques
+          Découvertes Scientifiques
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Explore le monde fascinant des sciences ! Découvre la nature, l'espace et les phénomènes qui nous entourent.

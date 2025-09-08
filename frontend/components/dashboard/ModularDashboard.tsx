@@ -12,12 +12,14 @@ import BubixTab from '../BubixTab'
 import SettingsTab from '../SettingsTab'
 import SettingsTabNoScroll from '../settings/SettingsTabNoScroll'
 import AnalyticsPageNoScroll from '../analytics/AnalyticsPageNoScroll'
-import { SubscriptionTab } from '../SubscriptionTab'
-import { BillingTab } from '../BillingTab'
+import SubscriptionBillingPage from '../subscription/SubscriptionBillingPage'
 import FamilyMembersTab from '../FamilyMembersTab'
 import { authAPI, statsAPI } from '@/lib/api'
 import DecorativeCubes from '../DecorativeCubes'
 import { AvatarProvider } from '@/contexts/AvatarContext'
+import { useModals } from '@/hooks/useModals'
+import ModalSystem from '../modals/ModalSystem'
+import BubixDedicatedWindow from '../bubix/BubixDedicatedWindow'
 
 // Import des pages des cubes existantes
 import MathCubePage from '../../app/dashboard/mathcube/page'
@@ -56,6 +58,14 @@ export default function ModularDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [childSessions, setChildSessions] = useState<any[]>([])
   const [isMobile, setIsMobile] = useState(false)
+  
+  // Hook pour les modals
+  const { modals, modalStates, closeModal, minimizeModal, maximizeModal, updateModal } = useModals()
+
+  // Fonction pour gérer les changements d'onglets
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId)
+  }
 
   // Chargement des données
   const loadData = async () => {
@@ -169,7 +179,7 @@ export default function ModularDashboard() {
             user={user}
             userType={user.userType as 'CHILD' | 'PARENT'}
             childSessions={childSessions}
-            onNavigate={setActiveTab}
+            onNavigate={handleTabChange}
           />
         )
       
@@ -213,21 +223,15 @@ export default function ModularDashboard() {
       // Pages de gestion (parents uniquement)
       case 'bubix':
         return (
-          <BubixTab 
+          <BubixDedicatedWindow 
             user={user}
-            childSessions={childSessions}
             userType={user.userType as 'CHILD' | 'PARENT'}
-            subscriptionType={user.subscriptionType}
           />
         )
       case 'reglages':
         return <SettingsTabNoScroll userType={user.userType as 'CHILD' | 'PARENT' | 'TEACHER' | 'ADMIN'} />
       case 'abonnements':
-        return <SubscriptionTab user={user} />
-      case 'family-members':
-        return <FamilyMembersTab />
-      case 'facturation':
-        return <BillingTab user={user} />
+        return <SubscriptionBillingPage user={user} />
       
       default:
         return (
@@ -235,7 +239,7 @@ export default function ModularDashboard() {
             user={user}
             userType={user.userType as 'CHILD' | 'PARENT'}
             childSessions={childSessions}
-            onNavigate={setActiveTab}
+            onNavigate={handleTabChange}
           />
         )
     }
@@ -249,7 +253,7 @@ export default function ModularDashboard() {
         {/* Sidebar de navigation modulaire */}
         <ModularNavigation
           activeTab={activeTab as any}
-          onTabChange={setActiveTab}
+          onTabChange={handleTabChange}
           userSubscriptionType={user?.subscriptionType || 'FREE'}
           userType={user?.userType as any}
           collapsed={sidebarCollapsed}
@@ -284,6 +288,13 @@ export default function ModularDashboard() {
             )}
           </main>
         </motion.div>
+        
+        {/* Système de modals */}
+        <ModalSystem
+          modals={modals}
+          modalStates={modalStates}
+          onModalChange={(id, updates) => updateModal(id, updates)}
+        />
       </div>
     </AvatarProvider>
   )
