@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Lock, Eye, EyeOff, ArrowRight, User as UserIcon, LogOut } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, ArrowRight, User as UserIcon, LogOut, Home } from 'lucide-react';
 import { authAPI } from '@/lib/api';
 import Navbar from '@/components/NavBar';
 import DecorativeCubes from '@/components/DecorativeCubes';
@@ -167,6 +167,17 @@ export default function LoginPage() {
               <a href="/forgot-password" className="flex items-center justify-center space-x-2 text-sm md:text-base text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">
                 <UserIcon className="h-4 w-4" />
                 <span>Mot de passe oublié ?</span>
+              </a>
+            </div>
+
+            {/* Bouton retour landing page */}
+            <div className="text-center pt-4 border-t border-gray-200 dark:border-gray-600">
+              <a 
+                href="/" 
+                className="inline-flex items-center space-x-2 text-sm md:text-base text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 font-medium transition-colors"
+              >
+                <Home className="h-4 w-4" />
+                <span>Retour à l'accueil</span>
               </a>
             </div>
 

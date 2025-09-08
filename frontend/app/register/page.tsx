@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   User, Mail, Lock, Eye, EyeOff, Check, ArrowRight, ArrowLeft, Plus, X, Users, Gift, Star, Sparkles,
-  CreditCard, ShieldCheck, Edit3, WalletMinimal, Tags, Apple, Landmark, CircleCheck, Info
+  CreditCard, ShieldCheck, Edit3, WalletMinimal, Tags, Apple, Landmark, CircleCheck, Info, Home
 } from 'lucide-react'
 import Link from 'next/link'
 import { authAPI } from '@/lib/api'
@@ -1699,9 +1699,22 @@ const SummarySidebar = () => {
                   <p className="text-xl text-gray-600 mb-10 leading-relaxed">
                     Votre compte a été créé. Nous vous avons envoyé un email de confirmation et un mail de bienvenue avec les identifiants de connexion pour chaque session.
                   </p>
-                  <motion.button onClick={handleGoToLogin} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-12 py-4 rounded-xl !font-semibold transition-all shadow-lg hover:shadow-xl">
-                    <span className="!text-white !font-semibold">Aller à la connexion</span>
-                  </motion.button>
+                  <div className="space-y-4">
+                    <motion.button onClick={handleGoToLogin} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-12 py-4 rounded-xl !font-semibold transition-all shadow-lg hover:shadow-xl">
+                      <span className="!text-white !font-semibold">Aller à la connexion</span>
+                    </motion.button>
+                    
+                    {/* Bouton retour landing page */}
+                    <div className="text-center pt-4 border-t border-gray-200">
+                      <a 
+                        href="/" 
+                        className="inline-flex items-center space-x-2 text-sm text-gray-500 hover:text-gray-700 font-medium transition-colors"
+                      >
+                        <Home className="h-4 w-4" />
+                        <span>Retour à l'accueil</span>
+                      </a>
+                    </div>
+                  </div>
                 </motion.div>
               </div>
             </motion.div>
