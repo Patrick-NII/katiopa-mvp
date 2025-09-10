@@ -449,8 +449,8 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps = {}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Commentaires - Colonne principale */}
               <div className="lg:col-span-2">
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                  <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Commentaires</h4>
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 ">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-4"></h4>
                   
                   {/* Ajouter un commentaire */}
                   <div className="mb-4">
@@ -502,8 +502,8 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps = {}
 
               {/* Classement - Colonne droite */}
               <div className="lg:col-span-1">
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Classement</h3>
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4"></h3>
                   
                   {/* En-tête du tableau */}
                   <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-2 mb-3">
