@@ -58,6 +58,9 @@ model UserSession {
   passwordResetTokens       PasswordResetToken[]
   performanceMetrics        PerformanceMetric[]
   userInteractions          UserInteraction[]
+  exerciseAttempts          ExerciseAttempt[]
+  competenceAssessments     CompetenceAssessment[]
+  bubixAnalyses             BubixAnalysis[]
   profile                   UserProfile?
   userPrompts               UserPrompt[]
   account                   Account                    @relation(fields: [accountId], references: [id])
@@ -742,6 +745,108 @@ enum Gender {
   MALE
   FEMALE
   UNKNOWN
+}
+
+enum CompetenceType {
+  MATHEMATIQUES
+  PROGRAMMATION
+  CREATIVITE
+  COLLABORATION
+  CONCENTRATION
+  RESOLUTION_PROBLEMES
+  COMMUNICATION
+  CONNAISSANCES_GENERALES
+  SENS_CRITIQUE
+  REFLEXION_LOGIQUE
+}
+
+enum ExerciseType {
+  QUIZ
+  INTERACTIF
+  CREATIF
+  COLLABORATIF
+  REFLEXION
+  PRATIQUE
+}
+
+model Competence {
+  id          String         @id @default(cuid())
+  type        CompetenceType @unique
+  name        String
+  description String
+  icon        String?
+  color       String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  exercises   Exercise[]
+  assessments CompetenceAssessment[]
+  bubixAnalyses BubixAnalysis[]
+}
+
+model Exercise {
+  id           String         @id @default(cuid())
+  competenceId String
+  title        String
+  description  String
+  type         ExerciseType
+  difficulty   Int            @default(1) // 1-5
+  estimatedTime Int           @default(10) // minutes
+  instructions Json?          // Instructions détaillées
+  content      Json?          // Contenu de l'exercice
+  solution     Json?          // Solution/réponse attendue
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  competence   Competence     @relation(fields: [competenceId], references: [id])
+  attempts     ExerciseAttempt[]
+
+  @@unique([competenceId, title])
+}
+
+model ExerciseAttempt {
+  id           String    @id @default(cuid())
+  exerciseId   String
+  userSessionId String
+  score        Float     @default(0) // Score obtenu (0-100)
+  timeSpent    Int       @default(0) // Temps passé en secondes
+  answers      Json?     // Réponses données
+  feedback     Json?     // Feedback reçu
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  exercise     Exercise  @relation(fields: [exerciseId], references: [id])
+  userSession  UserSession @relation(fields: [userSessionId], references: [id])
+}
+
+model CompetenceAssessment {
+  id           String    @id @default(cuid())
+  competenceId String
+  userSessionId String
+  score        Float     @default(0) // Score global de la compétence (0-10)
+  level        String    @default("Débutant") // Niveau atteint
+  progress     Float     @default(0) // Progression (0-100)
+  lastUpdated  DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  competence   Competence @relation(fields: [competenceId], references: [id])
+  userSession  UserSession @relation(fields: [userSessionId], references: [id])
+
+  @@unique([competenceId, userSessionId])
+}
+
+model BubixAnalysis {
+  id           String    @id @default(cuid())
+  userSessionId String
+  competenceId String
+  analysis     String    // Analyse générée par Bubix
+  recommendations Json?  // Recommandations
+  date         DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  userSession  UserSession @relation(fields: [userSessionId], references: [id])
+  competence   Competence @relation(fields: [competenceId], references: [id])
+
+  @@unique([userSessionId, competenceId, date]) // Max 1 analyse par jour par compétence
 }
 
 enum UserType {

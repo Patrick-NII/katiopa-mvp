@@ -22,7 +22,7 @@ interface AnalyticsPageProps {
   childSessions: any[]
 }
 
-export default function AnalyticsPage({ user, childSessions }: AnalyticsPageProps) {
+function AnalyticsPage({ user, childSessions }: AnalyticsPageProps) {
   const [selectedChild, setSelectedChild] = useState<string | null>(null)
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'quarter'>('week')
   const [loading, setLoading] = useState(false)
@@ -252,7 +252,10 @@ export default function AnalyticsPage({ user, childSessions }: AnalyticsPageProp
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">
                   {child.firstName} {child.lastName}
                 </h4>
-                <CommunicationAnalytics childSessionId={child.id} />
+                <CommunicationAnalytics 
+                  childSessionId={child.id} 
+                  childName={`${child.firstName} ${child.lastName}`}
+                />
               </div>
             ))}
           </div>
@@ -324,4 +327,30 @@ export default function AnalyticsPage({ user, childSessions }: AnalyticsPageProp
       </div>
     </div>
   )
+}
+
+export default function AnalyticsPageWrapper() {
+  // Données simulées pour la page analytics
+  const user = {
+    firstName: 'Parent',
+    lastName: 'Test',
+    userType: 'PARENT'
+  }
+  
+  const childSessions = [
+    {
+      id: 'milan',
+      firstName: 'Milan',
+      lastName: 'Test',
+      age: 8
+    },
+    {
+      id: 'aylon',
+      firstName: 'Aylon',
+      lastName: 'Test',
+      age: 10
+    }
+  ]
+
+  return <AnalyticsPage user={user} childSessions={childSessions} />
 }

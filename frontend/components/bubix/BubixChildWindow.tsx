@@ -6,6 +6,7 @@ import {
   MessageCircle, Send, Bot, User, ChevronLeft, ChevronRight, Settings, History, Star, Search,
   Plus, Calculator, BookOpen, Globe, Lightbulb, Palette, Microscope, Users, Zap, Heart, Code, Gamepad2, Archive
 } from 'lucide-react'
+import { useRadarDataContext } from '../../contexts/RadarDataContext'
 
 interface Message {
   id: string
@@ -40,6 +41,15 @@ const LIVE_SUBJECTS = [
 ]
 
 export default function BubixChildWindow({ user, userType }: BubixChildWindowProps) {
+  // Utiliser le contexte pour accéder aux données du radar (optionnel)
+  let radarData = null
+  try {
+    radarData = useRadarDataContext()
+  } catch (error) {
+    // Le contexte n'est pas disponible, ce n'est pas grave
+    console.log('RadarDataContext non disponible dans BubixChildWindow')
+  }
+  
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -84,33 +94,59 @@ export default function BubixChildWindow({ user, userType }: BubixChildWindowPro
     setNewMessage('')
     setIsTyping(true)
 
-    // Simulation de réponse de Bubix adaptée au sujet
-    setTimeout(() => {
-      const subjectResponses = {
-        'mathcube-live': `Super question ! En mathématiques, c'est important de comprendre le concept. Laisse-moi t'expliquer de manière simple...`,
-        'histoires-live': `Excellente question historique ! L'histoire est comme une grande aventure. Voici ce que je peux te raconter...`,
-        'geo-live': `Génial ! La géographie, c'est découvrir notre belle planète. Regardons ensemble...`,
-        'reflexion-live': `Très bonne réflexion ! Réfléchir, c'est comme faire du sport avec son cerveau. Analysons cela...`,
-        'creativite-live': `Fantastique ! La créativité, c'est magique. Créons quelque chose d'extraordinaire ensemble...`,
-        'sciencecube-live': `Incroyable ! La science, c'est comme être un petit détective. Explorons ce mystère...`,
-        'codecube-live': `Excellent ! La programmation, c'est comme donner des instructions à un robot. Programmons ensemble...`,
-        'playcube-live': `Super ! Jouer et apprendre, c'est le meilleur ! Amusons-nous en apprenant...`
+    try {
+      // Connexion à la vraie API Bubix avec les données du radar
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          messages: [...messages, userMessage].map(msg => ({
+            id: msg.id,
+            text: msg.content,
+            sender: msg.sender === 'bubix' ? 'bot' : 'user',
+            timestamp: msg.timestamp.getTime()
+          })),
+          persona: 'kid',
+          lang: 'fr',
+          user,
+          childSessions: [],
+                      radarData: radarData ? {
+                        profiles: radarData.profiles,
+                        focusedCompetence: radarData.focusedCompetence,
+                        selectedChildId: radarData.selectedChildId
+                      } : null
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la communication avec Bubix')
       }
 
-      const response = activeSubject && subjectResponses[activeSubject as keyof typeof subjectResponses] 
-        ? subjectResponses[activeSubject as keyof typeof subjectResponses]
-        : `Merci pour ton message : "${newMessage}". Je suis là pour t'aider à apprendre en s'amusant ! 🎮`
-
+      const data = await response.json()
+      
       const bubixResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: response,
+        content: data.text || 'Désolé, je n\'ai pas pu répondre à ta question.',
         sender: 'bubix',
         timestamp: new Date(),
         subject: activeSubject || undefined
       }
+      
       setMessages(prev => [...prev, bubixResponse])
+    } catch (error) {
+      console.error('Erreur Bubix:', error)
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        content: 'Désolé, je rencontre un problème technique. Peux-tu réessayer ?',
+        sender: 'bubix',
+        timestamp: new Date(),
+        subject: activeSubject || undefined
+      }
+      setMessages(prev => [...prev, errorResponse])
+    } finally {
       setIsTyping(false)
-    }, 1500)
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

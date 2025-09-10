@@ -33,7 +33,7 @@ export function useDataCache<T>(options: CacheOptions = {}) {
       try {
         const stored = localStorage.getItem('dataCache')
         if (stored) {
-          const parsedCache = new Map(JSON.parse(stored))
+          const parsedCache = new Map<string, CacheEntry<T>>(JSON.parse(stored))
           cacheRef.current = parsedCache
           setCache(parsedCache)
         }
@@ -82,7 +82,9 @@ export function useDataCache<T>(options: CacheOptions = {}) {
     if (cacheRef.current.size >= maxSize) {
       // Supprimer l'entrée la plus ancienne
       const oldestKey = cacheRef.current.keys().next().value
-      cacheRef.current.delete(oldestKey)
+      if (oldestKey) {
+        cacheRef.current.delete(oldestKey)
+      }
     }
 
     cacheRef.current.set(key, entry)

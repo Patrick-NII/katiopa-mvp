@@ -18,6 +18,7 @@ import {
   TrendingUp,
   Users,
   LogOut,
+  Calendar,
   Box,
   Code,
   Gamepad2,
@@ -41,6 +42,7 @@ import { useTheme } from '@/contexts/ThemeContext'
 export type NavigationTab = 
   | 'dashboard'
   | 'analytics'
+  | 'programme'
   | 'experiences'
   | 'family'
   | 'bubix-assistant'
@@ -270,6 +272,13 @@ export default function ModularNavigation({
               description: 'Statistiques détaillées',
               available: true,
               isNew: true
+            },
+            {
+              id: 'programme',
+              label: 'Programme',
+              icon: Calendar,
+              description: 'Cycle d\'apprentissage hebdomadaire',
+              available: true
             },
             {
               id: 'family',

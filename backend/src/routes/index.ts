@@ -10,6 +10,12 @@ import cubematchRoutes from './cubematch';
 import emailRoutes from './emails';
 import reportRoutes from './reports';
 import transactionalEmailRoutes from './transactional-emails';
+import competencesRoutes from './competences';
+import bubixRoutes from './bubix';
+import exercisesRoutes from './exercises';
+import testRoutes from './test';
+import sessionsTestRoutes from './sessions-test';
+import learningCyclesRoutes from './learning-cycles';
 
 const router = express.Router();
 
@@ -45,6 +51,27 @@ router.use('/reports', reportRoutes);
 
 // Routes d'emails transactionnels
 router.use('/transactional-emails', transactionalEmailRoutes);
+
+// Routes des compétences et exercices
+router.use('/competences', competencesRoutes);
+
+// Routes Bubix
+router.use('/bubix', bubixRoutes);
+
+// Routes des sessions utilisateur (pour les données radar)
+router.use('/user-sessions', competencesRoutes);
+
+// Routes des exercices
+router.use('/exercises', exercisesRoutes);
+
+// Routes de test (temporaires)
+router.use('/test', testRoutes);
+
+// Routes de test des sessions (avec auth temporaire)
+router.use('/sessions-test', sessionsTestRoutes);
+
+// Routes des cycles d'apprentissage (temporaire)
+router.use('/learning-cycles', learningCyclesRoutes);
 
 // Route de test de l'API
 router.get('/test', (req, res) => {

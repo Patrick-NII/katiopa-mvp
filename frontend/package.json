@@ -8,6 +8,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "@nivo/core": "^0.99.0",
+    "@nivo/legends": "^0.99.0",
+    "@nivo/radar": "^0.99.0",
     "@prisma/client": "^6.15.0",
     "@types/jsonwebtoken": "^9.0.10",
     "framer-motion": "^12.23.12",

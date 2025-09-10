@@ -107,8 +107,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   userType, 
   onClose 
 }) => {
-  const { selectedAvatar, updateAvatar } = useAvatar()
+  const [selectedAvatar, setSelectedAvatar] = useState<string>('')
   const { theme, setTheme } = useTheme()
+  
+  const handleAvatarChange = (avatarPath: string) => {
+    setSelectedAvatar(avatarPath)
+    setSettings(prev => ({ ...prev, avatarPath }))
+  }
   const [activeTab, setActiveTab] = useState<string>('general')
   const [settings, setSettings] = useState<UserSettings>({
     avatarPath: selectedAvatar || '',
@@ -276,7 +281,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const saveSettings = () => {
     localStorage.setItem('userSettings', JSON.stringify(settings))
     if (settings.avatarPath) {
-      updateAvatar(settings.avatarPath)
+      setSelectedAvatar(settings.avatarPath)
     }
     // Afficher une notification de succès
     console.log('Paramètres sauvegardés avec succès!')
@@ -396,7 +401,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   Choisir votre avatar
                 </h3>
-                <AvatarSelector />
+                <AvatarSelector 
+                  onAvatarChange={handleAvatarChange}
+                  userType={userType}
+                />
               </div>
             </div>
           )

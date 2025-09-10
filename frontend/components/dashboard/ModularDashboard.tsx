@@ -22,6 +22,7 @@ import ModalSystem from '../modals/ModalSystem'
 import BubixDedicatedWindow from '../bubix/BubixDedicatedWindow'
 import BubixChildWindow from '../bubix/BubixChildWindow'
 import CubeMatchModal from '../modals/CubeMatchModal'
+import MemoryGameModal from '../modals/MemoryGameModal'
 
 // Import des pages des cubes existantes
 import MathCubePage from '../../app/dashboard/mathcube/page'
@@ -30,6 +31,7 @@ import PlayCubePage from '../../app/dashboard/playcube/page'
 import ScienceCubePage from '../../app/dashboard/sciencecube/page'
 import DreamCubePage from '../../app/dashboard/dreamcube/page'
 import ComCubePage from '../../app/dashboard/comcube/page'
+import ProgrammePage from '../../app/dashboard/programme/page'
 
 interface User {
   id: string
@@ -110,15 +112,25 @@ export default function ModularDashboard() {
         })
       }
 
-      // Récupération des sessions enfants pour les parents
+      // Récupération des sessions enfants pour les parents (système hybride)
       if (userResponse.user && userResponse.user.userType === 'PARENT') {
         try {
-          const sessionsResponse = await fetch('/api/sessions/children', {
+          // Essayer d'abord les vraies routes d'auth, puis fallback sur les routes de test
+          let sessionsResponse = await fetch('/api/sessions/children', {
             credentials: 'include'
           })
+
+          if (!sessionsResponse.ok) {
+            console.log('⚠️ Route auth échouée, utilisation du fallback pour les sessions enfants')
+            sessionsResponse = await fetch('/api/sessions-test/children', {
+              credentials: 'include'
+            })
+          }
+
           if (sessionsResponse.ok) {
             const sessionsData = await sessionsResponse.json()
-            setChildSessions(sessionsData)
+            console.log('🔍 Sessions enfants récupérées dans ModularDashboard:', sessionsData.data || sessionsData)
+            setChildSessions(sessionsData.data || sessionsData)
           }
         } catch (error) {
           console.warn('⚠️ Impossible de charger les sessions enfants:', error)
@@ -201,24 +213,16 @@ export default function ModularDashboard() {
         return <AnalyticsPageNoScroll user={user} childSessions={childSessions} />
       
       case 'experiences':
-        return (
-          <ExperiencesPage 
-            user={user}
-            userType={user.userType as 'CHILD' | 'PARENT'}
-          />
-        )
+        return <ExperiencesPage />
+      
+      case 'programme':
+        return <ProgrammePage />
       
       case 'family':
-        return <FamilyPage user={user} childSessions={childSessions} />
+        return <FamilyPage />
       
       case 'bubix-assistant':
-        return (
-          <BubixAssistantPage 
-            user={user}
-            userType={user.userType as 'CHILD' | 'PARENT'}
-            childSessions={childSessions}
-          />
-        )
+        return <BubixAssistantPage />
       
       // Pages des cubes d'apprentissage
       case 'mathcube':
@@ -297,11 +301,7 @@ export default function ModularDashboard() {
                 transition={{ duration: 0.5 }}
                 className="backdrop-blur-xl bg-white/10 dark:bg-gray-900/10 rounded-3xl border border-white/20 dark:border-gray-700/50 shadow-2xl p-4 md:p-5 lg:p-6 h-full flex flex-col w-full overflow-y-auto"
               >
-                {(() => {
-                  const content = renderTabContent()
-                  console.log('🎭 Contenu rendu:', content)
-                  return content
-                })()}
+                {renderTabContent()}
               </motion.div>
             ) : (
               <div className="flex items-center justify-center h-full backdrop-blur-xl bg-white/10 dark:bg-gray-900/10 rounded-3xl border border-white/20 dark:border-gray-700/50 shadow-2xl w-full">
@@ -333,6 +333,22 @@ export default function ModularDashboard() {
             zIndex={modalStates.cubematch.zIndex}
             position={modalStates.cubematch.position}
             size={modalStates.cubematch.size}
+          />
+        )}
+        
+        {modalStates.memorygame && (
+          <MemoryGameModal
+            isOpen={modalStates.memorygame.isOpen}
+            onClose={() => closeModal('memorygame')}
+            onMinimize={() => minimizeModal('memorygame')}
+            onMaximize={() => maximizeModal('memorygame')}
+            onFullscreen={() => updateModal('memorygame', { isFullscreen: true, isMaximized: false })}
+            isMinimized={modalStates.memorygame.isMinimized}
+            isMaximized={modalStates.memorygame.isMaximized}
+            isFullscreen={modalStates.memorygame.isFullscreen}
+            zIndex={modalStates.memorygame.zIndex}
+            position={modalStates.memorygame.position}
+            size={modalStates.memorygame.size}
           />
         )}
       </div>

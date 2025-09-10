@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { ModalState, ModalProps } from './ModalSystem'
+import { ModalState, ModalProps } from '../components/modals/ModalSystem'
 
 export interface UseModalsReturn {
   modals: ModalProps[]
@@ -9,6 +9,7 @@ export interface UseModalsReturn {
   openModal: (modal: ModalProps) => void
   openBubixModal: () => void
   openCubeMatchModal: () => void
+  openMemoryGameModal: () => void
   closeModal: (id: string) => void
   updateModal: (id: string, updates: Partial<ModalState>) => void
   minimizeModal: (id: string) => void
@@ -68,7 +69,7 @@ export const useModals = (): UseModalsReturn => {
     const bubixModal: ModalProps = {
       id: 'bubix',
       title: 'Bubix Assistant',
-      content: null, // Will be handled by BubixModal component
+      children: null, // Will be handled by BubixModal component
       size: 'large'
     }
     
@@ -116,12 +117,12 @@ export const useModals = (): UseModalsReturn => {
       return [...prev, {
         id: 'cubematch',
         title: 'CubeMatch',
-        size: 'large',
-        component: 'CubeMatchModal'
+        size: 'medium',
+        children: null // Will be handled by CubeMatchModal component
       }]
     })
 
-    const cubematchSize = { width: 900, height: 700 }
+    const cubematchSize = { width: 700, height: 500 }
     const centerPosition = getDefaultPosition(cubematchSize)
 
     setModalStates(prev => ({
@@ -134,6 +135,37 @@ export const useModals = (): UseModalsReturn => {
         position: centerPosition,
         size: cubematchSize,
         originalSize: cubematchSize,
+        originalPosition: centerPosition,
+        zIndex: 1000 + Object.keys(prev).length
+      }
+    }))
+  }, [])
+
+  const openMemoryGameModal = useCallback(() => {
+    setModals(prev => {
+      const exists = prev.find(m => m.id === 'memorygame')
+      if (exists) return prev
+      return [...prev, {
+        id: 'memorygame',
+        title: 'Memory Game',
+        size: 'medium',
+        children: null // Will be handled by MemoryGameModal component
+      }]
+    })
+
+    const memoryGameSize = { width: 600, height: 450 }
+    const centerPosition = getDefaultPosition(memoryGameSize)
+
+    setModalStates(prev => ({
+      ...prev,
+      memorygame: {
+        isOpen: true,
+        isMinimized: false,
+        isMaximized: false,
+        isFullscreen: false,
+        position: centerPosition,
+        size: memoryGameSize,
+        originalSize: memoryGameSize,
         originalPosition: centerPosition,
         zIndex: 1000 + Object.keys(prev).length
       }
@@ -182,6 +214,7 @@ export const useModals = (): UseModalsReturn => {
     openModal,
     openBubixModal,
     openCubeMatchModal,
+    openMemoryGameModal,
     closeModal,
     updateModal,
     minimizeModal,

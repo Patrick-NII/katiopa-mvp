@@ -17,10 +17,17 @@ import {
   Award,
   BarChart3,
   Medal,
-  User
+  User,
+  ThumbsUp,
+  Share2,
+  MessageCircle,
+  Send,
+  Eye,
+  Download
 } from 'lucide-react'
 import Link from 'next/link'
 import { useModals } from '@/hooks/useModals'
+import Image from 'next/image'
 
 interface MathCubePageProps {
   onOpenCubeMatch?: () => void
@@ -37,17 +44,94 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps = {}
   const [top10Players, setTop10Players] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [userRanking, setUserRanking] = useState<number | null>(null)
+  
+  // États pour les fonctionnalités sociales
+  const [likes, setLikes] = useState(42)
+  const [isLiked, setIsLiked] = useState(false)
+  const [shares, setShares] = useState(8)
+  const [views, setViews] = useState(156)
+  const [gamesPlayed, setGamesPlayed] = useState(23)
+  const [comments, setComments] = useState([
+    {
+      id: 1,
+      author: "Milan",
+      avatar: "M",
+      content: "Super jeu ! J'adore les défis mathématiques 🎮",
+      timestamp: "2h",
+      likes: 3
+    },
+    {
+      id: 2,
+      author: "Sophie",
+      avatar: "S", 
+      content: "Parfait pour entraîner le calcul mental avec mes élèves",
+      timestamp: "5h",
+      likes: 1
+    }
+  ])
+  const [newComment, setNewComment] = useState("")
+  const [showInstructionsModal, setShowInstructionsModal] = useState(false)
 
   // Hook pour les modals (fallback si pas de props)
-  const { openCubeMatchModal } = useModals()
+  const { openCubeMatchModal, openMemoryGameModal } = useModals()
   
   // Fonction pour ouvrir CubeMatch (props ou fallback)
   const handleOpenCubeMatch = () => {
     if (onOpenCubeMatch) {
       onOpenCubeMatch()
     } else {
-      openCubeMatchModal()
+      // Rediriger vers la page CubeMatch directe
+      window.location.href = '/dashboard/mathcube/cubematch'
     }
+  }
+  
+  // Fonction pour ouvrir Memory Game
+  const handleOpenMemoryGame = () => {
+    openMemoryGameModal()
+  }
+  
+  // Fonctions pour les interactions sociales
+  const handleLike = () => {
+    setIsLiked(!isLiked)
+    setLikes(prev => isLiked ? prev - 1 : prev + 1)
+  }
+  
+  const handleShare = () => {
+    setShares(prev => prev + 1)
+    // Ici on pourrait ajouter la logique de partage réel
+    if (navigator.share) {
+      navigator.share({
+        title: 'CubeMatch - Jeu de Calcul',
+        text: 'Découvre ce super jeu de calcul mental !',
+        url: window.location.href
+      })
+    } else {
+      // Fallback : copier le lien
+      navigator.clipboard.writeText(window.location.href)
+    }
+  }
+  
+  const handleAddComment = () => {
+    if (newComment.trim()) {
+      const comment = {
+        id: comments.length + 1,
+        author: "Vous",
+        avatar: "V",
+        content: newComment.trim(),
+        timestamp: "maintenant",
+        likes: 0
+      }
+      setComments(prev => [comment, ...prev])
+      setNewComment("")
+    }
+  }
+  
+  const handleCommentLike = (commentId: number) => {
+    setComments(prev => prev.map(comment => 
+      comment.id === commentId 
+        ? { ...comment, likes: comment.likes + 1 }
+        : comment
+    ))
   }
 
   // Fonction pour charger les statistiques utilisateur
@@ -132,156 +216,220 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps = {}
   return (
     <div className="absolute inset-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
       <div className="h-full overflow-y-auto p-4 md:p-5 lg:p-6">
-        {/* Bande décorative en haut */}
-        <div className="w-full h-2 sm:h-3 md:h-4 bg-gradient-to-r from-emerald-400 via-blue-500 to-purple-500 rounded-full mb-4 sm:mb-6 md:mb-8 shadow-lg"></div>
-
+        
         {/* Contenu principal */}
         <div className="max-w-7xl mx-auto">
-          {/* En-tête */}
+          {/* En-tête MathCube */}
           <div className="text-center mb-8 sm:mb-10 md:mb-12">
-            <div className="inline-flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-xl">
-                <Gamepad2 className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
+            <div className="inline-flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-xl">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
-                  CubeMatch
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  MathCube
                 </h1>
-                <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base md:text-lg lg:text-xl">Le jeu de calcul le plus amusant !</p>
+                <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base md:text-lg lg:text-xl">Mathématiques rigoureuses</p>
               </div>
             </div>
           </div>
 
-          {/* Section CubeMatch avec photo et classement */}
+          {/* Section principale avec image et bouton play */}
           <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl border border-white/50 dark:border-gray-700/50 mb-6 sm:mb-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-start">
-              
-              {/* Photo du jeu et description */}
-              <div className="space-y-4 sm:space-y-6">
-                <div className="relative">
-                  {/* Placeholder pour la photo du jeu */}
-                  <div className="w-full h-48 sm:h-64 md:h-80 bg-gradient-to-br from-emerald-100 to-blue-100 dark:from-emerald-900/20 dark:to-blue-900/20 rounded-xl sm:rounded-2xl flex items-center justify-center border-2 border-dashed border-emerald-300 dark:border-emerald-600">
-                    <div className="text-center p-4">
-                      <Gamepad2 className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-emerald-500 dark:text-emerald-400 mx-auto mb-3 sm:mb-4" />
-                      <p className="text-emerald-600 dark:text-emerald-400 font-semibold text-base sm:text-lg">Capture d'écran du jeu</p>
-                      <p className="text-emerald-500 dark:text-emerald-500 text-xs sm:text-sm">CubeMatch en action</p>
-                    </div>
-                  </div>
+            {/* Titre du jeu */}
+            <div className="text-center mb-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
+                CubeMatch
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base md:text-lg mt-2">
+                Le jeu de calcul le plus amusant !
+              </p>
+            </div>
+            
+            {/* Image du jeu avec bouton play centré */}
+            <div className="relative mb-4">
+              <div className="w-full h-64 sm:h-80 md:h-96 relative rounded-xl overflow-hidden">
+                <Image
+                  src="/cubematch/image1.png"
+                  alt="CubeMatch Game Screenshot"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+                {/* Bouton play centré sur l'image */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <button
+                    onClick={handleOpenCubeMatch}
+                    className="w-16 h-16 sm:w-20 sm:h-20 bg-white/90 dark:bg-gray-800/90 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 backdrop-blur-sm"
+                  >
+                    <Play className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-600 dark:text-emerald-400" fill="currentColor" />
+                  </button>
                 </div>
-                
-                <div className="space-y-3 sm:space-y-4">
-                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Comment jouer ?</h3>
-                  <div className="space-y-2 sm:space-y-3">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div className="w-5 h-5 sm:w-6 sm:h-6 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-xs sm:text-sm font-bold">1</span>
-                      </div>
-                      <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">Sélectionne des cases adjacentes pour former des calculs</p>
-                    </div>
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div className="w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-xs sm:text-sm font-bold">2</span>
-                      </div>
-                      <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">Atteins la cible pour marquer des points</p>
-                    </div>
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div className="w-5 h-5 sm:w-6 sm:h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-xs sm:text-sm font-bold">3</span>
-                      </div>
-                      <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">Plus tu vas vite, plus tu gagnes de points !</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tableau de classement */}
-              <div className="space-y-2 sm:space-y-3">
-                
-                
-                {/* En-tête du tableau épuré */}
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-2 sm:p-3">
-                  <div className="grid grid-cols-12 gap-1 sm:gap-2 text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
-                    <div className="col-span-2 text-center">Rang</div>
-                    <div className="col-span-3 text-center">Pseudo</div>
-                    <div className="col-span-4 text-center">Score</div>
-                    <div className="col-span-3 text-center">Niveau</div>
-                  </div>
-                </div>
-                
-                {loading ? (
-                  <div className="space-y-1">
-                    {[...Array(10)].map((_, i) => (
-                      <div key={i} className="grid grid-cols-12 gap-1 sm:gap-2 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg animate-pulse">
-                        <div className="col-span-2 h-4 sm:h-5 bg-gray-200 dark:bg-gray-600 rounded"></div>
-                        <div className="col-span-3 h-3 sm:h-4 bg-gray-200 dark:bg-gray-600 rounded"></div>
-                        <div className="col-span-4 h-3 sm:h-4 bg-gray-200 dark:bg-gray-600 rounded"></div>
-                        <div className="col-span-3 h-3 sm:h-4 bg-gray-200 dark:bg-gray-600 rounded"></div>
-                      </div>
-                    ))}
-                  </div>
-                ) : top10Players.length > 0 ? (
-                  <div className="space-y-1">
-                    {top10Players.slice(0, 10).map((player, index) => (
-                      <div key={player.userId} className={`grid grid-cols-12 gap-1 sm:gap-2 items-center p-2 rounded-lg ${
-                        index < 3 
-                          ? 'bg-gray-100 dark:bg-gray-600 border-l-4 border-yellow-400' 
-                          : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
-                      }`}>
-                        {/* Rang simple */}
-                        <div className="col-span-2 text-center">
-                          {index < 3 ? (
-                            <div className="text-xs sm:text-sm font-bold text-yellow-600 dark:text-yellow-400">
-                              {index === 0 ? '1er' : index === 1 ? '2ème' : '3ème'}
-                            </div>
-                          ) : (
-                            <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
-                              {player.rank}
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Session ID simple */}
-                        <div className="col-span-3 text-center">
-                          <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white font-mono">
-                            {player.sessionId || player.userId.slice(-6)}
-                          </div>
-                        </div>
-
-                        {/* Score simple */}
-                        <div className="col-span-4 text-center">
-                          <div className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
-                            {player.score.toLocaleString()}
-                          </div>
-                        </div>
-                        
-                        {/* Niveau simple */}
-                        <div className="col-span-3 text-center">
-                          <div className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {player.level || 'N/A'}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-6 sm:py-8 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <Trophy className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto mb-2 sm:mb-3 text-gray-300 dark:text-gray-500" />
-                    <p className="text-xs sm:text-sm">Aucun joueur pour le moment</p>
-                  </div>
-                )}
               </div>
             </div>
-          </div>
 
-          {/* Bouton de jeu principal */}
-          <div className="text-center">
-            <button 
-              onClick={handleOpenCubeMatch}
-              className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 md:px-10 lg:px-12 py-4 sm:py-5 md:py-6 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-xl sm:rounded-2xl font-bold text-lg sm:text-xl hover:from-emerald-600 hover:to-blue-600 transition-all duration-300 transform hover:scale-105 shadow-xl"
-            >
-              <Play className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
-              <span className="text-sm sm:text-base md:text-lg lg:text-xl">Jouer maintenant</span>
-            </button>
+            {/* Engagements sur une seule ligne - Style réseaux sociaux */}
+            <div className="flex items-center justify-between py-3 px-4 bg-gray-50 dark:bg-gray-700 rounded-lg mb-4">
+              <div className="flex items-center gap-6">
+                <button
+                  onClick={handleLike}
+                  className={`flex items-center gap-2 transition-all duration-200 ${
+                    isLiked 
+                      ? 'text-red-500 dark:text-red-400' 
+                      : 'text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400'
+                  }`}
+                >
+                  <ThumbsUp className="w-5 h-5" fill={isLiked ? "currentColor" : "none"} />
+                  <span className="text-sm font-medium">{likes}</span>
+                </button>
+                
+                <button
+                  onClick={handleShare}
+                  className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                >
+                  <Share2 className="w-5 h-5" />
+                  <span className="text-sm font-medium">{shares}</span>
+                </button>
+                
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                  <MessageCircle className="w-5 h-5" />
+                  <span className="text-sm font-medium">{comments.length}</span>
+                </div>
+                
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                  <Eye className="w-5 h-5" />
+                  <span className="text-sm font-medium">{views}</span>
+                </div>
+                
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                  <Gamepad2 className="w-5 h-5" />
+                  <span className="text-sm font-medium">{gamesPlayed}</span>
+                </div>
+              </div>
+              
+              {/* Bouton mode d'emploi */}
+              <button
+                onClick={() => setShowInstructionsModal(true)}
+                className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 shadow-lg"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-sm">Mode d'emploi</span>
+              </button>
+            </div>
+
+            {/* Layout principal avec commentaires et classement */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Commentaires - Colonne principale */}
+              <div className="lg:col-span-2">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Commentaires</h4>
+                  
+                  {/* Ajouter un commentaire */}
+                  <div className="mb-4">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder="Ajouter un commentaire..."
+                        className="flex-1 p-3 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
+                      />
+                      <button
+                        onClick={handleAddComment}
+                        disabled={!newComment.trim()}
+                        className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <Send className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Liste des commentaires */}
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {comments.map((comment) => (
+                      <div key={comment.id} className="flex gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                          {comment.avatar}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-sm text-gray-900 dark:text-white">{comment.author}</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">{comment.timestamp}</span>
+                          </div>
+                          <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{comment.content}</p>
+                          <button
+                            onClick={() => handleCommentLike(comment.id)}
+                            className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 transition-colors"
+                          >
+                            <ThumbsUp className="w-3 h-3" />
+                            <span>{comment.likes}</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Classement - Colonne droite */}
+              <div className="lg:col-span-1">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Classement</h3>
+                  
+                  {/* En-tête du tableau */}
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-2 mb-3">
+                    <div className="grid grid-cols-12 gap-1 text-xs font-medium text-gray-600 dark:text-gray-300">
+                      <div className="col-span-3 text-center">Rang</div>
+                      <div className="col-span-5 text-center">Pseudo</div>
+                      <div className="col-span-4 text-center">Score</div>
+                    </div>
+                  </div>
+                  
+                  {/* Corps du tableau */}
+                  <div className="space-y-1">
+                    {loading ? (
+                      Array.from({ length: 5 }).map((_, index) => (
+                        <div key={index} className="grid grid-cols-12 gap-1 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg animate-pulse">
+                          <div className="col-span-3 h-4 bg-gray-200 dark:bg-gray-600 rounded"></div>
+                          <div className="col-span-5 h-3 bg-gray-200 dark:bg-gray-600 rounded"></div>
+                          <div className="col-span-4 h-3 bg-gray-200 dark:bg-gray-600 rounded"></div>
+                        </div>
+                      ))
+                    ) : top10Players.length > 0 ? (
+                      top10Players.slice(0, 5).map((player: any, index: number) => (
+                        <div key={player.userId} className="grid grid-cols-12 gap-1 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                          <div className="col-span-3 text-center">
+                            <div className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                              {index + 1}
+                            </div>
+                          </div>
+                          <div className="col-span-5 text-center">
+                            <div className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">
+                              {player.sessionId || player.userId.slice(-6)}
+                            </div>
+                          </div>
+                          <div className="col-span-4 text-center">
+                            <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                              {player.score?.toLocaleString() || 'N/A'}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-4 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <Trophy className="w-6 h-6 mx-auto mb-2 text-gray-300 dark:text-gray-500" />
+                        <p className="text-xs">Aucun joueur</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
