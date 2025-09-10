@@ -566,7 +566,7 @@ export default function CubeMatchGame() {
                   <Settings className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">⚙️ Paramètres du Jeu</h2>
+                  <h2 className="text-2xl font-bold text-white">Paramètres du Jeu</h2>
                   <p className="text-blue-100 text-sm">Personnalise ton expérience CubeMatch !</p>
                 </div>
               </div>
@@ -590,7 +590,9 @@ export default function CubeMatchGame() {
                 <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-5 border border-orange-200">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
-                      <span className="text-white text-lg">📐</span>
+                      <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/>
+                      </svg>
                     </div>
                     <div>
                       <h3 className="font-bold text-orange-800">Taille de la Grille</h3>
@@ -620,7 +622,9 @@ export default function CubeMatchGame() {
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-200">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
-                      <span className="text-white text-lg">🧮</span>
+                      <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                      </svg>
                     </div>
                     <div>
                       <h3 className="font-bold text-blue-800">Opération Mathématique</h3>
@@ -633,7 +637,11 @@ export default function CubeMatchGame() {
                       { key: 'SUB', symbol: '−', name: 'Soustraction', color: 'from-red-400 to-red-500' },
                       { key: 'MUL', symbol: '×', name: 'Multiplication', color: 'from-purple-400 to-purple-500' },
                       { key: 'DIV', symbol: '÷', name: 'Division', color: 'from-yellow-400 to-yellow-500' },
-                      { key: 'MIXED', symbol: '🎲', name: 'Mixte', color: 'from-pink-400 to-pink-500' }
+                      { key: 'MIXED', symbol: (
+                        <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M5 3v4h-.5c-.83 0-1.5.67-1.5 1.5v4c0 .83.67 1.5 1.5 1.5H5v4h4v-4h.5c.83 0 1.5-.67 1.5-1.5v-4c0-.83-.67-1.5-1.5-1.5H9V3H5zm10 0v4h-.5c-.83 0-1.5.67-1.5 1.5v4c0 .83.67 1.5 1.5 1.5h.5v4h4v-4h.5c.83 0 1.5-.67 1.5-1.5v-4c0-.83-.67-1.5-1.5-1.5H19V3h-4z"/>
+                        </svg>
+                      ), name: 'Mixte', color: 'from-pink-400 to-pink-500' }
                     ].map(op => (
                       <button
                         key={op.key}
@@ -644,7 +652,7 @@ export default function CubeMatchGame() {
                             : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md'
                         }`}
                       >
-                        <div className="text-2xl mb-1">{op.symbol}</div>
+                        <div className="text-2xl mb-1">{typeof op.symbol === 'string' ? op.symbol : op.symbol}</div>
                         <div className="text-xs font-medium">{op.name}</div>
                       </button>
                     ))}
@@ -655,7 +663,9 @@ export default function CubeMatchGame() {
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-5 border border-green-200">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
-                      <span className="text-white text-lg">🏆</span>
+                      <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
                     </div>
                     <div>
                       <h3 className="font-bold text-green-800">Niveau de Difficulté</h3>
@@ -664,9 +674,21 @@ export default function CubeMatchGame() {
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      { key: 'EASY', name: 'Facile', emoji: '😊', color: 'from-green-400 to-green-500' },
-                      { key: 'MEDIUM', name: 'Moyen', emoji: '🤔', color: 'from-yellow-400 to-orange-500' },
-                      { key: 'HARD', name: 'Difficile', emoji: '😤', color: 'from-red-400 to-red-500' }
+                      { key: 'EASY', name: 'Facile', icon: (
+                        <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                      ), color: 'from-green-400 to-green-500' },
+                      { key: 'MEDIUM', name: 'Moyen', icon: (
+                        <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+                        </svg>
+                      ), color: 'from-yellow-400 to-orange-500' },
+                      { key: 'HARD', name: 'Difficile', icon: (
+                        <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                      ), color: 'from-red-400 to-red-500' }
                     ].map(diff => (
                       <button
                         key={diff.key}
@@ -677,7 +699,7 @@ export default function CubeMatchGame() {
                             : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md'
                         }`}
                       >
-                        <div className="text-2xl mb-1">{diff.emoji}</div>
+                        <div className="mb-1">{diff.icon}</div>
                         <div className="text-xs font-medium">{diff.name}</div>
                       </button>
                     ))}
@@ -692,7 +714,9 @@ export default function CubeMatchGame() {
                 <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-5 border border-purple-200">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center">
-                      <span className="text-white text-lg">⏰</span>
+                      <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12,1A11,11 0 0,0 1,12A11,11 0 0,0 12,23A11,11 0 0,0 23,12A11,11 0 0,0 12,1M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+                      </svg>
                     </div>
                     <div>
                       <h3 className="font-bold text-purple-800">Gestion du Temps</h3>
@@ -708,7 +732,11 @@ export default function CubeMatchGame() {
                           : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md'
                       }`}
                     >
-                      <div className="text-2xl mb-1">♾️</div>
+                      <div className="mb-1">
+                        <svg className="w-8 h-8 mx-auto text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M18.6 6.62c-1.44 0-2.8.56-3.77 1.53L12 10.66 8.17 8.15c-.97-.97-2.33-1.53-3.77-1.53C1.95 6.62 0 8.57 0 11.02s1.95 4.4 4.4 4.4c1.44 0 2.8-.56 3.77-1.53L12 11.38l3.83 2.51c.97.97 2.33 1.53 3.77 1.53 2.45 0 4.4-1.95 4.4-4.4s-1.95-4.4-4.4-4.4z"/>
+                        </svg>
+                      </div>
                       <div className="text-sm font-medium">Temps Illimité</div>
                     </button>
                     
@@ -741,7 +769,9 @@ export default function CubeMatchGame() {
                 <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-2xl p-5 border border-cyan-200">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 bg-cyan-500 rounded-xl flex items-center justify-center">
-                      <span className="text-white text-lg">🎮</span>
+                      <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M5.5 2c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2H7v-2H5.5V4H7V2H5.5zm13 0H17v2h1.5v16H17v2h1.5c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 7.5c2.5 0 4.5 2 4.5 4.5s-2 4.5-4.5 4.5S7.5 14.5 7.5 12 9.5 7.5 12 7.5z"/>
+                      </svg>
                     </div>
                     <div>
                       <h3 className="font-bold text-cyan-800">Options de Jeu</h3>
@@ -750,10 +780,26 @@ export default function CubeMatchGame() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      { key: 'allowDiagonals', label: 'Diagonales', emoji: '↗️', enabled: config.allowDiagonals },
-                      { key: 'soundEnabled', label: 'Sons', emoji: '🔊', enabled: config.soundEnabled },
-                      { key: 'hintsEnabled', label: 'Indices', emoji: '💡', enabled: config.hintsEnabled },
-                      { key: 'autoSubmit', label: 'Auto-valider', emoji: '⚡', enabled: config.autoSubmit }
+                      { key: 'allowDiagonals', label: 'Diagonales', icon: (
+                        <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M1.5 3.5L20.5 22.5 22 21l-19-19L1.5 3.5zm17.83 9.83L22 10.66 20.66 9.33l-2.33 2.33 1 1zM12 6c3.31 0 6 2.69 6 6 0 1.31-.42 2.53-1.14 3.52l1.42 1.42C19.33 15.56 20 13.84 20 12c0-4.42-3.58-8-8-8-1.84 0-3.56.67-4.94 1.72l1.42 1.42C9.47 6.42 10.69 6 12 6z"/>
+                        </svg>
+                      ), enabled: config.allowDiagonals },
+                      { key: 'soundEnabled', label: 'Sons', icon: (
+                        <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                        </svg>
+                      ), enabled: config.soundEnabled },
+                      { key: 'hintsEnabled', label: 'Indices', icon: (
+                        <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M9 21c0 .5.4 1 1 1h4c.6 0 1-.5 1-1v-1H9v1zm3-19C8.1 2 5 5.1 5 9c0 2.4 1.2 4.5 3 5.7V17c0 .5.4 1 1 1h6c.6 0 1-.5 1-1v-2.3c1.8-1.3 3-3.4 3-5.7 0-3.9-3.1-7-7-7z"/>
+                        </svg>
+                      ), enabled: config.hintsEnabled },
+                      { key: 'autoSubmit', label: 'Auto-valider', icon: (
+                        <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91l-.01-.01L23 10z"/>
+                        </svg>
+                      ), enabled: config.autoSubmit }
                     ].map(option => (
                       <button
                         key={option.key}
@@ -764,7 +810,7 @@ export default function CubeMatchGame() {
                             : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md'
                         }`}
                       >
-                        <div className="text-xl mb-1">{option.emoji}</div>
+                        <div className="mb-1">{option.icon}</div>
                         <div className="text-xs font-medium">{option.label}</div>
                       </button>
                     ))}
@@ -775,7 +821,9 @@ export default function CubeMatchGame() {
                 <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-5 border border-yellow-200">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center">
-                      <span className="text-white text-lg">🌟</span>
+                      <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
                     </div>
                     <div>
                       <h3 className="font-bold text-yellow-800">Modes Spéciaux</h3>
@@ -792,7 +840,9 @@ export default function CubeMatchGame() {
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl">♾️</span>
+                        <svg className="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M18.6 6.62c-1.44 0-2.8.56-3.77 1.53L12 10.66 8.17 8.15c-.97-.97-2.33-1.53-3.77-1.53C1.95 6.62 0 8.57 0 11.02s1.95 4.4 4.4 4.4c1.44 0 2.8-.56 3.77-1.53L12 11.38l3.83 2.51c.97.97 2.33 1.53 3.77 1.53 2.45 0 4.4-1.95 4.4-4.4s-1.95-4.4-4.4-4.4z"/>
+                        </svg>
                         <div>
                           <div className="font-medium">Cubes Infinis</div>
                           <div className="text-xs opacity-75">Les cubes gardent leur valeur</div>
@@ -809,7 +859,9 @@ export default function CubeMatchGame() {
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl">🧹</span>
+                        <svg className="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M19.36 2.72L20.78 4.14l-1.06 1.06c.4.4.62.95.62 1.52V9h1a1 1 0 0 1 1 1v3c0 .55-.45 1-1 1h-1v2.28c0 .57-.22 1.12-.62 1.52L20.78 19.86 19.36 21.28 18 19.92l-1.41-1.41L5.51 7.43 4.1 6.02 5.51 4.6l1.42 1.42L8.34 7.43 19.36 2.72z"/>
+                        </svg>
                         <div>
                           <div className="font-medium">Cubes Nettoyés</div>
                           <div className="text-xs opacity-75">Les cubes deviennent vides</div>
@@ -827,9 +879,13 @@ export default function CubeMatchGame() {
                 onClick={() => setGameState('menu')}
                 className="px-12 py-4 bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 text-white rounded-2xl font-bold text-lg hover:from-green-600 hover:via-blue-600 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 shadow-xl flex items-center gap-3"
               >
-                <span className="text-2xl">✨</span>
+                <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
                 Sauvegarder et Jouer !
-                <span className="text-2xl">🚀</span>
+                <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M4 2h16c1.1 0 2 .9 2 2v16c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2zm8 3l-6 8h4v4h4v-4h4l-6-8z"/>
+                </svg>
               </button>
             </div>
           </div>
