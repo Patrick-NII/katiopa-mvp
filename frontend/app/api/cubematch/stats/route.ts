@@ -1,245 +1,126 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import jwt from 'jsonwebtoken'
-import { PrismaClient } from '@prisma/client'
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-// Fonction pour vérifier l'authentification
-async function verifyAuth(): Promise<any> {
-  try {
-    const cookieStore = cookies()
-    const authToken = cookieStore.get('authToken')?.value
-
-    if (!authToken) {
-      return null
-    }
-
-    const decoded = jwt.verify(authToken, process.env.JWT_SECRET!) as any
-    return decoded
-  } catch (error) {
-    console.error('Erreur vérification auth:', error)
-    return null
-  }
-}
-
-// GET /api/cubematch/stats - Récupérer les statistiques personnelles
+// GET - Récupérer les statistiques générales pour CubeMatch
 export async function GET(request: NextRequest) {
   try {
-    const userInfo = await verifyAuth()
-    
-    if (!userInfo) {
-      return NextResponse.json({
-        error: 'UNAUTHORIZED',
-        message: 'Token d\'authentification manquant ou invalide'
-      }, { status: 401 })
-    }
+    const { searchParams } = new URL(request.url);
+    const gameId = searchParams.get('gameId') || 'cubematch';
 
-    const { searchParams } = new URL(request.url)
-    const childId = searchParams.get('childId') // Optionnel pour les parents
-
-    // Si c'est un parent et qu'un childId est spécifié
-    if (userInfo.userType === 'PARENT' && childId) {
-      // Vérifier que l'enfant appartient au parent
-      const child = await prisma.userSession.findFirst({
-        where: {
-          id: childId,
-          accountId: userInfo.accountId,
-          userType: 'CHILD',
-          isActive: true
-        }
-      })
-
-      if (!child) {
-        return NextResponse.json({
-          error: 'CHILD_NOT_FOUND',
-          message: 'Enfant non trouvé ou non autorisé'
-        }, { status: 404 })
-      }
-
-      // Récupérer les statistiques de l'enfant
-      const stats = await prisma.cubeMatchUserStats.findUnique({
-        where: {
-          user_id: childId
-        }
-      })
-
-      // Si pas de stats, calculer depuis les scores
-      if (!stats) {
-        const scores = await prisma.cubeMatchScore.findMany({
-          where: { user_id: childId },
-          orderBy: { created_at: 'desc' }
-        })
-
-        if (scores.length === 0) {
-          return NextResponse.json({
-            success: true,
-            data: {
-              childName: `${child.firstName} ${child.lastName}`,
-              stats: {
-                totalGames: 0,
-                totalScore: 0,
-                bestScore: 0,
-                averageScore: 0,
-                highestLevel: 1,
-                totalTimePlayed: 0,
-                averageTimePlayed: 0,
-                favoriteOperator: 'ADD',
-                lastPlayed: null
-              }
-            }
-          })
-        }
-
-        // Calculer les stats depuis les scores
-        const totalGames = scores.length
-        const totalScore = scores.reduce((sum, s) => sum + s.score, 0)
-        const bestScore = Math.max(...scores.map(s => s.score))
-        const averageScore = totalScore / totalGames
-        const highestLevel = Math.max(...scores.map(s => s.level))
-        const totalTimePlayed = scores.reduce((sum, s) => sum + Number(s.time_played_ms), 0)
-        const averageTimePlayed = totalTimePlayed / totalGames
-
-        // Opérateur le plus utilisé
-        const operatorCounts = scores.reduce((acc, s) => {
-          acc[s.operator] = (acc[s.operator] || 0) + 1
-          return acc
-        }, {} as Record<string, number>)
-        const favoriteOperator = Object.keys(operatorCounts).reduce((a, b) => 
-          operatorCounts[a] > operatorCounts[b] ? a : b
-        )
-
-        return NextResponse.json({
-          success: true,
-          data: {
-            childName: `${child.firstName} ${child.lastName}`,
-            stats: {
-              totalGames,
-              totalScore,
-              bestScore,
-              averageScore: Math.round(averageScore * 100) / 100,
-              highestLevel,
-              totalTimePlayed,
-              averageTimePlayed: Math.round(averageTimePlayed),
-              favoriteOperator,
-              lastPlayed: scores[0]?.created_at
-            }
-          }
-        })
-      }
-
-      return NextResponse.json({
-        success: true,
-        data: {
-          childName: `${child.firstName} ${child.lastName}`,
-          stats: {
-            totalGames: stats.total_games,
-            totalScore: Number(stats.total_score),
-            bestScore: stats.best_score,
-            averageScore: Number(stats.average_score),
-            highestLevel: stats.highest_level,
-            totalTimePlayed: Number(stats.total_time_played),
-            averageTimePlayed: Number(stats.average_time_played),
-            favoriteOperator: stats.favorite_operator,
-            lastPlayed: stats.last_played
-          }
-        }
-      })
-    }
-
-    // Si c'est un enfant ou parent sans childId spécifique
-    const targetUserId = childId || userInfo.userId
-
-    const stats = await prisma.cubeMatchUserStats.findUnique({
-      where: {
-        user_id: targetUserId
-      }
-    })
-
-    // Si pas de stats, calculer depuis les scores
-    if (!stats) {
-      const scores = await prisma.cubeMatchScore.findMany({
-        where: { user_id: targetUserId },
-        orderBy: { created_at: 'desc' }
-      })
-
-      if (scores.length === 0) {
-        return NextResponse.json({
-          success: true,
-          data: {
-            stats: {
-              totalGames: 0,
-              totalScore: 0,
-              bestScore: 0,
-              averageScore: 0,
-              highestLevel: 1,
-              totalTimePlayed: 0,
-              averageTimePlayed: 0,
-              favoriteOperator: 'ADD',
-              lastPlayed: null
-            }
-          }
-        })
-      }
-
-      // Calculer les stats depuis les scores
-      const totalGames = scores.length
-      const totalScore = scores.reduce((sum, s) => sum + s.score, 0)
-      const bestScore = Math.max(...scores.map(s => s.score))
-      const averageScore = totalScore / totalGames
-      const highestLevel = Math.max(...scores.map(s => s.level))
-      const totalTimePlayed = scores.reduce((sum, s) => sum + Number(s.time_played_ms), 0)
-      const averageTimePlayed = totalTimePlayed / totalGames
-
-      // Opérateur le plus utilisé
-      const operatorCounts = scores.reduce((acc, s) => {
-        acc[s.operator] = (acc[s.operator] || 0) + 1
-        return acc
-      }, {} as Record<string, number>)
-      const favoriteOperator = Object.keys(operatorCounts).reduce((a, b) => 
-        operatorCounts[a] > operatorCounts[b] ? a : b
-      )
-
-      return NextResponse.json({
-        success: true,
-        data: {
-          stats: {
-            totalGames,
-            totalScore,
-            bestScore,
-            averageScore: Math.round(averageScore * 100) / 100,
-            highestLevel,
-            totalTimePlayed,
-            averageTimePlayed: Math.round(averageTimePlayed),
-            favoriteOperator,
-            lastPlayed: scores[0]?.created_at
-          }
-        }
-      })
-    }
+    // Compter les différents éléments
+    const [
+      totalLikes,
+      totalComments,
+      totalShares,
+      totalViews,
+      totalGamesPlayed,
+      totalPlayers
+    ] = await Promise.all([
+      prisma.gameLike.count({ where: { gameId } }),
+      prisma.gameComment.count({ where: { gameId } }),
+      prisma.gameShare.count({ where: { gameId } }),
+      prisma.gameView.count({ where: { gameId } }),
+      prisma.gameScore.count({ where: { gameId } }),
+      prisma.gameScore.groupBy({
+        by: ['userId'],
+        where: { gameId }
+      }).then(result => result.length)
+    ]);
 
     return NextResponse.json({
       success: true,
       data: {
-        stats: {
-          totalGames: stats.total_games,
-          totalScore: Number(stats.total_score),
-          bestScore: stats.best_score,
-          averageScore: Number(stats.average_score),
-          highestLevel: stats.highest_level,
-          totalTimePlayed: Number(stats.total_time_played),
-          averageTimePlayed: Number(stats.average_time_played),
-          favoriteOperator: stats.favorite_operator,
-          lastPlayed: stats.last_played
-        }
+        likes: totalLikes,
+        comments: totalComments,
+        shares: totalShares,
+        views: totalViews,
+        gamesPlayed: totalGamesPlayed,
+        totalPlayers
       }
-    })
-
+    });
   } catch (error) {
-    console.error('❌ Erreur récupération stats CubeMatch:', error)
+    console.error('Error fetching game stats:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch game stats' },
+      { status: 500 }
+    );
+  }
+}
+
+// POST - Enregistrer une action (share, view, etc.)
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { userId, gameId = 'cubematch', action, score } = body;
+
+    if (!userId || !action) {
+      return NextResponse.json(
+        { success: false, error: 'User ID and action required' },
+        { status: 400 }
+      );
+    }
+
+    let result;
+    switch (action) {
+      case 'share':
+        await prisma.gameShare.create({
+          data: {
+            userId,
+            gameId,
+            createdAt: new Date()
+          }
+        });
+        result = { action: 'shared' };
+        break;
+      
+      case 'view':
+        await prisma.gameView.create({
+          data: {
+            userId,
+            gameId,
+            createdAt: new Date()
+          }
+        });
+        result = { action: 'viewed' };
+        break;
+      
+      case 'play':
+        if (score !== undefined) {
+          await prisma.gameScore.create({
+            data: {
+              userId,
+              gameId,
+              score: parseInt(score),
+              createdAt: new Date()
+            }
+          });
+          result = { action: 'played', score };
+        } else {
+          return NextResponse.json(
+            { success: false, error: 'Score required for play action' },
+            { status: 400 }
+          );
+        }
+        break;
+      
+      default:
+        return NextResponse.json(
+          { success: false, error: 'Invalid action' },
+          { status: 400 }
+        );
+    }
+
     return NextResponse.json({
-      error: 'INTERNAL_ERROR',
-      message: 'Erreur interne du serveur'
-    }, { status: 500 })
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Error recording action:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to record action' },
+      { status: 500 }
+    );
   }
 }

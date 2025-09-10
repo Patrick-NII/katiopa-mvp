@@ -78,6 +78,12 @@ model UserSession {
   learningCycles            LearningCycle[]
   communicationAnalytics    CommunicationAnalytics[]
   childPreferences          ChildPreferences?
+  gameLikes                 GameLike[]
+  gameComments              GameComment[]
+  commentLikes              CommentLike[]
+  gameShares                GameShare[]
+  gameViews                 GameView[]
+  gameScores                GameScore[]
 }
 
 model UserProfile {
@@ -919,4 +925,61 @@ model ChildPreferences {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   userSession   UserSession @relation(fields: [userSessionId], references: [id], onDelete: Cascade)
+}
+
+// Modèles pour les fonctionnalités sociales de CubeMatch
+model GameLike {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String   @default("cubematch")
+  createdAt DateTime @default(now())
+  user      UserSession @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, gameId])
+}
+
+model GameComment {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String   @default("cubematch")
+  content   String
+  createdAt DateTime @default(now())
+  user      UserSession @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes     CommentLike[]
+}
+
+model CommentLike {
+  id        String   @id @default(cuid())
+  userId    String
+  commentId String
+  createdAt DateTime @default(now())
+  user      UserSession @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   GameComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, commentId])
+}
+
+model GameShare {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String   @default("cubematch")
+  createdAt DateTime @default(now())
+  user      UserSession @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GameView {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String   @default("cubematch")
+  createdAt DateTime @default(now())
+  user      UserSession @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GameScore {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String   @default("cubematch")
+  score     Int
+  createdAt DateTime @default(now())
+  user      UserSession @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

@@ -46,30 +46,14 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps = {}
   const [userRanking, setUserRanking] = useState<number | null>(null)
   
   // États pour les fonctionnalités sociales
-  const [likes, setLikes] = useState(42)
+  const [likes, setLikes] = useState(0)
   const [isLiked, setIsLiked] = useState(false)
-  const [shares, setShares] = useState(8)
-  const [views, setViews] = useState(156)
-  const [gamesPlayed, setGamesPlayed] = useState(23)
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      author: "Milan",
-      avatar: "M",
-      content: "Super jeu ! J'adore les défis mathématiques 🎮",
-      timestamp: "2h",
-      likes: 3
-    },
-    {
-      id: 2,
-      author: "Sophie",
-      avatar: "S", 
-      content: "Parfait pour entraîner le calcul mental avec mes élèves",
-      timestamp: "5h",
-      likes: 1
-    }
-  ])
+  const [shares, setShares] = useState(0)
+  const [views, setViews] = useState(0)
+  const [gamesPlayed, setGamesPlayed] = useState(0)
+  const [comments, setComments] = useState<any[]>([])
   const [newComment, setNewComment] = useState("")
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [showInstructionsModal, setShowInstructionsModal] = useState(false)
 
   // Hook pour les modals (fallback si pas de props)
@@ -90,48 +74,187 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps = {}
     openMemoryGameModal()
   }
   
-  // Fonctions pour les interactions sociales
-  const handleLike = () => {
-    setIsLiked(!isLiked)
-    setLikes(prev => isLiked ? prev - 1 : prev + 1)
-  }
-  
-  const handleShare = () => {
-    setShares(prev => prev + 1)
-    // Ici on pourrait ajouter la logique de partage réel
-    if (navigator.share) {
-      navigator.share({
-        title: 'CubeMatch - Jeu de Calcul',
-        text: 'Découvre ce super jeu de calcul mental !',
-        url: window.location.href
+  // Fonction pour obtenir l'ID utilisateur actuel
+  const getCurrentUserId = async () => {
+    try {
+      const response = await fetch('/api/auth/verify', {
+        method: 'GET',
+        credentials: 'include'
       })
-    } else {
-      // Fallback : copier le lien
-      navigator.clipboard.writeText(window.location.href)
-    }
-  }
-  
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      const comment = {
-        id: comments.length + 1,
-        author: "Vous",
-        avatar: "V",
-        content: newComment.trim(),
-        timestamp: "maintenant",
-        likes: 0
+      if (response.ok) {
+        const data = await response.json()
+        return data.user?.id || data.sessionId
       }
-      setComments(prev => [comment, ...prev])
-      setNewComment("")
+    } catch (error) {
+      console.error('Error getting current user:', error)
+    }
+    return null
+  }
+
+  // Fonction pour charger les données sociales
+  const loadSocialData = async () => {
+    try {
+      const userId = await getCurrentUserId()
+      if (!userId) return
+
+      setCurrentUserId(userId)
+
+      // Charger les statistiques générales
+      const statsResponse = await fetch('/api/cubematch/stats')
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json()
+        if (statsData.success) {
+          setLikes(statsData.data.likes)
+          setShares(statsData.data.shares)
+          setViews(statsData.data.views)
+          setGamesPlayed(statsData.data.gamesPlayed)
+        }
+      }
+
+      // Charger les likes de l'utilisateur
+      const likesResponse = await fetch('/api/cubematch/likes')
+      if (likesResponse.ok) {
+        const likesData = await likesResponse.json()
+        if (likesData.success) {
+          const userLiked = likesData.data.likes.some((like: any) => like.userId === userId)
+          setIsLiked(userLiked)
+        }
+      }
+
+      // Charger les commentaires
+      const commentsResponse = await fetch('/api/cubematch/comments')
+      if (commentsResponse.ok) {
+        const commentsData = await commentsResponse.json()
+        if (commentsData.success) {
+          setComments(commentsData.data)
+        }
+      }
+
+      // Charger le classement
+      const rankingResponse = await fetch('/api/cubematch/ranking')
+      if (rankingResponse.ok) {
+        const rankingData = await rankingResponse.json()
+        if (rankingData.success) {
+          setTop10Players(rankingData.data)
+        }
+      }
+
+      // Enregistrer la vue
+      await fetch('/api/cubematch/stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: 'view' })
+      })
+
+    } catch (error) {
+      console.error('Error loading social data:', error)
+    }
+  }
+
+  // Fonctions pour les interactions sociales
+  const handleLike = async () => {
+    if (!currentUserId) return
+
+    try {
+      const response = await fetch('/api/cubematch/likes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUserId })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          setIsLiked(data.data.liked)
+          setLikes(data.data.totalLikes)
+        }
+      }
+    } catch (error) {
+      console.error('Error handling like:', error)
     }
   }
   
-  const handleCommentLike = (commentId: number) => {
-    setComments(prev => prev.map(comment => 
-      comment.id === commentId 
-        ? { ...comment, likes: comment.likes + 1 }
-        : comment
-    ))
+  const handleShare = async () => {
+    if (!currentUserId) return
+
+    try {
+      // Enregistrer le partage
+      await fetch('/api/cubematch/stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUserId, action: 'share' })
+      })
+
+      setShares(prev => prev + 1)
+
+      // Partager via l'API native si disponible
+      if (navigator.share) {
+        navigator.share({
+          title: 'CubeMatch - Jeu de Calcul',
+          text: 'Découvre ce super jeu de calcul mental !',
+          url: window.location.href
+        })
+      } else {
+        // Fallback: copier le lien
+        navigator.clipboard.writeText(window.location.href)
+        alert('Lien copié dans le presse-papiers !')
+      }
+    } catch (error) {
+      console.error('Error sharing:', error)
+    }
+  }
+  
+  const handleAddComment = async () => {
+    if (!newComment.trim() || !currentUserId) return
+
+    try {
+      const response = await fetch('/api/cubematch/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          userId: currentUserId, 
+          content: newComment.trim() 
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          setComments(prev => [data.data, ...prev])
+          setNewComment('')
+        }
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error)
+    }
+  }
+  
+  const handleCommentLike = async (commentId: string) => {
+    if (!currentUserId) return
+
+    try {
+      const response = await fetch('/api/cubematch/comments/like', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          userId: currentUserId, 
+          commentId 
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          setComments(prev => prev.map(comment => 
+            comment.id === commentId 
+              ? { ...comment, likes: data.data.liked ? comment.likes + 1 : comment.likes - 1 }
+              : comment
+          ))
+        }
+      }
+    } catch (error) {
+      console.error('Error liking comment:', error)
+    }
   }
 
   // Fonction pour charger les statistiques utilisateur
@@ -205,7 +328,8 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps = {}
       await Promise.all([
         loadUserStats(),
         loadGlobalStats(),
-        loadTop10()
+        loadTop10(),
+        loadSocialData()
       ])
       setLoading(false)
     }
@@ -309,15 +433,15 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps = {}
                 </div>
               </div>
               
-              {/* Bouton mode d'emploi */}
+              {/* Logo help */}
               <button
                 onClick={() => setShowInstructionsModal(true)}
-                className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                className="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                title="Mode d'emploi"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-sm">Mode d'emploi</span>
               </button>
             </div>
 
@@ -433,6 +557,189 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps = {}
           </div>
         </div>
       </div>
+
+      {/* Modal Mode d'emploi */}
+      {showInstructionsModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            {/* En-tête du modal */}
+            <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-6 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold">Mode d'emploi CubeMatch</h2>
+                    <p className="text-blue-100">Règles et instructions du jeu</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowInstructionsModal(false)}
+                  className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center hover:bg-white/30 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Contenu du modal */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              <div className="space-y-6">
+                {/* Objectif du jeu */}
+                <div className="bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-900/20 dark:to-blue-900/20 rounded-xl p-6 border border-emerald-200 dark:border-emerald-700">
+                  <h3 className="text-xl font-bold text-emerald-700 dark:text-emerald-300 mb-3 flex items-center gap-2">
+                    <Target className="w-6 h-6" />
+                    Objectif du Jeu
+                  </h3>
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                    CubeMatch est un jeu de calcul mental où tu dois résoudre des équations mathématiques en faisant correspondre des cubes colorés. 
+                    L'objectif est d'obtenir le score le plus élevé possible en résolvant correctement le maximum d'équations dans le temps imparti.
+                  </p>
+                </div>
+
+                {/* Comment jouer */}
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-700">
+                  <h3 className="text-xl font-bold text-blue-700 dark:text-blue-300 mb-4 flex items-center gap-2">
+                    <Play className="w-6 h-6" />
+                    Comment Jouer
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">1</div>
+                      <div>
+                        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-1">Lance le jeu</h4>
+                        <p className="text-gray-600 dark:text-gray-400">Clique sur le bouton play au centre de l'image pour commencer une partie</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">2</div>
+                      <div>
+                        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-1">Résous les équations</h4>
+                        <p className="text-gray-600 dark:text-gray-400">Des cubes avec des chiffres apparaissent. Clique sur les cubes pour former l'équation correcte</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">3</div>
+                      <div>
+                        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-1">Valide ta réponse</h4>
+                        <p className="text-gray-600 dark:text-gray-400">Appuie sur "Entrée" ou clique sur "Valider" pour confirmer ton calcul</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">4</div>
+                      <div>
+                        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-1">Gagne des points</h4>
+                        <p className="text-gray-600 dark:text-gray-400">Chaque bonne réponse te rapporte des points. Plus tu es rapide, plus tu gagnes de points bonus !</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Règles du jeu */}
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-700">
+                  <h3 className="text-xl font-bold text-purple-700 dark:text-purple-300 mb-4 flex items-center gap-2">
+                    <BookOpen className="w-6 h-6" />
+                    Règles du Jeu
+                  </h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <span className="text-gray-700 dark:text-gray-300 font-medium">Temps limité par niveau</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <span className="text-gray-700 dark:text-gray-300 font-medium">Difficulté progressive</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <span className="text-gray-700 dark:text-gray-300 font-medium">Bonus de rapidité</span>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <span className="text-gray-700 dark:text-gray-300 font-medium">Vies limitées</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <span className="text-gray-700 dark:text-gray-300 font-medium">Multiplicateurs de score</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <span className="text-gray-700 dark:text-gray-300 font-medium">Power-ups spéciaux</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Système de points */}
+                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-xl p-6 border border-yellow-200 dark:border-yellow-700">
+                  <h3 className="text-xl font-bold text-yellow-700 dark:text-yellow-300 mb-4 flex items-center gap-2">
+                    <Star className="w-6 h-6" />
+                    Système de Points
+                  </h3>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div className="text-center p-4 bg-white dark:bg-gray-700 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">+10</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Réponse correcte</div>
+                    </div>
+                    <div className="text-center p-4 bg-white dark:bg-gray-700 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">+5</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Bonus rapidité</div>
+                    </div>
+                    <div className="text-center p-4 bg-white dark:bg-gray-700 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">×2</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Combo streak</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Conseils */}
+                <div className="bg-gradient-to-r from-indigo-50 to-cyan-50 dark:from-indigo-900/20 dark:to-cyan-900/20 rounded-xl p-6 border border-indigo-200 dark:border-indigo-700">
+                  <h3 className="text-xl font-bold text-indigo-700 dark:text-indigo-300 mb-4 flex items-center gap-2">
+                    <Brain className="w-6 h-6" />
+                    Conseils pour Bien Jouer
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <Zap className="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-gray-700 dark:text-gray-300">Entraîne-toi régulièrement pour améliorer ta vitesse de calcul</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Target className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-gray-700 dark:text-gray-300">Concentre-toi sur la précision avant la vitesse</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <TrendingUp className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-gray-700 dark:text-gray-300">Les niveaux deviennent plus difficiles, prépare-toi !</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Heart className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-gray-700 dark:text-gray-300">Gère bien tes vies, elles sont précieuses</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bouton de fermeture */}
+                <div className="flex justify-center pt-4">
+                  <button
+                    onClick={() => setShowInstructionsModal(false)}
+                    className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                  >
+                    Commencer à Jouer !
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
