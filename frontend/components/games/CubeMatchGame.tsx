@@ -31,12 +31,15 @@ interface GameConfig {
   operator: 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'MIXED'
   difficulty: 'EASY' | 'MEDIUM' | 'HARD'
   timeLimit: number
+  unlimitedTime: boolean
   allowDiagonals: boolean
   soundEnabled: boolean
   hintsEnabled: boolean
   autoSubmit: boolean
   spawnRate: number
   maxNumbers: number
+  infiniteCubes: boolean
+  cleanCubes: boolean
 }
 
 interface GameStats {
@@ -48,6 +51,7 @@ interface GameStats {
   cellsCleared: number
   hintsUsed: number
   accuracy: number
+  precision: number
   totalMoves: number
   successfulMoves: number
 }
@@ -70,6 +74,8 @@ export default function CubeMatchGame() {
   const [isGameRunning, setIsGameRunning] = useState(false)
   const [showHint, setShowHint] = useState(false)
   const [hintCells, setHintCells] = useState<Cell[]>([])
+  const [animations, setAnimations] = useState<Array<{type: string, x: number, y: number, id: string}>>([])
+  const [confetti, setConfetti] = useState(false)
   
   // Configuration du jeu
   const [config, setConfig] = useState<GameConfig>({
@@ -77,12 +83,15 @@ export default function CubeMatchGame() {
     operator: 'ADD',
     difficulty: 'MEDIUM',
     timeLimit: 60,
+    unlimitedTime: false,
     allowDiagonals: false,
     soundEnabled: true,
     hintsEnabled: true,
     autoSubmit: false,
     spawnRate: 2000,
-    maxNumbers: 9
+    maxNumbers: 9,
+    infiniteCubes: false,
+    cleanCubes: false
   })
 
   // Statistiques du jeu
@@ -95,6 +104,7 @@ export default function CubeMatchGame() {
     cellsCleared: 0,
     hintsUsed: 0,
     accuracy: 100,
+    precision: 100,
     totalMoves: 0,
     successfulMoves: 0
   })
@@ -104,8 +114,8 @@ export default function CubeMatchGame() {
   const spawnIntervalRef = useRef<NodeJS.Timeout>()
   const audioRef = useRef<HTMLAudioElement>()
 
-  // Sons du jeu
-  const playSound = useCallback((sound: 'click' | 'success' | 'error' | 'levelup' | 'gameover') => {
+  // Sons du jeu améliorés
+  const playSound = useCallback((sound: 'click' | 'success' | 'error' | 'levelup' | 'gameover' | 'validation' | 'combo') => {
     if (!config.soundEnabled) return
     
     const sounds = {
@@ -113,17 +123,44 @@ export default function CubeMatchGame() {
       success: '/sounds/success.mp3',
       error: '/sounds/error.mp3',
       levelup: '/sounds/levelup.mp3',
-      gameover: '/sounds/gameover.mp3'
+      gameover: '/sounds/gameover.mp3',
+      validation: '/sounds/validation.mp3',
+      combo: '/sounds/combo.mp3'
     }
     
     try {
       const audio = new Audio(sounds[sound])
-      audio.volume = 0.3
+      audio.volume = 0.4
       audio.play().catch(() => {}) // Ignore les erreurs de lecture
     } catch (error) {
       // Ignore les erreurs de son
     }
   }, [config.soundEnabled])
+
+  // Fonctions d'animation
+  const addAnimation = useCallback((type: string, x: number, y: number) => {
+    const id = Math.random().toString(36).substr(2, 9)
+    setAnimations(prev => [...prev, { type, x, y, id }])
+    
+    // Supprimer l'animation après 2 secondes
+    setTimeout(() => {
+      setAnimations(prev => prev.filter(anim => anim.id !== id))
+    }, 2000)
+  }, [])
+
+  const triggerConfetti = useCallback(() => {
+    setConfetti(true)
+    setTimeout(() => setConfetti(false), 3000)
+  }, [])
+
+  // Fonction pour obtenir la couleur des cellules selon leur valeur
+  const getCellColor = useCallback((value: number) => {
+    if (value <= 2) return 'bg-gradient-to-br from-green-300 to-green-400 text-green-900 hover:from-green-400 hover:to-green-500'
+    if (value <= 4) return 'bg-gradient-to-br from-blue-300 to-blue-400 text-blue-900 hover:from-blue-400 hover:to-blue-500'
+    if (value <= 6) return 'bg-gradient-to-br from-purple-300 to-purple-400 text-purple-900 hover:from-purple-400 hover:to-purple-500'
+    if (value <= 8) return 'bg-gradient-to-br from-orange-300 to-orange-400 text-orange-900 hover:from-orange-400 hover:to-orange-500'
+    return 'bg-gradient-to-br from-red-300 to-red-400 text-red-900 hover:from-red-400 hover:to-red-500'
+  }, [])
 
   // Initialiser le plateau de jeu
   const initializeGameBoard = useCallback(() => {
@@ -222,9 +259,11 @@ export default function CubeMatchGame() {
     })
   }, [gameState, playSound, areAdjacent])
 
-  // Soumettre la sélection
+  // Soumettre la sélection avec animations et sons améliorés
   const submitSelection = useCallback(() => {
     if (selectedCells.length < 2) return
+    
+    playSound('validation')
     
     const result = calculateResult(selectedCells)
     const isCorrect = result === target
@@ -233,61 +272,88 @@ export default function CubeMatchGame() {
       ...prev,
       totalMoves: prev.totalMoves + 1,
       successfulMoves: isCorrect ? prev.successfulMoves + 1 : prev.successfulMoves,
-      accuracy: Math.round((prev.successfulMoves + (isCorrect ? 1 : 0)) / (prev.totalMoves + 1) * 100)
+      accuracy: Math.round((prev.successfulMoves + (isCorrect ? 1 : 0)) / (prev.totalMoves + 1) * 100),
+      precision: Math.round((prev.successfulMoves + (isCorrect ? 1 : 0)) / (prev.totalMoves + 1) * 100)
     }))
     
     if (isCorrect) {
-      playSound('success')
+      // Calculer le score avec bonus pour temps illimité
+      let baseScore = selectedCells.length * 10
+      let comboBonus = stats.combo * 5
+      let timeBonus = config.unlimitedTime ? 0 : Math.max(0, stats.timeLeft * 2)
       
-      // Calculer les points
-      const basePoints = selectedCells.length * 10
-      const comboMultiplier = 1 + (stats.combo * 0.1)
-      const points = Math.floor(basePoints * comboMultiplier)
+      // Réduire les bonus en mode temps illimité
+      if (config.unlimitedTime) {
+        baseScore = Math.floor(baseScore * 0.7)
+        comboBonus = Math.floor(comboBonus * 0.5)
+      }
+      
+      const totalScore = baseScore + comboBonus + timeBonus
       
       setStats(prev => ({
         ...prev,
-        score: prev.score + points,
+        score: prev.score + totalScore,
         combo: prev.combo + 1,
         bestCombo: Math.max(prev.bestCombo, prev.combo + 1),
         cellsCleared: prev.cellsCleared + selectedCells.length
       }))
       
-      // Supprimer les cellules sélectionnées
+      // Sons et animations de succès
+      playSound('success')
+      if (stats.combo > 0) {
+        playSound('combo')
+        addAnimation('combo', 50, 50)
+      }
+      addAnimation('success', 50, 50)
+      
+      // Confettis pour les niveaux
+      if (stats.combo > 0 && stats.combo % 5 === 0) {
+        triggerConfetti()
+        playSound('levelup')
+      }
+      
+      // Effacer les cellules sélectionnées
       setGameBoard(prev => prev.map(row => 
         row.map(cell => 
           selectedCells.some(sc => sc.id === cell.id) 
-            ? { ...cell, value: 0, isSelected: false }
+            ? { 
+                ...cell, 
+                value: config.infiniteCubes ? cell.value : (config.cleanCubes ? 0 : Math.floor(Math.random() * config.maxNumbers) + 1), 
+                isSelected: false 
+              }
             : cell
         )
       ))
       
-      // Générer une nouvelle cible
+      setSelectedCells([])
       generateNewTarget()
       
       // Vérifier le niveau suivant
-      if (stats.score + points > stats.level * 100) {
+      if (stats.score + totalScore > stats.level * 100) {
         setStats(prev => ({
           ...prev,
           level: prev.level + 1,
-          timeLeft: Math.min(prev.timeLeft + 10, 120) // Bonus de temps
+          timeLeft: config.unlimitedTime ? prev.timeLeft : Math.min(prev.timeLeft + 10, 120)
         }))
+        triggerConfetti()
         playSound('levelup')
       }
     } else {
+      // Son et animation d'erreur
       playSound('error')
+      addAnimation('error', 50, 50)
+      
       setStats(prev => ({
         ...prev,
-        combo: 0,
-        score: Math.max(0, prev.score - 5)
+        combo: 0
       }))
+      
+      setSelectedCells([])
+      setGameBoard(prev => prev.map(row => 
+        row.map(cell => ({ ...cell, isSelected: false }))
+      ))
     }
-    
-    // Réinitialiser la sélection
-    setSelectedCells([])
-    setGameBoard(prev => prev.map(row => 
-      row.map(cell => ({ ...cell, isSelected: false }))
-    ))
-  }, [selectedCells, target, calculateResult, playSound, stats, generateNewTarget])
+  }, [selectedCells, target, calculateResult, stats, config.unlimitedTime, config.maxNumbers, playSound, addAnimation, triggerConfetti, generateNewTarget])
 
   // Utiliser un indice
   const useHint = useCallback(() => {
@@ -361,7 +427,7 @@ export default function CubeMatchGame() {
       ...prev,
       score: 0,
       level: 1,
-      timeLeft: config.timeLimit,
+      timeLeft: config.unlimitedTime ? 999 : config.timeLimit,
       combo: 0,
       cellsCleared: 0,
       hintsUsed: 0,
@@ -370,7 +436,7 @@ export default function CubeMatchGame() {
       accuracy: 100
     }))
     initializeGameBoard()
-  }, [config.timeLimit, initializeGameBoard])
+  }, [config.timeLimit, config.unlimitedTime, initializeGameBoard])
 
   // Pause/Reprendre
   const togglePause = useCallback(() => {
@@ -394,7 +460,7 @@ export default function CubeMatchGame() {
 
   // Timer du jeu
   useEffect(() => {
-    if (isGameRunning && stats.timeLeft > 0) {
+    if (isGameRunning && !config.unlimitedTime && stats.timeLeft > 0) {
       gameIntervalRef.current = setInterval(() => {
         setStats(prev => {
           if (prev.timeLeft <= 1) {
@@ -413,7 +479,7 @@ export default function CubeMatchGame() {
         clearInterval(gameIntervalRef.current)
       }
     }
-  }, [isGameRunning, stats.timeLeft, playSound])
+  }, [isGameRunning, stats.timeLeft, config.unlimitedTime, playSound])
 
   // Auto-submit si activé
   useEffect(() => {
@@ -489,145 +555,282 @@ export default function CubeMatchGame() {
   // Rendu des paramètres
   if (gameState === 'settings') {
     return (
-      <div className="h-full flex flex-col p-6 bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Paramètres</h2>
-          <button
-            onClick={() => setGameState('menu')}
-            className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        
-        <div className="space-y-6 overflow-y-auto">
-          {/* Taille de grille */}
-          <div className="bg-white rounded-lg p-4 shadow-sm">
-            <h3 className="font-semibold text-gray-900 mb-3">Taille de grille</h3>
-            <div className="flex items-center gap-4">
+      <div className="h-full flex items-center justify-center p-4 bg-gradient-to-br from-purple-100 via-blue-50 to-cyan-100">
+        {/* Container centré avec largeur maximale pour éviter l'étirement */}
+        <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 w-full max-w-4xl max-h-[90vh] overflow-hidden">
+          {/* En-tête coloré et ludique */}
+          <div className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                  <Settings className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white">⚙️ Paramètres du Jeu</h2>
+                  <p className="text-blue-100 text-sm">Personnalise ton expérience CubeMatch !</p>
+                </div>
+              </div>
               <button
-                onClick={() => setConfig(prev => ({ ...prev, gridSize: Math.max(4, prev.gridSize - 1) }))}
-                className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg"
+                onClick={() => setGameState('menu')}
+                className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-all duration-200 group"
               >
-                <Minus className="w-4 h-4" />
-              </button>
-              <span className="text-lg font-medium">{config.gridSize}x{config.gridSize}</span>
-              <button
-                onClick={() => setConfig(prev => ({ ...prev, gridSize: Math.min(8, prev.gridSize + 1) }))}
-                className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg"
-              >
-                <Plus className="w-4 h-4" />
+                <X className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
               </button>
             </div>
           </div>
           
-          {/* Opération */}
-          <div className="bg-white rounded-lg p-4 shadow-sm">
-            <h3 className="font-semibold text-gray-900 mb-3">Opération</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {['ADD', 'SUB', 'MUL', 'DIV', 'MIXED'].map(op => (
-                <button
-                  key={op}
-                  onClick={() => setConfig(prev => ({ ...prev, operator: op as any }))}
-                  className={`p-2 rounded-lg text-sm font-medium transition-colors ${
-                    config.operator === op
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {op === 'ADD' ? 'Addition' : 
-                   op === 'SUB' ? 'Soustraction' :
-                   op === 'MUL' ? 'Multiplication' :
-                   op === 'DIV' ? 'Division' : 'Mixte'}
-                </button>
-              ))}
-            </div>
-          </div>
-          
-          {/* Difficulté */}
-          <div className="bg-white rounded-lg p-4 shadow-sm">
-            <h3 className="font-semibold text-gray-900 mb-3">Difficulté</h3>
-            <div className="space-y-2">
-              {['EASY', 'MEDIUM', 'HARD'].map(diff => (
-                <button
-                  key={diff}
-                  onClick={() => setConfig(prev => ({ ...prev, difficulty: diff as any }))}
-                  className={`w-full p-2 rounded-lg text-sm font-medium transition-colors ${
-                    config.difficulty === diff
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {diff === 'EASY' ? 'Facile' : 
-                   diff === 'MEDIUM' ? 'Moyen' : 'Difficile'}
-                </button>
-              ))}
-            </div>
-          </div>
-          
-          {/* Temps limite */}
-          <div className="bg-white rounded-lg p-4 shadow-sm">
-            <h3 className="font-semibold text-gray-900 mb-3">Temps limite</h3>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setConfig(prev => ({ ...prev, timeLimit: Math.max(30, prev.timeLimit - 15) }))}
-                className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg"
-              >
-                <Minus className="w-4 h-4" />
-              </button>
-              <span className="text-lg font-medium">{config.timeLimit}s</span>
-              <button
-                onClick={() => setConfig(prev => ({ ...prev, timeLimit: Math.min(180, prev.timeLimit + 15) }))}
-                className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-          
-          {/* Options avancées */}
-          <div className="bg-white rounded-lg p-4 shadow-sm">
-            <h3 className="font-semibold text-gray-900 mb-3">Options</h3>
-            <div className="space-y-3">
-              <label className="flex items-center justify-between">
-                <span className="text-sm text-gray-700">Diagonales autorisées</span>
-                <input
-                  type="checkbox"
-                  checked={config.allowDiagonals}
-                  onChange={(e) => setConfig(prev => ({ ...prev, allowDiagonals: e.target.checked }))}
-                  className="w-4 h-4 text-blue-600 rounded"
-                />
-              </label>
+          {/* Contenu des paramètres avec scroll */}
+          <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
-              <label className="flex items-center justify-between">
-                <span className="text-sm text-gray-700">Sons activés</span>
-                <input
-                  type="checkbox"
-                  checked={config.soundEnabled}
-                  onChange={(e) => setConfig(prev => ({ ...prev, soundEnabled: e.target.checked }))}
-                  className="w-4 h-4 text-blue-600 rounded"
-                />
-              </label>
+              {/* Colonne 1 - Paramètres de base */}
+              <div className="space-y-4">
+                
+                {/* Taille de grille */}
+                <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-5 border border-orange-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
+                      <span className="text-white text-lg">📐</span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-orange-800">Taille de la Grille</h3>
+                      <p className="text-orange-600 text-sm">Plus c'est grand, plus c'est difficile !</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center gap-4">
+                    <button
+                      onClick={() => setConfig(prev => ({ ...prev, gridSize: Math.max(4, prev.gridSize - 1) }))}
+                      className="w-12 h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105"
+                    >
+                      <Minus className="w-5 h-5" />
+                    </button>
+                    <div className="bg-white rounded-xl px-6 py-3 shadow-md">
+                      <span className="text-2xl font-bold text-orange-800">{config.gridSize}×{config.gridSize}</span>
+                    </div>
+                    <button
+                      onClick={() => setConfig(prev => ({ ...prev, gridSize: Math.min(14, prev.gridSize + 1) }))}
+                      className="w-12 h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Opérations */}
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+                      <span className="text-white text-lg">🧮</span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-blue-800">Opération Mathématique</h3>
+                      <p className="text-blue-600 text-sm">Quel calcul veux-tu faire ?</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { key: 'ADD', symbol: '+', name: 'Addition', color: 'from-green-400 to-green-500' },
+                      { key: 'SUB', symbol: '−', name: 'Soustraction', color: 'from-red-400 to-red-500' },
+                      { key: 'MUL', symbol: '×', name: 'Multiplication', color: 'from-purple-400 to-purple-500' },
+                      { key: 'DIV', symbol: '÷', name: 'Division', color: 'from-yellow-400 to-yellow-500' },
+                      { key: 'MIXED', symbol: '🎲', name: 'Mixte', color: 'from-pink-400 to-pink-500' }
+                    ].map(op => (
+                      <button
+                        key={op.key}
+                        onClick={() => setConfig(prev => ({ ...prev, operator: op.key as any }))}
+                        className={`p-3 rounded-xl text-center transition-all duration-200 transform hover:scale-105 ${
+                          config.operator === op.key
+                            ? `bg-gradient-to-r ${op.color} text-white shadow-lg scale-105`
+                            : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md'
+                        }`}
+                      >
+                        <div className="text-2xl mb-1">{op.symbol}</div>
+                        <div className="text-xs font-medium">{op.name}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Difficulté */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-5 border border-green-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
+                      <span className="text-white text-lg">🏆</span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-green-800">Niveau de Difficulté</h3>
+                      <p className="text-green-600 text-sm">À quel point es-tu fort ?</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { key: 'EASY', name: 'Facile', emoji: '😊', color: 'from-green-400 to-green-500' },
+                      { key: 'MEDIUM', name: 'Moyen', emoji: '🤔', color: 'from-yellow-400 to-orange-500' },
+                      { key: 'HARD', name: 'Difficile', emoji: '😤', color: 'from-red-400 to-red-500' }
+                    ].map(diff => (
+                      <button
+                        key={diff.key}
+                        onClick={() => setConfig(prev => ({ ...prev, difficulty: diff.key as any }))}
+                        className={`p-3 rounded-xl text-center transition-all duration-200 transform hover:scale-105 ${
+                          config.difficulty === diff.key
+                            ? `bg-gradient-to-r ${diff.color} text-white shadow-lg scale-105`
+                            : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md'
+                        }`}
+                      >
+                        <div className="text-2xl mb-1">{diff.emoji}</div>
+                        <div className="text-xs font-medium">{diff.name}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
               
-              <label className="flex items-center justify-between">
-                <span className="text-sm text-gray-700">Indices activés</span>
-                <input
-                  type="checkbox"
-                  checked={config.hintsEnabled}
-                  onChange={(e) => setConfig(prev => ({ ...prev, hintsEnabled: e.target.checked }))}
-                  className="w-4 h-4 text-blue-600 rounded"
-                />
-              </label>
-              
-              <label className="flex items-center justify-between">
-                <span className="text-sm text-gray-700">Soumission automatique</span>
-                <input
-                  type="checkbox"
-                  checked={config.autoSubmit}
-                  onChange={(e) => setConfig(prev => ({ ...prev, autoSubmit: e.target.checked }))}
-                  className="w-4 h-4 text-blue-600 rounded"
-                />
-              </label>
+              {/* Colonne 2 - Paramètres avancés */}
+              <div className="space-y-4">
+                
+                {/* Temps */}
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-5 border border-purple-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center">
+                      <span className="text-white text-lg">⏰</span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-purple-800">Gestion du Temps</h3>
+                      <p className="text-purple-600 text-sm">Veux-tu jouer contre la montre ?</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => setConfig(prev => ({ ...prev, unlimitedTime: !prev.unlimitedTime }))}
+                      className={`w-full p-3 rounded-xl text-center transition-all duration-200 transform hover:scale-105 ${
+                        config.unlimitedTime
+                          ? 'bg-gradient-to-r from-green-400 to-green-500 text-white shadow-lg'
+                          : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md'
+                      }`}
+                    >
+                      <div className="text-2xl mb-1">♾️</div>
+                      <div className="text-sm font-medium">Temps Illimité</div>
+                    </button>
+                    
+                    {!config.unlimitedTime && (
+                      <div className="bg-white rounded-xl p-4 shadow-md">
+                        <div className="flex items-center justify-center gap-4">
+                          <button
+                            onClick={() => setConfig(prev => ({ ...prev, timeLimit: Math.max(30, prev.timeLimit - 15) }))}
+                            className="w-10 h-10 bg-purple-500 hover:bg-purple-600 text-white rounded-lg flex items-center justify-center transition-all duration-200 transform hover:scale-105"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-purple-800">{config.timeLimit}</div>
+                            <div className="text-xs text-purple-600">secondes</div>
+                          </div>
+                          <button
+                            onClick={() => setConfig(prev => ({ ...prev, timeLimit: Math.min(300, prev.timeLimit + 15) }))}
+                            className="w-10 h-10 bg-purple-500 hover:bg-purple-600 text-white rounded-lg flex items-center justify-center transition-all duration-200 transform hover:scale-105"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Options ludiques */}
+                <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-2xl p-5 border border-cyan-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-cyan-500 rounded-xl flex items-center justify-center">
+                      <span className="text-white text-lg">🎮</span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-cyan-800">Options de Jeu</h3>
+                      <p className="text-cyan-600 text-sm">Personnalise ton expérience !</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { key: 'allowDiagonals', label: 'Diagonales', emoji: '↗️', enabled: config.allowDiagonals },
+                      { key: 'soundEnabled', label: 'Sons', emoji: '🔊', enabled: config.soundEnabled },
+                      { key: 'hintsEnabled', label: 'Indices', emoji: '💡', enabled: config.hintsEnabled },
+                      { key: 'autoSubmit', label: 'Auto-valider', emoji: '⚡', enabled: config.autoSubmit }
+                    ].map(option => (
+                      <button
+                        key={option.key}
+                        onClick={() => setConfig(prev => ({ ...prev, [option.key]: !prev[option.key as keyof GameConfig] }))}
+                        className={`p-3 rounded-xl text-center transition-all duration-200 transform hover:scale-105 ${
+                          option.enabled
+                            ? 'bg-gradient-to-r from-cyan-400 to-cyan-500 text-white shadow-lg'
+                            : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md'
+                        }`}
+                      >
+                        <div className="text-xl mb-1">{option.emoji}</div>
+                        <div className="text-xs font-medium">{option.label}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Modes de jeu spéciaux */}
+                <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-5 border border-yellow-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center">
+                      <span className="text-white text-lg">🌟</span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-yellow-800">Modes Spéciaux</h3>
+                      <p className="text-yellow-600 text-sm">Des défis uniques !</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => setConfig(prev => ({ ...prev, infiniteCubes: !prev.infiniteCubes }))}
+                      className={`w-full p-3 rounded-xl text-left transition-all duration-200 transform hover:scale-105 ${
+                        config.infiniteCubes
+                          ? 'bg-gradient-to-r from-purple-400 to-purple-500 text-white shadow-lg'
+                          : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">♾️</span>
+                        <div>
+                          <div className="font-medium">Cubes Infinis</div>
+                          <div className="text-xs opacity-75">Les cubes gardent leur valeur</div>
+                        </div>
+                      </div>
+                    </button>
+                    
+                    <button
+                      onClick={() => setConfig(prev => ({ ...prev, cleanCubes: !prev.cleanCubes }))}
+                      className={`w-full p-3 rounded-xl text-left transition-all duration-200 transform hover:scale-105 ${
+                        config.cleanCubes
+                          ? 'bg-gradient-to-r from-green-400 to-green-500 text-white shadow-lg'
+                          : 'bg-white hover:bg-gray-50 text-gray-700 shadow-md'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🧹</span>
+                        <div>
+                          <div className="font-medium">Cubes Nettoyés</div>
+                          <div className="text-xs opacity-75">Les cubes deviennent vides</div>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Bouton de sauvegarde centré */}
+            <div className="flex justify-center pt-6">
+              <button
+                onClick={() => setGameState('menu')}
+                className="px-12 py-4 bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 text-white rounded-2xl font-bold text-lg hover:from-green-600 hover:via-blue-600 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 shadow-xl flex items-center gap-3"
+              >
+                <span className="text-2xl">✨</span>
+                Sauvegarder et Jouer !
+                <span className="text-2xl">🚀</span>
+              </button>
             </div>
           </div>
         </div>
@@ -769,92 +972,104 @@ export default function CubeMatchGame() {
           </div>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <div className="bg-blue-50 rounded-lg p-2">
-            <div className="text-lg font-bold text-blue-600">{stats.score}</div>
-            <div className="text-xs text-gray-600">Score</div>
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-3 text-center">
+          <div className="bg-blue-50 rounded-lg p-3">
+            <div className="text-xl font-bold text-blue-600">{stats.score.toLocaleString()}</div>
+            <div className="text-xs text-gray-600 font-medium">Score</div>
           </div>
-          <div className="bg-green-50 rounded-lg p-2">
-            <div className="text-lg font-bold text-green-600">{target}</div>
-            <div className="text-xs text-gray-600">Cible</div>
+          <div className="bg-green-50 rounded-lg p-3">
+            <div className="text-xl font-bold text-green-600">{target}</div>
+            <div className="text-xs text-gray-600 font-medium">Cible</div>
           </div>
-          <div className="bg-purple-50 rounded-lg p-2">
-            <div className="text-lg font-bold text-purple-600">{stats.level}</div>
-            <div className="text-xs text-gray-600">Niveau</div>
+          <div className="bg-purple-50 rounded-lg p-3">
+            <div className="text-xl font-bold text-purple-600">{stats.level}</div>
+            <div className="text-xs text-gray-600 font-medium">Niveau</div>
           </div>
-          <div className="bg-orange-50 rounded-lg p-2">
-            <div className="text-lg font-bold text-orange-600">{stats.timeLeft}</div>
-            <div className="text-xs text-gray-600">Temps</div>
+          <div className="bg-orange-50 rounded-lg p-3">
+            <div className="text-xl font-bold text-orange-600">{config.unlimitedTime ? '∞' : stats.timeLeft}</div>
+            <div className="text-xs text-gray-600 font-medium">Temps</div>
           </div>
-        </div>
-        
-        <div className="flex items-center justify-between mt-3">
-          <div className="flex items-center gap-4 text-sm text-gray-600">
-            <div>Combo: <span className="font-semibold text-blue-600">{stats.combo}</span></div>
-            <div>Précision: <span className="font-semibold text-green-600">{stats.accuracy}%</span></div>
+          <div className="bg-red-50 rounded-lg p-3">
+            <div className="text-xl font-bold text-red-600">{stats.combo}</div>
+            <div className="text-xs text-gray-600 font-medium">Combo</div>
           </div>
-          
-          <div className="flex items-center gap-2">
-            {config.hintsEnabled && (
-              <button
-                onClick={useHint}
-                disabled={stats.hintsUsed >= 3}
-                className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-lg text-sm font-medium hover:bg-yellow-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-              >
-                <HelpCircle className="w-4 h-4" />
-                Indice ({3 - stats.hintsUsed})
-              </button>
-            )}
-            
-            <button
-              onClick={submitSelection}
-              disabled={selectedCells.length < 2}
-              className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Valider ({calculateResult(selectedCells)})
-            </button>
+          <div className="bg-indigo-50 rounded-lg p-3">
+            <div className="text-xl font-bold text-indigo-600">{stats.precision}%</div>
+            <div className="text-xs text-gray-600 font-medium">Précision</div>
           </div>
         </div>
       </div>
       
       {/* Plateau de jeu */}
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl shadow-lg p-4">
-          <div 
-            className="grid gap-1"
-            style={{ 
-              gridTemplateColumns: `repeat(${config.gridSize}, 1fr)`,
-              gridTemplateRows: `repeat(${config.gridSize}, 1fr)`
-            }}
-          >
-            {gameBoard.map((row, rowIndex) =>
-              row.map((cell, colIndex) => {
-                const isSelected = selectedCells.some(sc => sc.id === cell.id)
-                const isHinted = showHint && hintCells.some(hc => hc.id === cell.id)
-                const isEmpty = cell.value === 0
-                
-                return (
-                  <button
-                    key={cell.id}
-                    onClick={() => !isEmpty && handleCellClick(cell)}
-                    disabled={isEmpty}
-                    className={`
-                      w-12 h-12 md:w-16 md:h-16 rounded-lg font-bold text-sm md:text-lg transition-all duration-200
-                      ${isEmpty 
-                        ? 'bg-gray-100 cursor-not-allowed' 
-                        : isSelected
-                          ? 'bg-blue-500 text-white shadow-lg scale-105'
-                          : isHinted
-                            ? 'bg-yellow-300 text-yellow-900 shadow-lg'
-                            : 'bg-gray-200 hover:bg-gray-300 active:bg-gray-400'
-                      }
-                    `}
-                  >
-                    {isEmpty ? '' : cell.value}
-                  </button>
-                )
-              })
+      <div className="flex-1 flex items-center justify-center p-4 min-h-0 overflow-hidden">
+        {/* WRAPPER VERTICAL => grille au-dessus, boutons en dessous */}
+        <div className="flex flex-col items-center gap-6 max-w-full">
+          {/* Grille */}
+          <div className="bg-white rounded-xl shadow-lg p-4 max-w-full max-h-full flex items-center justify-center">
+            <div
+              className="grid gap-1 max-w-full max-h-full"
+              style={{
+                gridTemplateColumns: `repeat(${config.gridSize}, minmax(60px, 1fr))`,
+                gridTemplateRows: `repeat(${config.gridSize}, minmax(60px, 1fr))`,
+                maxWidth: '100%',
+                maxHeight: '100%',
+              }}
+            >
+              {gameBoard.map((row) =>
+                row.map((cell) => {
+                  const isSelected = selectedCells.some((sc) => sc.id === cell.id)
+                  const isHinted = showHint && hintCells.some((hc) => hc.id === cell.id)
+                  const isEmpty = cell.value === 0
+
+                  return (
+                    <button
+                      key={cell.id}
+                      onClick={() => !isEmpty && handleCellClick(cell)}
+                      disabled={isEmpty}
+                      className={`
+                        w-full h-full min-w-[60px] min-h-[60px] max-w-[80px] max-h-[80px]
+                        rounded-xl font-bold text-lg md:text-xl lg:text-2xl transition-all duration-200
+                        shadow-md flex items-center justify-center
+                        ${
+                          isEmpty
+                            ? 'bg-gray-100 cursor-not-allowed'
+                            : isSelected
+                              ? 'bg-gradient-to-br from-yellow-400 to-yellow-500 text-yellow-900 shadow-xl scale-105 border-4 border-yellow-600 ring-2 ring-yellow-300'
+                              : isHinted
+                                ? 'bg-gradient-to-br from-yellow-200 to-yellow-300 text-yellow-800 border-2 border-yellow-500 shadow-lg'
+                                : getCellColor(cell.value)
+                        }
+                      `}
+                    >
+                      {isEmpty ? '' : cell.value}
+                    </button>
+                  )
+                })
+              )}
+            </div>
+          </div>
+
+          {/* Boutons d'action (désormais SOUS la grille) */}
+          <div className="flex items-center justify-center gap-4">
+            {config.hintsEnabled && (
+              <button
+                onClick={useHint}
+                disabled={stats.hintsUsed >= 3}
+                className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white rounded-xl font-semibold hover:from-yellow-500 hover:to-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg transition-all duration-200 transform hover:scale-105"
+              >
+                <HelpCircle className="w-5 h-5" />
+                Indice ({Math.max(0, 3 - stats.hintsUsed)})
+              </button>
             )}
+
+            <button
+              onClick={submitSelection}
+              disabled={selectedCells.length < 2}
+              className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg transition-all duration-200 transform hover:scale-105"
+            >
+              <Target className="w-5 h-5" />
+              Valider ({selectedCells.length >= 2 ? calculateResult(selectedCells) : 0})
+            </button>
           </div>
         </div>
       </div>
@@ -876,6 +1091,63 @@ export default function CubeMatchGame() {
           </p>
         </div>
       </div>
+      
+      {/* Animations de succès */}
+      {animations.map(anim => (
+        <motion.div
+          key={anim.id}
+          initial={{ opacity: 1, scale: 0, x: anim.x, y: anim.y }}
+          animate={{ 
+            opacity: 0, 
+            scale: 1.5, 
+            x: anim.x + (Math.random() - 0.5) * 100,
+            y: anim.y - 50
+          }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          className="fixed pointer-events-none z-50"
+        >
+          {anim.type === 'success' && (
+            <div className="text-green-500 text-2xl font-bold">✓</div>
+          )}
+          {anim.type === 'combo' && (
+            <div className="text-yellow-500 text-xl font-bold">COMBO!</div>
+          )}
+          {anim.type === 'error' && (
+            <div className="text-red-500 text-2xl font-bold">✗</div>
+          )}
+        </motion.div>
+      ))}
+      
+      {/* Confettis */}
+      {confetti && (
+        <div className="fixed inset-0 pointer-events-none z-50">
+          {[...Array(50)].map((_, i) => (
+            <motion.div
+              key={i}
+              initial={{ 
+                x: Math.random() * window.innerWidth,
+                y: -10,
+                rotate: 0,
+                opacity: 1
+              }}
+              animate={{ 
+                y: window.innerHeight + 10,
+                rotate: 360,
+                opacity: 0
+              }}
+              transition={{ 
+                duration: 3,
+                delay: Math.random() * 2,
+                ease: "easeOut"
+              }}
+              className="absolute w-2 h-2"
+              style={{
+                backgroundColor: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'][Math.floor(Math.random() * 6)]
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
