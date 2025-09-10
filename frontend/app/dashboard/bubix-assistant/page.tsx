@@ -28,7 +28,7 @@ interface BubixAssistantPageProps {
   childSessions: any[]
 }
 
-export default function BubixAssistantPage({ 
+function BubixAssistantPage({ 
   user, 
   userType, 
   childSessions 
@@ -438,4 +438,29 @@ export default function BubixAssistantPage({
       </div>
     </div>
   )
+}
+
+export default function BubixAssistantPageWrapper() {
+  // Données simulées pour la page bubix-assistant
+  const user = {
+    firstName: 'Parent',
+    lastName: 'Test',
+    userType: 'PARENT',
+    subscriptionType: 'PREMIUM'
+  }
+  
+  const childSessions = [
+    {
+      id: 'milan',
+      firstName: 'Milan',
+      lastName: 'Test'
+    },
+    {
+      id: 'aylon',
+      firstName: 'Aylon',
+      lastName: 'Test'
+    }
+  ]
+
+  return <BubixAssistantPage user={user} userType="PARENT" childSessions={childSessions} />
 }

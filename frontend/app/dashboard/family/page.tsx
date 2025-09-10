@@ -26,7 +26,7 @@ interface FamilyPageProps {
   childSessions: any[]
 }
 
-export default function FamilyPage({ user, childSessions }: FamilyPageProps) {
+function FamilyPage({ user, childSessions }: FamilyPageProps) {
   const [selectedChild, setSelectedChild] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all')
@@ -323,7 +323,10 @@ export default function FamilyPage({ user, childSessions }: FamilyPageProps) {
                       <h4 className="text-lg font-semibold text-gray-900 mb-4">
                         Analytics de Communication
                       </h4>
-                      <CommunicationAnalytics childSessionId={child.id} />
+                      <CommunicationAnalytics 
+                        childSessionId={child.id} 
+                        childName={`${child.firstName} ${child.lastName}`}
+                      />
                     </div>
                   </div>
                 </div>
@@ -336,4 +339,32 @@ export default function FamilyPage({ user, childSessions }: FamilyPageProps) {
       </div>
     </div>
   )
+}
+
+export default function FamilyPageWrapper() {
+  // Données simulées pour la page family
+  const user = {
+    firstName: 'Parent',
+    lastName: 'Test',
+    userType: 'PARENT'
+  }
+  
+  const childSessions = [
+    {
+      id: 'milan',
+      firstName: 'Milan',
+      lastName: 'Test',
+      age: 8,
+      isActive: true
+    },
+    {
+      id: 'aylon',
+      firstName: 'Aylon',
+      lastName: 'Test',
+      age: 10,
+      isActive: true
+    }
+  ]
+
+  return <FamilyPage user={user} childSessions={childSessions} />
 }

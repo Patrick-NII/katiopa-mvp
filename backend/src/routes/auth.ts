@@ -184,6 +184,14 @@ router.post('/register', async (req, res) => {
     
     // Créer d'abord la session parent avec le mot de passe principal
     const parentPassword = await bcrypt.hash(password, 12);
+    
+    // Récupérer le genre du parent principal depuis familyMembers[0] s'il existe
+    const parentGender = familyMembers && familyMembers.length > 0 && familyMembers[0].userType === 'PARENT' 
+      ? familyMembers[0].gender || 'UNKNOWN'
+      : 'UNKNOWN';
+    
+    console.log('👤 Genre du parent principal:', parentGender, 'depuis familyMembers[0]:', familyMembers?.[0]?.gender);
+    
     const mainParentSession = await prisma.userSession.create({
       data: {
         accountId: account.id,
@@ -191,7 +199,7 @@ router.post('/register', async (req, res) => {
         password: parentPassword,
         firstName,
         lastName,
-        gender: 'UNKNOWN',
+        gender: parentGender,
         userType: 'PARENT',
         isActive: true
       }
@@ -219,9 +227,15 @@ router.post('/register', async (req, res) => {
       console.log(`✅ Profil parent créé pour ${firstName} ${lastName}`);
     }
     
-    // Créer les sessions pour les membres de la famille
+    // Créer les sessions pour les membres de la famille (en ignorant le parent principal déjà créé)
     for (let index = 0; index < familyMembers.length; index++) {
       const member = familyMembers[index];
+      
+      // Ignorer le premier membre s'il s'agit du parent principal (déjà créé)
+      if (index === 0 && member.userType === 'PARENT') {
+        console.log('⏭️ Parent principal ignoré dans la boucle (déjà créé)');
+        continue;
+      }
       const {
         firstName,
         lastName,

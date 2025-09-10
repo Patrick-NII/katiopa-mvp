@@ -1,20 +1,30 @@
 "use client";
 
-import Navbar from '@/components/NavBar';
-import CubeMatch from '@/components/CubeMatch';
+import React, { useState, useEffect } from 'react';
+import CubeMatchModal from '@/components/modals/CubeMatchModal';
 
 export default function CubeMatchPage() {
+  const [dimensions, setDimensions] = useState({ width: 1200, height: 800 });
+
+  useEffect(() => {
+    setDimensions({ width: window.innerWidth, height: window.innerHeight });
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 relative overflow-hidden">
-      <Navbar />
-      <div className="max-w-7xl mx-auto px-0 py-8 relative z-10">
-        {/* Zone de jeu */}
-        <div className="relative">
-          <div className="relative z-10">
-            <CubeMatch />
-          </div>
-        </div>
-      </div>
+      <CubeMatchModal
+        isOpen={true}
+        onClose={() => window.history.back()}
+        onMinimize={() => {}}
+        onMaximize={() => {}}
+        onFullscreen={() => {}}
+        isMinimized={false}
+        isMaximized={false}
+        isFullscreen={false}
+        zIndex={1000}
+        position={{ x: 0, y: 0 }}
+        size={dimensions}
+      />
     </div>
   );
 }

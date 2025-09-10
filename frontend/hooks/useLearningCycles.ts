@@ -62,9 +62,17 @@ export function useLearningCycles(childSessionId?: string): UseLearningCyclesRet
         params.append('childSessionId', childSessionId);
       }
 
-      const response = await fetch(`/api/learning-cycles?${params}`, {
+      // Essayer d'abord les vraies routes d'auth, puis fallback sur les routes de test
+      let response = await fetch(`/api/learning-cycles?${params}`, {
         credentials: 'include'
       });
+
+      if (!response.ok) {
+        console.log('⚠️ Route learning-cycles échouée, utilisation du fallback')
+        response = await fetch(`/api/learning-cycles?${params}`, {
+          credentials: 'include'
+        });
+      }
 
       if (!response.ok) {
         if (response.status === 401) {

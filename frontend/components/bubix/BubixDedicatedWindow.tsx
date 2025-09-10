@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { MessageCircle, Send, Bot, User, ChevronLeft, ChevronRight, Settings, History, Star, Search, Plus, Archive } from 'lucide-react'
+import { useRadarDataContext } from '../../contexts/RadarDataContext'
 
 interface Message {
   id: string
@@ -17,6 +18,15 @@ interface BubixDedicatedWindowProps {
 }
 
 export default function BubixDedicatedWindow({ user, userType }: BubixDedicatedWindowProps) {
+  // Utiliser le contexte pour accéder aux données du radar (optionnel)
+  let radarData = null
+  try {
+    radarData = useRadarDataContext()
+  } catch (error) {
+    // Le contexte n'est pas disponible, ce n'est pas grave
+    console.log('RadarDataContext non disponible dans BubixDedicatedWindow')
+  }
+  
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -54,17 +64,57 @@ export default function BubixDedicatedWindow({ user, userType }: BubixDedicatedW
     setNewMessage('')
     setIsTyping(true)
 
-    // Simulation de réponse de Bubix
-    setTimeout(() => {
+    try {
+      // Connexion à la vraie API Bubix avec les données du radar
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          messages: [...messages, userMessage].map(msg => ({
+            id: msg.id,
+            text: msg.content,
+            sender: msg.sender === 'bubix' ? 'bot' : 'user',
+            timestamp: msg.timestamp.getTime()
+          })),
+          persona: 'pro',
+          lang: 'fr',
+          user,
+          childSessions: [],
+                      radarData: radarData ? {
+                        profiles: radarData.profiles,
+                        focusedCompetence: radarData.focusedCompetence,
+                        selectedChildId: radarData.selectedChildId
+                      } : null
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la communication avec Bubix')
+      }
+
+      const data = await response.json()
+      
       const bubixResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: `Merci pour votre message : "${newMessage}". Je suis là pour vous accompagner dans votre apprentissage !`,
+        content: data.text || 'Désolé, je n\'ai pas pu répondre à votre question.',
         sender: 'bubix',
         timestamp: new Date()
       }
+      
       setMessages(prev => [...prev, bubixResponse])
+    } catch (error) {
+      console.error('Erreur Bubix:', error)
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        content: 'Désolé, je rencontre un problème technique. Pouvez-vous réessayer ?',
+        sender: 'bubix',
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorResponse])
+    } finally {
       setIsTyping(false)
-    }, 1500)
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -103,27 +153,19 @@ export default function BubixDedicatedWindow({ user, userType }: BubixDedicatedW
             <div className="space-y-1 md:space-y-2 flex-1">
               <button className="w-full flex items-center gap-2 md:gap-3 p-1.5 md:p-3 rounded-xl hover:bg-white/20 transition-colors text-white">
                 <History className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="text-xs md:text-sm text-white hidden md:inline">Historique</span>
+                <span className="text-xs md:text-lg text-white hidden md:inline">Historique</span>
               </button>
               <button className="w-full flex items-center gap-2 md:gap-3 p-1.5 md:p-3 rounded-xl hover:bg-white/20 transition-colors text-white">
                 <Star className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="text-xs md:text-sm text-white hidden md:inline">Favoris</span>
+                <span className="text-xs md:text-lg text-white hidden md:inline">Favoris</span>
               </button>
               <button className="w-full flex items-center gap-2 md:gap-3 p-1.5 md:p-3 rounded-xl hover:bg-white/20 transition-colors text-white">
                 <Settings className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="text-xs md:text-sm text-white hidden md:inline">Paramètres</span>
+                <span className="text-xs md:text-lg text-white hidden md:inline">Paramètres</span>
               </button>
             </div>
 
-            <div className="mt-auto">
-              <div className="bg-white/20 rounded-xl p-1.5 md:p-3">
-                <p className="text-xs text-purple-100 mb-2 hidden md:block">Statut</p>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-white hidden md:inline">En ligne</span>
-                </div>
-              </div>
-            </div>
+            
           </motion.div>
         )}
       </motion.div>
@@ -182,14 +224,14 @@ export default function BubixDedicatedWindow({ user, userType }: BubixDedicatedW
                     ? 'bg-blue-500 text-white' 
                     : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
                 }`}>
-                  {message.sender === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                  {message.sender === 'user' ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
                 </div>
                 <div className={`rounded-2xl px-4 py-2 ${
                   message.sender === 'user'
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-blue-500 !text-gray-100'
                     : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
                 }`}>
-                  <p className="text-sm">{message.content}</p>
+                  <p className="text-lg">{message.content}</p>
                   <p className={`text-xs mt-1 ${
                     message.sender === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
                   }`}>

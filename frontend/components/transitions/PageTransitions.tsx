@@ -92,7 +92,7 @@ export function StaggerTransition({
       scale: 1,
       transition: {
         duration,
-        ease: [0.4, 0, 0.2, 1]
+        ease: "easeOut" as const
       }
     }
   }

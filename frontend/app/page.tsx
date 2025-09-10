@@ -292,7 +292,7 @@ export default function HomePage() {
       </section>
 
 
-      {/* Section des plans */}
+      {/* Section des plans 
       <section className="py-20 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -383,7 +383,7 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+      </section>. */}
 
       {/* Section des fonctionnalités */}
       <section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">

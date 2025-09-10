@@ -895,10 +895,10 @@ function getRAGSnippets(intent: string, userQuery: string): string[] {
 
 // Fonction pour obtenir le modèle selon l'abonnement
 function getModelForSubscription(subscriptionType: string): string {
-  // FREE → local, DECOUVERTE → gpt-3.5, EXPLORATEUR → gpt-4o-mini, MAITRE → gpt-4o
+  // FREE → gpt-3.5-turbo, DECOUVERTE → gpt-3.5, EXPLORATEUR → gpt-4o-mini, MAITRE → gpt-4o
   switch (subscriptionType) {
     case 'FREE':
-      return 'local' // Modèle local uniquement
+      return 'gpt-3.5-turbo' // GPT-3.5 pour les comptes gratuits
     case 'DECOUVERTE':
       return 'gpt-3.5-turbo' // GPT-3 limité
     case 'EXPLORATEUR':
@@ -908,7 +908,7 @@ function getModelForSubscription(subscriptionType: string): string {
     case 'ENTERPRISE':
       return 'gpt-4o' // GPT-4o + modèles personnalisés
     default:
-      return 'local'
+      return 'gpt-3.5-turbo' // Par défaut GPT-3.5
   }
 }
 
@@ -920,10 +920,10 @@ function isLLMEnabled(subscriptionType: string): boolean {
 
 // Fonction pour obtenir le nombre max de tokens
 function getMaxTokensForSubscription(subscriptionType: string): number {
-  // FREE → 0, DECOUVERTE → 500, EXPLORATEUR → 1000, MAITRE → 2000, ENTERPRISE → illimité
+  // FREE → 100, DECOUVERTE → 500, EXPLORATEUR → 1000, MAITRE → 2000, ENTERPRISE → illimité
   switch (subscriptionType) {
     case 'FREE':
-      return 0
+      return 100 // Minimum pour que ça fonctionne
     case 'DECOUVERTE':
       return 500
     case 'EXPLORATEUR':
@@ -933,7 +933,7 @@ function getMaxTokensForSubscription(subscriptionType: string): number {
     case 'ENTERPRISE':
       return 999999 // Illimité
     default:
-      return 0
+      return 100 // Par défaut 100 tokens
   }
 }
 
