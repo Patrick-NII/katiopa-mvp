@@ -27,7 +27,7 @@ import {
   HelpCircle
 } from 'lucide-react'
 import { cubeMatchSocialAPI, type SocialStats, type Comment, type LeaderboardPlayer } from '@/lib/api/cubematch-social'
-import { cubeMatchLeaderboardAPI, type LeaderboardEntry } from '@/lib/api/cubematch-leaderboard'
+import { cubeMatchAPI, type LeaderboardEntry } from '@/lib/api/cubematch-v2'
 import Link from 'next/link'
 import { useModals } from '@/hooks/useModals'
 import Image from 'next/image'
@@ -246,10 +246,10 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
           }
         }
         
-        // Charger le vrai classement Top 10
-        console.log('🏆 Chargement du classement...')
-        const leaderboard = await cubeMatchLeaderboardAPI.getTop10()
-        console.log('✅ Classement chargé:', leaderboard.length, 'entrées', leaderboard)
+        // Charger le vrai classement Top 10 avec l'API v2
+        console.log('🏆 Chargement du classement v2...')
+        const leaderboard = await cubeMatchAPI.getTop10()
+        console.log('✅ Classement v2 chargé:', leaderboard.length, 'entrées', leaderboard)
         setTop10Players(leaderboard || [])
         console.log('📊 État top10Players mis à jour avec:', leaderboard.length, 'joueurs')
         
