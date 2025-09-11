@@ -7,6 +7,7 @@ import sessionsRoutes from './sessions';
 import trackingRoutes from './tracking';
 import experiencesRoutes from './experiences';
 import cubematchRoutes from './cubematch';
+import cubematchSettingsRoutes from './cubematch-settings';
 import emailRoutes from './emails';
 import reportRoutes from './reports';
 import transactionalEmailRoutes from './transactional-emails';
@@ -42,6 +43,7 @@ router.use('/experiences', experiencesRoutes);
 
 // Routes CubeMatch
 router.use('/cubematch', cubematchRoutes);
+router.use('/cubematch', cubematchSettingsRoutes);
 
 // Routes d'emails
 router.use('/emails', emailRoutes);

@@ -23,8 +23,11 @@ import {
   MessageCircle,
   Send,
   Eye,
-  Download
+  Download,
+  HelpCircle
 } from 'lucide-react'
+import { cubeMatchSocialAPI, type SocialStats, type Comment, type LeaderboardPlayer } from '@/lib/api/cubematch-social'
+import { cubeMatchLeaderboardAPI, type LeaderboardEntry } from '@/lib/api/cubematch-leaderboard'
 import Link from 'next/link'
 import { useModals } from '@/hooks/useModals'
 import Image from 'next/image'
@@ -37,11 +40,12 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
   const [currentLevel, setCurrentLevel] = useState(1)
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
+  const [isClient, setIsClient] = useState(false)
 
   // États pour les vraies données de la base de données
   const [userStats, setUserStats] = useState<any>(null)
   const [globalStats, setGlobalStats] = useState<any>(null)
-  const [top10Players, setTop10Players] = useState<any[]>([])
+  const [top10Players, setTop10Players] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [userRanking, setUserRanking] = useState<number | null>(null)
   
@@ -64,8 +68,8 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
     if (onOpenCubeMatch) {
       onOpenCubeMatch()
     } else {
-      // Rediriger vers la page CubeMatch directe
-      window.location.href = '/dashboard/mathcube/cubematch'
+      // Ouvrir le modal CubeMatch
+      openCubeMatchModal()
     }
   }
   
@@ -91,86 +95,65 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
     return null
   }
 
-  // Fonction pour charger les données sociales
+  // Test simple pour récupérer les données 
   const loadSocialData = async () => {
     try {
-      const userId = await getCurrentUserId()
-      if (!userId) return
-
-      setCurrentUserId(userId)
-
-      // Charger les statistiques générales
-      const statsResponse = await fetch('/api/cubematch/stats')
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json()
-        if (statsData.success) {
-          setLikes(statsData.data.likes)
-          setShares(statsData.data.shares)
-          setViews(statsData.data.views)
-          setGamesPlayed(statsData.data.gamesPlayed)
-        }
+      console.log('🔄 Test de chargement des données...')
+      setLoading(true)
+      
+      // Test direct de l'API
+      const response = await fetch('/api/cubematch/social/stats/cubematch-main')
+      if (response.ok) {
+        const data = await response.json()
+        console.log('📊 Données reçues:', data)
+        setLikes(data.likes || 0)
+        setShares(data.shares || 0)
+        setViews(data.views || 0)
+        setGamesPlayed(data.gamesPlayed || 0)
+      } else {
+        console.error('❌ Erreur API:', response.status)
       }
-
-      // Charger les likes de l'utilisateur
-      const likesResponse = await fetch('/api/cubematch/likes')
-      if (likesResponse.ok) {
-        const likesData = await likesResponse.json()
-        if (likesData.success) {
-          const userLiked = likesData.data.likes.some((like: any) => like.userId === userId)
-          setIsLiked(userLiked)
-        }
-      }
-
-      // Charger les commentaires
-      const commentsResponse = await fetch('/api/cubematch/comments')
+      
+      // Test commentaires
+      const commentsResponse = await fetch('/api/cubematch/social/comments/cubematch-main')
       if (commentsResponse.ok) {
         const commentsData = await commentsResponse.json()
-        if (commentsData.success) {
-          setComments(commentsData.data)
-        }
+        console.log('💬 Commentaires:', commentsData)
+        setComments(commentsData || [])
       }
-
-      // Charger le classement
-      const rankingResponse = await fetch('/api/cubematch/ranking')
-      if (rankingResponse.ok) {
-        const rankingData = await rankingResponse.json()
-        if (rankingData.success) {
-          setTop10Players(rankingData.data)
-        }
-      }
-
-      // Enregistrer la vue
-      await fetch('/api/cubematch/stats', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, action: 'view' })
-      })
+      
+      // Charger le vrai classement Top 10
+      const realLeaderboard = await cubeMatchLeaderboardAPI.getTop10()
+      console.log('🏆 Classement Top 10 réel:', realLeaderboard)
+      setTop10Players(realLeaderboard || [])
 
     } catch (error) {
-      console.error('Error loading social data:', error)
+      console.error('❌ Erreur de test:', error)
+      setLikes(0)
+      setShares(0)
+      setViews(0)
+      setGamesPlayed(0)
+      setComments([])
+      setTop10Players([])
+    } finally {
+      setLoading(false)
+      console.log('🏁 Test terminé')
     }
   }
 
-  // Fonctions pour les interactions sociales
+  // Fonctions pour les interactions sociales avec la nouvelle API
   const handleLike = async () => {
     if (!currentUserId) return
 
     try {
-      const response = await fetch('/api/cubematch/likes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: currentUserId })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        if (data.success) {
-          setIsLiked(data.data.liked)
-          setLikes(data.data.totalLikes)
-        }
-      }
+      const result = await cubeMatchSocialAPI.toggleLike()
+      setIsLiked(result.liked)
+      
+      // Recharger les statistiques sociales pour avoir le nombre exact
+      const socialStats = await cubeMatchSocialAPI.getSocialStats()
+      setLikes(socialStats.likes)
     } catch (error) {
-      console.error('Error handling like:', error)
+      console.error('Erreur lors de la gestion du like:', error)
     }
   }
   
@@ -178,14 +161,11 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
     if (!currentUserId) return
 
     try {
-      // Enregistrer le partage
-      await fetch('/api/cubematch/stats', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: currentUserId, action: 'share' })
-      })
-
-      setShares(prev => prev + 1)
+      await cubeMatchSocialAPI.recordShare('web')
+      
+      // Mettre à jour le compteur de partages
+      const socialStats = await cubeMatchSocialAPI.getSocialStats()
+      setShares(socialStats.shares)
 
       // Partager via l'API native si disponible
       if (navigator.share) {
@@ -208,24 +188,14 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
     if (!newComment.trim() || !currentUserId) return
 
     try {
-      const response = await fetch('/api/cubematch/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          userId: currentUserId, 
-          content: newComment.trim() 
-        })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        if (data.success) {
-          setComments(prev => [data.data, ...prev])
-          setNewComment('')
-        }
-      }
+      await cubeMatchSocialAPI.addComment(newComment.trim())
+      
+      // Recharger les commentaires pour avoir la liste mise à jour
+      const updatedComments = await cubeMatchSocialAPI.getComments(20)
+      setComments(updatedComments)
+      setNewComment('')
     } catch (error) {
-      console.error('Error adding comment:', error)
+      console.error('Erreur lors de l\'ajout du commentaire:', error)
     }
   }
   
@@ -233,108 +203,65 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
     if (!currentUserId) return
 
     try {
-      const response = await fetch('/api/cubematch/comments/like', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          userId: currentUserId, 
-          commentId 
-        })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        if (data.success) {
-          setComments(prev => prev.map(comment => 
-            comment.id === commentId 
-              ? { ...comment, likes: data.data.liked ? comment.likes + 1 : comment.likes - 1 }
-              : comment
-          ))
-        }
-      }
+      await cubeMatchSocialAPI.toggleCommentLike(commentId)
+      
+      // Recharger les commentaires pour avoir les likes mis à jour
+      const updatedComments = await cubeMatchSocialAPI.getComments(20)
+      setComments(updatedComments)
     } catch (error) {
       console.error('Error liking comment:', error)
     }
   }
 
-  // Fonction pour charger les statistiques utilisateur
-  const loadUserStats = async () => {
-    try {
-      const response = await fetch('/api/cubematch/user-stats', {
-        credentials: 'include'
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setUserStats(data)
-      }
-    } catch (error) {
-      console.error('Erreur chargement stats utilisateur:', error)
-    }
-  }
 
-  // Fonction pour charger les statistiques globales
-  const loadGlobalStats = async () => {
-    try {
-      const response = await fetch('/api/cubematch/stats', {
-        credentials: 'include'
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setGlobalStats(data.data?.stats || null)
-      }
-    } catch (error) {
-      console.error('Erreur chargement stats globales:', error)
-    }
-  }
-
-  // Fonction pour charger le top 10
-  const loadTop10 = async () => {
-    try {
-      const response = await fetch('/api/cubematch/global-leaderboard?limit=10', {
-        credentials: 'include'
-      })
-      
-      if (response.ok) {
-        const responseData = await response.json()
+  // Chargement des données
+  useEffect(() => {
+    setIsClient(true)
+    
+    const loadData = async () => {
+      try {
+        console.log('🔄 Chargement des données CubeMatch...')
         
-        if (responseData.success && responseData.data.leaderboard) {
-          const top10 = responseData.data.leaderboard
-          setTop10Players(top10)
+        // Charger les données sociales
+        const socialResponse = await fetch('/api/cubematch/social-data')
+        if (socialResponse.ok) {
+          const socialResult = await socialResponse.json()
+          console.log('✅ Données sociales chargées:', socialResult)
           
-          // Calculer le rang de l'utilisateur actuel
-          const currentUser = await fetch('/api/auth/verify', {
-            credentials: 'include'
-          })
-          if (currentUser.ok) {
-            const userData = await currentUser.json()
-            const userRank = top10.findIndex((player: any) => player.userId === userData.user?.id) + 1
-            setUserRanking(userRank || null)
+          if (socialResult.success && socialResult.data) {
+            const { socialStats, comments } = socialResult.data
+            
+            // Mettre à jour les états sociaux
+            setLikes(socialStats.likes || 0)
+            setShares(socialStats.shares || 0)
+            setViews(socialStats.views || 0)
+            setGamesPlayed(socialStats.gamesPlayed || 0)
+            setComments(comments || [])
+            
+            console.log('📊 Stats sociales mises à jour:', { 
+              likes: socialStats.likes, 
+              shares: socialStats.shares, 
+              views: socialStats.views 
+            })
           }
         }
-      } else {
-        console.error('Erreur chargement leaderboard:', response.status)
+        
+        // Charger le vrai classement Top 10
+        console.log('🏆 Chargement du classement...')
+        const leaderboard = await cubeMatchLeaderboardAPI.getTop10()
+        console.log('✅ Classement chargé:', leaderboard.length, 'entrées', leaderboard)
+        setTop10Players(leaderboard || [])
+        console.log('📊 État top10Players mis à jour avec:', leaderboard.length, 'joueurs')
+        
+      } catch (error) {
+        console.error('❌ Erreur de chargement:', error)
+      } finally {
+        setLoading(false)
+        console.log('🏁 Chargement terminé')
       }
-    } catch (error) {
-      console.error('Erreur chargement top 10:', error)
     }
-  }
 
-  // Charger toutes les données au montage du composant
-  useEffect(() => {
-    const loadAllData = async () => {
-      setLoading(true)
-      await Promise.all([
-        loadUserStats(),
-        loadGlobalStats(),
-        loadTop10(),
-        loadSocialData()
-      ])
-      setLoading(false)
-    }
-    
-    loadAllData()
+    loadData()
   }, [])
 
   return (
@@ -550,21 +477,41 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
                 </div>
                 
                 {/* Colonne 3 - Stats et classement */}
-                <div className="space-y-6">
+                <div className="space-y-6 max-w-4xl mx-auto">
                   
                   {/* Carte de performance */}
                   <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 overflow-hidden">
                     <div className="bg-gradient-to-r from-purple-400 to-pink-400 p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-white/30 rounded-xl flex items-center justify-center">
-                          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                          </svg>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-white/30 rounded-xl flex items-center justify-center">
+                            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-white text-lg">Classement</h3>
+                            <p className="text-purple-100 text-sm">Meilleur score de nos {top10Players.length} champions</p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-bold text-white text-lg">Classement</h3>
-                          <p className="text-purple-100 text-sm">Top des champions</p>
-                        </div>
+                        <button 
+                          onClick={async () => {
+                            console.log('🔄 Rechargement manuel du classement...')
+                            setLoading(true)
+                            try {
+                              const data = await cubeMatchLeaderboardAPI.getTop10()
+                              console.log('✅ Données rechargées:', data)
+                              setTop10Players(data)
+                            } catch (error) {
+                              console.error('❌ Erreur rechargement:', error)
+                            } finally {
+                              setLoading(false)
+                            }
+                          }}
+                          className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-sm text-white transition-colors"
+                        >
+                          🔄
+                        </button>
                       </div>
                     </div>
                     
@@ -580,6 +527,8 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
                       
                       {/* Corps du tableau avec design moderne */}
                       <div className="space-y-2">
+                      {/* Debug info */}
+                        {console.log('🔍 État du rendu:', { loading, top10PlayersLength: top10Players.length, top10Players })}
                         {loading ? (
                           Array.from({ length: 5 }).map((_, index) => (
                             <div key={index} className="grid grid-cols-12 gap-1 p-3 bg-gray-50 rounded-xl animate-pulse">
@@ -589,35 +538,83 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
                             </div>
                           ))
                         ) : top10Players.length > 0 ? (
-                          top10Players.slice(0, 5).map((player: any, index: number) => (
-                            <div key={player.userId} className={`grid grid-cols-12 gap-1 p-3 rounded-xl transition-all hover:scale-[1.02] ${
-                              index === 0 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200' :
-                              index === 1 ? 'bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200' :
-                              index === 2 ? 'bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200' :
-                              'bg-white border border-gray-100'
-                            }`}>
-                              <div className="col-span-3 text-center">
-                                <div className={`text-sm font-bold ${
-                                  index === 0 ? 'text-yellow-600' :
-                                  index === 1 ? 'text-gray-600' :
-                                  index === 2 ? 'text-orange-600' :
-                                  'text-gray-700'
-                                }`}>
-                                  {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                          top10Players.map((player: LeaderboardEntry, index: number) => {
+                            // Extraire le nom d'affichage depuis le sessionId (ex: "aylon-session" -> "Aylon")
+                            const displayName = player.username 
+                              ? player.username.split('-')[0].charAt(0).toUpperCase() + player.username.split('-')[0].slice(1)
+                              : 'Joueur';
+                            
+                            // Première lettre pour l'avatar
+                            const avatarLetter = displayName.charAt(0).toUpperCase();
+                            
+                            // Couleur de gradient basée sur l'index
+                            const avatarGradients = [
+                              'from-blue-600 to-purple-600',
+                              'from-emerald-600 to-teal-600', 
+                              'from-pink-600 to-red-600',
+                              'from-orange-600 to-yellow-600',
+                              'from-indigo-600 to-blue-600'
+                            ];
+                            
+                            return (
+                              <div key={player.id} className={`flex items-center gap-3 p-3 rounded-xl transition-all hover:scale-[1.02] ${
+                                index === 0 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200' :
+                                index === 1 ? 'bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200' :
+                                index === 2 ? 'bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200' :
+                                'bg-white border border-gray-100'
+                              }`}>
+                                
+                                {/* Avatar avec première lettre */}
+                                <div className={`w-10 h-10 bg-gradient-to-r ${avatarGradients[index % avatarGradients.length]} rounded-xl flex items-center justify-center text-white text-sm font-semibold shadow-lg`}>
+                                  {avatarLetter}
+                                </div>
+                                
+                                {/* Informations du joueur */}
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                      {displayName}
+                                    </p>
+                                    {/* Badge de classement */}
+                                    <span className={`text-xs px-2 py-1 rounded-full font-bold ${
+                                      index === 0 ? 'bg-yellow-100 text-yellow-700' :
+                                      index === 1 ? 'bg-gray-100 text-gray-700' :
+                                      index === 2 ? 'bg-orange-100 text-orange-700' :
+                                      'bg-blue-100 text-blue-700'
+                                    }`}>
+                                      {index === 0 ? '🥇 CHAMPION' : 
+                                       index === 1 ? '🥈 EXPERT' :
+                                       index === 2 ? '🥉 PRO' :
+                                       'MAÎTRE'}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-300">
+                                    <span className="font-medium">
+                                      🏆 {player.score.toLocaleString()} pts
+                                    </span>
+                                    <span>
+                                      ⚡ Niveau {player.level}
+                                    </span>
+                                    <span>
+                                      ⏱️ {player.timePlayedFormatted}
+                                    </span>
+                                  </div>
+                                </div>
+                                
+                                {/* Indicateur de position */}
+                                <div className="text-right">
+                                  <div className={`text-lg font-bold ${
+                                    index === 0 ? 'text-yellow-600' :
+                                    index === 1 ? 'text-gray-600' :
+                                    index === 2 ? 'text-orange-600' :
+                                    'text-gray-700'
+                                  }`}>
+                                    {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                                  </div>
                                 </div>
                               </div>
-                              <div className="col-span-5 text-center">
-                                <div className="text-xs font-medium text-gray-700 truncate">
-                                  {player.sessionId || player.userId.slice(-6)}
-                                </div>
-                              </div>
-                              <div className="col-span-4 text-center">
-                                <div className="text-xs font-bold text-emerald-600">
-                                  {player.score?.toLocaleString() || 'N/A'}
-                                </div>
-                              </div>
-                            </div>
-                          ))
+                            );
+                          })
                         ) : (
                           <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-xl">
                             <svg className="w-8 h-8 mx-auto mb-2 text-gray-300" fill="currentColor" viewBox="0 0 24 24">

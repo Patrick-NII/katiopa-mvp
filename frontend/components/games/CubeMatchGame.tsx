@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { cubeMatchScoresAPI, type CubeMatchScore } from '@/lib/api/cubematch-scores'
+import { cubeMatchSettingsAPI, type CubeMatchSettings } from '@/lib/api/cubematch-settings'
 import { 
   Gamepad2, 
   Trophy, 
@@ -54,6 +56,7 @@ interface GameStats {
   precision: number
   totalMoves: number
   successfulMoves: number
+  timePlayedMs: number
 }
 
 interface Cell {
@@ -106,13 +109,20 @@ export default function CubeMatchGame() {
     accuracy: 100,
     precision: 100,
     totalMoves: 0,
-    successfulMoves: 0
+    successfulMoves: 0,
+    timePlayedMs: 0
   })
 
   // Refs
   const gameIntervalRef = useRef<NodeJS.Timeout>()
   const spawnIntervalRef = useRef<NodeJS.Timeout>()
   const audioRef = useRef<HTMLAudioElement>()
+  const gameStartTimeRef = useRef<number>(0)
+  const autoSaveRef = useRef<(() => void) | null>(null)
+  
+  // État de chargement et récupération
+  const [isLoadingSettings, setIsLoadingSettings] = useState(true)
+  const [hasRecoveredGame, setHasRecoveredGame] = useState(false)
 
   // Sons du jeu améliorés
   const playSound = useCallback((sound: 'click' | 'success' | 'error' | 'levelup' | 'gameover' | 'validation' | 'combo') => {
@@ -421,6 +431,7 @@ export default function CubeMatchGame() {
 
   // Démarrer le jeu
   const startGame = useCallback(() => {
+    gameStartTimeRef.current = Date.now() // Capturer le temps de début
     setGameState('playing')
     setIsGameRunning(true)
     setStats(prev => ({
@@ -433,7 +444,8 @@ export default function CubeMatchGame() {
       hintsUsed: 0,
       totalMoves: 0,
       successfulMoves: 0,
-      accuracy: 100
+      accuracy: 100,
+      timePlayedMs: 0
     }))
     initializeGameBoard()
   }, [config.timeLimit, config.unlimitedTime, initializeGameBoard])
@@ -493,15 +505,228 @@ export default function CubeMatchGame() {
     }
   }, [selectedCells, config.autoSubmit, calculateResult, target, submitSelection])
 
-  // Sauvegarder les meilleurs scores
+  // 🍎 SYSTÈME MAGIQUE DE CHARGEMENT INITIAL (Style Apple)
+  useEffect(() => {
+    const initializeGame = async () => {
+      console.log('🍎 Initialisation magique CubeMatch...')
+      setIsLoadingSettings(true)
+      
+      try {
+        // Charger les paramètres utilisateur personnalisés
+        const response = await cubeMatchSettingsAPI.loadSettings()
+        
+        if (response.success) {
+          console.log('✨ Paramètres personnalisés chargés:', response.settings)
+          setConfig(response.settings)
+          
+          // Récupérer une session de jeu interrompue ?
+          if (response.settings.currentGameState?.isPlaying) {
+            const recovered = response.settings.currentGameState
+            console.log('🔄 Session de jeu détectée ! Récupération...')
+            
+            // Proposer la récupération à l'enfant
+            const shouldRecover = window.confirm(
+              `🎮 Hey ! Tu as une partie en cours avec ${recovered.score} points au niveau ${recovered.level}.\n\n✨ Veux-tu continuer où tu t'étais arrêté ?`
+            )
+            
+            if (shouldRecover) {
+              setStats(prev => ({
+                ...prev,
+                score: recovered.score,
+                level: recovered.level,
+                timeLeft: recovered.timeLeft,
+                ...recovered.stats
+              }))
+              
+              setTarget(recovered.target)
+              if (recovered.gameBoard) {
+                setGameBoard(recovered.gameBoard)
+              }
+              
+              setGameState('playing')
+              setIsGameRunning(true)
+              setHasRecoveredGame(true)
+              gameStartTimeRef.current = Date.now() - (recovered.stats?.timePlayedMs || 0)
+              
+              console.log('🎉 Session récupérée avec succès !')
+            } else {
+              // Nettoyer la session refusée
+              await cubeMatchSettingsAPI.clearGameState()
+            }
+          }
+        }
+      } catch (error) {
+        console.log('💾 Utilisation des paramètres par défaut')
+      } finally {
+        setIsLoadingSettings(false)
+      }
+    }
+    
+    initializeGame()
+  }, [])
+
+  // 🔄 Auto-sauvegarde magique en continu
+  useEffect(() => {
+    if (gameState === 'playing' && !autoSaveRef.current) {
+      console.log('🔄 Démarrage de l\'auto-sauvegarde...')
+      
+      autoSaveRef.current = cubeMatchSettingsAPI.startAutoSave(() => ({
+        isPlaying: gameState === 'playing',
+        score: stats.score,
+        level: stats.level,
+        timeLeft: stats.timeLeft,
+        target: target,
+        gameBoard: gameBoard,
+        stats: stats
+      }), 8000) // Sauvegarde toutes les 8 secondes
+    }
+    
+    if (gameState !== 'playing' && autoSaveRef.current) {
+      autoSaveRef.current()
+      autoSaveRef.current = null
+    }
+    
+    return () => {
+      if (autoSaveRef.current) {
+        autoSaveRef.current()
+        autoSaveRef.current = null
+      }
+    }
+  }, [gameState, stats, target, gameBoard])
+
+  // 💾 Sauvegarde des paramètres à chaque modification
+  useEffect(() => {
+    if (!isLoadingSettings) {
+      console.log('💾 Auto-sauvegarde des paramètres...')
+      cubeMatchSettingsAPI.saveSettings(config).catch(() => {
+        // Silent fail pour ne pas perturber l'expérience
+      })
+    }
+  }, [config, isLoadingSettings])
+
+  // 🏆 Sauvegarde des scores et nettoyage de session
   useEffect(() => {
     if (gameState === 'gameOver') {
+      // Sauvegarde locale
       const bestScore = localStorage.getItem('cubematch-best-score')
       if (!bestScore || stats.score > parseInt(bestScore)) {
         localStorage.setItem('cubematch-best-score', stats.score.toString())
       }
+
+      // Nettoyer l'état de jeu sauvegardé (partie terminée)
+      cubeMatchSettingsAPI.clearGameState().catch(() => {
+        // Silent fail
+      })
+
+      // Sauvegarde vers l'API backend (uniquement si l'utilisateur est authentifié)
+      const saveScoreToBackend = async () => {
+        try {
+          // Vérifier d'abord l'authentification
+          console.log('🔐 Vérification de l\'authentification avant sauvegarde...');
+          
+          const authResponse = await fetch('/api/auth/status');
+          const authData = await authResponse.json();
+          
+          if (!authData.authenticated) {
+            console.log('⚠️ Utilisateur non authentifié - score non sauvegardé');
+            console.log('💡 Pour sauvegarder vos scores, veuillez vous connecter');
+            return;
+          }
+          
+          console.log(`👤 Utilisateur authentifié: ${authData.user.firstName || authData.user.username}`);
+          
+          // Calculer le temps joué
+          const timePlayedMs = gameStartTimeRef.current > 0 ? Date.now() - gameStartTimeRef.current : 0;
+          
+          console.log('💾 Sauvegarde du score pour utilisateur authentifié:', { ...stats, timePlayedMs });
+          
+          const scoreData: CubeMatchScore = {
+            score: stats.score,
+            level: stats.level,
+            timePlayedMs: timePlayedMs,
+            operator: config.operator,
+            target: target,
+            allowDiagonals: config.allowDiagonals,
+            gridSize: config.gridSize,
+            difficulty: config.difficulty,
+            hintsUsed: stats.hintsUsed || 0,
+            gameDurationSeconds: Math.floor(timePlayedMs / 1000),
+            // Nouvelles données statistiques
+            comboMax: stats.bestCombo || 0,
+            cellsCleared: stats.cellsCleared || 0,
+            totalMoves: stats.totalMoves || 0,
+            successfulMoves: stats.successfulMoves || 0,
+            accuracy: stats.accuracy || 100,
+            precision: stats.precision || 100,
+            soundEnabled: config.soundEnabled || true,
+            hintsEnabled: config.hintsEnabled || true
+          };
+
+          await cubeMatchScoresAPI.saveScore(scoreData);
+          console.log('✅ Score sauvegardé avec succès en base de données');
+        } catch (error) {
+          console.error('❌ Erreur lors de la sauvegarde du score:', error);
+          
+          if (error.message?.includes('AUTH_REQUIRED') || error.message?.includes('401')) {
+            console.log('🔑 Authentification requise pour sauvegarder le score');
+          }
+        }
+      };
+
+      saveScoreToBackend();
     }
-  }, [gameState, stats.score])
+  }, [gameState, stats.score, stats.level, stats.timePlayedMs, stats.hintsUsed, config, target])
+
+  // 🌟 Écran de chargement magique style Apple/Disney
+  if (isLoadingSettings) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          {/* Logo CubeMatch animé */}
+          <motion.div
+            animate={{ 
+              rotateY: [0, 360],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-xl"
+          >
+            <span className="text-3xl font-bold text-white">🧮</span>
+          </motion.div>
+          
+          {/* Texte de chargement enfantin */}
+          <motion.h2
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className="text-2xl font-bold text-gray-700 mb-2"
+          >
+            ✨ Préparation de ta partie magique...
+          </motion.h2>
+          
+          <p className="text-gray-500 text-lg">
+            {hasRecoveredGame ? '🔄 Récupération de ta session...' : '🎮 Chargement de tes paramètres...'}
+          </p>
+          
+          {/* Barre de progression style iOS */}
+          <div className="w-48 h-2 bg-gray-200 rounded-full mt-6 mx-auto overflow-hidden">
+            <motion.div
+              animate={{ x: [-100, 200] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              className="w-20 h-full bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"
+            />
+          </div>
+        </motion.div>
+      </div>
+    )
+  }
 
   // Rendu du menu principal
   if (gameState === 'menu') {
