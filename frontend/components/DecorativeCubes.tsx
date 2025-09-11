@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface DecorativeCubesProps {
   variant?: 'default' | 'minimal' | 'intense' | 'glassmorphism';
@@ -11,7 +11,19 @@ const DecorativeCubes: React.FC<DecorativeCubesProps> = ({
   variant = 'default', 
   className = '' 
 }) => {
-  const getCubeStyles = (type: string, size: number, color: string, position: string) => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Générateur de nombres pseudo-aléatoires déterministe
+  const seededRandom = (seed: number) => {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  };
+
+  const getCubeStyles = (type: string, size: number, color: string, position: string, index: number) => {
     const baseStyles = {
       position: 'absolute' as const,
       width: `${size}px`,
@@ -26,7 +38,7 @@ const DecorativeCubes: React.FC<DecorativeCubesProps> = ({
         return {
           ...baseStyles,
           background: `linear-gradient(135deg, ${color}40, ${color}80)`,
-          transform: `rotate(${Math.random() * 45}deg)`,
+          transform: `rotate(${seededRandom(index + 1) * 45}deg)`,
           boxShadow: `0 ${size/3}px ${size/2}px ${color}30, inset 0 2px 4px rgba(255,255,255,0.3)`,
           animation: 'float 6s ease-in-out infinite',
         };
@@ -34,7 +46,7 @@ const DecorativeCubes: React.FC<DecorativeCubesProps> = ({
         return {
           ...baseStyles,
           background: `linear-gradient(145deg, ${color}60, ${color}40)`,
-          transform: `rotate(${Math.random() * 30}deg)`,
+          transform: `rotate(${seededRandom(index + 2) * 30}deg)`,
           boxShadow: `0 4px 8px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.4)`,
           animation: 'breathe 8s ease-in-out infinite',
         };
@@ -43,7 +55,7 @@ const DecorativeCubes: React.FC<DecorativeCubesProps> = ({
           ...baseStyles,
           background: 'transparent',
           border: `2px solid ${color}60`,
-          transform: `rotate(${Math.random() * 60}deg)`,
+          transform: `rotate(${seededRandom(index + 3) * 60}deg)`,
           boxShadow: `0 2px 4px ${color}20`,
           animation: 'pulse 5s ease-in-out infinite',
         };
@@ -51,7 +63,7 @@ const DecorativeCubes: React.FC<DecorativeCubesProps> = ({
         return {
           ...baseStyles,
           background: `linear-gradient(45deg, ${color}50, ${color}80, ${color}60)`,
-          transform: `rotate(${Math.random() * 90}deg)`,
+          transform: `rotate(${seededRandom(index + 4) * 90}deg)`,
           boxShadow: `0 ${size/4}px ${size/3}px ${color}40`,
           animation: 'rotate 12s linear infinite',
         };
@@ -61,7 +73,7 @@ const DecorativeCubes: React.FC<DecorativeCubesProps> = ({
           background: `linear-gradient(135deg, ${color}20, ${color}40)`,
           backdropFilter: 'blur(10px)',
           border: `1px solid ${color}30`,
-          transform: `rotate(${Math.random() * 45}deg)`,
+          transform: `rotate(${seededRandom(index + 5) * 45}deg)`,
           boxShadow: `0 8px 32px ${color}20, inset 0 1px 0 rgba(255,255,255,0.2)`,
           animation: 'glassFloat 8s ease-in-out infinite',
         };
@@ -69,7 +81,7 @@ const DecorativeCubes: React.FC<DecorativeCubesProps> = ({
         return {
           ...baseStyles,
           background: `radial-gradient(circle, ${color}60, ${color}30)`,
-          transform: `rotate(${Math.random() * 30}deg)`,
+          transform: `rotate(${seededRandom(index + 6) * 30}deg)`,
           boxShadow: `0 0 ${size/2}px ${color}80, 0 0 ${size}px ${color}60, 0 0 ${size*1.5}px ${color}40`,
           animation: 'neonPulse 4s ease-in-out infinite',
         };
@@ -78,7 +90,7 @@ const DecorativeCubes: React.FC<DecorativeCubesProps> = ({
           ...baseStyles,
           borderRadius: '50%',
           background: `conic-gradient(from 0deg, ${color}40, ${color}80, ${color}40)`,
-          transform: `rotate(${Math.random() * 360}deg)`,
+          transform: `rotate(${seededRandom(index + 7) * 360}deg)`,
           boxShadow: `0 4px 16px ${color}30, inset 0 2px 4px rgba(255,255,255,0.3)`,
           animation: 'crystalSpin 10s linear infinite',
         };
@@ -86,7 +98,7 @@ const DecorativeCubes: React.FC<DecorativeCubesProps> = ({
         return {
           ...baseStyles,
           background: `linear-gradient(135deg, ${color}30, ${color}60)`,
-          transform: `rotate(${Math.random() * 60}deg)`,
+          transform: `rotate(${seededRandom(index + 8) * 60}deg)`,
           boxShadow: `0 ${size/3}px ${size/2}px ${color}20`,
           animation: 'floatingMove 9s ease-in-out infinite',
         };
@@ -94,7 +106,7 @@ const DecorativeCubes: React.FC<DecorativeCubesProps> = ({
         return {
           ...baseStyles,
           background: `linear-gradient(135deg, ${color}60, ${color}80)`,
-          transform: `rotate(${Math.random() * 45}deg)`,
+          transform: `rotate(${seededRandom(index + 9) * 45}deg)`,
           boxShadow: `0 ${size/4}px ${size/3}px ${color}30`,
           animation: 'float 7s ease-in-out infinite',
         };
@@ -166,12 +178,12 @@ const DecorativeCubes: React.FC<DecorativeCubesProps> = ({
     
     // Utiliser les zones de distribution pour une meilleure répartition
     const zone = distributionZones[i % distributionZones.length];
-    const top = zone.top.min + Math.random() * (zone.top.max - zone.top.min);
-    const left = zone.left.min + Math.random() * (zone.left.max - zone.left.min);
+    const top = zone.top.min + seededRandom(i + 10) * (zone.top.max - zone.top.min);
+    const left = zone.left.min + seededRandom(i + 11) * (zone.left.max - zone.left.min);
     
     return {
       id: i,
-      style: getCubeStyles(type, size, color, `${top}px ${left}%`),
+      style: getCubeStyles(type, size, color, `${top}px ${left}%`, i),
       top,
       left: `${left}%`,
     };
@@ -219,20 +231,23 @@ const DecorativeCubes: React.FC<DecorativeCubesProps> = ({
         }
       `}</style>
       
-      <div className={`absolute inset-0 pointer-events-none ${className}`} style={{ top: '0px' }}>
-        {cubes.map((cube) => (
-          <div
-            key={cube.id}
-            className="absolute"
-            style={{
-              ...cube.style,
-              top: `${cube.top}px`,
-              left: cube.left,
-              ['--rotation' as string]: `${Math.random() * 360}deg`,
-            } as React.CSSProperties}
-          />
-        ))}
-      </div>
+      {/* Ne render que côté client pour éviter les problèmes d'hydratation */}
+      {isClient && (
+        <div className={`absolute inset-0 pointer-events-none ${className}`} style={{ top: '0px' }}>
+          {cubes.map((cube) => (
+            <div
+              key={cube.id}
+              className="absolute"
+              style={{
+                ...cube.style,
+                top: `${cube.top}px`,
+                left: cube.left,
+                ['--rotation' as string]: `${seededRandom(cube.id + 12) * 360}deg`,
+              } as React.CSSProperties}
+            />
+          ))}
+        </div>
+      )}
     </>
   );
 };

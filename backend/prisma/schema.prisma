@@ -608,6 +608,7 @@ model CubeMatchUserStats {
   total_cells_cleared Int         @default(0)
   total_hints_used    Int         @default(0)
   favorite_operator   String      @default("ADD") @db.VarChar(10)
+  user_preferences    String?     @db.Text // Stockage JSON des paramètres utilisateur
   last_played         DateTime    @default(now())
   created_at          DateTime    @default(now())
   updated_at          DateTime    @updatedAt

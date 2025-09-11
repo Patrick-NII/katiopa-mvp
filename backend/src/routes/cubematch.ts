@@ -20,13 +20,8 @@ router.get('/scores', async (req, res) => {
     `;
     
     if (!(tableExists as any[])[0]?.exists) {
-      // Si la table n'existe pas, retourner des données par défaut
-      const defaultScores = [
-        { id: '1', userId: 'user1', username: 'Joueur 1', score: 1250, level: 8, timePlayedMs: 45000, operator: 'ADD', target: 10, allowDiagonals: false, createdAt: new Date().toISOString() },
-        { id: '2', userId: 'user2', username: 'Joueur 2', score: 980, level: 6, timePlayedMs: 38000, operator: 'ADD', target: 10, allowDiagonals: false, createdAt: new Date().toISOString() },
-        { id: '3', userId: 'user3', username: 'Joueur 3', score: 750, level: 5, timePlayedMs: 32000, operator: 'ADD', target: 10, allowDiagonals: false, createdAt: new Date().toISOString() }
-      ];
-      return res.json(defaultScores.slice(0, limit));
+      // Si la table n'existe pas, retourner un tableau vide
+      return res.json([]);
     }
     
     const scores = await prisma.$queryRaw`
@@ -143,7 +138,7 @@ router.get('/stats', async (req, res) => {
   }
 });
 
-// GET /api/cubematch/leaderboard - Récupérer le classement complet
+// GET /api/cubematch/leaderboard - Récupérer le classement complet (PUBLIC)
 router.get('/leaderboard', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit as string) || 10;
@@ -177,7 +172,7 @@ router.get('/leaderboard', async (req, res) => {
   }
 });
 
-// POST /api/cubematch/scores - Sauvegarder un nouveau score
+// POST /api/cubematch/scores - Sauvegarder un nouveau score (AUTHENTIFICATION REQUISE)
 router.post('/scores', requireAuth, async (req, res) => {
   try {
     const {
@@ -204,22 +199,14 @@ router.post('/scores', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'Données manquantes' });
     }
 
-    // Récupérer les informations de l'utilisateur
-    const user = await prisma.userSession.findUnique({
-      where: { id: req.user!.userId },
-      select: { firstName: true, lastName: true }
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: 'Utilisateur non trouvé' });
-    }
-
-    const username = `${user.firstName} ${user.lastName}`;
+    // Utiliser les données de l'utilisateur authentifié
+    const userId = req.user!.userId;
+    const username = req.user!.sessionId || req.user!.firstName || req.user!.username || 'Utilisateur';
 
     // Sauvegarder le score avec Prisma ORM
     const newScore = await prisma.cubeMatchScore.create({
       data: {
-        user_id: req.user!.userId,
+        user_id: userId,
         username: username,
         score: score,
         level: level,
@@ -337,6 +324,299 @@ router.get('/user-stats', requireAuth, async (req, res) => {
     });
   } catch (error) {
     console.error('Erreur lors de la récupération des statistiques utilisateur:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// ===== FONCTIONNALITÉS SOCIALES =====
+
+// GET /api/cubematch/social/likes/:gameId - Récupérer les likes d'un jeu
+router.get('/social/likes/:gameId', async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    
+    const likes = await prisma.gameLike.findMany({
+      where: { gameId },
+      select: {
+        userId: true,
+        createdAt: true
+      }
+    });
+    
+    res.json({
+      totalLikes: likes.length,
+      userIds: likes.map(like => like.userId)
+    });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des likes:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// POST /api/cubematch/social/likes/:gameId - Ajouter/retirer un like
+router.post('/social/likes/:gameId', requireAuth, async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    const userId = req.user!.userId;
+    
+    // Vérifier si l'utilisateur a déjà liké
+    const existingLike = await prisma.gameLike.findUnique({
+      where: {
+        userId_gameId: {
+          userId,
+          gameId
+        }
+      }
+    });
+    
+    if (existingLike) {
+      // Retirer le like
+      await prisma.gameLike.delete({
+        where: {
+          userId_gameId: {
+            userId,
+            gameId
+          }
+        }
+      });
+      res.json({ liked: false, message: 'Like retiré' });
+    } else {
+      // Ajouter le like
+      await prisma.gameLike.create({
+        data: {
+          userId,
+          gameId
+        }
+      });
+      res.json({ liked: true, message: 'Like ajouté' });
+    }
+  } catch (error) {
+    console.error('Erreur lors de la gestion du like:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// GET /api/cubematch/social/shares/:gameId - Récupérer le nombre de partages
+router.get('/social/shares/:gameId', async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    
+    const shareCount = await prisma.gameShare.count({
+      where: { gameId }
+    });
+    
+    res.json({ totalShares: shareCount });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des partages:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// POST /api/cubematch/social/shares/:gameId - Enregistrer un partage
+router.post('/social/shares/:gameId', requireAuth, async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    const userId = req.user!.userId;
+    
+    await prisma.gameShare.create({
+      data: {
+        userId,
+        gameId
+      }
+    });
+    
+    res.json({ success: true, message: 'Partage enregistré' });
+  } catch (error) {
+    console.error('Erreur lors de l\'enregistrement du partage:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// GET /api/cubematch/social/comments/:gameId - Récupérer les commentaires d'un jeu (PUBLIC)
+router.get('/social/comments/:gameId', async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    const limit = parseInt(req.query.limit as string) || 20;
+    
+    const comments = await prisma.gameComment.findMany({
+      where: { gameId },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true
+          }
+        },
+        likes: true
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: limit
+    });
+    
+    const formattedComments = comments.map(comment => ({
+      id: comment.id,
+      userId: comment.userId,
+      author: `${comment.user.firstName} ${comment.user.lastName}`,
+      content: comment.content,
+      timestamp: new Date(comment.createdAt).toLocaleDateString('fr-FR'),
+      likes: comment.likes.length
+    }));
+    
+    res.json(formattedComments);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des commentaires:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// POST /api/cubematch/social/comments/:gameId - Ajouter un commentaire
+router.post('/social/comments/:gameId', requireAuth, async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    const { content } = req.body;
+    const userId = req.user!.userId;
+    
+    if (!content || content.trim().length === 0) {
+      return res.status(400).json({ error: 'Le contenu du commentaire est requis' });
+    }
+    
+    await prisma.gameComment.create({
+      data: {
+        userId,
+        gameId,
+        content: content.trim()
+      }
+    });
+    
+    res.status(201).json({ success: true, message: 'Commentaire ajouté' });
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout du commentaire:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// POST /api/cubematch/social/comments/:commentId/like - Liker un commentaire
+router.post('/social/comments/:commentId/like', requireAuth, async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const userId = req.user!.userId;
+    
+    // Vérifier si l'utilisateur a déjà liké ce commentaire
+    const existingLike = await prisma.commentLike.findUnique({
+      where: {
+        userId_commentId: {
+          userId,
+          commentId
+        }
+      }
+    });
+    
+    if (existingLike) {
+      // Retirer le like
+      await prisma.commentLike.delete({
+        where: {
+          userId_commentId: {
+            userId,
+            commentId
+          }
+        }
+      });
+      res.json({ liked: false, message: 'Like retiré du commentaire' });
+    } else {
+      // Ajouter le like
+      await prisma.commentLike.create({
+        data: {
+          userId,
+          commentId
+        }
+      });
+      res.json({ liked: true, message: 'Like ajouté au commentaire' });
+    }
+  } catch (error) {
+    console.error('Erreur lors de la gestion du like de commentaire:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// GET /api/cubematch/social/views/:gameId - Récupérer le nombre de vues
+router.get('/social/views/:gameId', async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    
+    const viewCount = await prisma.gameView.count({
+      where: { gameId }
+    });
+    
+    res.json({ totalViews: viewCount });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des vues:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// POST /api/cubematch/social/views/:gameId - Enregistrer une vue
+router.post('/social/views/:gameId', requireAuth, async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    const userId = req.user!.userId;
+    
+    // Éviter les doublons de vues (1 vue par utilisateur par jour)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const existingView = await prisma.gameView.findFirst({
+      where: {
+        gameId,
+        userId,
+        createdAt: {
+          gte: today,
+          lt: tomorrow
+        }
+      }
+    });
+    
+    if (!existingView) {
+      await prisma.gameView.create({
+        data: {
+          userId,
+          gameId
+        }
+      });
+    }
+    
+    res.json({ success: true, message: 'Vue enregistrée' });
+  } catch (error) {
+    console.error('Erreur lors de l\'enregistrement de la vue:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// GET /api/cubematch/social/stats/:gameId - Récupérer toutes les stats sociales d'un jeu (PUBLIC)
+router.get('/social/stats/:gameId', async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    
+    const [likes, shares, views, comments, gamesPlayed] = await Promise.all([
+      prisma.gameLike.count({ where: { gameId } }),
+      prisma.gameShare.count({ where: { gameId } }),
+      prisma.gameView.count({ where: { gameId } }),
+      prisma.gameComment.count({ where: { gameId } }),
+      prisma.cubeMatchScore.count() // Total des parties jouées
+    ]);
+    
+    res.json({
+      likes,
+      shares,
+      views,
+      comments,
+      gamesPlayed
+    });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des stats sociales:', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
