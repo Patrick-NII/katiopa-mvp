@@ -6,8 +6,8 @@ import statsRoutes from './stats';
 import sessionsRoutes from './sessions';
 import trackingRoutes from './tracking';
 import experiencesRoutes from './experiences';
-import cubematchRoutes from './cubematch';
-import cubematchSettingsRoutes from './cubematch-settings';
+// CubeMatch routes v2.0 - Architecture modulaire
+import cubematchV2Routes from './cubematch';
 import emailRoutes from './emails';
 import reportRoutes from './reports';
 import transactionalEmailRoutes from './transactional-emails';
@@ -41,9 +41,8 @@ router.use('/tracking', trackingRoutes);
 // Nouvelles routes d'expériences CubeAI
 router.use('/experiences', experiencesRoutes);
 
-// Routes CubeMatch
-router.use('/cubematch', cubematchRoutes);
-router.use('/cubematch', cubematchSettingsRoutes);
+// Routes CubeMatch v2.0 - Architecture modulaire  
+router.use('/cubematch', cubematchV2Routes);
 
 // Routes d'emails
 router.use('/emails', emailRoutes);
