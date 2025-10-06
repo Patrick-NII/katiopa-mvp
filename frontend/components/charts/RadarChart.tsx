@@ -906,102 +906,35 @@ export default function RadarChart({
   }
 
   return (
-    <div className={`bg-white dark:bg-gray-800 backdrop-blur-xl rounded-2xl shadow-2xl p-8 ${className}`}>
-      {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
-        <div className="flex items-center justify-center gap-4 mb-4">
-          <ShieldIcon className="w-10 h-10" style={{ color: ageColors.primary }} />
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {isChild 
-              ? adaptTextForAge(averageAge, {
-                  simple: 'Mon Super Bouclier !',
-                  intermediate: 'Mon Bouclier des Compétences',
-                  advanced: 'Tableau de Bord des Compétences'
-                })
-              : `Bouclier des Compétences${profiles.length > 1 ? ' - Vue Famille' : ''}`
-            }
-          </h1>
+    <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 ${className}`}>
+      {/* Header épuré */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <ShieldIcon className="w-8 h-8 text-blue-600" />
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {isChild ? 'Mon Bouclier' : 'Compétences'}
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {isChild ? 'Mes progrès' : `${profiles.length > 1 ? 'Vue famille' : 'Suivi individuel'}`}
+              </p>
+            </div>
+          </div>
+          
+          {/* Résumé compact */}
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <div className="text-2xl font-bold" style={{ color: levelColor }}>{percentage}%</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">{level}</div>
+            </div>
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 flex items-center justify-center">
+              <Icon className="w-8 h-8" style={{ color: levelColor }} />
+            </div>
+          </div>
         </div>
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <span className="px-3 py-1 text-sm font-medium rounded-full" style={{ 
-            backgroundColor: ageColors.primary + '20', 
-            color: ageColors.primary 
-          }}>
-            {ageSegment.name} • {ageSegment.ageRange}
-          </span>
-        </div>
-        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-          {isChild 
-            ? adaptTextForAge(averageAge, {
-                simple: 'Chaque jeu te rend plus fort ! 🌟',
-                intermediate: 'Chaque apprentissage renforce ton bouclier magique !',
-                advanced: 'Développe tes compétences et atteins tes objectifs !'
-              })
-            : profiles.length > 1 
-              ? 'Suivi des compétences de vos enfants' 
-              : 'Suivi des compétences pédagogiques'
-          }
-        </p>
       </motion.div>
 
-      {/* Stats résumé - Adapté selon l'âge */}
-      {isFeatureAvailable(averageAge, 'showAdvancedStats') ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-2xl p-6 text-center">
-            <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">{totalScore}/{maxTotalScore}</div>
-            <div className="text-blue-700 dark:text-blue-300 font-medium">
-              {adaptTextForAge(averageAge, {
-                simple: 'Points',
-                intermediate: 'Points totaux',
-                advanced: 'Score total'
-              })}
-        </div>
-        </div>
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-2xl p-6 text-center">
-            <div className="text-4xl font-bold mb-2" style={{ color: levelColor }}>{percentage}%</div>
-            <div className="text-purple-700 dark:text-purple-300 font-medium">
-              {adaptTextForAge(averageAge, {
-                simple: 'Réussite',
-                intermediate: 'Progression',
-                advanced: 'Taux de maîtrise'
-              })}
-          </div>
-        </div>
-          <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-2xl p-6 text-center">
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <Icon className="w-8 h-8" style={{ color: levelColor }} />
-              <div className="text-2xl font-bold" style={{ color: levelColor }}>{level}</div>
-      </div>
-            <div className="text-green-700 dark:text-green-300 font-medium">
-              {adaptTextForAge(averageAge, {
-                simple: 'Mon niveau',
-                intermediate: 'Niveau actuel',
-                advanced: 'Niveau de compétence'
-              })}
-            </div>
-          </div>
-        </div>
-      ) : (
-        // Version simplifiée pour les jeunes enfants
-        <div className="flex justify-center mb-12">
-          <div className="bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-2xl p-8 text-center border-4 border-yellow-300 dark:border-yellow-700">
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <Icon className="w-12 h-12" style={{ color: levelColor }} />
-              <div className="text-4xl font-bold" style={{ color: levelColor }}>{level}</div>
-            </div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              {adaptTextForAge(averageAge, {
-                simple: 'Tu es super ! 🌟',
-                intermediate: 'Bravo champion !',
-                advanced: 'Excellent niveau !'
-              })}
-            </div>
-            <div className="text-lg text-gray-600 dark:text-gray-300">
-              {percentage}% de réussite
-        </div>
-          </div>
-        </div>
-      )}
 
       {/* Sélecteurs - Uniquement pour les parents avec plusieurs enfants et si l'âge le permet */}
       {!isChild && profiles.length > 1 && isFeatureAvailable(averageAge, 'enableComparison') && (
@@ -1091,162 +1024,102 @@ export default function RadarChart({
           </div>
         </div>
 
-      {/* SECTION INTERACTIVE : CARTES + ANALYSE BUBIX */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* CARTES DE COMPÉTENCES - 2/3 de l'espace */}
-        <div className="lg:col-span-2">
-          <div className="mb-6">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Sélectionnez une compétence
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              Cliquez sur une compétence pour voir l'analyse détaillée
-            </p>
-      </div>
+       {/* BOUTONS DE COMPÉTENCES - UNE SEULE LIGNE */}
+       <div className="mb-8 w-full">
+         <div className="flex gap-2 w-full overflow-x-auto pb-2">
+           {CAUSAL_COMPETENCES.map((comp, idx) => {
+             const selected = isChild 
+               ? profiles[0] 
+               : profiles.find(p => p.id === (activeKeys[0] || profiles[0]?.id))
+             const d = selected?.data.find(x => x.competence === comp.key)
+             const score = d ? normalize(Number(d.score), d.maxScore, 10) : 0
+             const { level, color } = getScoreLevel(score)
 
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-          {CAUSAL_COMPETENCES.map((comp, idx) => {
-              const selected = isChild 
-                ? profiles[0] 
-                : profiles.find(p => p.id === (activeKeys[0] || profiles[0]?.id))
-            const d = selected?.data.find(x => x.competence === comp.key)
-              const score = d ? normalize(Number(d.score), d.maxScore, 10) : 0
-              const { level, color } = getScoreLevel(score)
+             return (
+               <motion.button
+                 key={comp.key}
+                 initial={{ opacity: 0, y: 10 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ delay: idx * 0.03 }}
+                 className={`group relative flex flex-col items-center p-3 rounded-xl cursor-pointer transition-all duration-200 text-center border flex-1 min-w-[110px] ${
+                   focusedCompetence === comp.key
+                     ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600 shadow-md'
+                     : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
+                 }`}
+                 onClick={() => handleSetFocusedCompetence(comp.key)}
+               >
+                 {/* Nom de la compétence */}
+                 <h4 className="text-xs font-semibold text-gray-900 dark:text-white mb-2 leading-tight">
+                   {comp.label}
+                 </h4>
+                 
+                 {/* Score */}
+                 <div className="text-lg font-bold mb-1" style={{ color }}>
+                   {score.toFixed(1)}<span className="text-xs text-gray-400 ml-0.5">/10</span>
+                 </div>
+                 
+                 {/* Niveau */}
+                 <div className="text-xs text-gray-500 dark:text-gray-400">
+                   {level}
+                 </div>
+               </motion.button>
+             )
+           })}
+         </div>
+       </div>
 
-            return (
-              <motion.div
-                key={comp.key}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  className={`relative overflow-hidden rounded-2xl p-4 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl border-2 ${
-                    focusedCompetence === comp.key
-                      ? 'ring-4 ring-blue-500/50 shadow-2xl scale-105 border-blue-500'
-                      : comp.type === 'cause' 
-                        ? 'border-green-200 dark:border-green-800 hover:border-green-300' 
-                        : 'border-blue-200 dark:border-blue-800 hover:border-blue-300'
-                  } ${
-                  comp.type === 'cause' 
-                      ? 'bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20' 
-                      : 'bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20'
-                }`}
-                  onClick={() => {
-                    handleSetFocusedCompetence(comp.key)
-                  }}
-              >
-                  {/* Badge de type */}
-                  <div className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-bold text-white ${
-                    comp.type === 'cause' ? 'bg-green-500' : 'bg-blue-500'
-                  }`}>
-                    {comp.type === 'cause' ? 'BASE' : 'EFFET'}
-                </div>
-                  
-                  {/* Icône principale */}
-                  <div className="flex justify-center mb-3">
-                    {React.cloneElement(comp.icon as React.ReactElement, { className: "w-10 h-10" })}
-                  </div>
-                  
-                  {/* Titre */}
-                  <h4 className="text-sm font-bold text-gray-900 dark:text-white text-center mb-2 leading-tight">
-                    {comp.label}
-                  </h4>
-                  
-                  {/* Score */}
-                  <div className="text-center mb-3">
-                    <div className="text-lg font-bold mb-1" style={{ color }}>
-                      {score.toFixed(1)}<span className="text-xs text-gray-500">/10</span>
-                    </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
-                      {level}
-                    </div>
-                  </div>
-                  
-                  {/* Barre de progression */}
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div 
-                      className="h-2 rounded-full transition-all duration-500"
-                      style={{ 
-                        width: `${(score / 10) * 100}%`,
-                        backgroundColor: color
-                      }}
-                    />
-                </div>
-              </motion.div>
-            )
-          })}
-        </div>
-      </div>
+       {/* ANALYSE BUBIX - VERSION ÉPURÉE */}
+       {!isChild && (
+         <div className="w-full mt-8">
+           <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+             <div className="flex items-center gap-3 mb-4">
+               <MessageCircleIcon className="w-5 h-5 text-blue-600" />
+               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                 Analyse Pédagogique
+               </h3>
+             </div>
 
-        {/* ANALYSE BUBIX - 1/3 de l'espace */}
-        {!isChild && (
-          <div className="lg:col-span-1">
-            <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg p-6 h-[600px] overflow-y-auto sticky top-4">
-            <div className="flex items-center gap-3 mb-4">
-                <MessageCircleIcon className="w-6 h-6" style={{ color: ageColors.primary }} />
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  Analyse Pédagogique
-                </h3>
-            </div>
-
-            {focusedCompetence ? (
-              <>
-                  <div className="mb-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="flex-shrink-0">
-                        {React.cloneElement(CAUSAL_COMPETENCES.find(c => c.key === focusedCompetence)?.icon as React.ReactElement, { className: "w-8 h-8" })}
-                      </div>
-                      <h4 className="text-lg font-bold text-gray-900 dark:text-white">
-                  {CAUSAL_COMPETENCES.find(c => c.key === focusedCompetence)?.label}
-                </h4>
-                    </div>
-                    <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-                      <div className="flex items-center gap-3 mb-3">
-                        <span className="px-3 py-1 text-sm font-medium text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-800/50 rounded-full">
-                          {CAUSAL_COMPETENCES.find(c => c.key === focusedCompetence)?.type === 'cause' 
-                            ? '🎯 Compétence de base'
-                            : '📈 Compétence dérivée'
-                          }
-                    </span>
-                  </div>
-                      <p className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
-                    {CAUSAL_COMPETENCES.find(c => c.key === focusedCompetence)?.description}
-            </p>
-          </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                {(compareMode ? profiles : profiles.filter(p => activeKeys.includes(p.id))).map(p => (
-                      <div key={p.id} className="bg-white dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center gap-3 mb-3">
-                          <span className="w-4 h-4 rounded-full flex-shrink-0" style={{ background: p.color }} />
-                          <span className="font-bold text-base text-gray-900 dark:text-white">
-                            {isChild ? 'Votre analyse' : p.name}
-                          </span>
-                    </div>
-                        <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm">
-                          <AnalysisDisplay 
-                            content={focusedCompetence ? getBubixAnalysis(focusedCompetence, p.id, profiles, isChild) : ''}
-                            isChild={isChild}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="text-center text-gray-500 dark:text-gray-400 py-12">
-                  <MessageCircleIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <h4 className="text-lg font-semibold mb-2">Analyse personnalisée</h4>
-                  <p className="text-sm leading-relaxed max-w-sm mx-auto">
-                    Cliquez sur une compétence ci-contre pour voir l'analyse détaillée et les recommandations pédagogiques.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+             {focusedCompetence ? (
+               <div className="space-y-4">
+                 <div className="flex items-center gap-3 pb-3 border-b border-gray-200 dark:border-gray-600">
+                   <div className="flex-shrink-0">
+                     {React.cloneElement(CAUSAL_COMPETENCES.find(c => c.key === focusedCompetence)?.icon as React.ReactElement, { className: "w-6 h-6 text-blue-600" })}
+                   </div>
+                   <h4 className="text-base font-semibold text-gray-900 dark:text-white">
+                     {CAUSAL_COMPETENCES.find(c => c.key === focusedCompetence)?.label}
+                   </h4>
+                 </div>
+                 
+                 <div className="space-y-3">
+                   {(compareMode ? profiles : profiles.filter(p => activeKeys.includes(p.id))).map(p => (
+                     <div key={p.id} className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                       <div className="flex items-center gap-2 mb-2">
+                         <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: p.color }} />
+                         <span className="font-medium text-sm text-gray-900 dark:text-white">
+                           {isChild ? 'Analyse' : p.name}
+                         </span>
+                       </div>
+                       <div className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                         <AnalysisDisplay 
+                           content={focusedCompetence ? getBubixAnalysis(focusedCompetence, p.id, profiles, isChild) : ''}
+                           isChild={isChild}
+                         />
+                       </div>
+                     </div>
+                   ))}
+                 </div>
+               </div>
+             ) : (
+               <div className="text-center text-gray-400 dark:text-gray-500 py-8">
+                 <MessageCircleIcon className="w-12 h-12 mx-auto mb-3 opacity-40" />
+                 <p className="text-sm">
+                   Sélectionnez une compétence pour voir l'analyse détaillée
+                 </p>
+               </div>
+             )}
+           </div>
+         </div>
+       )}
     </div>
   )
 }
