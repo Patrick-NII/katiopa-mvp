@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { useScreenSize } from '@/hooks/useScreenSize'
 import { cubeMatchAPI, type ScoreData, type GameSettings } from '@/lib/api/cubematch-v2'
 // import { useCurrentUser } from '@/hooks/useCurrentUser' // Temporairement désactivé
 import { 
@@ -69,6 +70,9 @@ interface Cell {
 }
 
 export default function CubeMatchGame() {
+  // Hook pour la taille d'écran
+  const { isMobile, isTablet } = useScreenSize()
+  
   // États du jeu
   const [gameState, setGameState] = useState<'menu' | 'playing' | 'paused' | 'gameOver' | 'settings'>('menu')
   const [gameBoard, setGameBoard] = useState<Cell[][]>([])
@@ -1337,67 +1341,72 @@ export default function CubeMatchGame() {
   // Rendu du jeu principal
   return (
     <div className="h-full flex flex-col bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header avec statistiques */}
-      <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-xl font-bold text-gray-900">CubeMatch</h2>
-          <div className="flex items-center gap-2">
+      {/* Header avec statistiques - OPTIMISÉ MOBILE */}
+      <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200 p-2 sm:p-4">
+        <div className="flex items-center justify-between mb-2 sm:mb-3">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">CubeMatch</h2>
+          <div className="flex items-center gap-1 sm:gap-2">
             <button
               onClick={togglePause}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors"
               title="Pause"
             >
-              <Pause className="w-5 h-5 text-gray-600" />
+              <Pause className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             </button>
             <button
               onClick={() => setGameState('settings')}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors"
               title="Paramètres"
             >
-              <Settings className="w-5 h-5 text-gray-600" />
+              <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             </button>
           </div>
         </div>
         
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-3 text-center">
-          <div className="bg-blue-50 rounded-lg p-3">
-            <div className="text-xl font-bold text-blue-600">{stats.score.toLocaleString()}</div>
+        {/* Stats en grille responsive optimisée mobile */}
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-1.5 sm:gap-3 text-center">
+          <div className="bg-blue-50 rounded-md sm:rounded-lg p-2 sm:p-3">
+            <div className="text-lg sm:text-xl font-bold text-blue-600">{stats.score.toLocaleString()}</div>
             <div className="text-xs text-gray-600 font-medium">Score</div>
           </div>
-          <div className="bg-green-50 rounded-lg p-3">
-            <div className="text-xl font-bold text-green-600">{target}</div>
+          <div className="bg-green-50 rounded-md sm:rounded-lg p-2 sm:p-3">
+            <div className="text-lg sm:text-xl font-bold text-green-600">{target}</div>
             <div className="text-xs text-gray-600 font-medium">Cible</div>
           </div>
-          <div className="bg-purple-50 rounded-lg p-3">
-            <div className="text-xl font-bold text-purple-600">{stats.level}</div>
+          <div className="bg-purple-50 rounded-md sm:rounded-lg p-2 sm:p-3">
+            <div className="text-lg sm:text-xl font-bold text-purple-600">{stats.level}</div>
             <div className="text-xs text-gray-600 font-medium">Niveau</div>
           </div>
-          <div className="bg-orange-50 rounded-lg p-3">
-            <div className="text-xl font-bold text-orange-600">{config.unlimitedTime ? '∞' : stats.timeLeft}</div>
+          <div className="bg-orange-50 rounded-md sm:rounded-lg p-2 sm:p-3">
+            <div className="text-lg sm:text-xl font-bold text-orange-600">{config.unlimitedTime ? '∞' : stats.timeLeft}</div>
             <div className="text-xs text-gray-600 font-medium">Temps</div>
           </div>
-          <div className="bg-red-50 rounded-lg p-3">
-            <div className="text-xl font-bold text-red-600">{stats.combo}</div>
+          <div className="bg-red-50 rounded-md sm:rounded-lg p-2 sm:p-3">
+            <div className="text-lg sm:text-xl font-bold text-red-600">{stats.combo}</div>
             <div className="text-xs text-gray-600 font-medium">Combo</div>
           </div>
-          <div className="bg-indigo-50 rounded-lg p-3">
-            <div className="text-xl font-bold text-indigo-600">{stats.precision}%</div>
+          <div className="bg-indigo-50 rounded-md sm:rounded-lg p-2 sm:p-3">
+            <div className="text-lg sm:text-xl font-bold text-indigo-600">{stats.precision}%</div>
             <div className="text-xs text-gray-600 font-medium">Précision</div>
           </div>
         </div>
       </div>
       
-      {/* Plateau de jeu */}
-      <div className="flex-1 flex items-center justify-center p-4 min-h-0 overflow-hidden">
+      {/* Plateau de jeu - OPTIMISÉ MOBILE */}
+      <div className="flex-1 flex items-center justify-center p-2 sm:p-4 min-h-0 overflow-hidden">
         {/* WRAPPER VERTICAL => grille au-dessus, boutons en dessous */}
-        <div className="flex flex-col items-center gap-6 max-w-full">
-          {/* Grille */}
-          <div className="bg-white rounded-xl shadow-lg p-4 max-w-full max-h-full flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3 sm:gap-6 max-w-full w-full">
+          {/* Grille - TAILLE ADAPTATIVE MOBILE */}
+          <div className="bg-white rounded-lg sm:rounded-xl shadow-lg p-2 sm:p-4 max-w-full max-h-full flex items-center justify-center w-full">
             <div
-              className="grid gap-1 max-w-full max-h-full"
+              className="grid gap-1 sm:gap-2 w-full max-w-full max-h-full"
               style={{
-                gridTemplateColumns: `repeat(${config.gridSize}, minmax(60px, 1fr))`,
-                gridTemplateRows: `repeat(${config.gridSize}, minmax(60px, 1fr))`,
+                gridTemplateColumns: `repeat(${config.gridSize}, minmax(${
+                  isMobile ? '40px' : isTablet ? '50px' : '60px'
+                }, 1fr))`,
+                gridTemplateRows: `repeat(${config.gridSize}, minmax(${
+                  isMobile ? '40px' : isTablet ? '50px' : '60px'
+                }, 1fr))`,
                 maxWidth: '100%',
                 maxHeight: '100%',
               }}
@@ -1414,16 +1423,25 @@ export default function CubeMatchGame() {
                       onClick={() => !isEmpty && handleCellClick(cell)}
                       disabled={isEmpty}
                       className={`
-                        w-full h-full min-w-[60px] min-h-[60px] max-w-[80px] max-h-[80px]
-                        rounded-xl font-bold text-lg md:text-xl lg:text-2xl transition-all duration-200
+                        w-full h-full 
+                        ${isMobile 
+                          ? 'min-w-[40px] min-h-[40px] max-w-[45px] max-h-[45px]' 
+                          : isTablet 
+                            ? 'min-w-[50px] min-h-[50px] max-w-[55px] max-h-[55px]'
+                            : 'min-w-[60px] min-h-[60px] max-w-[80px] max-h-[80px]'
+                        }
+                        rounded-lg sm:rounded-xl font-bold 
+                        ${isMobile ? 'text-sm' : isTablet ? 'text-base' : 'text-lg md:text-xl lg:text-2xl'}
+                        transition-all duration-200
                         shadow-md flex items-center justify-center
+                        touch-manipulation
                         ${
                           isEmpty
                             ? 'bg-gray-100 cursor-not-allowed'
                             : isSelected
-                              ? 'bg-gradient-to-br from-yellow-400 to-yellow-500 text-yellow-900 shadow-xl scale-105 border-4 border-yellow-600 ring-2 ring-yellow-300'
+                              ? `bg-gradient-to-br from-yellow-400 to-yellow-500 text-yellow-900 shadow-xl scale-105 border-2 ${!isMobile ? 'sm:border-4' : ''} border-yellow-600 ring-1 ${!isMobile ? 'sm:ring-2' : ''} ring-yellow-300`
                               : isHinted
-                                ? 'bg-gradient-to-br from-yellow-200 to-yellow-300 text-yellow-800 border-2 border-yellow-500 shadow-lg'
+                                ? `bg-gradient-to-br from-yellow-200 to-yellow-300 text-yellow-800 border-1 ${!isMobile ? 'sm:border-2' : ''} border-yellow-500 shadow-lg`
                                 : getCellColor(cell.value)
                         }
                       `}
@@ -1436,45 +1454,54 @@ export default function CubeMatchGame() {
             </div>
           </div>
 
-          {/* Boutons d'action (désormais SOUS la grille) */}
-          <div className="flex items-center justify-center gap-4">
+          {/* Boutons d'action - OPTIMISÉS MOBILE */}
+          <div className="flex items-center justify-center gap-2 sm:gap-4 w-full max-w-sm sm:max-w-none px-2 sm:px-0">
             {config.hintsEnabled && (
               <button
                 onClick={useHint}
                 disabled={stats.hintsUsed >= 3}
-                className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white rounded-xl font-semibold hover:from-yellow-500 hover:to-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg transition-all duration-200 transform hover:scale-105"
+                className="flex-1 sm:flex-none px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white rounded-lg sm:rounded-xl font-semibold hover:from-yellow-500 hover:to-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 sm:gap-2 shadow-lg transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
               >
-                <HelpCircle className="w-5 h-5" />
-                Indice ({Math.max(0, 3 - stats.hintsUsed)})
+                <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Indice ({Math.max(0, 3 - stats.hintsUsed)})</span>
+                <span className="sm:hidden">Aide</span>
               </button>
             )}
 
             <button
               onClick={submitSelection}
               disabled={selectedCells.length < 2}
-              className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg transition-all duration-200 transform hover:scale-105"
+              className="flex-1 sm:flex-none px-4 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 sm:gap-2 shadow-lg transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
             >
-              <Target className="w-5 h-5" />
-              Valider ({selectedCells.length >= 2 ? calculateResult(selectedCells) : 0})
+              <Target className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Valider ({selectedCells.length >= 2 ? calculateResult(selectedCells) : 0})</span>
+              <span className="sm:hidden">OK ({selectedCells.length >= 2 ? calculateResult(selectedCells) : 0})</span>
             </button>
           </div>
         </div>
       </div>
       
-      {/* Instructions */}
-      <div className="bg-white/90 backdrop-blur-sm border-t border-gray-200 p-4">
-        <div className="text-center text-sm text-gray-600">
-          <p>
-            Sélectionnez des cases adjacentes pour atteindre la cible de <span className="font-semibold text-green-600">{target}</span>
+      {/* Instructions - COMPACTES MOBILE */}
+      <div className="bg-white/90 backdrop-blur-sm border-t border-gray-200 p-2 sm:p-4">
+        <div className="text-center text-xs sm:text-sm text-gray-600">
+          <p className="mb-1 sm:mb-0">
+            <span className="hidden sm:inline">Sélectionnez des cases adjacentes pour atteindre la cible de </span>
+            <span className="sm:hidden">Cible: </span>
+            <span className="font-semibold text-green-600">{target}</span>
           </p>
-          <p className="mt-1">
-            Opération: <span className="font-semibold text-blue-600">
+          <p className="sm:mt-1">
+            <span className="font-semibold text-blue-600">
               {config.operator === 'ADD' ? 'Addition' : 
                config.operator === 'SUB' ? 'Soustraction' :
                config.operator === 'MUL' ? 'Multiplication' :
                config.operator === 'DIV' ? 'Division' : 'Mixte'}
             </span>
-            {config.allowDiagonals && ' • Diagonales autorisées'}
+            {config.allowDiagonals && (
+              <>
+                <span className="hidden sm:inline"> • Diagonales autorisées</span>
+                <span className="sm:hidden"> + Diag.</span>
+              </>
+            )}
           </p>
         </div>
       </div>

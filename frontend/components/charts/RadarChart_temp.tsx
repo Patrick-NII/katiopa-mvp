@@ -1103,20 +1103,20 @@ export default function RadarChart({
             <p className="text-gray-600 dark:text-gray-300">
               Cliquez sur une compétence pour voir l'analyse détaillée
             </p>
-      </div>
-
+          </div>
+          
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-          {CAUSAL_COMPETENCES.map((comp, idx) => {
+            {CAUSAL_COMPETENCES.map((comp, idx) => {
               const selected = isChild 
                 ? profiles[0] 
                 : profiles.find(p => p.id === (activeKeys[0] || profiles[0]?.id))
-            const d = selected?.data.find(x => x.competence === comp.key)
+              const d = selected?.data.find(x => x.competence === comp.key)
               const score = d ? normalize(Number(d.score), d.maxScore, 10) : 0
               const { level, color } = getScoreLevel(score)
 
-            return (
-              <motion.div
-                key={comp.key}
+              return (
+                <motion.div
+                  key={comp.key}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.1 }}
@@ -1127,20 +1127,20 @@ export default function RadarChart({
                         ? 'border-green-200 dark:border-green-800 hover:border-green-300' 
                         : 'border-blue-200 dark:border-blue-800 hover:border-blue-300'
                   } ${
-                  comp.type === 'cause' 
+                    comp.type === 'cause' 
                       ? 'bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20' 
                       : 'bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20'
-                }`}
+                  }`}
                   onClick={() => {
                     handleSetFocusedCompetence(comp.key)
                   }}
-              >
+                >
                   {/* Badge de type */}
                   <div className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-bold text-white ${
-                    comp.type === 'cause' ? 'bg-green-500' : 'bg-blue-500'
-                  }`}>
+                      comp.type === 'cause' ? 'bg-green-500' : 'bg-blue-500'
+                    }`}>
                     {comp.type === 'cause' ? 'BASE' : 'EFFET'}
-                </div>
+                  </div>
                   
                   {/* Icône principale */}
                   <div className="flex justify-center mb-3">
@@ -1171,12 +1171,12 @@ export default function RadarChart({
                         backgroundColor: color
                       }}
                     />
-                </div>
-              </motion.div>
-            )
-          })}
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
         </div>
-      </div>
 
         {/* ANALYSE BUBIX - 1/3 de l'espace */}
         {!isChild && (
@@ -1211,8 +1211,8 @@ export default function RadarChart({
                   </div>
                       <p className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
                     {CAUSAL_COMPETENCES.find(c => c.key === focusedCompetence)?.description}
-            </p>
-          </div>
+                  </p>
+                </div>
                   </div>
                   
                   <div className="space-y-4">
@@ -1246,7 +1246,152 @@ export default function RadarChart({
             </div>
           </div>
         )}
-      </div>
     </div>
   )
 }
+        <div className={!isChild ? "xl:col-span-2" : ""}>
+          <div 
+            className="h-[650px] w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-900/50 rounded-2xl p-6"
+            onClick={(e) => {
+              console.log('🎯 CONTAINER CLICK:', e.target)
+              // Si le clic Nivo ne fonctionne pas, on peut intercepter ici
+            }}
+          >
+            <ResponsiveRadar
+              data={radarData}
+              keys={activeKeys}
+              indexBy="competence"
+              maxValue={10}
+              valueFormat={(value) => `${Number(value).toFixed(2)}`}
+              margin={{ top: 80, right: 120, bottom: 80, left: 120 }}
+              gridLabelOffset={36}
+              gridShape="linear"
+              curve="linearClosed"
+              enableDots
+              dotSize={10}
+              dotBorderWidth={2}
+              colors={colors}
+              borderColor={{ from: 'color' }}
+              fillOpacity={0.35}
+              blendMode="multiply"
+              animate
+              motionConfig="gentle"
+              theme={{
+                background: 'transparent',
+                text: { fontSize: 13, fill: '#374151', fontFamily: 'Inter, sans-serif', fontWeight: 600 },
+                grid: { line: { stroke: '#E5E7EB', strokeWidth: 1.5, strokeOpacity: 0.5 } },
+                tooltip: {
+                  container: {
+                    background: 'rgba(255,255,255,0.96)',
+                    border: '1px solid rgba(0,0,0,0.08)',
+                    borderRadius: 12,
+                    padding: 12,
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
+                  }
+                }
+              }}
+              onClick={(point) => {
+                console.log('🎯 RADAR CLICK:', point)
+                
+                // Essayer plusieurs façons d'extraire la compétence
+                const competenceLabel = point?.data?.competence || point?.indexValue || point?.index || point?.id
+                console.log('🔍 Competence label found:', competenceLabel)
+                
+                if (competenceLabel) {
+                  // Trouver la compétence correspondante
+                  const competence = CAUSAL_COMPETENCES.find(c => c.label === competenceLabel)
+                  console.log('🔍 Competence found:', competence)
+                  
+                  if (competence) {
+                    console.log('✅ Setting focused competence:', competence.key)
+                    handleSetFocusedCompetence(competence.key)
+                  } else {
+                    console.log('❌ No matching competence found')
+                    // Essayer de trouver par correspondance partielle
+                    const partialMatch = CAUSAL_COMPETENCES.find(c => 
+                      c.label.toLowerCase().includes(competenceLabel.toLowerCase()) ||
+                      competenceLabel.toLowerCase().includes(c.label.toLowerCase())
+                    )
+                    if (partialMatch) {
+                      console.log('✅ Partial match found:', partialMatch.key)
+                      handleSetFocusedCompetence(partialMatch.key)
+                    }
+                  }
+                }
+              }}
+              legends={[]}
+            />
+          </div>
+        </div>
+
+        {/* Analyse Bubix - RÉSERVÉE AUX PARENTS UNIQUEMENT */}
+        {!isChild && (
+          <div className="xl:col-span-1">
+            <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg p-8 h-[650px] overflow-y-auto">
+            <div className="flex items-center gap-3 mb-4">
+                <MessageCircleIcon className="w-6 h-6" style={{ color: ageColors.primary }} />
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  Analyse Pédagogique Professionnelle
+                </h3>
+            </div>
+
+            {focusedCompetence ? (
+              <>
+                <div className="mb-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex-shrink-0">
+                      {React.cloneElement(CAUSAL_COMPETENCES.find(c => c.key === focusedCompetence)?.icon as React.ReactElement, { className: "w-8 h-8" })}
+                    </div>
+                    <h4 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {CAUSAL_COMPETENCES.find(c => c.key === focusedCompetence)?.label}
+                </h4>
+                  </div>
+                  <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="px-3 py-1 text-sm font-medium text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-800/50 rounded-full">
+                        {CAUSAL_COMPETENCES.find(c => c.key === focusedCompetence)?.type === 'cause' 
+                          ? (isChild ? '🎯 Compétence magique' : '🎯 Compétence de base')
+                          : (isChild ? '📈 Compétence développée' : '📈 Compétence dérivée')
+                        }
+                    </span>
+                  </div>
+                    <p className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
+                    {CAUSAL_COMPETENCES.find(c => c.key === focusedCompetence)?.description}
+                  </p>
+                </div>
+                </div>
+                
+                <div className="space-y-6">
+                {(compareMode ? profiles : profiles.filter(p => activeKeys.includes(p.id))).map(p => (
+                    <div key={p.id} className="bg-white dark:bg-gray-800/50 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="w-4 h-4 rounded-full flex-shrink-0" style={{ background: p.color }} />
+                        <span className="font-bold text-lg text-gray-900 dark:text-white">
+                          {isChild ? 'Ton niveau' : p.name}
+                        </span>
+                    </div>
+                      <div className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                        <AnalysisDisplay 
+                          content={focusedCompetence ? getBubixAnalysis(focusedCompetence, p.id, profiles, isChild) : ''}
+                          isChild={isChild}
+                        />
+                      </div>
+                  </div>
+                ))}
+                  </div>
+              </>
+            ) : (
+              <div className="text-center text-gray-500 dark:text-gray-400 py-12">
+                <MessageCircleIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                <h4 className="text-lg font-semibold mb-2">Analyse personnalisée</h4>
+                <p className="text-sm leading-relaxed max-w-sm mx-auto">
+                  {isChild 
+                    ? 'Clique sur une compétence du radar pour découvrir ton analyse personnalisée !' 
+                    : 'Cliquez sur un axe du radar pour voir l\'analyse détaillée de cette compétence.'
+                  }
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>

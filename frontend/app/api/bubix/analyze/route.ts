@@ -7,6 +7,11 @@ import { PredictiveAnalytics } from '@/lib/predictive-analytics';
 import { AutomaticRecommendations } from '@/lib/automatic-recommendations';
 import { PEDAGOGICAL_CHARTER, getCommunicationStyle, generatePedagogicalMessage } from '@/lib/pedagogical-charter';
 
+// 🎯 API BUBIX CENTRALISÉE - GOUVERNANCE DES DONNÉES
+// ✅ Route principale pour toutes les analyses Bubix
+// ✅ Gestion unifiée parent/enfant avec thématisation
+// ✅ Cache intelligent et sécurité renforcée
+
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {

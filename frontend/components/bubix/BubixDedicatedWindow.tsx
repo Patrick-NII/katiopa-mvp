@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { MessageCircle, Send, Bot, User, ChevronLeft, ChevronRight, Settings, History, Star, Search, Plus, Archive } from 'lucide-react'
 import { useRadarDataContext } from '../../contexts/RadarDataContext'
+import BubixThemedContainer, { useBubixTheme } from './BubixThemedContainer'
+import { bubixService } from '@/lib/services/bubix-service'
 
 interface Message {
   id: string
@@ -18,6 +20,9 @@ interface BubixDedicatedWindowProps {
 }
 
 export default function BubixDedicatedWindow({ user, userType }: BubixDedicatedWindowProps) {
+  // 🎨 Thématisation selon le type d'utilisateur
+  const { theme, themeConfig, getButtonClasses, getCardClasses, getInputClasses, getIconColor } = useBubixTheme(userType)
+  
   // Utiliser le contexte pour accéder aux données du radar (optionnel)
   let radarData = null
   try {
@@ -30,7 +35,9 @@ export default function BubixDedicatedWindow({ user, userType }: BubixDedicatedW
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: `Bonjour ${user?.firstName || 'cher utilisateur'} ! Je suis Bubix, votre assistant pédagogique. Comment puis-je vous aider aujourd'hui ?`,
+      content: userType === 'CHILD' 
+        ? `Salut ${user?.firstName || 'champion'} ! 🤖✨ Je suis Bubix, ton super assistant pour apprendre en s'amusant ! Qu'est-ce qu'on va découvrir ensemble aujourd'hui ? 🎯🚀`
+        : `Bonjour ${user?.firstName || 'cher utilisateur'} ! Je suis Bubix, votre assistant pédagogique. Comment puis-je vous accompagner dans le suivi éducatif aujourd'hui ?`,
       sender: 'bubix',
       timestamp: new Date()
     }

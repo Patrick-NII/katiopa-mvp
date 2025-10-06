@@ -26,21 +26,40 @@ import {
   Download,
   HelpCircle
 } from 'lucide-react'
+import { useScreenSize } from '@/hooks/useScreenSize'
 import { cubeMatchSocialAPI, type SocialStats, type Comment, type LeaderboardPlayer } from '@/lib/api/cubematch-social'
 import { cubeMatchAPI, type LeaderboardEntry } from '@/lib/api/cubematch-v2'
 import Link from 'next/link'
 import { useModals } from '@/hooks/useModals'
 import Image from 'next/image'
+import { useAgeAdaptation } from '@/hooks/useAgeAdaptation'
+import { authAPI } from '@/lib/api'
 
 interface MathCubePageProps {
   onOpenCubeMatch?: () => void
 }
 
 export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
+  // Hook pour la taille d'écran
+  const { isMobile, isTablet } = useScreenSize()
+  
   const [currentLevel, setCurrentLevel] = useState(1)
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
   const [isClient, setIsClient] = useState(false)
+  const [userAge, setUserAge] = useState<number>(8) // Âge par défaut
+  
+  // Adaptation par âge
+  const { 
+    adaptText, 
+    colors, 
+    isFeatureEnabled, 
+    ui,
+    getMotivationalMessage,
+    isYoungChild,
+    isMiddleChild,
+    isOlderChild
+  } = useAgeAdaptation({ age: userAge })
 
   // États pour les vraies données de la base de données
   const [userStats, setUserStats] = useState<any>(null)
@@ -222,6 +241,17 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
       try {
         console.log('🔄 Chargement des données CubeMatch...')
         
+        // Charger l'âge de l'utilisateur
+        try {
+          const response = await authAPI.verify()
+          if (response.success && response.user?.age) {
+            setUserAge(response.user.age)
+            console.log('👶 Âge utilisateur chargé:', response.user.age)
+          }
+        } catch (error) {
+          console.error('Erreur lors du chargement de l\'âge:', error)
+        }
+        
         // Charger les données sociales
         const socialResponse = await fetch('/api/cubematch/social-data')
         if (socialResponse.ok) {
@@ -279,10 +309,20 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  MathCube
+                <h1 className={`${ui.fontSize.title} font-bold text-gray-900 dark:text-white bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent`}>
+                  {adaptText({
+                    simple: 'Mes Nombres',
+                    intermediate: 'MathCube',
+                    advanced: 'Mathématiques Avancées'
+                  })}
                 </h1>
-                <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base md:text-lg lg:text-xl">Mathématiques rigoureuses</p>
+                <p className={`text-gray-600 dark:text-gray-300 ${ui.fontSize.subtitle}`}>
+                  {adaptText({
+                    simple: 'Apprendre à compter et calculer !',
+                    intermediate: 'Mathématiques amusantes et interactives',
+                    advanced: 'Mathématiques rigoureuses et approfondies'
+                  })}
+                </p>
           </div>
         </div>
           </div>
@@ -300,10 +340,20 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
                     </svg>
         </div>
                   <div>
-                    <h2 className="text-3xl md:text-4xl font-bold text-white">
-                      🧮 CubeMatch
+                    <h2 className={`${ui.fontSize.title} font-bold text-white`}>
+                      {adaptText({
+                        simple: '🧮 Jeu des Cubes',
+                        intermediate: '🧮 CubeMatch',
+                        advanced: '🧮 CubeMatch Pro'
+                      })}
                     </h2>
-                    <p className="text-blue-100 text-lg">Le défi mathématique ultime !</p>
+                    <p className={`text-blue-100 ${ui.fontSize.body}`}>
+                      {adaptText({
+                        simple: 'Jouer avec les nombres !',
+                        intermediate: 'Le défi mathématique ultime !',
+                        advanced: 'Défi de calcul mental avancé'
+                      })}
+                    </p>
           </div>
         </div>
 
@@ -390,7 +440,11 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
                         {/* Corner badges */}
                         <div className="absolute top-4 left-4">
                           <div className="bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1 text-xs font-medium text-gray-700">
-                            🎯 Mathématiques
+                            {adaptText({
+                              simple: '🔢 Nombres',
+                              intermediate: '🎯 Mathématiques',
+                              advanced: '📊 Maths Avancées'
+                            })}
           </div>
         </div>
 
@@ -425,16 +479,7 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
                           <span className="text-sm font-semibold">{likes}</span>
                         </button>
                         
-                        {/* Share */}
-                        <button
-                          onClick={handleShare}
-                          className="group flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-blue-50 text-gray-600 hover:text-blue-500 transition-all duration-200"
-                        >
-                          <svg className="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                          </svg>
-                          <span className="text-sm font-semibold">{shares}</span>
-                        </button>
+                        
                         
                         {/* Comments */}
                         <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 text-gray-600">
@@ -444,14 +489,7 @@ export default function MathCubePage({ onOpenCubeMatch }: MathCubePageProps) {
                           <span className="text-sm font-semibold">{comments.length}</span>
                         </div>
                         
-                        {/* Views */}
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 text-gray-600">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                          <span className="text-sm font-semibold">{views}</span>
-              </div>
+                      
                         
                         {/* Games played */}
                         <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 text-emerald-600">

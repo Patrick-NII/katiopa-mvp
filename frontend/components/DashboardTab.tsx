@@ -31,6 +31,7 @@ import UserStats from './UserStats'
 import { sessionsAPI, statsAPI } from '@/lib/api'
 import { apiFetch } from '@/lib/api'
 import { childSessionsAPI, type ChildSession, type ChildActivity, type SessionAnalysis, type GlobalAnalysis, type ExerciseResponse } from '@/lib/api/sessions'
+import { bubixService, type BubixAnalysisRequest, BUBIX_THEMES } from '@/lib/services/bubix-service'
 import { useTracking } from '@/hooks/useTracking'
 import { useRealTimeStatus } from '@/hooks/useRealTimeStatus'
 import SavedAnalyses from './SavedAnalyses'
@@ -44,6 +45,7 @@ import ConversationAnalysis from './ConversationAnalysis'
 import { useLimitationPopup } from '@/hooks/useLimitationPopup'
 import WeeklyCycle from './WeeklyCycle'
 import CommunicationAnalytics from './CommunicationAnalytics'
+import { BubixCompteRenduButton } from './bubix/BubixActionButton'
 
 interface DashboardTabProps {
   user: any
@@ -814,45 +816,46 @@ export default function DashboardTab({
         await new Promise(resolve => setTimeout(resolve, 500)); // Délai entre chaque étape
       }
 
-      const response = await fetch('/api/bubix/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          prompt,
-          sessionId: sessionIdToSend, // Utiliser l'ID de la base de données
-          analysisType: 'compte_rendu',
-          context: {
-            childName: foundSession.name,
-            activities: sessionActivities[sessionId] || [],
-            subscriptionType: user?.subscriptionType
-          }
-        })
-      });
+      // 🎯 Utiliser le service Bubix centralisé avec thématisation
+      const theme = user?.userType === 'CHILD' ? 'child' : 'parent';
+      
+      const analysisRequest: BubixAnalysisRequest = {
+        prompt: theme === 'child' 
+          ? `🤖 Salut ! Je vais créer un super rapport sur tes aventures d'apprentissage ! ✨ 
+             Raconte-moi tout ce que tu as appris et tes réussites incroyables !`
+          : prompt,
+        sessionId: sessionIdToSend,
+        analysisType: 'compte_rendu',
+        context: {
+          childName: foundSession.name,
+          activities: sessionActivities[sessionId] || [],
+          subscriptionType: user?.subscriptionType
+        }
+      };
 
-      if (response.status === 429) {
+      const data = await bubixService.analyzeSession(analysisRequest);
+      
+      // Vérification des limitations directement dans le service
+      if (!data.success && data.error?.includes('Limite atteinte')) {
         showLimitPopup();
         throw new Error('Limite atteinte');
       }
 
-      if (!response.ok) {
-        throw new Error('Erreur lors de la communication avec Bubix');
-      }
-
-      const data = await response.json();
-      const analysisText = data.response || data.content || 'Aucune réponse de Bubix';
+      const analysisText = data.response || 'Aucune réponse de Bubix';
 
       // Marquer comme terminé
       setBubixCompleted(prev => ({ ...prev, [sessionId]: true }));
 
-      // Stocker la réponse de Bubix
+      // Stocker la réponse de Bubix avec thématisation
       setBubixResponses(prev => ({
         ...prev,
         [`compte_rendu_${sessionId}`]: {
           type: 'compte_rendu',
           content: analysisText,
           timestamp: new Date(),
-          sessionId
+          sessionId,
+          theme: data.theme,
+          childName: foundSession.name
         }
       }));
       // Marquer l'utilisation (Découverte)
@@ -1182,32 +1185,28 @@ export default function DashboardTab({
                       </div>
                     )}
 
-                    {/* Actions rapides — style aligné sur la page login */}
+                    {/* Actions rapides — Boutons Bubix thématisés */}
                     <div className="mb-6">
                       <div className="flex flex-wrap items-center gap-3">
-                        {/* Compte rendu */}
-                        <button
-                          onClick={() => generateCompteRendu(session.sessionId)}
-                          disabled={loadingStates[`compte_rendu_${session.sessionId}`]}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 !text-gray-200 font-medium rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                          title="Générer un compte rendu"
-                        >
-                          <BookOpen className="w-4 h-4" />
-                          <span>Compte rendu</span>
-                          {loadingStates[`compte_rendu_${session.sessionId}`] && (
-                            <RefreshCw className="w-4 h-4 animate-spin" />
-                          )}
-                        </button>
+                        {/* Compte rendu avec thématisation */}
+                        <BubixCompteRenduButton
+                          sessionId={session.sessionId}
+                          sessionName={session.name}
+                          onGenerate={generateCompteRendu}
+                          loading={loadingStates[`compte_rendu_${session.sessionId}`]}
+                          userType={user?.userType || 'PARENT'}
+                        />
                     </div>
                   </div>
 
-                    {/* Étapes Bubix en cours */}
+                    {/* Étapes Bubix en cours avec thématisation */}
                     {bubixStepsVisible[session.sessionId] && (
                       <BubixSteps
                         isVisible={bubixStepsVisible[session.sessionId]}
                         currentStep={bubixCurrentStep[session.sessionId] || 'auth'}
                         isCompleted={bubixCompleted[session.sessionId] || false}
                         error={bubixError[session.sessionId]}
+                        userType={user?.userType || 'PARENT'}
                       />
                     )}
 

@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle, Clock, Shield, Database, Brain, AlertCircle } from 'lucide-react'
+import { useBubixTheme } from './bubix/BubixThemedContainer'
 
 interface BubixStepsProps {
   isVisible: boolean
   currentStep: string
   isCompleted: boolean
   error?: string
+  userType?: 'PARENT' | 'CHILD'
 }
 
 interface Step {
@@ -19,11 +21,36 @@ interface Step {
   percentage: number
 }
 
-export default function BubixSteps({ isVisible, currentStep, isCompleted, error }: BubixStepsProps) {
+export default function BubixSteps({ isVisible, currentStep, isCompleted, error, userType = 'PARENT' }: BubixStepsProps) {
   const [currentStepData, setCurrentStepData] = useState<Step | null>(null);
   const [progressPercentage, setProgressPercentage] = useState(0);
+  
+  // 🎨 Thématisation selon le type d'utilisateur
+  const { theme, themeConfig, getCardClasses, getIconColor } = useBubixTheme(userType);
 
-  const steps: Step[] = [
+  const steps: Step[] = userType === 'CHILD' ? [
+    {
+      id: 'auth',
+      title: '🔐 Vérification magique',
+      description: 'Je vérifie que tout est sécurisé pour toi !',
+      icon: Shield,
+      percentage: 20
+    },
+    {
+      id: 'data',
+      title: '📊 Collecte de tes exploits',
+      description: 'Je rassemble tous tes progrès incroyables !',
+      icon: Database,
+      percentage: 60
+    },
+    {
+      id: 'ai',
+      title: '🤖 Analyse super intelligente',
+      description: 'Je prépare ton rapport personnalisé !',
+      icon: Brain,
+      percentage: 100
+    }
+  ] : [
     {
       id: 'auth',
       title: 'Vérification d\'authentification',

@@ -15,6 +15,7 @@ interface ChildProfile {
   id: string
   name: string
   color: string
+  age?: number
   data: CompetenceData[]
 }
 
@@ -60,13 +61,19 @@ export function useRadarData({ userSessionId, isChild = false, userType = 'CHILD
 
       console.log('Récupération des données radar pour la session:', targetSessionId)
 
-      // Utiliser les routes de test qui fonctionnent
       console.log('🔍 Utilisation des routes de test pour les données radar')
+      console.log('🔍 Target Session ID:', targetSessionId)
+      console.log('🔍 URL appelée:', `/api/sessions-test/${targetSessionId}/competences`)
+      
       const response = await fetch(`/api/sessions-test/${targetSessionId}/competences`, {
         credentials: 'include'
       })
 
+      console.log('🔍 Response status:', response.status)
+      console.log('🔍 Response ok:', response.ok)
+
       const data = await response.json()
+      console.log('🔍 Data received:', data)
       
       if (data.success && data.data.radarData) {
         // Transformer les données pour le radar chart
@@ -74,18 +81,54 @@ export function useRadarData({ userSessionId, isChild = false, userType = 'CHILD
           ? `${currentSession?.firstName || 'Enfant'} ${currentSession?.lastName || ''}`.trim()
           : childSessions.find(s => s.id === targetSessionId)?.firstName || 'Enfant'
 
+        // Mapping des compétences API vers les clés radar
+        const competenceMapping: Record<string, string> = {
+          'mathematiques': 'mathematiques',
+          'mathematics': 'mathematiques',
+          'math': 'mathematiques',
+          'programmation': 'programmation',
+          'programming': 'programmation',
+          'creativite': 'creativite',
+          'creativity': 'creativite',
+          'creative': 'creativite',
+          'communication': 'communication',
+          'concentration': 'concentration',
+          'focus': 'concentration',
+          'resolution_problemes': 'resolution_problemes',
+          'problem_solving': 'resolution_problemes',
+          'problemes': 'resolution_problemes',
+          'connaissances_generales': 'connaissances_generales',
+          'general_knowledge': 'connaissances_generales',
+          'knowledge': 'connaissances_generales',
+          'sens_critique': 'sens_critique',
+          'critical_thinking': 'sens_critique',
+          'critique': 'sens_critique'
+        }
+
         const profile: ChildProfile = {
           id: currentSession?.sessionId || targetSessionId,
           name: sessionName,
           color: getColorForChild(targetSessionId),
-          data: data.data.radarData.map((item: any) => ({
-            competence: item.competence,
-            score: Number(item.score).toFixed(2),
-            maxScore: item.maxScore,
-            level: item.level,
-            progress: item.progress
-          }))
+          age: currentSession?.age || undefined,
+          data: data.data.radarData.map((item: any) => {
+            // Mapper la compétence vers la clé attendue
+            const mappedCompetence = competenceMapping[item.competence.toLowerCase()] || item.competence.toLowerCase()
+            return {
+              competence: mappedCompetence,
+              score: Number(item.score).toFixed(2),
+              maxScore: item.maxScore,
+              level: item.level,
+              progress: item.progress
+            }
+          })
         }
+
+        console.log('✅ Profile créé:', {
+          id: profile.id,
+          name: profile.name,
+          dataLength: profile.data.length,
+          competences: profile.data.map(d => ({ competence: d.competence, score: d.score }))
+        })
 
         setProfiles([profile])
         console.log('✅ Données radar chargées depuis la BDD:', profile.name, profile.data.length, 'compétences')
@@ -189,17 +232,46 @@ export function useMultiChildRadarData({ userType = 'PARENT' }: { userType?: 'CH
         console.log(`✅ Données récupérées pour ${session.firstName}:`, data)
         
         if (data.success && data.data.radarData) {
+          // Mapping des compétences API vers les clés radar
+          const competenceMapping: Record<string, string> = {
+            'mathematiques': 'mathematiques',
+            'mathematics': 'mathematiques',
+            'math': 'mathematiques',
+            'programmation': 'programmation',
+            'programming': 'programmation',
+            'creativite': 'creativite',
+            'creativity': 'creativite',
+            'creative': 'creativite',
+            'communication': 'communication',
+            'concentration': 'concentration',
+            'focus': 'concentration',
+            'resolution_problemes': 'resolution_problemes',
+            'problem_solving': 'resolution_problemes',
+            'problemes': 'resolution_problemes',
+            'connaissances_generales': 'connaissances_generales',
+            'general_knowledge': 'connaissances_generales',
+            'knowledge': 'connaissances_generales',
+            'sens_critique': 'sens_critique',
+            'critical_thinking': 'sens_critique',
+            'critique': 'sens_critique'
+          }
+
           const profile = {
             id: session.sessionId,
             name: `${session.firstName} ${session.lastName}`.trim(),
             color: getColorForChild(session.id),
-            data: data.data.radarData.map((item: any) => ({
-              competence: item.competence,
-              score: Number(item.score).toFixed(2),
-              maxScore: item.maxScore,
-              level: item.level,
-              progress: item.progress
-            }))
+            age: session.age || undefined,
+            data: data.data.radarData.map((item: any) => {
+              // Mapper la compétence vers la clé attendue
+              const mappedCompetence = competenceMapping[item.competence.toLowerCase()] || item.competence.toLowerCase()
+              return {
+                competence: mappedCompetence,
+                score: Number(item.score).toFixed(2),
+                maxScore: item.maxScore,
+                level: item.level,
+                progress: item.progress
+              }
+            })
           }
           console.log(`✅ Profil créé pour ${session.firstName}:`, profile)
           return profile

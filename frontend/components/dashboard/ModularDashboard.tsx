@@ -213,7 +213,7 @@ export default function ModularDashboard() {
         return <AnalyticsPageNoScroll user={user} childSessions={childSessions} />
       
       case 'experiences':
-        return <ExperiencesPage />
+        return <ExperiencesPage user={user} userType={user.userType as 'CHILD' | 'PARENT'} />
       
       case 'programme':
         return <ProgrammePage />
@@ -279,6 +279,7 @@ export default function ModularDashboard() {
           onTabChange={handleTabChange}
           userSubscriptionType={user?.subscriptionType || 'FREE'}
           userType={user?.userType as any}
+          userAge={(user as any)?.age}
           collapsed={sidebarCollapsed}
           onCollapsedChange={setSidebarCollapsed}
         />
@@ -299,7 +300,7 @@ export default function ModularDashboard() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="backdrop-blur-xl bg-white/10 dark:bg-gray-900/10 rounded-3xl border border-white/20 dark:border-gray-700/50 shadow-2xl p-4 md:p-5 lg:p-6 h-full flex flex-col w-full overflow-y-auto"
+                className="backdrop-blur-xl bg-white dark:bg-gray- rounded-3xl border border-white/20 dark:border-gray-700/50 shadow-2xl p-4 md:p-5 lg:p-6 h-full flex flex-col w-full overflow-y-auto"
               >
                 {renderTabContent()}
               </motion.div>

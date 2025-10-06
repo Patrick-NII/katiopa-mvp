@@ -38,6 +38,7 @@ import {
 import { authAPI } from '@/lib/api'
 import { useAvatar } from '@/contexts/AvatarContext'
 import { useTheme } from '@/contexts/ThemeContext'
+import { useAgeAdaptation } from '../../hooks/useAgeAdaptation'
 
 export type NavigationTab = 
   | 'dashboard'
@@ -62,6 +63,7 @@ interface ModularNavigationProps {
   onTabChange: (tab: NavigationTab) => void
   userSubscriptionType: string
   userType: 'CHILD' | 'PARENT' | 'TEACHER' | 'ADMIN'
+  userAge?: number
   collapsed?: boolean
   onCollapsedChange?: (collapsed: boolean) => void
 }
@@ -98,6 +100,7 @@ export default function ModularNavigation({
   onTabChange, 
   userSubscriptionType,
   userType,
+  userAge,
   collapsed: collapsedProp,
   onCollapsedChange
 }: ModularNavigationProps) {
@@ -112,6 +115,17 @@ export default function ModularNavigation({
   
   const isChild = userType === 'CHILD'
   const isParent = userType === 'PARENT'
+  
+  // Adaptation par âge
+  const { 
+    adaptText, 
+    colors, 
+    isFeatureEnabled, 
+    ui,
+    isYoungChild,
+    isMiddleChild,
+    isOlderChild
+  } = useAgeAdaptation({ age: userAge })
   
   // Normaliser le type d'abonnement
   const normalizedType = userSubscriptionType?.toUpperCase() || 'FREE'
@@ -193,60 +207,112 @@ export default function ModularNavigation({
     })
   }
 
-  // Définir les sections de navigation selon le type d'utilisateur
+  // Définir les sections de navigation selon le type d'utilisateur et l'âge
   const getNavigationSections = (): NavigationSection[] => {
     if (isChild) {
       return [
         {
           id: 'main',
-          title: 'Principal',
+          title: adaptText({
+            simple: 'Mes Jeux',
+            intermediate: 'Mes Activités', 
+            advanced: 'Mes Expériences'
+          }),
           icon: Home,
           available: true,
           items: [
             {
               id: 'experiences',
-              label: 'Mes Expériences',
+              label: adaptText({
+                simple: 'Mes Jeux',
+                intermediate: 'Mes Expériences',
+                advanced: 'Centre d\'Apprentissage'
+              }),
               icon: Brain,
-              description: 'Apprentissage et jeux',
+              description: adaptText({
+                simple: 'Jouer et apprendre',
+                intermediate: 'Apprentissage et jeux',
+                advanced: 'Expériences d\'apprentissage'
+              }),
               available: true,
               isNew: true
             },
             {
               id: 'mathcube',
-              label: 'MathCube',
+              label: adaptText({
+                simple: 'Nombres',
+                intermediate: 'MathCube',
+                advanced: 'Mathématiques'
+              }),
               icon: BookOpen,
-              description: 'Mathématiques rigoureuses',
+              description: adaptText({
+                simple: 'Compter et calculer',
+                intermediate: 'Mathématiques amusantes',
+                advanced: 'Mathématiques rigoureuses'
+              }),
               available: true
             },
             {
               id: 'codecube',
-              label: 'CodeCube',
+              label: adaptText({
+                simple: 'Robot',
+                intermediate: 'CodeCube',
+                advanced: 'Programmation'
+              }),
               icon: Code,
-              description: 'Programmation et logique',
-              available: true
+              description: adaptText({
+                simple: 'Faire bouger le robot',
+                intermediate: 'Apprendre à coder',
+                advanced: 'Programmation et logique'
+              }),
+              available: isMiddleChild || isOlderChild // Pas de code pour les très jeunes
             },
             {
               id: 'playcube',
-              label: 'PlayCube',
+              label: adaptText({
+                simple: 'Jeux',
+                intermediate: 'PlayCube',
+                advanced: 'Jeux Éducatifs'
+              }),
               icon: Gamepad2,
-              description: 'Apprentissage par le jeu',
+              description: adaptText({
+                simple: 'Jouer et s\'amuser',
+                intermediate: 'Apprentissage par le jeu',
+                advanced: 'Jeux pédagogiques'
+              }),
               available: true
             },
             {
               id: 'sciencecube',
-              label: 'ScienceCube',
+              label: adaptText({
+                simple: 'Découvertes',
+                intermediate: 'ScienceCube',
+                advanced: 'Sciences'
+              }),
               icon: Lightbulb,
-              description: 'Sciences et découverte',
-              available: true
+              description: adaptText({
+                simple: 'Explorer le monde',
+                intermediate: 'Sciences et découverte',
+                advanced: 'Expérimentation scientifique'
+              }),
+              available: !isYoungChild // Sciences pour 6+ ans
             },
             {
               id: 'dreamcube',
-              label: 'DreamCube',
+              label: adaptText({
+                simple: 'Créations',
+                intermediate: 'DreamCube',
+                advanced: 'Créativité'
+              }),
               icon: Heart,
-              description: 'Créativité et émotions',
+              description: adaptText({
+                simple: 'Créer et imaginer',
+                intermediate: 'Créativité et émotions',
+                advanced: 'Expression créative'
+              }),
               available: true
             }
-          ]
+          ].filter(item => item.available) // Filtrer les items non disponibles
         }
       ]
     } else {
@@ -278,7 +344,7 @@ export default function ModularNavigation({
               label: 'Programme',
               icon: Calendar,
               description: 'Cycle d\'apprentissage hebdomadaire',
-              available: true
+              available: isFeatureEnabled('weeklyCycle') // Conditionné par l'âge des enfants
             },
             {
               id: 'family',
@@ -305,7 +371,7 @@ export default function ModularNavigation({
               description: 'Configuration et sécurité',
               available: true
             }
-          ]
+          ].filter(item => item.available) // Filtrer les items non disponibles
         }
       ]
     }
@@ -327,7 +393,7 @@ export default function ModularNavigation({
       initial={{ width: collapsedProp ? (isMobile ? 0 : 64) : (isMobile ? '100vw' : 224) }}
       animate={{ width: collapsedProp ? (isMobile ? 0 : 64) : (isMobile ? '100vw' : 224) }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className={`fixed left-0 top-0 z-50 backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 border-r border-white/30 dark:border-gray-700/30 h-screen flex flex-col shadow-2xl ${
+      className={`fixed left-0 top-0 z-50 backdrop-blur-xl bg-white dark:bg-gray- border-r border-white dark:border-gray- h-screen flex flex-col shadow-2xl ${
         isMobile && collapsedProp ? 'overflow-hidden pointer-events-none opacity-0' : ''
       }`}
       style={isMobile && collapsedProp ? { display: 'none' } : {}}

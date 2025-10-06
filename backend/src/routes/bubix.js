@@ -1,3 +1,7 @@
+// ❌ OBSOLÈTE - Ne pas utiliser
+// ✅ Utiliser /frontend/app/api/bubix/analyze/route.ts pour l'API Bubix centralisée
+// ✅ Utiliser /backend/src/routes/bubix.ts pour les fonctionnalités backend spécifiques
+
 import express from 'express'
 import { PrismaClient } from '@prisma/client'
 import { requireAuth } from '../middleware/auth.js'

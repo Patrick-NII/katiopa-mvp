@@ -60,7 +60,7 @@ export default function CubeMatchModal({
       }
     }
 
-    // Mode mobile : prendre tout l'écran
+    // Mode mobile : prendre tout l'écran avec safe area
     if (typeof window !== 'undefined' && window.innerWidth <= 768) {
       return {
         position: 'fixed' as const,
@@ -68,7 +68,9 @@ export default function CubeMatchModal({
         left: 0,
         width: '100vw',
         height: '100vh',
-        zIndex: zIndex
+        zIndex: zIndex,
+        maxHeight: '100vh',
+        overflow: 'hidden'
       }
     }
 
@@ -93,13 +95,13 @@ export default function CubeMatchModal({
       className="absolute inset-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden"
       style={getModalStyles()}
     >
-      {/* Header avec contrôles */}
-      <div className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white p-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
+      {/* Header avec contrôles - MOBILE OPTIMISÉ */}
+      <div className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white p-2 sm:p-3 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white/20 rounded-md sm:rounded-lg flex items-center justify-center">
             <span className="text-xs font-bold">CM</span>
           </div>
-          <h2 className="text-lg font-bold">CubeMatch</h2>
+          <h2 className="text-base sm:text-lg font-bold">CubeMatch</h2>
         </div>
         
         <div className="flex items-center gap-2">
@@ -127,19 +129,19 @@ export default function CubeMatchModal({
               <Square className="w-4 h-4" />
             </button>
           </div>
-          {/* Bouton fermer - toujours visible */}
+          {/* Bouton fermer - toujours visible, optimisé mobile */}
           <button
             onClick={onClose}
-            className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
+            className="p-1.5 sm:p-2 hover:bg-red-500/20 rounded-md sm:rounded-lg transition-colors"
             title="Fermer"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
       </div>
 
-      {/* Contenu du jeu */}
-      <div className="h-full overflow-hidden">
+      {/* Contenu du jeu - OPTIMISÉ MOBILE */}
+      <div className="h-full overflow-hidden min-h-0">
         <CubeMatchGame />
       </div>
     </motion.div>
