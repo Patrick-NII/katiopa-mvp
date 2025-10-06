@@ -2,20 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000'
 
-export async function POST(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { childId: string; competence: string } }
+) {
   try {
-    const body = await request.json()
+    const { childId, competence } = params
     
     // Transférer la requête au backend avec les cookies d'authentification
-    const response = await fetch(`${BACKEND_URL}/api/bubix/analyze`, {
-      method: 'POST',
+    const response = await fetch(`${BACKEND_URL}/api/bubix/analysis/${childId}/${competence}`, {
       headers: {
-        'Content-Type': 'application/json',
         'Cookie': request.headers.get('cookie') || '',
-      },
-      body: JSON.stringify(body)
+      }
     })
-
+    
     const data = await response.json()
 
     if (!response.ok) {
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data)
     
   } catch (error) {
-    console.error('Erreur API /api/bubix/analyze:', error)
+    console.error('Erreur API /api/bubix/analysis:', error)
     return NextResponse.json(
       { error: 'INTERNAL_ERROR', message: 'Erreur interne du serveur' },
       { status: 500 }

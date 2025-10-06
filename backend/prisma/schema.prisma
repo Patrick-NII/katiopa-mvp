@@ -60,7 +60,6 @@ model UserSession {
   userInteractions          UserInteraction[]
   exerciseAttempts          ExerciseAttempt[]
   competenceAssessments     CompetenceAssessment[]
-  bubixAnalyses             BubixAnalysis[]
   profile                   UserProfile?
   userPrompts               UserPrompt[]
   account                   Account                    @relation(fields: [accountId], references: [id])
@@ -787,7 +786,6 @@ model Competence {
   updatedAt   DateTime       @updatedAt
   exercises   Exercise[]
   assessments CompetenceAssessment[]
-  bubixAnalyses BubixAnalysis[]
 }
 
 model Exercise {
@@ -841,20 +839,6 @@ model CompetenceAssessment {
   @@unique([competenceId, userSessionId])
 }
 
-model BubixAnalysis {
-  id           String    @id @default(cuid())
-  userSessionId String
-  competenceId String
-  analysis     String    // Analyse générée par Bubix
-  recommendations Json?  // Recommandations
-  date         DateTime  @default(now())
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  userSession  UserSession @relation(fields: [userSessionId], references: [id])
-  competence   Competence @relation(fields: [competenceId], references: [id])
-
-  @@unique([userSessionId, competenceId, date]) // Max 1 analyse par jour par compétence
-}
 
 enum UserType {
   CHILD
@@ -983,4 +967,18 @@ model GameScore {
   score     Int
   createdAt DateTime @default(now())
   user      UserSession @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model BubixAnalysis {
+  id          String   @id @default(cuid())
+  childId     String   // ID de la session enfant
+  competence  String   // Nom de la compétence analysée
+  analysis    String   // Analyse générée par OpenAI
+  metadata    Json     // Métadonnées (score, niveau, nom enfant, etc.)
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime // Date d'expiration (24h après création)
+  
+  // Index pour optimiser les requêtes
+  @@index([childId, competence, createdAt])
+  @@index([childId, createdAt])
 }

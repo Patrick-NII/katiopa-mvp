@@ -20,6 +20,7 @@ import {
   CheckCircle
 } from 'lucide-react'
 import RadarChart from '../charts/RadarChart'
+import { useRadarData, useMultiChildRadarData } from '../../hooks/useRadarData'
 
 interface DashboardOverviewProps {
   user: any
@@ -44,62 +45,21 @@ export default function DashboardOverview({
 
   const isChild = userType === 'CHILD'
 
-  // Données des enfants pour le radar chart (nouvelle interface)
-  const childrenProfiles = [
-    {
-      id: 'milan',
-      name: 'Milan',
-      color: '#3B82F6',
-      data: [
-        { competence: 'mathematiques', score: 6, maxScore: 10 },
-        { competence: 'programmation', score: 5, maxScore: 10 },
-        { competence: 'creativite', score: 7, maxScore: 10 },
-        { competence: 'collaboration', score: 4, maxScore: 10 },
-        { competence: 'concentration', score: 6, maxScore: 10 },
-        { competence: 'resolution_problemes', score: 5, maxScore: 10 },
-        { competence: 'communication', score: 6, maxScore: 10 },
-        { competence: 'connaissances_generales', score: 5, maxScore: 10 },
-        { competence: 'sens_critique', score: 4, maxScore: 10 },
-        { competence: 'reflexion_logique', score: 6, maxScore: 10 }
-      ]
-    },
-    {
-      id: 'aylon',
-      name: 'Aylon',
-      color: '#8B5CF6',
-      data: [
-        { competence: 'mathematiques', score: 8, maxScore: 10 },
-        { competence: 'programmation', score: 7, maxScore: 10 },
-        { competence: 'creativite', score: 9, maxScore: 10 },
-        { competence: 'collaboration', score: 6, maxScore: 10 },
-        { competence: 'concentration', score: 7, maxScore: 10 },
-        { competence: 'resolution_problemes', score: 8, maxScore: 10 },
-        { competence: 'communication', score: 7, maxScore: 10 },
-        { competence: 'connaissances_generales', score: 6, maxScore: 10 },
-        { competence: 'sens_critique', score: 5, maxScore: 10 },
-        { competence: 'reflexion_logique', score: 8, maxScore: 10 }
-      ]
-    }
-  ]
+  // Utiliser les vraies données de l'API au lieu du hardcoding
+  const { profiles: singleProfiles, loading: singleLoading, error: singleError } = useRadarData({ 
+    userSessionId: user?.sessionId || '', 
+    isChild,
+    userType
+  })
+  
+  const { profiles: multiProfiles, loading: multiLoading, error: multiError } = useMultiChildRadarData({
+    userType: 'PARENT'
+  })
 
-  // Données pour l'enfant (mode enfant)
-  const childProfile = {
-    id: 'current-child',
-    name: user?.firstName || 'Enfant',
-    color: '#3B82F6',
-    data: [
-      { competence: 'mathematiques', score: 7, maxScore: 10 },
-      { competence: 'programmation', score: 6, maxScore: 10 },
-      { competence: 'creativite', score: 8, maxScore: 10 },
-      { competence: 'collaboration', score: 5, maxScore: 10 },
-      { competence: 'concentration', score: 7, maxScore: 10 },
-      { competence: 'resolution_problemes', score: 6, maxScore: 10 },
-      { competence: 'communication', score: 8, maxScore: 10 },
-      { competence: 'connaissances_generales', score: 7, maxScore: 10 },
-      { competence: 'sens_critique', score: 6, maxScore: 10 },
-      { competence: 'reflexion_logique', score: 7, maxScore: 10 }
-    ]
-  }
+  // Déterminer quelles données utiliser selon le contexte
+  const profiles = isChild ? singleProfiles : (childSessions?.length > 1 ? multiProfiles : singleProfiles)
+  const loading = isChild ? singleLoading : (childSessions?.length > 1 ? multiLoading : singleLoading)
+  const error = isChild ? singleError : (childSessions?.length > 1 ? multiError : singleError)
 
   // Données rapides pour la vue d'ensemble (supprimées selon demande utilisateur)
   const quickActions: any[] = []
@@ -130,33 +90,45 @@ export default function DashboardOverview({
 
           
 
-          {/* Radar Chart pour les parents */}
-          {!isChild && (
+          {/* Radar Chart avec gestion des états de chargement */}
+          {loading ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-8 mb-8"
             >
-              <RadarChart 
-                isChild={false}
-                userType="PARENT"
-                className="mb-8"
-                compareModeDefault={true}
-              />
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
             </motion.div>
-          )}
-
-          {/* Radar Chart pour les enfants */}
-          {isChild && (
+          ) : error ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-8 mb-8"
+            >
+              <div className="flex items-center justify-center h-64 text-red-600">
+                <div className="text-center">
+                  <div className="text-2xl mb-2">⚠️</div>
+                  <p>Erreur lors du chargement des données</p>
+                </div>
+              </div>
+            </motion.div>
+          ) : (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
               <RadarChart 
-                isChild={true}
-                userType="CHILD"
+                childrenProfiles={profiles}
+                userSessionId={user?.sessionId}
+                isChild={isChild}
+                userType={userType}
                 className="mb-8"
+                compareModeDefault={!isChild && profiles.length > 1}
               />
             </motion.div>
           )}

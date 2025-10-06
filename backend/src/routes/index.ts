@@ -13,6 +13,8 @@ import reportRoutes from './reports';
 import transactionalEmailRoutes from './transactional-emails';
 import competencesRoutes from './competences';
 import bubixRoutes from './bubix';
+import bubixAnalysisRoutes from './bubix-analysis';
+import bubixAnalysisSimpleRoutes from './bubix-analysis-simple';
 import exercisesRoutes from './exercises';
 import testRoutes from './test';
 import sessionsTestRoutes from './sessions-test';
@@ -56,8 +58,14 @@ router.use('/transactional-emails', transactionalEmailRoutes);
 // Routes des compétences et exercices
 router.use('/competences', competencesRoutes);
 
-// Routes Bubix
-router.use('/bubix', bubixRoutes);
+// Routes Bubix Analysis (OpenAI) - Priorité sur les routes simples
+router.use('/bubix', bubixAnalysisRoutes);
+
+// Routes Bubix (anciennes)
+// router.use('/bubix', bubixRoutes);
+
+// Routes Bubix Analysis Simple (Test)
+router.use('/bubix-simple', bubixAnalysisSimpleRoutes);
 
 // Routes des sessions utilisateur (pour les données radar)
 router.use('/user-sessions', competencesRoutes);

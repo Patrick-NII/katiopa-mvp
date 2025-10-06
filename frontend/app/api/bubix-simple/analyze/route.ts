@@ -6,12 +6,11 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
-    // Transférer la requête au backend avec les cookies d'authentification
-    const response = await fetch(`${BACKEND_URL}/api/bubix/analyze`, {
+    // Transférer la requête au backend
+    const response = await fetch(`${BACKEND_URL}/api/bubix-simple/analyze`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Cookie': request.headers.get('cookie') || '',
       },
       body: JSON.stringify(body)
     })
@@ -25,7 +24,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data)
     
   } catch (error) {
-    console.error('Erreur API /api/bubix/analyze:', error)
+    console.error('Erreur API /api/bubix-simple/analyze:', error)
     return NextResponse.json(
       { error: 'INTERNAL_ERROR', message: 'Erreur interne du serveur' },
       { status: 500 }
