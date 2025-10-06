@@ -1,9 +1,11 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { MessageCircle, RefreshCw, Clock, CheckCircle, AlertCircle, Sparkles } from 'lucide-react'
+import { MessageCircle, RefreshCw, Clock, CheckCircle, AlertCircle, Sparkles, Save, Trash2, MessageSquare, Heart, HeartOff } from 'lucide-react'
 import { useBubixAnalysis } from '../../hooks/useBubixAnalysis'
+import { useSavedReports } from '../../hooks/useSavedReports'
+import { useRouter } from 'next/navigation'
 
 interface BubixAnalysisPanelProps {
   childId: string
@@ -25,6 +27,12 @@ export default function BubixAnalysisPanel({
   isChild
 }: BubixAnalysisPanelProps) {
   
+  const router = useRouter()
+  const [showSaveDialog, setShowSaveDialog] = useState(false)
+  const [saveTitle, setSaveTitle] = useState('')
+  const [saveNotes, setSaveNotes] = useState('')
+  const [saveTags, setSaveTags] = useState<string[]>([])
+
   const {
     analysis,
     loading,
@@ -42,6 +50,72 @@ export default function BubixAnalysisPanel({
     competenceLevel,
     autoLoad: true
   })
+
+  const {
+    saveReport,
+    deleteReport,
+    isReportSaved,
+    reports,
+    loading: savedReportsLoading
+  } = useSavedReports({ childId, autoLoad: true })
+
+  // Vérifier si ce rapport est déjà sauvegardé
+  const isSaved = analysis ? isReportSaved(analysis.id) : false
+  const savedReport = reports.find(r => r.analysisId === analysis?.id)
+
+  // Gérer la sauvegarde
+  const handleSave = async () => {
+    if (!analysis) return
+
+    try {
+      const title = saveTitle || `${competenceLabel} - ${new Date().toLocaleDateString('fr-FR')}`
+      await saveReport({
+        childId,
+        analysisId: analysis.id,
+        title,
+        notes: saveNotes || undefined,
+        tags: saveTags
+      })
+      
+      setShowSaveDialog(false)
+      setSaveTitle('')
+      setSaveNotes('')
+      setSaveTags([])
+    } catch (error) {
+      console.error('Erreur sauvegarde:', error)
+    }
+  }
+
+  // Gérer la suppression
+  const handleDelete = async () => {
+    if (!savedReport) return
+
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce rapport sauvegardé ?')) {
+      try {
+        await deleteReport(savedReport.id)
+      } catch (error) {
+        console.error('Erreur suppression:', error)
+      }
+    }
+  }
+
+  // Rediriger vers Bubix avec le contexte de l'analyse
+  const handleTalkWithBubix = () => {
+    if (!analysis) return
+
+    // Encoder les données pour les passer en paramètres
+    const contextData = {
+      analysisId: analysis.id,
+      competence: competenceLabel,
+      childName: childProfile?.name || 'Enfant',
+      analysis: analysis.analysis,
+      score: competenceScore,
+      level: competenceLevel
+    }
+
+    const encodedContext = encodeURIComponent(JSON.stringify(contextData))
+    router.push(`/dashboard/bubix?context=${encodedContext}`)
+  }
 
   // Version simplifiée pour les enfants
   if (isChild) {
@@ -71,15 +145,54 @@ export default function BubixAnalysisPanel({
           </h3>
         </div>
         
-        {/* Bouton d'actualisation */}
-        <button
-          onClick={refreshAnalysis}
-          disabled={loading}
-          className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-          title="Actualiser"
-        >
-          <RefreshCw className={`w-4 h-4 text-gray-600 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
-        </button>
+        {/* Actions */}
+        <div className="flex items-center gap-2">
+          {/* Talk with Bubix */}
+          {analysis && (
+            <button
+              onClick={handleTalkWithBubix}
+              className="p-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/20 transition-colors"
+              title="Discuter avec Bubix de cette analyse"
+            >
+              <MessageSquare className="w-4 h-4 text-blue-600" />
+            </button>
+          )}
+
+          {/* Save/Delete */}
+          {analysis && (
+            <>
+              {isSaved ? (
+                <button
+                  onClick={handleDelete}
+                  disabled={savedReportsLoading}
+                  className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50"
+                  title="Supprimer de mes rapports sauvegardés"
+                >
+                  <Trash2 className="w-4 h-4 text-red-600" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowSaveDialog(true)}
+                  disabled={savedReportsLoading}
+                  className="p-2 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/20 transition-colors disabled:opacity-50"
+                  title="Sauvegarder ce rapport"
+                >
+                  <Save className="w-4 h-4 text-green-600" />
+                </button>
+              )}
+            </>
+          )}
+
+          {/* Refresh */}
+          <button
+            onClick={refreshAnalysis}
+            disabled={loading}
+            className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+            title="Actualiser"
+          >
+            <RefreshCw className={`w-4 h-4 text-gray-600 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
       </div>
 
       {/* État de chargement */}
@@ -175,6 +288,89 @@ export default function BubixAnalysisPanel({
               }
             </p>
           </div>
+        </div>
+      )}
+
+      {/* Dialog de sauvegarde */}
+      {showSaveDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Sauvegarder le rapport
+            </h3>
+
+            <div className="space-y-4">
+              {/* Titre */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Titre du rapport
+                </label>
+                <input
+                  type="text"
+                  value={saveTitle}
+                  onChange={(e) => setSaveTitle(e.target.value)}
+                  placeholder={`${competenceLabel} - ${new Date().toLocaleDateString('fr-FR')}`}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Notes personnelles (optionnel)
+                </label>
+                <textarea
+                  value={saveNotes}
+                  onChange={(e) => setSaveNotes(e.target.value)}
+                  placeholder="Ajoutez vos observations ou commentaires..."
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+                />
+              </div>
+
+              {/* Tags */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Tags (optionnel)
+                </label>
+                <input
+                  type="text"
+                  value={saveTags.join(', ')}
+                  onChange={(e) => setSaveTags(e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
+                  placeholder="mathématiques, progrès, difficultés..."
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Séparez les tags par des virgules
+                </p>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3 mt-6">
+              <button
+                onClick={handleSave}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                Sauvegarder
+              </button>
+              <button
+                onClick={() => {
+                  setShowSaveDialog(false)
+                  setSaveTitle('')
+                  setSaveNotes('')
+                  setSaveTags([])
+                }}
+                className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-900 dark:text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                Annuler
+              </button>
+            </div>
+          </motion.div>
         </div>
       )}
     </div>

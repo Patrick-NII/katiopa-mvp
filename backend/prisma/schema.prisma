@@ -982,3 +982,21 @@ model BubixAnalysis {
   @@index([childId, competence, createdAt])
   @@index([childId, createdAt])
 }
+
+model SavedBubixReport {
+  id          String   @id @default(cuid())
+  parentId    String   // ID du parent qui sauvegarde
+  childId     String   // ID de la session enfant
+  analysisId  String   // ID de l'analyse BubixAnalysis
+  title       String   // Titre personnalisé du rapport
+  notes       String?  // Notes personnelles du parent
+  tags        String[] // Tags pour organiser les rapports
+  isFavorite  Boolean  @default(false)
+  savedAt     DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Index pour optimiser les requêtes
+  @@index([parentId, savedAt])
+  @@index([parentId, childId, savedAt])
+  @@index([parentId, isFavorite])
+}

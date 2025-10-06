@@ -23,14 +23,27 @@ interface Conversation {
   lastUpdated: number
 }
 
+interface InitialContext {
+  message: string
+  metadata?: {
+    type: string
+    analysisId?: string
+    competence?: string
+    childName?: string
+    score?: number
+    level?: string
+  }
+}
+
 interface BubixTabProps {
   user: any
   childSessions: any[]
   userType: 'CHILD' | 'PARENT'
   subscriptionType: string
+  initialContext?: InitialContext
 }
 
-export default function BubixTab({ user, childSessions, userType, subscriptionType }: BubixTabProps) {
+export default function BubixTab({ user, childSessions, userType, subscriptionType, initialContext }: BubixTabProps) {
   const { selectedAvatar } = useAvatar()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null)
@@ -222,6 +235,46 @@ Comment puis-je vous aider aujourd'hui ?`;
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
+    // Si on a un contexte initial, créer une conversation contextuelle
+    if (initialContext) {
+      const contextConversation: Conversation = {
+        id: `context-${Date.now()}`,
+        title: initialContext.metadata?.competence 
+          ? `Discussion : ${initialContext.metadata.competence}${initialContext.metadata.childName ? ` (${initialContext.metadata.childName})` : ''}`
+          : 'Discussion contextuelle',
+        messages: [
+          {
+            id: `msg-${Date.now()}`,
+            text: initialContext.message,
+            sender: 'bot',
+            timestamp: Date.now()
+          }
+        ],
+        createdAt: Date.now(),
+        lastUpdated: Date.now()
+      }
+
+      // Charger les conversations existantes
+      const savedConversations = localStorage.getItem(`bubix_conversations_${user?.id}`)
+      let existingConversations: Conversation[] = []
+      
+      if (savedConversations) {
+        try {
+          existingConversations = JSON.parse(savedConversations)
+        } catch (e) {
+          console.error('Erreur lors du chargement des conversations:', e)
+        }
+      }
+
+      // Ajouter la conversation contextuelle en première position
+      const allConversations = [contextConversation, ...existingConversations]
+      setConversations(allConversations)
+      setCurrentConversation(contextConversation)
+      
+      return
+    }
+
+    // Logique normale sans contexte
     const savedConversations = localStorage.getItem(`bubix_conversations_${user?.id}`)
     if (savedConversations) {
       try {
@@ -236,7 +289,7 @@ Comment puis-je vous aider aujourd'hui ?`;
     } else {
       createNewConversation()
     }
-  }, [user?.id])
+  }, [user?.id, initialContext])
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

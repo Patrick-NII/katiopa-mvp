@@ -32,6 +32,7 @@ import ScienceCubePage from '../../app/dashboard/sciencecube/page'
 import DreamCubePage from '../../app/dashboard/dreamcube/page'
 import ComCubePage from '../../app/dashboard/comcube/page'
 import ProgrammePage from '../../app/dashboard/programme/page'
+import SavedReportsPage from '../../app/dashboard/rapports/page'
 
 interface User {
   id: string
@@ -220,6 +221,9 @@ export default function ModularDashboard() {
       
       case 'family':
         return <FamilyPage />
+      
+      case 'rapports':
+        return <SavedReportsPage />
       
       case 'bubix-assistant':
         return <BubixAssistantPage />

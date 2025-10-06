@@ -15,6 +15,7 @@ import competencesRoutes from './competences';
 import bubixRoutes from './bubix';
 import bubixAnalysisRoutes from './bubix-analysis';
 import bubixAnalysisSimpleRoutes from './bubix-analysis-simple';
+import savedReportsRoutes from './saved-reports';
 import exercisesRoutes from './exercises';
 import testRoutes from './test';
 import sessionsTestRoutes from './sessions-test';
@@ -66,6 +67,9 @@ router.use('/bubix', bubixAnalysisRoutes);
 
 // Routes Bubix Analysis Simple (Test)
 router.use('/bubix-simple', bubixAnalysisSimpleRoutes);
+
+// Routes des rapports sauvegardés
+router.use('/saved-reports', savedReportsRoutes);
 
 // Routes des sessions utilisateur (pour les données radar)
 router.use('/user-sessions', competencesRoutes);

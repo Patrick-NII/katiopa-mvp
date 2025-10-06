@@ -33,7 +33,8 @@ import {
   Monitor,
   ChevronDown,
   ChevronUp,
-  Search
+  Search,
+  FileText
 } from 'lucide-react'
 import { authAPI } from '@/lib/api'
 import { useAvatar } from '@/contexts/AvatarContext'
@@ -48,6 +49,7 @@ export type NavigationTab =
   | 'family'
   | 'bubix-assistant'
   | 'bubix'
+  | 'rapports'
   | 'reglages'
   | 'abonnements'
   | 'family-members'
@@ -351,6 +353,14 @@ export default function ModularNavigation({
               label: 'Gestion Familiale',
               icon: Users,
               description: 'Suivi des enfants',
+              available: true,
+              isNew: true
+            },
+            {
+              id: 'rapports',
+              label: 'Mes Rapports',
+              icon: FileText,
+              description: 'Rapports pédagogiques sauvegardés',
               available: true,
               isNew: true
             },
