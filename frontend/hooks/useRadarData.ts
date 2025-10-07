@@ -106,7 +106,7 @@ export function useRadarData({ userSessionId, isChild = false, userType = 'CHILD
         }
 
         const profile: ChildProfile = {
-          id: currentSession?.sessionId || targetSessionId,
+          id: currentSession?.id || targetSessionId,
           name: sessionName,
           color: getColorForChild(targetSessionId),
           age: currentSession?.age || undefined,
@@ -257,7 +257,7 @@ export function useMultiChildRadarData({ userType = 'PARENT' }: { userType?: 'CH
           }
 
           const profile = {
-            id: session.sessionId,
+            id: session.id,
             name: `${session.firstName} ${session.lastName}`.trim(),
             color: getColorForChild(session.id),
             age: session.age || undefined,

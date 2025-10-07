@@ -58,12 +58,20 @@ CONSIGNES IMPORTANTES :
 8. Maximum 300 mots pour rester digeste
 
 STRUCTURE SOUHAITÉE :
-- Observation générale positive
+- Observation générale positive mais réaliste
 - Analyse spécifique de la compétence
 - Conseils pratiques pour les parents
 - Perspective d'évolution encourageante
+- Mettre en lumière les causes et effets pour aiguiller les parents sur les bonnes pistes
+- OBLIGATOIRE : Terminer par la signature suivante exactement :
+
+Cordialement,
+Bubix - Assistant IA Pédagogique
+CubeAI
 
 Exemple de ton : "J'ai le plaisir de vous faire part de mes observations concernant ${childProfile.name}. Dans l'ensemble, je constate que..."
+
+IMPORTANT : Tu DOIS absolument terminer par la signature "Cordialement, Bubix - Assistant IA Pédagogique, CubeAI"
 
 Rédige maintenant le rapport :`
 }
@@ -124,7 +132,7 @@ router.post('/analyze', async (req, res) => {
     const generatedAnalysis = completion.choices[0]?.message?.content
 
     if (!generatedAnalysis) {
-      throw new Error('Aucune analyse générée par OpenAI')
+      throw new Error('Aucune analyse générée par Bubix')
     }
 
     // 3. Sauvegarder l'analyse en BDD

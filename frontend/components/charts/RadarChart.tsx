@@ -784,13 +784,20 @@ export default function RadarChart({
   const [compareMode, setCompareMode] = useState(isChild ? false : compareModeDefault)
   const [focusedCompetence, setFocusedCompetenceLocal] = useState<AxisKey | ''>('')
   
+  // Synchroniser selectedChildId avec les changements de profils
+  useEffect(() => {
+    if (profiles.length > 0 && !selectedChildId) {
+      setSelectedChildIdLocal(profiles[0].id)
+    }
+  }, [profiles, selectedChildId])
+  
   // Partager les données avec le contexte (si disponible)
   useEffect(() => {
     if (radarContext) {
       radarContext.setProfiles(profiles)
-      radarContext.setSelectedChildId(profiles[0]?.id || '')
+      radarContext.setSelectedChildId(selectedChildId || profiles[0]?.id || '')
     }
-  }, [profiles, radarContext])
+  }, [profiles, selectedChildId, radarContext])
   
   // Fonctions qui mettent à jour le contexte (si disponible)
   const handleSetFocusedCompetence = (competence: AxisKey | '') => {
@@ -1090,30 +1097,41 @@ export default function RadarChart({
              <div className="flex items-center gap-3 mb-4">
                <MessageCircleIcon className="w-5 h-5 text-blue-600" />
                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                 Analyse Pédagogique
+                 Analyse Bubix
                </h3>
              </div>
 
-             {focusedCompetence ? (
-               <BubixAnalysisPanel
-                 childId={profiles[0]?.id || ''}
-                 competence={focusedCompetence}
-                 competenceLabel={CAUSAL_COMPETENCES.find(c => c.key === focusedCompetence)?.label || ''}
-                 childProfile={profiles[0]}
-                 competenceScore={(() => {
-                   const selected = isChild ? profiles[0] : profiles.find(p => p.id === (activeKeys[0] || profiles[0]?.id))
-                   const d = selected?.data.find(x => x.competence === focusedCompetence)
-                   return d ? normalize(Number(d.score), d.maxScore, 10) : 0
-                 })()}
-                 competenceLevel={(() => {
-                   const selected = isChild ? profiles[0] : profiles.find(p => p.id === (activeKeys[0] || profiles[0]?.id))
-                   const d = selected?.data.find(x => x.competence === focusedCompetence)
-                   const score = d ? normalize(Number(d.score), d.maxScore, 10) : 0
-                   return getScoreLevel(score).level
-                 })()}
-                 isChild={isChild}
-               />
-             ) : (
+            {focusedCompetence ? (() => {
+              // Sélectionner le bon enfant selon le contexte
+              const selectedProfile = isChild 
+                ? profiles[0] 
+                : profiles.find(p => p.id === (activeKeys[0] || profiles[0]?.id)) || profiles[0]
+              
+              // Debug logs pour vérifier la sélection
+              console.log('🎯 BUBIX CHILD SELECTION DEBUG:', {
+                isChild,
+                selectedChildId,
+                activeKeys,
+                profilesAvailable: profiles.map(p => ({ id: p.id, name: p.name })),
+                selectedProfile: selectedProfile ? { id: selectedProfile.id, name: selectedProfile.name } : null,
+                focusedCompetence
+              })
+              
+              const competenceData = selectedProfile?.data.find(x => x.competence === focusedCompetence)
+              const competenceScore = competenceData ? normalize(Number(competenceData.score), competenceData.maxScore, 10) : 0
+              
+              return (
+                <BubixAnalysisPanel
+                  childId={selectedProfile?.id || ''}
+                  competence={focusedCompetence}
+                  competenceLabel={CAUSAL_COMPETENCES.find(c => c.key === focusedCompetence)?.label || ''}
+                  childProfile={selectedProfile}
+                  competenceScore={competenceScore}
+                  competenceLevel={getScoreLevel(competenceScore).level}
+                  isChild={isChild}
+                />
+              )
+            })() : (
                <div className="text-center text-gray-400 dark:text-gray-500 py-8">
                  <MessageCircleIcon className="w-12 h-12 mx-auto mb-3 opacity-40" />
                  <p className="text-sm">

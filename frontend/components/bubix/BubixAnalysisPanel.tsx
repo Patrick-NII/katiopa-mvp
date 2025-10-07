@@ -137,12 +137,9 @@ export default function BubixAnalysisPanel({
   // Interface complète pour les parents
   return (
     <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between">
+        
         <div className="flex items-center gap-3">
-          <MessageCircle className="w-5 h-5 text-blue-600" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Rapport Pédagogique
-          </h3>
         </div>
         
         {/* Actions */}
@@ -226,7 +223,7 @@ export default function BubixAnalysisPanel({
           {/* En-tête de l'analyse */}
           <div className="flex items-center gap-3 pb-3 border-b border-gray-200 dark:border-gray-600">
             <div className="flex-shrink-0">
-              <MessageCircle className="w-6 h-6 text-blue-600" />
+              <h3 className="w-6 h-6 text-blue-600" />
             </div>
             <div className="flex-1">
               <h4 className="text-base font-semibold text-gray-900 dark:text-white">
