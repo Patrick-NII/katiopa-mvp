@@ -78,6 +78,7 @@ interface CubeMatchUnifiedProps {
   onScoreSubmit?: (score: number) => void
   initialConfig?: Partial<GameConfig>
   isFullPage?: boolean
+  userAge?: number
 }
 
 // Configuration par défaut
@@ -238,7 +239,8 @@ export default function CubeMatchUnified({
   onClose, 
   onScoreSubmit, 
   initialConfig = {},
-  isFullPage = false 
+  isFullPage = false,
+  userAge = 10
 }: CubeMatchUnifiedProps) {
   // Hooks
   const { isMobile, isTablet } = useScreenSize()
@@ -316,6 +318,87 @@ export default function CubeMatchUnified({
     return newGrid
   }, [config.gridSize])
   
+  // Générer un nombre aléatoire qui peut aider à atteindre le target
+  const generateRandomNumber = useCallback(() => {
+    // Déterminer le palier de difficulté basé sur le niveau
+    const difficultyTier = Math.floor((stats.level - 1) / 10) + 1 // Palier 1, 2, 3, etc.
+    
+    console.log(`🎲 Génération nombre - Niveau: ${stats.level}, Palier: ${difficultyTier}, Target actuel: ${target}`)
+    
+    if (difficultyTier === 1) {
+      // Niveau FACILE - Nombres de 1 à 20, mais proches du target
+      if (target <= 20) {
+        // Si target petit, générer des nombres qui peuvent le faire
+        const maxValue = Math.min(20, Math.max(1, target - 1))
+        const result = Math.floor(Math.random() * maxValue) + 1
+        console.log(`🎯 Palier FACILE (1-${maxValue}) - Target: ${target}, Résultat: ${result}`)
+        return result
+      } else {
+        // Target plus grand, générer des nombres normaux
+        const result = Math.floor(Math.random() * 20) + 1
+        console.log(`🎯 Palier FACILE (1-20) - Résultat: ${result}`)
+        return result
+      }
+    } else if (difficultyTier === 2) {
+      // Niveau MOYEN - Nombres de 21 à 50, adaptés au target
+      if (target >= 21 && target <= 50) {
+        // Target dans la plage, générer des nombres qui peuvent l'atteindre
+        const maxValue = Math.min(50, target)
+        const minValue = Math.max(21, Math.floor(target / 3))
+        const result = Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue
+        console.log(`🎯 Palier MOYEN (${minValue}-${maxValue}) - Target: ${target}, Résultat: ${result}`)
+        return result
+      } else {
+        // Target hors plage, générer des nombres normaux
+        const result = Math.floor(Math.random() * 30) + 21
+        console.log(`🎯 Palier MOYEN (21-50) - Résultat: ${result}`)
+        return result
+      }
+    } else {
+      // Niveau DIFFICILE - Nombres de 51+, adaptés au target
+      if (target >= 51) {
+        // Target élevé, générer des nombres qui peuvent l'atteindre
+        const maxValue = Math.min(200, target)
+        const minValue = Math.max(51, Math.floor(target / 4))
+        const result = Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue
+        console.log(`🎯 Palier DIFFICILE (${minValue}-${maxValue}) - Target: ${target}, Résultat: ${result}`)
+        return result
+      } else {
+        // Target plus petit, générer des nombres normaux
+        const result = Math.floor(Math.random() * 150) + 51
+        console.log(`🎯 Palier DIFFICILE (51-200) - Résultat: ${result}`)
+        return result
+      }
+    }
+  }, [stats.level, target])
+  
+  // Générer des nombres complexes pour les niveaux élevés
+  const generateComplexNumber = useCallback(() => {
+    // Déterminer le palier de difficulté basé sur le niveau
+    const difficultyTier = Math.floor((stats.level - 1) / 10) + 1 // Palier 1, 2, 3, etc.
+    const levelInTier = ((stats.level - 1) % 10) + 1 // Niveau dans le palier (1-10)
+    
+    console.log(`🎲 Génération nombre complexe - Niveau: ${stats.level}, Palier: ${difficultyTier}`)
+    
+    if (difficultyTier === 1) {
+      // Niveau FACILE - Nombres complexes dans la limite de 20
+      const complexNumbers = [12, 15, 18, 20]
+      const result = complexNumbers[Math.floor(Math.random() * complexNumbers.length)]
+      console.log(`🎯 Complexe FACILE - Résultat: ${result}`)
+      return result
+    } else if (difficultyTier === 2) {
+      // Niveau MOYEN - Nombres complexes de 21 à 50
+      const result = Math.floor(Math.random() * 30) + 21
+      console.log(`🎯 Complexe MOYEN - Résultat: ${result}`)
+      return result
+    } else {
+      // Niveau DIFFICILE - Nombres complexes 51+
+      const result = Math.floor(Math.random() * 150) + 51
+      console.log(`🎯 Complexe DIFFICILE - Résultat: ${result}`)
+      return result
+    }
+  }, [stats.level])
+  
   // Initialiser la grille avec des nombres - VERSION SIMPLIFIÉE
   const initializeGridWithNumbers = useCallback(() => {
     console.log('🏗️ Création de la grille avec nombres...')
@@ -323,7 +406,7 @@ export default function CubeMatchUnified({
     // Créer la grille directement avec des nombres
     const newGrid: Cell[][] = []
     const totalCells = config.gridSize * config.gridSize
-    const numbersToSpawn = Math.floor(totalCells * 0.6) // 60% de la grille
+    const numbersToSpawn = Math.floor(totalCells * 0.7) // 70% de la grille pour commencer avec plus de nombres
     
     // Créer toutes les cellules
     for (let row = 0; row < config.gridSize; row++) {
@@ -356,7 +439,9 @@ export default function CubeMatchUnified({
     // Ajouter des nombres aux premières positions
     for (let i = 0; i < numbersToSpawn; i++) {
       const { row, col } = positions[i]
-      const newValue = Math.floor(Math.random() * 10) + 1 // Valeur simple pour test
+      // Utiliser des nombres complexes pour certains spawns (20% de chance)
+      const useComplexNumber = Math.random() < 0.2 && stats.level >= 10
+      const newValue = useComplexNumber ? generateComplexNumber() : generateRandomNumber()
       newGrid[row][col].value = newValue
       newGrid[row][col].bornAt = Date.now()
       console.log(`🎲 Nombre ${newValue} ajouté à [${row},${col}]`)
@@ -364,27 +449,153 @@ export default function CubeMatchUnified({
     
     console.log(`✅ Grille créée avec ${numbersToSpawn} nombres sur ${totalCells} cellules`)
     setGrid(newGrid)
-  }, [config.gridSize])
+  }, [config.gridSize, generateRandomNumber, generateComplexNumber, stats.level])
   
-  // Générer un nombre aléatoire selon la difficulté adaptative
-  const generateRandomNumber = useCallback(() => {
-    // Difficulté adaptative basée sur le niveau
-    const adaptiveDifficulty = Math.min(stats.level, 20) // Max niveau 20
-    const baseRange = Math.floor(adaptiveDifficulty / 5) + 1 // 1-5, 2-10, 3-15, etc.
-    const maxRange = baseRange * 5
-    
-    return Math.floor(Math.random() * maxRange) + 1
-  }, [stats.level])
-  
-  // Générer un nouveau target avec difficulté adaptative
+  // Générer un nouveau target avec difficulté adaptative et l'âge
   const generateTarget = useCallback(() => {
-    // Difficulté adaptative basée sur le niveau
-    const adaptiveDifficulty = Math.min(stats.level, 20)
-    const baseTarget = Math.floor(adaptiveDifficulty / 3) + 5 // 5-12, 6-15, 7-18, etc.
-    const maxTarget = baseTarget + 10
+    // Déterminer le palier de difficulté basé sur le niveau
+    const difficultyTier = Math.floor((stats.level - 1) / 10) + 1 // Palier 1, 2, 3, etc.
+    const levelInTier = ((stats.level - 1) % 10) + 1 // Niveau dans le palier (1-10)
     
-    return Math.floor(Math.random() * (maxTarget - baseTarget + 1)) + baseTarget
-  }, [stats.level])
+    console.log(`🎯 Génération target - Niveau: ${stats.level}, Palier: ${difficultyTier}, Opérateur: ${config.operator}`)
+    
+    if (difficultyTier === 1) {
+      // Niveau FACILE - Targets de 5 à 20 SEULEMENT
+      let result = Math.floor(Math.random() * 16) + 5
+      
+      // Pour les multiplications, s'assurer que le target est atteignable
+      if (config.operator === 'MUL') {
+        // Générer un target qui peut être atteint par multiplication de petits nombres
+        const multipliers = [2, 3, 4, 5, 6, 7, 8, 9, 10]
+        const mult1 = multipliers[Math.floor(Math.random() * multipliers.length)]
+        const mult2 = Math.floor(Math.random() * 10) + 1
+        result = mult1 * mult2
+        if (result > 20) result = 20 // Limiter à 20 pour le niveau facile
+      }
+      
+      console.log(`🎯 Target FACILE (5-20) - Opérateur: ${config.operator}, Résultat: ${result}`)
+      return result
+    } else if (difficultyTier === 2) {
+      // Niveau MOYEN - Targets de 21 à 50 SEULEMENT
+      let result = Math.floor(Math.random() * 30) + 21
+      
+      // Pour les multiplications, s'assurer que le target est atteignable
+      if (config.operator === 'MUL') {
+        // Générer un target qui peut être atteint par multiplication de nombres moyens
+        const multipliers = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        const mult1 = multipliers[Math.floor(Math.random() * multipliers.length)]
+        const mult2 = Math.floor(Math.random() * 5) + 2
+        result = mult1 * mult2
+        if (result > 50) result = 50 // Limiter à 50 pour le niveau moyen
+      }
+      
+      console.log(`🎯 Target MOYEN (21-50) - Opérateur: ${config.operator}, Résultat: ${result}`)
+      return result
+    } else {
+      // Niveau DIFFICILE - Targets de 51+ SEULEMENT
+      let result = Math.floor(Math.random() * 150) + 51
+      
+      // Pour les multiplications, s'assurer que le target est atteignable
+      if (config.operator === 'MUL') {
+        // Générer un target qui peut être atteint par multiplication de nombres élevés
+        const multipliers = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+        const mult1 = multipliers[Math.floor(Math.random() * multipliers.length)]
+        const mult2 = Math.floor(Math.random() * 10) + 3
+        result = mult1 * mult2
+        if (result < 51) result = 51 // Garantir minimum 51 pour niveau difficile
+      }
+      
+      console.log(`🎯 Target DIFFICILE (51-200) - Opérateur: ${config.operator}, Résultat: ${result}`)
+      return result
+    }
+  }, [stats.level, config.operator])
+  
+  // Calculer les points avec handicaps et bonus de difficulté
+  const calculateAdvancedPoints = useCallback((cells: Cell[], isCorrect: boolean) => {
+    if (!isCorrect) return 0
+    
+    const values = cells.map(cell => cell.value!).filter(v => v !== null)
+    const numCells = cells.length
+    const combo = stats.combo
+    const level = stats.level
+    const age = userAge
+    
+    // Points de base
+    let basePoints = numCells * 10
+    
+    // Multiplicateur de combo
+    const comboMultiplier = 1 + (combo * 0.2)
+    
+    // Multiplicateur de niveau basé sur les paliers (handicap progressif)
+    const difficultyTier = Math.floor((level - 1) / 10) + 1 // Palier 1, 2, 3, etc.
+    const levelInTier = ((level - 1) % 10) + 1 // Niveau dans le palier (1-10)
+    
+    // Multiplicateur progressif par palier
+    let levelMultiplier = 1
+    if (difficultyTier === 1) {
+      levelMultiplier = 1 + (levelInTier * 0.1) // Niveau facile : 1.1 à 2.0
+    } else if (difficultyTier === 2) {
+      levelMultiplier = 2 + (levelInTier * 0.15) // Niveau moyen : 2.15 à 3.5
+    } else {
+      levelMultiplier = 3.5 + (levelInTier * 0.2) // Niveau difficile : 3.7 à 5.5
+    }
+    
+    // Bonus de difficulté basé sur les valeurs
+    const maxValue = Math.max(...values)
+    const minValue = Math.min(...values)
+    const valueRange = maxValue - minValue
+    const difficultyBonus = 1 + (valueRange / 50) // Plus les nombres sont éloignés, plus c'est difficile
+    
+    // Bonus de complexité du calcul
+    let complexityBonus = 1
+    if (config.operator === 'MUL') {
+      complexityBonus = 1.5 // Multiplication plus difficile
+    } else if (config.operator === 'DIV') {
+      complexityBonus = 1.8 // Division encore plus difficile
+    } else if (config.operator === 'MIXED') {
+      complexityBonus = 2.0 // Mixte le plus difficile
+    }
+    
+    // Handicap d'âge (plus l'utilisateur est jeune, plus les points sont élevés)
+    const ageHandicap = age < 8 ? 1.5 : age < 12 ? 1.2 : 1.0
+    
+    // Bonus de target basé sur les paliers de difficulté
+    let targetDifficultyBonus = 1.0
+    if (target > 50) {
+      targetDifficultyBonus = 1.5 // Niveau difficile (50+)
+    } else if (target > 20) {
+      targetDifficultyBonus = 1.2 // Niveau moyen (20-50)
+    } else {
+      targetDifficultyBonus = 1.0 // Niveau facile (≤20)
+    }
+    
+    // Calcul final
+    const finalPoints = Math.round(
+      basePoints * 
+      comboMultiplier * 
+      levelMultiplier * 
+      difficultyBonus * 
+      complexityBonus * 
+      ageHandicap * 
+      targetDifficultyBonus
+    )
+    
+    console.log(`🎯 Calcul de points avancé:`, {
+      niveau: level,
+      palier: difficultyTier,
+      niveauDansPalier: levelInTier,
+      basePoints,
+      comboMultiplier: comboMultiplier.toFixed(2),
+      levelMultiplier: levelMultiplier.toFixed(2),
+      difficultyBonus: difficultyBonus.toFixed(2),
+      complexityBonus: complexityBonus.toFixed(2),
+      ageHandicap: ageHandicap.toFixed(2),
+      targetDifficultyBonus: targetDifficultyBonus.toFixed(2),
+      finalPoints
+    })
+    
+    return finalPoints
+  }, [stats.combo, stats.level, userAge, config.operator, target])
   
   // Spawn de nouveaux nombres - VERSION SIMPLIFIÉE
   const spawnNumbers = useCallback(() => {
@@ -399,36 +610,50 @@ export default function CubeMatchUnified({
       
       // Trouver les cellules vides
       const emptyCells: {row: number, col: number}[] = []
+      const allCells: {row: number, col: number}[] = []
+      
       for (let row = 0; row < config.gridSize; row++) {
         for (let col = 0; col < config.gridSize; col++) {
+          allCells.push({ row, col })
           if (prevGrid[row] && prevGrid[row][col] && prevGrid[row][col].value === null) {
             emptyCells.push({ row, col })
           }
         }
       }
       
-      if (emptyCells.length === 0) {
-        console.log('⚠️ Aucune cellule vide disponible')
-        return prevGrid
-      }
+      // Si pas de cellules vides, on remplace des cellules existantes
+      const cellsToUse = emptyCells.length > 0 ? emptyCells : allCells
       
-      // Spawn de 2-3 nombres
-      const numbersToSpawn = Math.min(3, emptyCells.length)
+      // Spawn de 3-5 nombres pour garder la grille remplie
+      const numbersToSpawn = Math.min(5, cellsToUse.length)
       const newGrid = prevGrid.map(row => [...row])
       
+      // Créer une copie des cellules disponibles pour éviter les doublons
+      const availableCells = [...cellsToUse]
+      
       for (let i = 0; i < numbersToSpawn; i++) {
-        const randomIndex = Math.floor(Math.random() * emptyCells.length)
-        const { row, col } = emptyCells.splice(randomIndex, 1)[0]
+        if (availableCells.length === 0) break
         
-        const newValue = Math.floor(Math.random() * 10) + 1 // Valeur simple
+        const randomIndex = Math.floor(Math.random() * availableCells.length)
+        const { row, col } = availableCells.splice(randomIndex, 1)[0]
+        
+        // Utiliser des nombres complexes pour certains spawns (30% de chance)
+        const useComplexNumber = Math.random() < 0.3 && stats.level >= 10
+        const newValue = useComplexNumber ? generateComplexNumber() : generateRandomNumber()
+        const oldValue = newGrid[row][col].value
         newGrid[row][col].value = newValue
         newGrid[row][col].bornAt = Date.now()
-        console.log(`🎲 Spawn nombre ${newValue} à [${row},${col}]`)
+        
+        if (oldValue !== null) {
+          console.log(`🔄 Remplacement nombre ${oldValue} → ${newValue} à [${row},${col}]`)
+        } else {
+          console.log(`🎲 Spawn nombre ${newValue} à [${row},${col}]`)
+        }
       }
       
       return newGrid
     })
-  }, [gameState, config.gridSize])
+  }, [gameState, config.gridSize, generateRandomNumber, generateComplexNumber, stats.level])
   
   // Vérifier si une solution existe
   const checkSolution = useCallback((cells: Cell[]): boolean => {
@@ -443,15 +668,29 @@ export default function CubeMatchUnified({
       case 'SUB':
         return values.length === 2 && Math.abs(values[0] - values[1]) === target
       case 'MUL':
-        return values.reduce((prod, val) => prod * val, 1) === target
+        // Vérifier que la multiplication donne un résultat entier et égal au target
+        const product = values.reduce((prod, val) => prod * val, 1)
+        return product === target && Number.isInteger(product)
       case 'DIV':
-        return values.length === 2 && (values[0] / values[1] === target || values[1] / values[0] === target)
+        // Vérifier que la division donne un résultat entier et égal au target
+        if (values.length !== 2) return false
+        const div1 = values[0] / values[1]
+        const div2 = values[1] / values[0]
+        return (Number.isInteger(div1) && div1 === target) || (Number.isInteger(div2) && div2 === target)
       case 'MIXED':
         // Essayer toutes les opérations
         const sum = values.reduce((s, v) => s + v, 0)
         const diff = values.length === 2 ? Math.abs(values[0] - values[1]) : 0
         const prod = values.reduce((p, v) => p * v, 1)
-        const div = values.length === 2 ? (values[0] / values[1] === Math.floor(values[0] / values[1]) ? values[0] / values[1] : values[1] / values[0] === Math.floor(values[1] / values[0]) ? values[1] / values[0] : 0) : 0
+        
+        // Division seulement si elle donne un entier
+        let div = 0
+        if (values.length === 2) {
+          const div1 = values[0] / values[1]
+          const div2 = values[1] / values[0]
+          if (Number.isInteger(div1)) div = div1
+          else if (Number.isInteger(div2)) div = div2
+        }
         
         return sum === target || diff === target || prod === target || div === target
       default:
@@ -466,9 +705,8 @@ export default function CubeMatchUnified({
     const isCorrectSolution = checkSolution(cells)
     
     if (isCorrectSolution) {
-      // Solution correcte - Calculs optimisés
-      const multiplier = calculateStreakMultiplier(stats.combo)
-      const points = Math.round(cells.length * 10 * (stats.combo + 1) * multiplier)
+      // Solution correcte - Nouveau système de points avancé
+      const points = calculateAdvancedPoints(cells, true)
       
       // Batch les mises à jour de stats pour éviter les re-renders multiples
       setStats(prev => {
@@ -565,7 +803,7 @@ export default function CubeMatchUnified({
     
     // Nettoyer la sélection
     setSelectedCells([])
-  }, [gameState, selectedCells, checkSolution, stats.combo, config.soundEnabled, generateTarget, isTutorialMode, tutorialStep])
+  }, [gameState, selectedCells, checkSolution, calculateAdvancedPoints, config.soundEnabled, generateTarget, isTutorialMode, tutorialStep])
   
   // Gérer la sélection de cellules
   const handleCellClick = useCallback((cell: Cell) => {
@@ -1213,7 +1451,7 @@ export default function CubeMatchUnified({
         <div className="flex items-center justify-between gap-4 p-3 relative z-10 h-20">
           
           {/* Section Gauche - Stats */}
-          <div className="flex items-center gap-4 h-full mt-10">
+          <div className="flex items-center gap-4 h-full mt-16">
             {/* Card Score */}
             <div className="bg-gradient-to-br from-yellow-400 via-orange-400 to-red-400 border-2 border-yellow-500 rounded-2xl px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
               <div className="text-xl text-white font-bold flex items-center gap-2 mb-1">
@@ -1382,9 +1620,9 @@ export default function CubeMatchUnified({
               exit={{ opacity: 0, scale: 0.5, x: 100 }}
               className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-xl shadow-lg text-center min-w-[160px]"
             >
-              <div className="text-2xl mb-1">🎉</div>
-              <div className="text-sm font-bold">NIVEAU {stats.level} !</div>
-              <div className="text-xs opacity-90">Félicitations !</div>
+              <div className="text-4xl mb-1">🎉</div>
+              <div className="text-4xl font-bold text-white">Tu as atteint le niveau {stats.level} !</div>
+              <div className="text-4xl font-bold text-white">Félicitations !</div>
             </motion.div>
           )}
         </AnimatePresence>
