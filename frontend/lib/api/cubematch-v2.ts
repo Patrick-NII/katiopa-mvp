@@ -486,10 +486,4 @@ class CubeMatchAPIv2 {
 // Export de l'instance singleton
 export const cubeMatchAPI = new CubeMatchAPIv2();
 
-// Export des types pour utilisation externe
-export type {
-  ScoreData,
-  LeaderboardEntry,
-  UserStats,
-  GameSettings
-};
+// Types déjà exportés via les interfaces ci-dessus;

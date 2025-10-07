@@ -111,9 +111,15 @@ export const useModals = (): UseModalsReturn => {
   }, [])
 
   const openCubeMatchModal = useCallback(() => {
+    console.log('🎮 useModals: Ouverture du modal CubeMatch...')
+    
     setModals(prev => {
       const exists = prev.find(m => m.id === 'cubematch')
-      if (exists) return prev
+      if (exists) {
+        console.log('⚠️ Modal CubeMatch existe déjà')
+        return prev
+      }
+      console.log('✅ Ajout du modal CubeMatch à la liste')
       return [...prev, {
         id: 'cubematch',
         title: 'CubeMatch',
@@ -122,23 +128,30 @@ export const useModals = (): UseModalsReturn => {
       }]
     })
 
-    const cubematchSize = { width: 700, height: 500 }
+    const cubematchSize = { width: Math.min(window.innerWidth - 100, 1000), height: Math.min(window.innerHeight - 100, 700) }
     const centerPosition = getDefaultPosition(cubematchSize)
+    
+    console.log('📐 Taille du modal:', cubematchSize)
+    console.log('📍 Position du modal:', centerPosition)
 
-    setModalStates(prev => ({
-      ...prev,
-      cubematch: {
-        isOpen: true,
-        isMinimized: false,
-        isMaximized: false,
-        isFullscreen: false,
-        position: centerPosition,
-        size: cubematchSize,
-        originalSize: cubematchSize,
-        originalPosition: centerPosition,
-        zIndex: 1000 + Object.keys(prev).length
+    setModalStates(prev => {
+      const newState = {
+        ...prev,
+        cubematch: {
+          isOpen: true,
+          isMinimized: false,
+          isMaximized: false,
+          isFullscreen: false,
+          position: centerPosition,
+          size: cubematchSize,
+          originalSize: cubematchSize,
+          originalPosition: centerPosition,
+          zIndex: 1000 + Object.keys(prev).length
+        }
       }
-    }))
+      console.log('🔄 Nouveau état des modals:', newState)
+      return newState
+    })
   }, [])
 
   const openMemoryGameModal = useCallback(() => {

@@ -8,7 +8,7 @@ import {
   Maximize2,
   Square
 } from 'lucide-react'
-import CubeMatchGame from '../games/CubeMatchGame'
+import CubeMatchUnified from '../games/CubeMatchUnified'
 
 interface CubeMatchModalProps {
   isOpen: boolean
@@ -142,7 +142,7 @@ export default function CubeMatchModal({
 
       {/* Contenu du jeu - OPTIMISÉ MOBILE */}
       <div className="h-full overflow-hidden min-h-0">
-        <CubeMatchGame />
+        <CubeMatchUnified onClose={onClose} />
       </div>
     </motion.div>
   )

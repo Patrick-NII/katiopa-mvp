@@ -282,7 +282,7 @@ export function useMultiChildRadarData({ userType = 'PARENT' }: { userType?: 'CH
       })
 
       const results = await Promise.all(promises)
-      const validProfiles = results.filter((profile): profile is ChildProfile => profile !== null)
+      const validProfiles = results.filter(profile => profile !== null && profile !== undefined) as ChildProfile[]
       
       console.log(`✅ Résultats finaux: ${validProfiles.length} profils valides sur ${childSessions.length} sessions`)
       setProfiles(validProfiles)

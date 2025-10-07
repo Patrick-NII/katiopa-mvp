@@ -8,15 +8,30 @@ import { useAgeAdaptation } from '../../../hooks/useAgeAdaptation'
 import { authAPI } from '../../../lib/api'
 import { Shield } from 'lucide-react'
 
-interface ExperiencesPageProps {
-  user: any
-  userType: 'CHILD' | 'PARENT'
-}
-
-function ExperiencesPage({ user, userType }: ExperiencesPageProps) {
-  const [userAge, setUserAge] = useState<number>((user as any)?.age || 8) // Utiliser l'âge des props ou défaut
+export default function ExperiencesPage() {
+  const [user, setUser] = useState<any>(null)
+  const [userType, setUserType] = useState<'CHILD' | 'PARENT'>('CHILD')
+  const [userAge, setUserAge] = useState<number>(8)
 
   const isChild = userType === 'CHILD'
+  
+  // Charger les données utilisateur
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const response = await authAPI.verify()
+        if (response.success && response.user) {
+          setUser(response.user)
+          setUserType((response.user as any).userType || 'CHILD')
+          setUserAge((response.user as any).age || 8)
+        }
+      } catch (error) {
+        console.error('Erreur chargement profil:', error)
+      }
+    }
+    
+    loadUserData()
+  }, [])
   
   // Adaptation par âge
   const { 
@@ -77,4 +92,3 @@ function ExperiencesPage({ user, userType }: ExperiencesPageProps) {
   )
 }
 
-export default ExperiencesPage

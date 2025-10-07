@@ -1,57 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
 
-// GET - Récupérer les commentaires pour CubeMatch
+// GET - Récupérer les commentaires d'un jeu (proxy vers backend)
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const gameId = searchParams.get('gameId') || 'cubematch';
-
-    const comments = await prisma.gameComment.findMany({
-      where: { gameId },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            email: true
-          }
-        },
-        likes: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                username: true
-              }
-            }
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
+    
+    // Proxy vers le backend
+    const backendResponse = await fetch(`${BACKEND_URL}/api/cubematch/comments?gameId=${gameId}`, {
+      method: 'GET',
+      headers: {
+        'Cookie': request.headers.get('Cookie') || ''
       }
     });
 
-    return NextResponse.json({
-      success: true,
-      data: comments.map(comment => ({
-        id: comment.id,
-        content: comment.content,
-        userId: comment.userId,
-        username: comment.user.username,
-        createdAt: comment.createdAt,
-        likes: comment.likes.map(like => ({
-          id: like.id,
-          userId: like.userId,
-          username: like.user.username
-        }))
-      }))
+    const data = await backendResponse.json();
+    
+    return NextResponse.json(data, { 
+      status: backendResponse.status 
     });
+    
   } catch (error) {
-    console.error('Error fetching comments:', error);
+    console.error('Error proxying comments request:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch comments' },
       { status: 500 }
@@ -59,50 +31,29 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Ajouter un commentaire
+// POST - Ajouter un commentaire (proxy vers backend)
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, gameId = 'cubematch', content } = body;
-
-    if (!userId || !content) {
-      return NextResponse.json(
-        { success: false, error: 'User ID and content required' },
-        { status: 400 }
-      );
-    }
-
-    const comment = await prisma.gameComment.create({
-      data: {
-        userId,
-        gameId,
-        content: content.trim(),
-        createdAt: new Date()
+    
+    // Proxy vers le backend
+    const backendResponse = await fetch(`${BACKEND_URL}/api/cubematch/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': request.headers.get('Cookie') || ''
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            email: true
-          }
-        }
-      }
+      body: JSON.stringify(body)
     });
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        id: comment.id,
-        content: comment.content,
-        userId: comment.userId,
-        username: comment.user.username,
-        createdAt: comment.createdAt,
-        likes: []
-      }
+    const data = await backendResponse.json();
+    
+    return NextResponse.json(data, { 
+      status: backendResponse.status 
     });
+    
   } catch (error) {
-    console.error('Error creating comment:', error);
+    console.error('Error proxying comment creation request:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to create comment' },
       { status: 500 }

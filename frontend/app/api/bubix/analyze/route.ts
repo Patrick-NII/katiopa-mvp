@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(data)
-    
+
   } catch (error) {
     console.error('Erreur API /api/bubix/analyze:', error)
     return NextResponse.json(

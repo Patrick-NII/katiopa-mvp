@@ -1,125 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
 
-// GET - Récupérer les statistiques générales pour CubeMatch
+// GET - Récupérer les statistiques d'un jeu (proxy vers backend)
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const gameId = searchParams.get('gameId') || 'cubematch';
-
-    // Compter les différents éléments
-    const [
-      totalLikes,
-      totalComments,
-      totalShares,
-      totalViews,
-      totalGamesPlayed,
-      totalPlayers
-    ] = await Promise.all([
-      prisma.gameLike.count({ where: { gameId } }),
-      prisma.gameComment.count({ where: { gameId } }),
-      prisma.gameShare.count({ where: { gameId } }),
-      prisma.gameView.count({ where: { gameId } }),
-      prisma.gameScore.count({ where: { gameId } }),
-      prisma.gameScore.groupBy({
-        by: ['userId'],
-        where: { gameId }
-      }).then(result => result.length)
-    ]);
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        likes: totalLikes,
-        comments: totalComments,
-        shares: totalShares,
-        views: totalViews,
-        gamesPlayed: totalGamesPlayed,
-        totalPlayers
+    const childId = searchParams.get('childId');
+    
+    let url = `${BACKEND_URL}/api/cubematch/stats?gameId=${gameId}`;
+    if (childId) {
+      url += `&childId=${childId}`;
+    }
+    
+    // Proxy vers le backend
+    const backendResponse = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Cookie': request.headers.get('Cookie') || ''
       }
     });
-  } catch (error) {
-    console.error('Error fetching game stats:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch game stats' },
-      { status: 500 }
-    );
-  }
-}
 
-// POST - Enregistrer une action (share, view, etc.)
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { userId, gameId = 'cubematch', action, score } = body;
-
-    if (!userId || !action) {
-      return NextResponse.json(
-        { success: false, error: 'User ID and action required' },
-        { status: 400 }
-      );
-    }
-
-    let result;
-    switch (action) {
-      case 'share':
-        await prisma.gameShare.create({
-          data: {
-            userId,
-            gameId,
-            createdAt: new Date()
-          }
-        });
-        result = { action: 'shared' };
-        break;
-      
-      case 'view':
-        await prisma.gameView.create({
-          data: {
-            userId,
-            gameId,
-            createdAt: new Date()
-          }
-        });
-        result = { action: 'viewed' };
-        break;
-      
-      case 'play':
-        if (score !== undefined) {
-          await prisma.gameScore.create({
-            data: {
-              userId,
-              gameId,
-              score: parseInt(score),
-              createdAt: new Date()
-            }
-          });
-          result = { action: 'played', score };
-        } else {
-          return NextResponse.json(
-            { success: false, error: 'Score required for play action' },
-            { status: 400 }
-          );
-        }
-        break;
-      
-      default:
-        return NextResponse.json(
-          { success: false, error: 'Invalid action' },
-          { status: 400 }
-        );
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: result
+    const data = await backendResponse.json();
+    
+    return NextResponse.json(data, { 
+      status: backendResponse.status 
     });
+    
   } catch (error) {
-    console.error('Error recording action:', error);
+    console.error('Error proxying stats request:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to record action' },
+      { success: false, error: 'Failed to fetch stats' },
       { status: 500 }
     );
   }

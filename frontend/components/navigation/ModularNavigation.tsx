@@ -47,12 +47,12 @@ export type NavigationTab =
   | 'programme'
   | 'experiences'
   | 'family'
+  | 'family-members'
   | 'bubix-assistant'
   | 'bubix'
   | 'rapports'
   | 'reglages'
   | 'abonnements'
-  | 'family-members'
   | 'mathcube'
   | 'codecube'
   | 'playcube'
@@ -224,7 +224,7 @@ export default function ModularNavigation({
           available: true,
           items: [
             {
-              id: 'experiences',
+              id: 'experiences' as NavigationTab,
               label: adaptText({
                 simple: 'Mes Jeux',
                 intermediate: 'Mes Expériences',
@@ -240,7 +240,7 @@ export default function ModularNavigation({
               isNew: true
             },
             {
-              id: 'mathcube',
+              id: 'mathcube' as NavigationTab,
               label: adaptText({
                 simple: 'Nombres',
                 intermediate: 'MathCube',
@@ -255,7 +255,7 @@ export default function ModularNavigation({
               available: true
             },
             {
-              id: 'codecube',
+              id: 'codecube' as NavigationTab,
               label: adaptText({
                 simple: 'Robot',
                 intermediate: 'CodeCube',
@@ -270,7 +270,7 @@ export default function ModularNavigation({
               available: isMiddleChild || isOlderChild // Pas de code pour les très jeunes
             },
             {
-              id: 'playcube',
+              id: 'playcube' as NavigationTab,
               label: adaptText({
                 simple: 'Jeux',
                 intermediate: 'PlayCube',
@@ -285,7 +285,7 @@ export default function ModularNavigation({
               available: true
             },
             {
-              id: 'sciencecube',
+              id: 'sciencecube' as NavigationTab,
               label: adaptText({
                 simple: 'Découvertes',
                 intermediate: 'ScienceCube',
@@ -300,7 +300,7 @@ export default function ModularNavigation({
               available: !isYoungChild // Sciences pour 6+ ans
             },
             {
-              id: 'dreamcube',
+              id: 'dreamcube' as NavigationTab,
               label: adaptText({
                 simple: 'Créations',
                 intermediate: 'DreamCube',
@@ -327,14 +327,14 @@ export default function ModularNavigation({
           available: true,
           items: [
             {
-              id: 'dashboard',
+              id: 'dashboard' as NavigationTab,
               label: 'Dashboard',
               icon: LayoutDashboard,
               description: 'Vue d\'ensemble',
               available: true
             },
             {
-              id: 'analytics',
+              id: 'analytics' as NavigationTab,
               label: 'Analytics',
               icon: BarChart3,
               description: 'Statistiques détaillées',
@@ -342,14 +342,14 @@ export default function ModularNavigation({
               isNew: true
             },
             {
-              id: 'programme',
+              id: 'programme' as NavigationTab,
               label: 'Programme',
               icon: Calendar,
               description: 'Cycle d\'apprentissage hebdomadaire',
               available: isFeatureEnabled('weeklyCycle') // Conditionné par l'âge des enfants
             },
             {
-              id: 'family',
+              id: 'family' as NavigationTab,
               label: 'Gestion Familiale',
               icon: Users,
               description: 'Suivi des enfants',
@@ -357,7 +357,7 @@ export default function ModularNavigation({
               isNew: true
             },
             {
-              id: 'rapports',
+              id: 'rapports' as NavigationTab,
               label: 'Mes Rapports',
               icon: FileText,
               description: 'Rapports pédagogiques sauvegardés',
@@ -365,7 +365,7 @@ export default function ModularNavigation({
               isNew: true
             },
             {
-              id: 'abonnements',
+              id: 'abonnements' as NavigationTab,
               label: 'Abonnements & Facturation',
               icon: Crown,
               description: 'Plans, fonctionnalités et historique des paiements',
@@ -375,7 +375,7 @@ export default function ModularNavigation({
                      planTier === 'MAITRE' ? 'Maître' : 'Entreprise'
             },
             {
-              id: 'reglages',
+              id: 'reglages' as NavigationTab,
               label: 'Configuration',
               icon: Settings,
               description: 'Configuration et sécurité',

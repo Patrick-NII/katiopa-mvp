@@ -17,7 +17,7 @@ import FamilyMembersTab from '../FamilyMembersTab'
 import { authAPI, statsAPI } from '@/lib/api'
 import DecorativeCubes from '../DecorativeCubes'
 import { AvatarProvider } from '@/contexts/AvatarContext'
-import { useModals } from '@/hooks/useModals'
+import { ModalProvider, useModalContext } from '@/contexts/ModalContext'
 import ModalSystem from '../modals/ModalSystem'
 import BubixDedicatedWindow from '../bubix/BubixDedicatedWindow'
 import BubixChildWindow from '../bubix/BubixChildWindow'
@@ -55,7 +55,7 @@ interface Summary {
   }>
 }
 
-export default function ModularDashboard() {
+function ModularDashboardContent() {
   const [activeTab, setActiveTab] = useState<string>('dashboard')
   const [user, setUser] = useState<User | null>(null)
   const [summary, setSummary] = useState<Summary | null>(null)
@@ -64,8 +64,8 @@ export default function ModularDashboard() {
   const [childSessions, setChildSessions] = useState<any[]>([])
   const [isMobile, setIsMobile] = useState(false)
   
-  // Hook pour les modals
-  const { modals, modalStates, closeModal, minimizeModal, maximizeModal, updateModal, openCubeMatchModal } = useModals()
+  // Hook pour les modals depuis le contexte
+  const { modals, modalStates, closeModal, minimizeModal, maximizeModal, updateModal, openCubeMatchModal } = useModalContext()
 
   // Détecter si on est sur mobile
   useEffect(() => {
@@ -214,7 +214,7 @@ export default function ModularDashboard() {
         return <AnalyticsPageNoScroll user={user} childSessions={childSessions} />
       
       case 'experiences':
-        return <ExperiencesPage user={user} userType={user.userType as 'CHILD' | 'PARENT'} />
+        return <ExperiencesPage />
       
       case 'programme':
         return <ProgrammePage />
@@ -230,7 +230,7 @@ export default function ModularDashboard() {
       
       // Pages des cubes d'apprentissage
       case 'mathcube':
-        return <MathCubePage onOpenCubeMatch={openCubeMatchModal} />
+        return <MathCubePage />
       case 'codecube':
         return <CodeCubePage />
       case 'playcube':
@@ -358,5 +358,13 @@ export default function ModularDashboard() {
         )}
       </div>
     </AvatarProvider>
+  )
+}
+
+export default function ModularDashboard() {
+  return (
+    <ModalProvider>
+      <ModularDashboardContent />
+    </ModalProvider>
   )
 }

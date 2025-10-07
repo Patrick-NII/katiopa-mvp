@@ -1,61 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
 
-// POST - Ajouter/retirer un like sur un commentaire
+// POST - Ajouter/retirer un like sur un commentaire (proxy vers backend)
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, commentId } = body;
-
-    if (!userId || !commentId) {
-      return NextResponse.json(
-        { success: false, error: 'User ID and comment ID required' },
-        { status: 400 }
-      );
-    }
-
-    const existingLike = await prisma.commentLike.findFirst({
-      where: {
-        userId,
-        commentId
-      }
+    
+    // Proxy vers le backend
+    const backendResponse = await fetch(`${BACKEND_URL}/api/cubematch/comments/like`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': request.headers.get('Cookie') || ''
+      },
+      body: JSON.stringify(body)
     });
 
-    let result;
-    if (existingLike) {
-      // Retirer le like
-      await prisma.commentLike.delete({
-        where: { id: existingLike.id }
-      });
-      result = { liked: false, action: 'removed' };
-    } else {
-      // Ajouter le like
-      await prisma.commentLike.create({
-        data: {
-          userId,
-          commentId,
-          createdAt: new Date()
-        }
-      });
-      result = { liked: true, action: 'added' };
-    }
-
-    // Récupérer le nouveau total de likes pour ce commentaire
-    const totalLikes = await prisma.commentLike.count({
-      where: { commentId }
+    const data = await backendResponse.json();
+    
+    return NextResponse.json(data, { 
+      status: backendResponse.status 
     });
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        ...result,
-        totalLikes
-      }
-    });
+    
   } catch (error) {
-    console.error('Error handling comment like:', error);
+    console.error('Error proxying comment like request:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to handle comment like' },
       { status: 500 }
