@@ -56,6 +56,7 @@ interface GameConfig {
   maxNumbers: number
   target: number
   theme: 'rainbow' | 'ocean' | 'sunset' | 'forest'
+  numbersPerSpawn: number
 }
 
 interface GameStats {
@@ -90,11 +91,12 @@ const DEFAULT_CONFIG: GameConfig = {
   allowDiagonals: true,
   soundEnabled: true,
   hintsEnabled: true,
-    autoSubmit: true,
+  autoSubmit: true, // Validation automatique par défaut
   spawnRate: 2000,
   maxNumbers: 20,
   target: 10,
-  theme: 'rainbow'
+  theme: 'rainbow',
+  numbersPerSpawn: 3
 }
 
 // Thèmes visuels - Design Enfantin Attrayant
@@ -270,11 +272,18 @@ export default function CubeMatchUnified({
   const [tutorialStep, setTutorialStep] = useState(0)
   const [isTutorialMode, setIsTutorialMode] = useState(false)
   const [particles, setParticles] = useState<Array<{id: string, x: number, y: number}>>([])
-  const [streakMultiplier, setStreakMultiplier] = useState(1)
   const [sessionBestScore, setSessionBestScore] = useState(0)
-  const [maxLevel, setMaxLevel] = useState(1)
+  const [lastLevel, setLastLevel] = useState(1)
   const [showLevelUp, setShowLevelUp] = useState(false)
   const [showNewRecord, setShowNewRecord] = useState(false)
+  const [streakMultiplier, setStreakMultiplier] = useState(1)
+  const [powerUps, setPowerUps] = useState<Array<{type: string, count: number}>>([
+    { type: 'BOMB', count: 3 },
+    { type: 'FREEZE', count: 2 },
+    { type: 'MULTIPLY', count: 1 }
+  ])
+  const [gameMultiplier, setGameMultiplier] = useState(1)
+  const [comboStreak, setComboStreak] = useState(0)
   
   // Refs
   const gameLoopRef = useRef<NodeJS.Timeout>()
@@ -283,14 +292,16 @@ export default function CubeMatchUnified({
   
   // Charger les données sauvegardées
   useEffect(() => {
+    // Charger le meilleur score de session
     const savedSessionScore = localStorage.getItem('cubematch-session-best')
     if (savedSessionScore) {
       setSessionBestScore(parseInt(savedSessionScore))
     }
     
-    const savedMaxLevel = localStorage.getItem('cubematch-max-level')
-    if (savedMaxLevel) {
-      setMaxLevel(parseInt(savedMaxLevel))
+    // Charger le dernier niveau
+    const savedLastLevel = localStorage.getItem('cubematch-last-level')
+    if (savedLastLevel) {
+      setLastLevel(parseInt(savedLastLevel))
     }
   }, [])
   
@@ -412,8 +423,8 @@ export default function CubeMatchUnified({
         return prevGrid
       }
       
-      // Spawn de 2-3 nombres
-      const numbersToSpawn = Math.min(3, emptyCells.length)
+      // Spawn selon la configuration
+      const numbersToSpawn = Math.min(config.numbersPerSpawn, emptyCells.length)
       const newGrid = prevGrid.map(row => [...row])
       
       for (let i = 0; i < numbersToSpawn; i++) {
@@ -459,35 +470,93 @@ export default function CubeMatchUnified({
     }
   }, [config.operator, target])
   
-  // Soumettre une solution - Optimisé
+  // Gérer la sélection de cellules
+  const handleCellClick = useCallback((cell: Cell) => {
+    if (gameState !== 'playing' || cell.value === null) return
+    
+    setSelectedCells(prev => {
+      const isSelected = prev.some(c => c.id === cell.id)
+      
+      if (isSelected) {
+        // Désélectionner
+        return prev.filter(c => c.id !== cell.id)
+      } else {
+        // Sélectionner
+        const newSelection = [...prev, cell]
+        
+        // Vérifier automatiquement si c'est une solution
+        if (config.autoSubmit && checkSolution(newSelection)) {
+          setTimeout(() => handleSubmit(newSelection), 100)
+        }
+        
+        return newSelection
+      }
+    })
+  }, [gameState, config.autoSubmit, checkSolution])
+  
+  // Calculer les points avec logique avancée
+  const calculatePoints = useCallback((cells: Cell[], combo: number, level: number) => {
+    const basePoints = cells.length * 10
+    const comboMultiplier = Math.min(combo * 0.5 + 1, 5) // Max 5x combo
+    const levelMultiplier = Math.min(level * 0.1 + 1, 3) // Max 3x level
+    const gameMultiplierValue = gameMultiplier
+    const timeBonus = config.unlimitedTime ? 0.5 : 1 // Réduction en mode infini
+    
+    const totalPoints = Math.round(
+      basePoints * 
+      comboMultiplier * 
+      levelMultiplier * 
+      gameMultiplierValue * 
+      timeBonus
+    )
+    
+    return {
+      basePoints,
+      comboMultiplier,
+      levelMultiplier,
+      gameMultiplierValue,
+      timeBonus,
+      totalPoints
+    }
+  }, [gameMultiplier, config.unlimitedTime])
+
+  // Soumettre une solution - Logique avancée
   const handleSubmit = useCallback((cells: Cell[] = selectedCells) => {
     if (gameState !== 'playing') return
     
     const isCorrectSolution = checkSolution(cells)
     
     if (isCorrectSolution) {
-      // Solution correcte - Calculs optimisés
-      const multiplier = calculateStreakMultiplier(stats.combo)
-      const points = Math.round(cells.length * 10 * (stats.combo + 1) * multiplier)
+      // Calcul des points avec logique avancée
+      const pointCalculation = calculatePoints(cells, stats.combo, stats.level)
+      const newCombo = stats.combo + 1
       
-      // Batch les mises à jour de stats pour éviter les re-renders multiples
+      // Mise à jour du streak combo
+      setComboStreak(prev => prev + 1)
+      
+      // Bonus de streak (tous les 5 combos)
+      if (newCombo % 5 === 0) {
+        setGameMultiplier(prev => Math.min(prev + 0.5, 3))
+        // Animation de bonus
+        console.log(`🔥 STREAK BONUS! Multiplicateur: ${gameMultiplier + 0.5}x`)
+      }
+      
+      // Batch les mises à jour de stats
       setStats(prev => {
         const newSuccessfulMoves = prev.successfulMoves + 1
         const newTotalMoves = prev.totalMoves + 1
-        const newCombo = prev.combo + 1
-        const newScore = prev.score + points
+        const newScore = prev.score + pointCalculation.totalPoints
         const newLevel = Math.floor(newScore / 1000) + 1
         
         // Vérifier passage de niveau
         if (newLevel > prev.level) {
           setShowLevelUp(true)
           setTimeout(() => setShowLevelUp(false), 3000)
+          setLastLevel(newLevel)
+          localStorage.setItem('cubematch-last-level', newLevel.toString())
           
-          // Sauvegarder le nouveau niveau max
-          if (newLevel > maxLevel) {
-            setMaxLevel(newLevel)
-            localStorage.setItem('cubematch-max-level', newLevel.toString())
-          }
+          // Bonus de niveau - Power-up gratuit
+          setPowerUps(prev => prev.map(p => ({ ...p, count: p.count + 1 })))
         }
         
         // Vérifier nouveau record
@@ -510,6 +579,22 @@ export default function CubeMatchUnified({
           accuracy: Math.round((newSuccessfulMoves / newTotalMoves) * 100)
         }
       })
+      
+      console.log(`✅ Solution correcte! Points: ${pointCalculation.totalPoints} (${pointCalculation.basePoints} × ${pointCalculation.comboMultiplier.toFixed(1)}x combo × ${pointCalculation.levelMultiplier.toFixed(1)}x level × ${pointCalculation.gameMultiplierValue.toFixed(1)}x game × ${pointCalculation.timeBonus}x temps)`)
+    } else {
+      // Solution incorrecte - Reset combo
+      setComboStreak(0)
+      setGameMultiplier(1)
+      
+      setStats(prev => ({
+        ...prev,
+        combo: 0,
+        totalMoves: prev.totalMoves + 1,
+        accuracy: Math.round((prev.successfulMoves / (prev.totalMoves + 1)) * 100)
+      }))
+      
+      console.log('❌ Solution incorrecte - Combo reset')
+    }
       
       // Créer des particules d'effet (non-bloquant)
       requestAnimationFrame(() => createParticles(400, 300))
@@ -566,31 +651,6 @@ export default function CubeMatchUnified({
     // Nettoyer la sélection
     setSelectedCells([])
   }, [gameState, selectedCells, checkSolution, stats.combo, config.soundEnabled, generateTarget, isTutorialMode, tutorialStep])
-  
-  // Gérer la sélection de cellules
-  const handleCellClick = useCallback((cell: Cell) => {
-    if (gameState !== 'playing' || cell.value === null) return
-    
-    setSelectedCells(prev => {
-      const isSelected = prev.some(c => c.id === cell.id)
-      
-      if (isSelected) {
-        // Désélectionner
-        return prev.filter(c => c.id !== cell.id)
-      } else {
-        // Sélectionner
-        const newSelection = [...prev, cell]
-        
-        // Vérifier automatiquement si c'est une solution (minimum 2 cellules)
-        if (config.autoSubmit && newSelection.length >= 2 && checkSolution(newSelection)) {
-          console.log('🎯 AUTO-VALIDATION: Solution détectée automatiquement!')
-          setTimeout(() => handleSubmit(newSelection), 100)
-        }
-        
-        return newSelection
-      }
-    })
-  }, [gameState, config.autoSubmit, checkSolution, handleSubmit])
   
   // Utiliser un indice
   const useHint = useCallback(() => {
@@ -693,7 +753,7 @@ export default function CubeMatchUnified({
       combo: 0,
       bestCombo: 0,
       lives: 3,
-      timeLeft: config.unlimitedTime ? 999999 : config.timeLimit,
+      timeLeft: config.timeLimit,
       cellsCleared: 0,
       totalMoves: 0,
       successfulMoves: 0,
@@ -821,14 +881,44 @@ export default function CubeMatchUnified({
   const startInfiniteGame = useCallback(() => {
     console.log('🚀 Démarrage mode infini...')
     
+    // Nettoyer tous les timers existants
+    if (timeTimerRef.current) clearInterval(timeTimerRef.current)
+    if (spawnTimerRef.current) clearInterval(spawnTimerRef.current)
+    
     // Configurer le mode infini
     setConfig(prev => ({ ...prev, unlimitedTime: true }))
+    setGameState('playing')
+    setGameStartTime(Date.now())
+    setSelectedCells([])
     
-    // Démarrer le jeu normalement (il détectera le mode infini)
-    startGame()
+    // Initialiser les stats avec temps infini
+    setStats(prev => ({
+      ...prev,
+      score: 0,
+      level: 1,
+      combo: 0,
+      bestCombo: 0,
+      lives: 3,
+      timeLeft: 999999, // Vraiment infini
+      cellsCleared: 0,
+      totalMoves: 0,
+      successfulMoves: 0,
+      hintsUsed: 0,
+      accuracy: 100,
+      timePlayedMs: 0
+    }))
+    
+    const newTarget = generateTarget()
+    setTarget(newTarget)
+    initializeGridWithNumbers()
+    
+    // Timer de spawn seulement (pas de timer de temps)
+    spawnTimerRef.current = setInterval(() => {
+      spawnNumbers()
+    }, config.spawnRate)
     
     console.log('✅ Mode infini activé - Pas de limite de temps')
-  }, [startGame])
+  }, [generateTarget, initializeGridWithNumbers, spawnNumbers, config.spawnRate])
   
   // Redémarrer
   const restartGame = useCallback(() => {
@@ -888,16 +978,16 @@ export default function CubeMatchUnified({
             Jouer Maintenant !
           </button>
           
-          {maxLevel > 1 && (
+          {lastLevel > 1 && (
             <button
               onClick={() => {
-                setStats(prev => ({ ...prev, level: maxLevel, score: sessionBestScore }))
+                setStats(prev => ({ ...prev, level: lastLevel }))
                 startGame()
               }}
               className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-4 rounded-2xl font-bold text-lg hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl transform"
             >
               <span className="text-2xl mr-3">🎯</span>
-              Continuer Niveau {maxLevel}
+              Continuer Niveau {lastLevel}
             </button>
           )}
           
@@ -956,7 +1046,7 @@ export default function CubeMatchUnified({
       <motion.div
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
-        className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto"
       >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Paramètres</h2>
@@ -968,28 +1058,28 @@ export default function CubeMatchUnified({
           </button>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* COLONNE GAUCHE */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* Section Jeu */}
-            <div className="bg-gray-50 rounded-xl p-4">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <span className="text-lg">🎮</span>
+            <div className="bg-gray-50 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Gamepad2 className="w-5 h-5" />
                 Configuration du Jeu
               </h3>
               
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {/* Difficulté */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">Difficulté</label>
-                  <div className="grid grid-cols-3 gap-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Difficulté</label>
+                  <div className="grid grid-cols-3 gap-3">
                     {(['EASY', 'MEDIUM', 'HARD'] as Difficulty[]).map(diff => (
                       <button
                         key={diff}
                         onClick={() => setConfig(prev => ({ ...prev, difficulty: diff }))}
-                        className={`py-2 px-2 rounded-lg text-xs font-medium transition-colors ${
+                        className={`py-3 px-4 rounded-xl font-medium transition-all duration-200 ${
                           config.difficulty === diff
-                            ? `bg-gradient-to-r ${currentTheme.primary} text-white`
+                            ? `bg-gradient-to-r ${currentTheme.primary} text-white shadow-lg`
                             : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                         }`}
                       >
@@ -1001,13 +1091,13 @@ export default function CubeMatchUnified({
                 
                 {/* Opérateur */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">Opération</label>
-                  <div className="grid grid-cols-5 gap-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Opération</label>
+                  <div className="grid grid-cols-3 gap-2">
                     {(['ADD', 'SUB', 'MUL', 'DIV', 'MIXED'] as Operator[]).map(op => (
                       <button
                         key={op}
                         onClick={() => setConfig(prev => ({ ...prev, operator: op }))}
-                        className={`py-2 px-1 rounded-lg text-xs font-medium transition-colors ${
+                        className={`py-2 px-4 rounded-xl font-medium transition-colors ${
                           config.operator === op
                             ? `bg-gradient-to-r ${currentTheme.primary} text-white`
                             : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
@@ -1021,8 +1111,8 @@ export default function CubeMatchUnified({
                 
                 {/* Taille de grille */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">
-                    Taille: {config.gridSize}×{config.gridSize}
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Taille de grille: {config.gridSize}×{config.gridSize}
                   </label>
                   <input
                     type="range"
@@ -1032,31 +1122,35 @@ export default function CubeMatchUnified({
                     onChange={(e) => setConfig(prev => ({ ...prev, gridSize: parseInt(e.target.value) }))}
                     className="w-full"
                   />
+                  <div className="flex justify-between text-xs text-gray-400 mt-2">
+                    <span>4×4</span>
+                    <span>8×8</span>
+                  </div>
                 </div>
               </div>
             </div>
             
             {/* Section Temps */}
-            <div className="bg-green-50 rounded-xl p-4">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <span className="text-lg">⏰</span>
+            <div className="bg-green-50 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Clock className="w-5 h-5" />
                 Gestion du Temps
               </h3>
               
-              <div className="space-y-3">
-                <div className="flex items-center justify-between bg-white rounded-lg p-3 border border-gray-200">
-                  <span className="text-xs text-gray-700 font-medium">Temps limité</span>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between bg-white rounded-xl p-4 border border-gray-200">
+                  <span className="text-sm text-gray-700 font-medium">Temps limité</span>
                   <input
                     type="checkbox"
                     checked={!config.unlimitedTime}
                     onChange={(e) => setConfig(prev => ({ ...prev, unlimitedTime: !e.target.checked }))}
-                    className="w-4 h-4 text-blue-600 rounded"
+                    className="w-5 h-5 text-blue-600 rounded"
                   />
                 </div>
                 
                 {!config.unlimitedTime && (
-                  <div className="bg-white rounded-lg p-3 border border-gray-200">
-                    <label className="block text-xs text-gray-600 mb-2">
+                  <div className="bg-white rounded-xl p-4 border border-gray-200">
+                    <label className="block text-sm text-gray-600 mb-2">
                       Durée: {config.timeLimit} secondes
                     </label>
                     <input
@@ -1068,7 +1162,7 @@ export default function CubeMatchUnified({
                       onChange={(e) => setConfig(prev => ({ ...prev, timeLimit: parseInt(e.target.value) }))}
                       className="w-full"
                     />
-                    <div className="flex justify-between text-xs text-gray-400 mt-1">
+                    <div className="flex justify-between text-xs text-gray-400 mt-2">
                       <span>30s</span>
                       <span>5min</span>
                     </div>
@@ -1076,10 +1170,10 @@ export default function CubeMatchUnified({
                 )}
                 
                 {config.unlimitedTime && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                     <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-green-600" />
-                      <span className="text-xs text-green-700 font-medium">Mode infini activé</span>
+                      <Clock className="w-5 h-5 text-green-600" />
+                      <span className="text-sm text-green-700 font-medium">Mode infini activé</span>
                     </div>
                     <p className="text-xs text-green-600 mt-1">Points réduits de 50%</p>
                   </div>
@@ -1089,194 +1183,259 @@ export default function CubeMatchUnified({
           </div>
           
           {/* COLONNE DROITE */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* Section Spawn */}
-            <div className="bg-blue-50 rounded-xl p-4">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <span className="text-lg">⚡</span>
+            <div className="bg-blue-50 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Zap className="w-5 h-5" />
                 Apparition des Nombres
               </h3>
             
-              <div className="bg-white rounded-lg p-3 border border-gray-200">
-                <label className="block text-xs font-medium text-gray-700 mb-2">
-                  Fréquence: {config.spawnRate / 1000}s
-                </label>
-                <input
-                  type="range"
-                  min="1000"
-                  max="10000"
-                  step="500"
-                  value={config.spawnRate}
-                  onChange={(e) => setConfig(prev => ({ ...prev, spawnRate: parseInt(e.target.value) }))}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-xs text-gray-400 mt-1">
-                  <span>1s</span>
-                  <span>10s</span>
+              <div className="space-y-6">
+                {/* Fréquence */}
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Fréquence d'apparition: {config.spawnRate / 1000}s
+                  </label>
+                  <input
+                    type="range"
+                    min="1000"
+                    max="10000"
+                    step="500"
+                    value={config.spawnRate}
+                    onChange={(e) => setConfig(prev => ({ ...prev, spawnRate: parseInt(e.target.value) }))}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-gray-400 mt-2">
+                    <span>1s</span>
+                    <span>10s</span>
+                  </div>
+                </div>
+                
+                {/* Quantité */}
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Nombres par spawn: {config.numbersPerSpawn}
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    step="1"
+                    value={config.numbersPerSpawn}
+                    onChange={(e) => setConfig(prev => ({ ...prev, numbersPerSpawn: parseInt(e.target.value) }))}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-gray-400 mt-2">
+                    <span>1</span>
+                    <span>5</span>
+                  </div>
                 </div>
               </div>
             </div>
             
             {/* Section Options */}
-            <div className="bg-purple-50 rounded-xl p-4">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <span className="text-lg">⚙️</span>
-                Options
+            <div className="bg-purple-50 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                Options Avancées
               </h3>
               
-              <div className="space-y-3">
-                <div className="flex items-center justify-between bg-white rounded-lg p-3 border border-gray-200">
-                  <span className="text-xs text-gray-700 font-medium">Son activé</span>
-                  <input
-                    type="checkbox"
-                    checked={config.soundEnabled}
-                    onChange={(e) => setConfig(prev => ({ ...prev, soundEnabled: e.target.checked }))}
-                    className="w-4 h-4 text-blue-600 rounded"
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between bg-white rounded-lg p-3 border border-gray-200">
-                  <span className="text-xs text-gray-700 font-medium">Indices activés</span>
-                  <input
-                    type="checkbox"
-                    checked={config.hintsEnabled}
-                    onChange={(e) => setConfig(prev => ({ ...prev, hintsEnabled: e.target.checked }))}
-                    className="w-4 h-4 text-blue-600 rounded"
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between bg-white rounded-lg p-3 border border-gray-200">
-                  <span className="text-xs text-gray-700 font-medium">Diagonales autorisées</span>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between bg-white rounded-xl p-4 border border-gray-200">
+                  <span className="text-sm text-gray-700 font-medium">Diagonales autorisées</span>
                   <input
                     type="checkbox"
                     checked={config.allowDiagonals}
                     onChange={(e) => setConfig(prev => ({ ...prev, allowDiagonals: e.target.checked }))}
-                    className="w-4 h-4 text-blue-600 rounded"
+                    className="w-5 h-5 text-blue-600 rounded"
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between bg-white rounded-xl p-4 border border-gray-200">
+                  <span className="text-sm text-gray-700 font-medium">Aides activées</span>
+                  <input
+                    type="checkbox"
+                    checked={config.hintsEnabled}
+                    onChange={(e) => setConfig(prev => ({ ...prev, hintsEnabled: e.target.checked }))}
+                    className="w-5 h-5 text-blue-600 rounded"
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between bg-white rounded-xl p-4 border border-gray-200">
+                  <span className="text-sm text-gray-700 font-medium">Son activé</span>
+                  <input
+                    type="checkbox"
+                    checked={config.soundEnabled}
+                    onChange={(e) => setConfig(prev => ({ ...prev, soundEnabled: e.target.checked }))}
+                    className="w-5 h-5 text-blue-600 rounded"
                   />
                 </div>
               </div>
             </div>
+          </div>
+        </div>
             
-            {/* Section Thème */}
-            <div className="bg-pink-50 rounded-xl p-4">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <span className="text-lg">🎨</span>
-                Thème Visuel
-              </h3>
-              
-              <div className="grid grid-cols-2 gap-2">
-                {(Object.keys(THEMES) as Array<keyof typeof THEMES>).map(theme => (
-                  <button
-                    key={theme}
-                    onClick={() => setConfig(prev => ({ ...prev, theme }))}
-                    className={`py-2 px-3 rounded-lg text-xs font-medium transition-colors capitalize ${
-                      config.theme === theme
-                        ? `bg-gradient-to-r ${THEMES[theme].primary} text-white`
-                        : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                    }`}
-                  >
-                    {theme === 'rainbow' ? 'Arc-en-ciel' : 
-                     theme === 'ocean' ? 'Océan' :
-                     theme === 'sunset' ? 'Coucher' : 'Forêt'}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <label className="flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-700">Indices activés</span>
+              <input
+                type="checkbox"
+                checked={config.hintsEnabled}
+                onChange={(e) => setConfig(prev => ({ ...prev, hintsEnabled: e.target.checked }))}
+                className="rounded"
+              />
+            </label>
+            
+            <label className="flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-700">Diagonales autorisées</span>
+              <input
+                type="checkbox"
+                checked={config.allowDiagonals}
+                onChange={(e) => setConfig(prev => ({ ...prev, allowDiagonals: e.target.checked }))}
+                className="rounded"
+              />
+            </label>
+            
+            <label className="flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-700">Soumission automatique</span>
+              <input
+                type="checkbox"
+                checked={config.autoSubmit}
+                onChange={(e) => setConfig(prev => ({ ...prev, autoSubmit: e.target.checked }))}
+                className="rounded"
+              />
+            </label>
           </div>
         </div>
       </motion.div>
     </div>
   )
   
+  // Debug: log de l'état de la grille
+  console.log(`🔍 ÉTAT GRILLE: ${grid.length} lignes, ${grid[0]?.length || 0} colonnes`)
+  console.log(`🔍 NOMBRES DANS GRILLE:`, grid.flat().filter(cell => cell.value !== null).length)
+  
   // Rendu du jeu
-  const renderGame = () => {
-    // Debug: log de l'état de la grille
-    console.log(`🔍 ÉTAT GRILLE: ${grid.length} lignes, ${grid[0]?.length || 0} colonnes`)
-    console.log(`🔍 NOMBRES DANS GRILLE:`, grid.flat().filter(cell => cell.value !== null).length)
-    
-    return (
-      <div className={`h-screen ${currentTheme.background} relative overflow-hidden flex flex-col`}>
-        {/* Éléments décoratifs animés */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Cercles flottants colorés */}
-          <div className="absolute top-20 left-10 w-32 h-32 bg-pink-300/20 rounded-full blur-xl animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-24 h-24 bg-purple-300/20 rounded-full blur-xl animate-pulse delay-1000"></div>
-          <div className="absolute bottom-32 left-1/4 w-20 h-20 bg-blue-300/20 rounded-full blur-xl animate-pulse delay-2000"></div>
-          <div className="absolute bottom-20 right-1/3 w-16 h-16 bg-yellow-300/20 rounded-full blur-xl animate-pulse delay-3000"></div>
-          
-          {/* Étoiles scintillantes */}
-          <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-yellow-400 rounded-full animate-ping delay-500"></div>
-          <div className="absolute top-3/4 left-1/4 w-1 h-1 bg-pink-400 rounded-full animate-ping delay-1500"></div>
-          <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-blue-400 rounded-full animate-ping delay-2500"></div>
-        </div>
-        {/* Barre de Contrôle Unique - Une Seule Ligne */}
-        <div className="flex items-center justify-between gap-4 p-3 relative z-10 h-20">
-          
-          {/* Section Gauche - Stats */}
-          <div className="flex items-center gap-4 h-full mt-10">
-            {/* Card Score */}
-            <div className="bg-gradient-to-br from-yellow-400 via-orange-400 to-red-400 border-2 border-yellow-500 rounded-2xl px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-              <div className="text-xl text-white font-bold flex items-center gap-2 mb-1">
-                <Trophy className="w-4 h-4" />
-                Score
-              </div>
-              <div className="text-xl font-black text-white drop-shadow-lg">{stats.score.toLocaleString()}</div>
-              {sessionBestScore > 0 && (
-                <div className="text-xl text-yellow-100 font-semibold">Meilleur: {sessionBestScore.toLocaleString()}</div>
-              )}
-            </div>
-            
-            {/* Card Niveau */}
-            <div className="bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-500 border-2 border-blue-500 rounded-2xl px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-              <div className="text-xl text-white font-bold flex items-center gap-2 mb-1">
-                <Star className="w-4 h-4" />
-                Niveau
-              </div>
-              <div className="text-6xl font-black text-white drop-shadow-lg">{stats.level}</div>
-            </div>
-            
-            {/* Card Temps/Mode Infini */}
-            {!config.unlimitedTime ? (
-              <div className="bg-gradient-to-br from-green-400 via-emerald-500 to-teal-500 border-2 border-green-500 rounded-2xl px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                <div className="text-xl text-white font-bold flex items-center gap-2 mb-1">
-                  <Clock className="w-4 h-4" />
-                  Temps
-                </div>
-                <div className="text-6xl font-black text-white drop-shadow-lg">{stats.timeLeft}s</div>
-              </div>
-            ) : (
-              <div className="bg-gradient-to-br from-purple-400 via-pink-500 to-rose-500 border-2 border-purple-500 rounded-2xl px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                <div className="text-xl text-white font-bold flex items-center gap-2 mb-1">
-                  <span className="text-xl">∞</span>
-                  Mode Infini
-                </div>
-                <div className="text-6xl font-black text-white drop-shadow-lg">∞</div>
-              </div>
-            )}
-        </div>
+  const renderGame = () => (
+    <div className={`h-screen ${currentTheme.background} relative overflow-hidden flex flex-col`}>
+      {/* Éléments décoratifs animés */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Cercles flottants colorés */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-pink-300/20 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-purple-300/20 rounded-full blur-xl animate-pulse delay-1000"></div>
+        <div className="absolute bottom-32 left-1/4 w-20 h-20 bg-blue-300/20 rounded-full blur-xl animate-pulse delay-2000"></div>
+        <div className="absolute bottom-20 right-1/3 w-16 h-16 bg-yellow-300/20 rounded-full blur-xl animate-pulse delay-3000"></div>
         
-        {/* Section Centre - Objectif */}
-        <div className="flex-1 flex justify-center items-center h-full">
-          <div className={`inline-flex items-center gap-3 bg-gradient-to-r ${currentTheme.primary} text-white px-6 py-2 rounded-2xl shadow-lg transform -translate-x-32 mt-20`}>
-            <Target className="w-5 h-5" />
-            <span className="text-lg font-bold text-white">Trouve le chiffre ({target}) en utilisant une opération</span>
-            <span className="text-lg font-bold text-white">
-              {config.operator === 'ADD' ? 'Addition' : 
-               config.operator === 'SUB' ? 'Soustraction' :
-               config.operator === 'MUL' ? 'Multiplication' :
-               config.operator === 'DIV' ? 'Division' : 'Mixte'}
-            </span>
-          </div>
-        </div>
+        {/* Étoiles scintillantes */}
+        <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-yellow-400 rounded-full animate-ping delay-500"></div>
+        <div className="absolute top-3/4 left-1/4 w-1 h-1 bg-pink-400 rounded-full animate-ping delay-1500"></div>
+        <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-blue-400 rounded-full animate-ping delay-2500"></div>
+      </div>
+      {/* Barre de Contrôle Unique - Une Seule Ligne */}
+      <div className="flex items-center justify-between gap-4 p-3 relative z-10 ">
         
-        {/* Section Droite - Actions et Contrôles */}
-        <div className="flex items-center gap-3 h-full">
+        {/* Section Gauche - Contrôles et Stats */}
+        <div className="flex items-center gap-4">
           <button
             onClick={pauseGame}
             className={`p-3 rounded-xl ${currentTheme.accent} text-white hover:scale-110 transition-all duration-300 shadow-lg`}
           >
             {gameState === 'paused' ? <Play className="w-6 h-6" /> : <Pause className="w-6 h-6" />}
           </button>
+          
+          <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-br from-yellow-100 to-orange-100 border border-yellow-300 rounded-xl px-3 py-2">
+                <div className="text-xs text-orange-600 font-semibold flex items-center gap-1">
+                  <Trophy className="w-3 h-3" />
+                  Score
+                </div>
+                <div className="text-lg font-bold text-orange-700">{stats.score.toLocaleString()}</div>
+                {sessionBestScore > 0 && (
+                  <div className="text-xs text-orange-500">Meilleur: {sessionBestScore.toLocaleString()}</div>
+                )}
+              </div>
+            
+            <div className="bg-gradient-to-br from-blue-100 to-indigo-100 border border-blue-300 rounded-xl px-3 py-2">
+              <div className="text-xs text-blue-600 font-semibold flex items-center gap-1">
+                <Star className="w-3 h-3" />
+                Niveau
+              </div>
+              <div className="text-lg font-bold text-blue-700">{stats.level}</div>
+            </div>
+            
+            {gameMultiplier > 1 && (
+              <div className="bg-gradient-to-br from-purple-100 to-pink-100 border border-purple-300 rounded-xl px-3 py-2">
+                <div className="text-xs text-purple-600 font-semibold flex items-center gap-1">
+                  <Zap className="w-3 h-3" />
+                  Multi
+                </div>
+                <div className="text-lg font-bold text-purple-700">{gameMultiplier.toFixed(1)}x</div>
+              </div>
+            )}
+            
+            {config.unlimitedTime ? (
+              <div className="bg-gradient-to-br from-purple-100 to-pink-100 border border-purple-300 rounded-xl px-3 py-2">
+                <div className="text-xs text-purple-600 font-semibold flex items-center gap-1">
+                  <span className="text-lg">∞</span>
+                  Mode Infini
+                </div>
+                <div className="text-lg font-bold text-purple-700">∞</div>
+              </div>
+            ) : (
+              <div className="bg-gradient-to-br from-green-100 to-emerald-100 border border-green-300 rounded-xl px-3 py-2">
+                <div className="text-xs text-green-600 font-semibold flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  Temps
+                </div>
+                <div className="text-lg font-bold text-green-700">{stats.timeLeft}s</div>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Section Centre - Objectif */}
+        <div className="flex-1 flex justify-center">
+          <div className={`inline-flex items-center gap-3 bg-gradient-to-r ${currentTheme.primary} text-white px-6 py-3 rounded-2xl shadow-lg`}>
+            <Target className="w-5 h-5" />
+            <span className="text-lg font-bold">Objectif: {target}</span>
+            <span className="text-sm opacity-90">
+              {config.operator === 'ADD' ? '➕' : 
+               config.operator === 'SUB' ? '➖' :
+               config.operator === 'MUL' ? '✖️' :
+               config.operator === 'DIV' ? '➗' : '🔀'}
+            </span>
+          </div>
+        </div>
+        
+        {/* Section Droite - Actions et Contrôles */}
+        <div className="flex items-center gap-3">
+          {/* Power-ups */}
+          <div className="flex items-center gap-2">
+            {powerUps.map((powerUp, index) => (
+              <button
+                key={powerUp.type}
+                onClick={() => {
+                  if (powerUp.count > 0) {
+                    setPowerUps(prev => prev.map((p, i) => 
+                      i === index ? { ...p, count: p.count - 1 } : p
+                    ))
+                    // Logique du power-up
+                    console.log(`🚀 Power-up ${powerUp.type} utilisé!`)
+                  }
+                }}
+                disabled={powerUp.count === 0}
+                className={`p-2 rounded-xl transition-all duration-300 shadow-lg ${
+                  powerUp.count > 0 
+                    ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white hover:scale-110' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+                title={`${powerUp.type}: ${powerUp.count} restants`}
+              >
+                {powerUp.type === 'BOMB' ? '💣' : powerUp.type === 'FREEZE' ? '❄️' : '⭐'}
+                <span className="text-xs ml-1">{powerUp.count}</span>
+              </button>
+            ))}
+          </div>
           
           <button
             onClick={() => setGameState('settings')}
@@ -1309,14 +1468,14 @@ export default function CubeMatchUnified({
             </button>
           )}
         </div>
-
-        </div>
-
-        {/* Zone de Jeu Principale */}
-        <div className="flex-1 flex flex-col items-center justify-start p-4 relative z-10 mt-20 pt-4">
+      </div>
+      
+      
+      {/* Zone de Jeu Principale */}
+      <div className="flex-1 flex flex-col items-center justify-center p-4 relative z-10 -mt-5">
         {/* Grille - Design Enfantin */}
         <div 
-          className="grid gap-2 p-2 bg-gradient-to-br from-white via-blue-50 to-green-50 border-2 border-blue-200 rounded-3xl shadow-2xl"
+          className="grid gap-4 p-6 bg-gradient-to-br from-white via-blue-50 to-green-50 border-2 border-blue-200 rounded-3xl shadow-2xl"
           style={{ 
             gridTemplateColumns: `repeat(${config.gridSize}, minmax(0, 1fr))`,
             width: isFullPage 
@@ -1349,9 +1508,10 @@ export default function CubeMatchUnified({
         </div>
         
         
-        
-        {/* Particules d'effet */}
-        <AnimatePresence>
+      </div>
+      
+      {/* Particules d'effet */}
+      <AnimatePresence>
         {particles.map(particle => (
           <motion.div
             key={particle.id}
@@ -1368,11 +1528,11 @@ export default function CubeMatchUnified({
           >
             <div className="w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full shadow-lg" />
           </motion.div>
-        ))}
-        </AnimatePresence>
-        
-        {/* Zone d'événements - HORS DE LA GRILLE */}
-        <div className="absolute top-32 right-4 z-40 space-y-2">
+        )        )}
+      </AnimatePresence>
+      
+      {/* Zone d'événements - HORS DE LA GRILLE */}
+      <div className="absolute top-4 right-4 z-50 space-y-2">
         {/* Animation Level Up */}
         <AnimatePresence>
           {showLevelUp && (
@@ -1380,10 +1540,10 @@ export default function CubeMatchUnified({
               initial={{ opacity: 0, scale: 0.5, x: 100 }}
               animate={{ opacity: 1, scale: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.5, x: 100 }}
-              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-xl shadow-lg text-center min-w-[160px]"
+              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3 rounded-2xl shadow-2xl text-center min-w-[200px]"
             >
-              <div className="text-2xl mb-1">🎉</div>
-              <div className="text-sm font-bold">NIVEAU {stats.level} !</div>
+              <div className="text-3xl mb-1">🎉</div>
+              <div className="text-lg font-bold">NIVEAU {stats.level} !</div>
               <div className="text-xs opacity-90">Félicitations !</div>
             </motion.div>
           )}
@@ -1396,18 +1556,18 @@ export default function CubeMatchUnified({
               initial={{ opacity: 0, scale: 0.5, x: 100 }}
               animate={{ opacity: 1, scale: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.5, x: 100 }}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-xl shadow-lg text-center min-w-[160px]"
+              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-2xl shadow-2xl text-center min-w-[200px]"
             >
-              <div className="text-2xl mb-1">🏆</div>
-              <div className="text-sm font-bold">NOUVEAU RECORD !</div>
+              <div className="text-3xl mb-1">🏆</div>
+              <div className="text-lg font-bold">NOUVEAU RECORD !</div>
               <div className="text-xs opacity-90">{stats.score.toLocaleString()} points</div>
             </motion.div>
           )}
         </AnimatePresence>
-        </div>
+      </div>
 
-        {/* Messages de tutoriel */}
-        <AnimatePresence>
+      {/* Messages de tutoriel */}
+      <AnimatePresence>
         {isTutorialMode && (
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -1431,10 +1591,10 @@ export default function CubeMatchUnified({
             )}
           </motion.div>
         )}
-        </AnimatePresence>
+      </AnimatePresence>
 
-        {/* Hint */}
-        <AnimatePresence>
+      {/* Hint */}
+      <AnimatePresence>
         {showHint && !isTutorialMode && (
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -1445,11 +1605,9 @@ export default function CubeMatchUnified({
             💡 Cherchez des combinaisons qui donnent {target}
           </motion.div>
         )}
-        </AnimatePresence>
-        </div>
-      </div>
-    )
-  }
+      </AnimatePresence>
+    </div>
+  )
   
   // Rendu pause
   const renderPaused = () => (

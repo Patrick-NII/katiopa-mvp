@@ -5,12 +5,7 @@ import { useRouter } from 'next/navigation'
 import { 
   ArrowLeft,
   Home,
-  RotateCcw,
-  Settings,
-  Trophy,
-  Star,
-  Clock,
-  Target
+  RotateCcw
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import CubeMatchUnified from '@/components/games/CubeMatchUnified'
@@ -21,12 +16,6 @@ export default function CubeMatchPage() {
   const router = useRouter()
   const [userAge, setUserAge] = useState<number>(8)
   const [isClient, setIsClient] = useState(false)
-  const [gameStats, setGameStats] = useState({
-    gamesPlayed: 0,
-    bestScore: 0,
-    totalTime: 0,
-    lastPlayed: null as Date | null
-  })
 
   // Adaptation par âge
   const { adaptText, ui } = useAgeAdaptation({ age: userAge })
@@ -41,12 +30,6 @@ export default function CubeMatchPage() {
         const response = await authAPI.verify()
         if (response.success && (response.user as any)?.age) {
           setUserAge((response.user as any).age)
-        }
-        
-        // Charger les statistiques du jeu
-        const savedStats = localStorage.getItem('cubematch-progress')
-        if (savedStats) {
-          setGameStats(JSON.parse(savedStats))
         }
       } catch (error) {
         console.error('Erreur lors du chargement:', error)
@@ -142,23 +125,6 @@ export default function CubeMatchPage() {
             </div>
           </div>
 
-          {/* Stats rapides */}
-          <div className="flex items-center justify-center gap-6 mt-3 pt-3 border-t border-gray-200/50 dark:border-gray-700/50">
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <Trophy className="w-4 h-4 text-yellow-500" />
-              <span>Meilleur: {gameStats.bestScore.toLocaleString()}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <Target className="w-4 h-4 text-blue-500" />
-              <span>Parties: {gameStats.gamesPlayed}</span>
-            </div>
-            {gameStats.totalTime > 0 && (
-              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <Clock className="w-4 h-4 text-green-500" />
-                <span>Temps: {Math.round(gameStats.totalTime / 60)}min</span>
-              </div>
-            )}
-          </div>
         </div>
       </motion.div>
 

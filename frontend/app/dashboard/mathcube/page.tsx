@@ -94,17 +94,17 @@ function MathCubePageContent() {
 
     loadData()
   }, [])
-  
+
   
   if (!isClient) {
-    return (
+  return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50/80 via-blue-50/60 to-indigo-50/80 dark:from-gray-950/95 dark:via-slate-900/90 dark:to-indigo-950/95 flex items-center justify-center relative overflow-hidden">
         {/* Éléments décoratifs pour le loading */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-40 h-40 bg-blue-200/8 dark:bg-blue-400/3 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-20 right-10 w-32 h-32 bg-indigo-200/10 dark:bg-indigo-400/4 rounded-full blur-2xl animate-pulse delay-1000"></div>
         </div>
-        
+
         <div className="relative z-10 flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-400"></div>
           <p className="text-blue-600 dark:text-blue-400 font-medium animate-pulse">Chargement de MathCube...</p>
@@ -130,13 +130,13 @@ function MathCubePageContent() {
                backgroundSize: '40px 40px'
              }}>
         </div>
-        
+
         {/* Points lumineux discrets */}
         <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-400/30 dark:bg-blue-300/20 rounded-full animate-ping delay-500"></div>
         <div className="absolute top-2/3 left-1/4 w-1 h-1 bg-indigo-400/30 dark:bg-indigo-300/20 rounded-full animate-ping delay-1500"></div>
         <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-purple-400/30 dark:bg-purple-300/20 rounded-full animate-ping delay-2500"></div>
       </div>
-      
+
       <div className="container mx-auto px-8 py-8 max-w-8xl relative z-10">
         
          {/* Header Hero Section Amélioré */}
@@ -201,8 +201,8 @@ function MathCubePageContent() {
                    advanced: 'Catalogue de Jeux'
                  })}
                </h2>
-             </div>
-
+                        </div>
+                        
              {/* Grille des jeux - Optimisée pour enfants */}
              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                
@@ -231,24 +231,24 @@ function MathCubePageContent() {
                          intermediate: 'Moyen',
                          advanced: 'Expert'
                        })}
-                     </div>
-                   </div>
-                   
+              </div>
+            </div>
+            
                    {/* Bouton Play au centre */}
                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                      <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30">
                        <Play className="w-8 h-8 text-white ml-1" />
-                     </div>
-                   </div>
-                 </div>
-                 
+                    </div>
+                  </div>
+                </div>
+                
                  {/* Informations du jeu - Compactes */}
                  <div className="p-3">
                    <div className="text-center mb-2">
                      <h3 className="font-bold text-base text-gray-900 dark:text-white">CubeMatch</h3>
                      <p className="text-xs text-blue-600 dark:text-blue-400">Calcul Mental</p>
-                   </div>
-                   
+                    </div>
+                    
                    {/* Stats en une ligne */}
                    <div className="flex items-center justify-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                      <div className="flex items-center gap-1">
@@ -258,9 +258,9 @@ function MathCubePageContent() {
                      <div className="flex items-center gap-1">
                        <Target className="w-3 h-3 text-blue-500" />
                        <span>Niv.{currentLevel}</span>
-                     </div>
-                   </div>
-                   </div>
+                        </div>
+                      </div>
+                            </div>
                </motion.div>
                
               {/* NuméroMagic - Jeu de nombres */}
@@ -273,30 +273,30 @@ function MathCubePageContent() {
                  <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-green-400 to-emerald-500">
                    <div className="absolute inset-0 flex items-center justify-center">
                      <span className="text-6xl">🔢</span>
-                   </div>
+                                </div>
                    <div className="absolute top-3 left-3">
                      <div className="bg-green-500/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium text-white">
                        Bientôt
-                     </div>
-                   </div>
+                                  </div>
+                                </div>
                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                      <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30">
                        <Play className="w-8 h-8 text-white ml-1" />
-                     </div>
-                   </div>
-                 </div>
+                                  </div>
+                                </div>
+                              </div>
                  <div className="p-3">
                    <div className="text-center mb-2">
                      <h3 className="font-bold text-base text-gray-900 dark:text-white">NuméroMagic</h3>
                      <p className="text-xs text-green-600 dark:text-green-400">Nombres Magiques</p>
-                   </div>
+                          </div>
                    <div className="flex items-center justify-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                      <div className="flex items-center gap-1">
                        <Sparkles className="w-3 h-3 text-green-500" />
                        <span>Nouveau</span>
-                     </div>
-                   </div>
-                 </div>
+                      </div>
+                    </div>
+                  </div>
                </motion.div>
                
               {/* FormesFun - Géométrie */}
@@ -313,26 +313,26 @@ function MathCubePageContent() {
                    <div className="absolute top-3 left-3">
                      <div className="bg-purple-500/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium text-white">
                        Bientôt
-                     </div>
-                   </div>
+                </div>
+              </div>
                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                      <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30">
                        <Play className="w-8 h-8 text-white ml-1" />
-                     </div>
-                   </div>
-                 </div>
+                      </div>
+                    </div>
+                  </div>
                  <div className="p-3">
                    <div className="text-center mb-2">
                      <h3 className="font-bold text-base text-gray-900 dark:text-white">FormesFun</h3>
                      <p className="text-xs text-purple-600 dark:text-purple-400">Géométrie</p>
-                   </div>
+                        </div>
                    <div className="flex items-center justify-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                      <div className="flex items-center gap-1">
                        <Sparkles className="w-3 h-3 text-purple-500" />
                        <span>Nouveau</span>
-                     </div>
-                   </div>
-                 </div>
+                          </div>
+                        </div>
+                      </div>
                </motion.div>
                
               {/* LogiQuest - Logique */}
@@ -345,18 +345,18 @@ function MathCubePageContent() {
                  <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-orange-400 to-red-500">
                    <div className="absolute inset-0 flex items-center justify-center">
                      <span className="text-6xl">🧩</span>
-                   </div>
+                              </div>
                    <div className="absolute top-3 left-3">
                      <div className="bg-orange-500/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium text-white">
                        Bientôt
-                     </div>
-                   </div>
+                            </div>
+                          </div>
                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                      <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30">
                        <Play className="w-8 h-8 text-white ml-1" />
-                     </div>
-                   </div>
-                 </div>
+                    </div>
+                  </div>
+                </div>
                  <div className="p-3">
                    <div className="text-center mb-2">
                      <h3 className="font-bold text-base text-gray-900 dark:text-white">LogiQuest</h3>
@@ -366,9 +366,9 @@ function MathCubePageContent() {
                      <div className="flex items-center gap-1">
                        <Sparkles className="w-3 h-3 text-orange-500" />
                        <span>Nouveau</span>
-                     </div>
-                   </div>
-                 </div>
+              </div>
+            </div>
+          </div>
                </motion.div>
                
              </div>
