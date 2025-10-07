@@ -20,8 +20,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 import { useScreenSize } from '@/hooks/useScreenSize'
 import { cubeMatchAPI, type LeaderboardEntry } from '@/lib/api/cubematch-v2'
-import { ModalProvider, useModalContext } from '@/contexts/ModalContext'
-import CubeMatchModal from '@/components/modals/CubeMatchModal'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useAgeAdaptation } from '@/hooks/useAgeAdaptation'
 import { authAPI } from '@/lib/api'
@@ -29,7 +28,7 @@ import { authAPI } from '@/lib/api'
 function MathCubePageContent() {
   // Hooks
   const { isMobile, isTablet } = useScreenSize()
-  const { openCubeMatchModal, modalStates, closeModal, minimizeModal, maximizeModal, updateModal } = useModalContext()
+  const router = useRouter()
   
   // États principaux
   const [userAge, setUserAge] = useState<number>(8)
@@ -55,12 +54,8 @@ function MathCubePageContent() {
   
   // Fonction pour ouvrir CubeMatch
   const handleOpenCubeMatch = () => {
-    console.log('🎮 Tentative d\'ouverture du modal CubeMatch...')
-    console.log('📊 État des modals avant:', modalStates)
-    openCubeMatchModal()
-    setTimeout(() => {
-      console.log('📊 État des modals après:', modalStates)
-    }, 100)
+    console.log('🎮 Navigation vers la page CubeMatch...')
+    router.push('/dashboard/games/cubematch')
   }
 
   // Chargement des données
@@ -103,38 +98,59 @@ function MathCubePageContent() {
   
   if (!isClient) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50/80 via-blue-50/60 to-indigo-50/80 dark:from-gray-950/95 dark:via-slate-900/90 dark:to-indigo-950/95 flex items-center justify-center relative overflow-hidden">
+        {/* Éléments décoratifs pour le loading */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-40 h-40 bg-blue-200/8 dark:bg-blue-400/3 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 w-32 h-32 bg-indigo-200/10 dark:bg-indigo-400/4 rounded-full blur-2xl animate-pulse delay-1000"></div>
+        </div>
+        
+        <div className="relative z-10 flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-400"></div>
+          <p className="text-blue-600 dark:text-blue-400 font-medium animate-pulse">Chargement de MathCube...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50/80 via-blue-50/60 to-indigo-50/80 dark:from-gray-950/95 dark:via-slate-900/90 dark:to-indigo-950/95 relative overflow-hidden">
+      {/* Éléments décoratifs subtils et élégants */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Motifs géométriques doux */}
+        <div className="absolute top-20 left-10 w-40 h-40 bg-blue-200/8 dark:bg-blue-400/3 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-60 right-16 w-32 h-32 bg-indigo-200/10 dark:bg-indigo-400/4 rounded-full blur-2xl animate-pulse delay-1000"></div>
+        <div className="absolute bottom-40 left-1/4 w-28 h-28 bg-purple-200/8 dark:bg-purple-400/3 rounded-full blur-2xl animate-pulse delay-2000"></div>
+        <div className="absolute bottom-20 right-1/3 w-24 h-24 bg-cyan-200/10 dark:bg-cyan-400/4 rounded-full blur-xl animate-pulse delay-3000"></div>
         
-        {/* Header Hero Section Amélioré */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative text-center mb-12 overflow-hidden"
-        >
-          {/* Arrière-plan animé */}
-          <div className="absolute inset-0 -z-10">
-            <div className="absolute top-10 left-10 w-20 h-20 bg-blue-500/10 rounded-full animate-pulse"></div>
-            <div className="absolute top-20 right-20 w-16 h-16 bg-purple-500/10 rounded-full animate-bounce delay-300"></div>
-            <div className="absolute bottom-10 left-1/4 w-12 h-12 bg-pink-500/10 rounded-full animate-pulse delay-700"></div>
-            <div className="absolute bottom-20 right-1/3 w-8 h-8 bg-yellow-500/10 rounded-full animate-bounce delay-1000"></div>
-          </div>
+        {/* Grille subtile en arrière-plan */}
+        <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.01]" 
+             style={{
+               backgroundImage: `radial-gradient(circle at 1px 1px, rgb(99 102 241) 1px, transparent 0)`,
+               backgroundSize: '40px 40px'
+             }}>
+        </div>
+        
+        {/* Points lumineux discrets */}
+        <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-400/30 dark:bg-blue-300/20 rounded-full animate-ping delay-500"></div>
+        <div className="absolute top-2/3 left-1/4 w-1 h-1 bg-indigo-400/30 dark:bg-indigo-300/20 rounded-full animate-ping delay-1500"></div>
+        <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-purple-400/30 dark:bg-purple-300/20 rounded-full animate-ping delay-2500"></div>
+      </div>
+      
+      <div className="container mx-auto px-8 py-8 max-w-8xl relative z-10">
+        
+         {/* Header Hero Section Amélioré */}
+         <motion.div
+           initial={{ opacity: 0, y: -20 }}
+           animate={{ opacity: 1, y: 0 }}
+           className="relative text-center mb-6 overflow-hidden"
+         >
+         
 
           
           
           {/* Titre avec effet de typing */}
           <motion.h1 
-            className={`${ui.fontSize.title} font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4 relative`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
           >
             {adaptText({
               simple: '🧮 MathCube',
@@ -142,7 +158,7 @@ function MathCubePageContent() {
               advanced: '🧮 MathCube Pro'
             })}
             <motion.div
-              className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 rounded-lg blur-lg"
+              className="absolute -inset-1 "
               animate={{ opacity: [0.5, 0.8, 0.5] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
@@ -166,13 +182,13 @@ function MathCubePageContent() {
         </motion.div>
         
          {/* App Store - Jeux et Exercices */}
-         <div className="space-y-8">
+         <div className="space-y-6">
            
            {/* Section Jeux Disponibles */}
            <motion.div
              initial={{ opacity: 0, y: 20 }}
              animate={{ opacity: 1, y: 0 }}
-             className="space-y-6"
+             className="space-y-4"
            >
              <div className="flex items-center justify-between">
                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
@@ -185,17 +201,10 @@ function MathCubePageContent() {
                    advanced: 'Catalogue de Jeux'
                  })}
                </h2>
-               <div className="text-sm text-gray-500 dark:text-gray-400">
-                 {adaptText({
-                   simple: '1 jeu',
-                   intermediate: '1 jeu disponible',
-                   advanced: '1 jeu • Plus à venir'
-                 })}
-               </div>
              </div>
 
-             {/* Grille des jeux */}
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+             {/* Grille des jeux - Optimisée pour enfants */}
+             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                
                {/* CubeMatch - Carte App Store */}
                <motion.div
@@ -204,8 +213,8 @@ function MathCubePageContent() {
                  transition={{ type: "spring", stiffness: 300 }}
                  onClick={handleOpenCubeMatch}
                >
-                 {/* Image de prévisualisation */}
-                 <div className="relative aspect-[16/10] overflow-hidden">
+                 {/* Image de prévisualisation - Compacte */}
+                 <div className="relative aspect-[4/3] overflow-hidden">
                    <Image
                      src="/cubematch/image1.png"
                      alt="CubeMatch"
@@ -233,271 +242,139 @@ function MathCubePageContent() {
                    </div>
                  </div>
                  
-                 {/* Informations du jeu */}
-                 <div className="p-4">
-                   <div className="flex items-start justify-between mb-2">
-                     <div>
-                       <h3 className="font-bold text-lg text-gray-900 dark:text-white">CubeMatch</h3>
-                       <p className="text-sm text-blue-600 dark:text-blue-400">Calcul Mental</p>
-                     </div>
-                     <div className="text-right">
-                       <div className="text-sm font-bold text-gray-900 dark:text-white">{personalProgress.bestScore.toLocaleString()}</div>
-                       <div className="text-xs text-gray-500 dark:text-gray-400">Record</div>
-                     </div>
+                 {/* Informations du jeu - Compactes */}
+                 <div className="p-3">
+                   <div className="text-center mb-2">
+                     <h3 className="font-bold text-base text-gray-900 dark:text-white">CubeMatch</h3>
+                     <p className="text-xs text-blue-600 dark:text-blue-400">Calcul Mental</p>
                    </div>
                    
-                   <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                     {adaptText({
-                       simple: 'Trouve les bonnes combinaisons de nombres !',
-                       intermediate: 'Développe ton calcul mental avec des défis amusants',
-                       advanced: 'Maîtrise les opérations et développe ta logique numérique'
-                     })}
-                   </p>
-                   
-                   {/* Stats compactes */}
-                   <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-3">
+                   {/* Stats en une ligne */}
+                   <div className="flex items-center justify-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                      <div className="flex items-center gap-1">
-                       <Clock className="w-3 h-3" />
-                       <span>{personalProgress.gamesPlayed} parties</span>
+                       <Trophy className="w-3 h-3 text-yellow-500" />
+                       <span>{personalProgress.bestScore.toLocaleString()}</span>
                      </div>
                      <div className="flex items-center gap-1">
-                       <Target className="w-3 h-3" />
-                       <span>Niveau {currentLevel}</span>
+                       <Target className="w-3 h-3 text-blue-500" />
+                       <span>Niv.{currentLevel}</span>
                      </div>
                    </div>
-                   
-                   {/* Bouton d'action */}
-                   <motion.button
-                     onClick={(e) => {
-                       e.stopPropagation()
-                       handleOpenCubeMatch()
-                     }}
-                     className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-2 rounded-xl font-medium hover:from-blue-600 hover:to-purple-600 transition-all duration-300 flex items-center justify-center gap-2"
-                     whileHover={{ scale: 1.02 }}
-                     whileTap={{ scale: 0.98 }}
-                   >
-                     <Play className="w-4 h-4" />
-                     {adaptText({
-                       simple: 'Jouer',
-                       intermediate: 'Démarrer',
-                       advanced: 'Lancer le jeu'
-                     })}
-                   </motion.button>
+                   </div>
+               </motion.div>
+               
+              {/* NuméroMagic - Jeu de nombres */}
+              <motion.div
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden border border-white/20 group cursor-pointer"
+                whileHover={{ y: -4, scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                onClick={() => router.push('/dashboard/games/numeromagic')}
+              >
+                 <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-green-400 to-emerald-500">
+                   <div className="absolute inset-0 flex items-center justify-center">
+                     <span className="text-6xl">🔢</span>
+                   </div>
+                   <div className="absolute top-3 left-3">
+                     <div className="bg-green-500/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium text-white">
+                       Bientôt
+                     </div>
+                   </div>
+                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                     <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30">
+                       <Play className="w-8 h-8 text-white ml-1" />
+                     </div>
+                   </div>
+                 </div>
+                 <div className="p-3">
+                   <div className="text-center mb-2">
+                     <h3 className="font-bold text-base text-gray-900 dark:text-white">NuméroMagic</h3>
+                     <p className="text-xs text-green-600 dark:text-green-400">Nombres Magiques</p>
+                   </div>
+                   <div className="flex items-center justify-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                     <div className="flex items-center gap-1">
+                       <Sparkles className="w-3 h-3 text-green-500" />
+                       <span>Nouveau</span>
+                     </div>
+                   </div>
                  </div>
                </motion.div>
                
-               {/* Placeholder pour futurs jeux */}
-               <motion.div
-                 className="bg-gray-50/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl border-2 border-dashed border-gray-300/50 dark:border-gray-600/50 p-6 flex flex-col items-center justify-center text-center min-h-[300px] group hover:border-blue-400/50 transition-all duration-300"
-                 whileHover={{ scale: 1.02 }}
-               >
-                 <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                   <Sparkles className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+              {/* FormesFun - Géométrie */}
+              <motion.div
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden border border-white/20 group cursor-pointer"
+                whileHover={{ y: -4, scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                onClick={() => router.push('/dashboard/games/formesfun')}
+              >
+                 <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-purple-400 to-pink-500">
+                   <div className="absolute inset-0 flex items-center justify-center">
+                     <span className="text-6xl">🔺</span>
+                   </div>
+                   <div className="absolute top-3 left-3">
+                     <div className="bg-purple-500/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium text-white">
+                       Bientôt
+                     </div>
+                   </div>
+                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                     <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30">
+                       <Play className="w-8 h-8 text-white ml-1" />
+                     </div>
+                   </div>
                  </div>
-                 <h3 className="font-bold text-gray-600 dark:text-gray-400 mb-2">
-                   {adaptText({
-                     simple: 'Nouveau Jeu',
-                     intermediate: 'Prochainement',
-                     advanced: 'En Développement'
-                   })}
-                 </h3>
-                 <p className="text-sm text-gray-500 dark:text-gray-500">
-                   {adaptText({
-                     simple: 'Bientôt disponible !',
-                     intermediate: 'De nouveaux jeux arrivent',
-                     advanced: 'Modules en cours de développement'
-                   })}
-                 </p>
+                 <div className="p-3">
+                   <div className="text-center mb-2">
+                     <h3 className="font-bold text-base text-gray-900 dark:text-white">FormesFun</h3>
+                     <p className="text-xs text-purple-600 dark:text-purple-400">Géométrie</p>
+                   </div>
+                   <div className="flex items-center justify-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                     <div className="flex items-center gap-1">
+                       <Sparkles className="w-3 h-3 text-purple-500" />
+                       <span>Nouveau</span>
+                     </div>
+                   </div>
+                 </div>
                </motion.div>
                
-               {/* Autre placeholder */}
-               <motion.div
-                 className="bg-gray-50/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl border-2 border-dashed border-gray-300/50 dark:border-gray-600/50 p-6 flex flex-col items-center justify-center text-center min-h-[300px] group hover:border-green-400/50 transition-all duration-300"
-                 whileHover={{ scale: 1.02 }}
-               >
-                 <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                   <Brain className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+              {/* LogiQuest - Logique */}
+              <motion.div
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden border border-white/20 group cursor-pointer"
+                whileHover={{ y: -4, scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                onClick={() => router.push('/dashboard/games/logiquest')}
+              >
+                 <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-orange-400 to-red-500">
+                   <div className="absolute inset-0 flex items-center justify-center">
+                     <span className="text-6xl">🧩</span>
+                   </div>
+                   <div className="absolute top-3 left-3">
+                     <div className="bg-orange-500/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium text-white">
+                       Bientôt
+                     </div>
+                   </div>
+                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                     <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30">
+                       <Play className="w-8 h-8 text-white ml-1" />
+                     </div>
+                   </div>
                  </div>
-                 <h3 className="font-bold text-gray-600 dark:text-gray-400 mb-2">
-                   {adaptText({
-                     simple: 'Autre Jeu',
-                     intermediate: 'À venir',
-                     advanced: 'Module Futur'
-                   })}
-                 </h3>
-                 <p className="text-sm text-gray-500 dark:text-gray-500">
-                   {adaptText({
-                     simple: 'Plus de jeux bientôt !',
-                     intermediate: 'Exercices supplémentaires',
-                     advanced: 'Contenu éducatif avancé'
-                   })}
-                 </p>
+                 <div className="p-3">
+                   <div className="text-center mb-2">
+                     <h3 className="font-bold text-base text-gray-900 dark:text-white">LogiQuest</h3>
+                     <p className="text-xs text-orange-600 dark:text-orange-400">Énigmes</p>
+                   </div>
+                   <div className="flex items-center justify-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                     <div className="flex items-center gap-1">
+                       <Sparkles className="w-3 h-3 text-orange-500" />
+                       <span>Nouveau</span>
+                     </div>
+                   </div>
+                 </div>
                </motion.div>
                
              </div>
            </motion.div>
 
-           {/* Section Exercices et Leçons */}
-           <motion.div
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ delay: 0.2 }}
-             className="space-y-6"
-           >
-             <div className="flex items-center justify-between">
-               <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                 <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
-                   <Brain className="w-5 h-5 text-white" />
-                 </div>
-                 {adaptText({
-                   simple: 'Mes Leçons',
-                   intermediate: 'Exercices & Leçons',
-                   advanced: 'Modules d\'Apprentissage'
-                 })}
-               </h2>
-               <div className="text-sm text-gray-500 dark:text-gray-400">
-                 {adaptText({
-                   simple: 'Bientôt',
-                   intermediate: 'En préparation',
-                   advanced: 'Contenu à venir'
-                 })}
-               </div>
-             </div>
-
-             {/* Grille des exercices */}
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-               
-               {/* Calcul Mental */}
-               <motion.div
-                 className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-2xl p-4 border border-blue-200/50 dark:border-blue-700/30 hover:shadow-lg transition-all duration-300 cursor-pointer group"
-                 whileHover={{ scale: 1.02, y: -2 }}
-               >
-                 <div className="flex items-center gap-3 mb-3">
-                   <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                     <span className="text-xl">🧮</span>
-                   </div>
-                   <div>
-                     <h3 className="font-bold text-sm text-gray-900 dark:text-white">
-                       {adaptText({
-                         simple: 'Calculs',
-                         intermediate: 'Calcul Mental',
-                         advanced: 'Calcul Rapide'
-                       })}
-                     </h3>
-                     <p className="text-xs text-blue-600 dark:text-blue-400">Mathématiques</p>
-                   </div>
-                 </div>
-                 <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
-                   {adaptText({
-                     simple: 'Additions et soustractions',
-                     intermediate: 'Opérations de base',
-                     advanced: 'Stratégies de calcul'
-                   })}
-                 </p>
-                 <div className="text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full inline-block">
-                   📊 Suivi Bubix
-                 </div>
-               </motion.div>
-
-               {/* Géométrie */}
-               <motion.div
-                 className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 rounded-2xl p-4 border border-green-200/50 dark:border-green-700/30 hover:shadow-lg transition-all duration-300 cursor-pointer group"
-                 whileHover={{ scale: 1.02, y: -2 }}
-               >
-                 <div className="flex items-center gap-3 mb-3">
-                   <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
-                     <span className="text-xl">📐</span>
-                   </div>
-                   <div>
-                     <h3 className="font-bold text-sm text-gray-900 dark:text-white">
-                       {adaptText({
-                         simple: 'Formes',
-                         intermediate: 'Géométrie',
-                         advanced: 'Géométrie Spatiale'
-                       })}
-                     </h3>
-                     <p className="text-xs text-green-600 dark:text-green-400">Mathématiques</p>
-                   </div>
-                 </div>
-                 <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
-                   {adaptText({
-                     simple: 'Formes et couleurs',
-                     intermediate: 'Figures géométriques',
-                     advanced: 'Aires et volumes'
-                   })}
-                 </p>
-                 <div className="text-xs bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 px-2 py-1 rounded-full inline-block">
-                   📊 Suivi Bubix
-                 </div>
-               </motion.div>
-
-               {/* Résolution de Problèmes */}
-               <motion.div
-                 className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 rounded-2xl p-4 border border-purple-200/50 dark:border-purple-700/30 hover:shadow-lg transition-all duration-300 cursor-pointer group"
-                 whileHover={{ scale: 1.02, y: -2 }}
-               >
-                 <div className="flex items-center gap-3 mb-3">
-                   <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
-                     <span className="text-xl">🧩</span>
-                   </div>
-                   <div>
-                     <h3 className="font-bold text-sm text-gray-900 dark:text-white">
-                       {adaptText({
-                         simple: 'Problèmes',
-                         intermediate: 'Résolution',
-                         advanced: 'Problèmes Complexes'
-                       })}
-                     </h3>
-                     <p className="text-xs text-purple-600 dark:text-purple-400">Logique</p>
-                   </div>
-                 </div>
-                 <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
-                   {adaptText({
-                     simple: 'Énigmes simples',
-                     intermediate: 'Stratégies étape par étape',
-                     advanced: 'Problèmes multi-étapes'
-                   })}
-                 </p>
-                 <div className="text-xs bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-2 py-1 rounded-full inline-block">
-                   📊 Suivi Bubix
-                 </div>
-               </motion.div>
-
-               {/* Logique */}
-               <motion.div
-                 className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 rounded-2xl p-4 border border-orange-200/50 dark:border-orange-700/30 hover:shadow-lg transition-all duration-300 cursor-pointer group"
-                 whileHover={{ scale: 1.02, y: -2 }}
-               >
-                 <div className="flex items-center gap-3 mb-3">
-                   <div className="w-10 h-10 bg-orange-500/20 rounded-xl flex items-center justify-center">
-                     <span className="text-xl">🎯</span>
-                   </div>
-                   <div>
-                     <h3 className="font-bold text-sm text-gray-900 dark:text-white">
-                       {adaptText({
-                         simple: 'Logique',
-                         intermediate: 'Raisonnement',
-                         advanced: 'Déduction'
-                       })}
-                     </h3>
-                     <p className="text-xs text-orange-600 dark:text-orange-400">Sens critique</p>
-                   </div>
-                 </div>
-                 <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
-                   {adaptText({
-                     simple: 'Suites logiques',
-                     intermediate: 'Raisonnement logique',
-                     advanced: 'Analyse critique'
-                   })}
-                 </p>
-                 <div className="text-xs bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 px-2 py-1 rounded-full inline-block">
-                   📊 Suivi Bubix
-                 </div>
-               </motion.div>
-
-             </div>
-           </motion.div>
-          
+           
           
         </div>
         
@@ -636,31 +513,11 @@ function MathCubePageContent() {
       )}
       </AnimatePresence>
       
-      {/* CubeMatch Modal */}
-      {modalStates.cubematch && (
-        <CubeMatchModal
-          isOpen={modalStates.cubematch.isOpen}
-          onClose={() => closeModal('cubematch')}
-          onMinimize={() => minimizeModal('cubematch')}
-          onMaximize={() => maximizeModal('cubematch')}
-          onFullscreen={() => updateModal('cubematch', { isFullscreen: true, isMaximized: false })}
-          isMinimized={modalStates.cubematch.isMinimized}
-          isMaximized={modalStates.cubematch.isMaximized}
-          isFullscreen={modalStates.cubematch.isFullscreen}
-          zIndex={modalStates.cubematch.zIndex}
-          position={modalStates.cubematch.position}
-          size={modalStates.cubematch.size}
-        />
-      )}
       
     </div>
   )
 }
 
 export default function MathCubePage() {
-  return (
-    <ModalProvider>
-      <MathCubePageContent />
-    </ModalProvider>
-  )
+  return <MathCubePageContent />
 }

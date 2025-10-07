@@ -55,7 +55,7 @@ interface GameConfig {
   spawnRate: number
   maxNumbers: number
   target: number
-  theme: 'classic' | 'ocean' | 'sunset' | 'forest'
+  theme: 'rainbow' | 'ocean' | 'sunset' | 'forest'
 }
 
 interface GameStats {
@@ -77,6 +77,7 @@ interface CubeMatchUnifiedProps {
   onClose?: () => void
   onScoreSubmit?: (score: number) => void
   initialConfig?: Partial<GameConfig>
+  isFullPage?: boolean
 }
 
 // Configuration par défaut
@@ -93,42 +94,50 @@ const DEFAULT_CONFIG: GameConfig = {
   spawnRate: 2000,
   maxNumbers: 20,
   target: 10,
-  theme: 'classic'
+  theme: 'rainbow'
 }
 
-// Thèmes visuels
+// Thèmes visuels - Design Enfantin Attrayant
 const THEMES = {
-  classic: {
-    primary: 'from-blue-500 to-purple-500',
-    secondary: 'from-blue-400 to-purple-400',
-    accent: 'bg-blue-500',
-    background: 'bg-gradient-to-br from-blue-50 to-purple-50',
-    cell: 'bg-white border-blue-200',
-    selectedCell: 'bg-blue-100 border-blue-400'
+  rainbow: {
+    primary: 'from-blue-400 via-purple-500 to-indigo-500',
+    secondary: 'from-yellow-400 via-red-500 to-pink-500',
+    accent: 'bg-gradient-to-r from-pink-500 to-purple-500',
+    background: 'bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100',
+    cell: 'bg-white border-2 border-pink-200 shadow-lg hover:shadow-xl',
+    selectedCell: 'bg-gradient-to-br from-pink-200 to-purple-200 border-2 border-pink-400 shadow-xl',
+    text: 'text-gray-800',
+    button: 'from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700'
   },
   ocean: {
-    primary: 'from-cyan-500 to-blue-500',
-    secondary: 'from-cyan-400 to-blue-400',
-    accent: 'bg-cyan-500',
-    background: 'bg-gradient-to-br from-cyan-50 to-blue-50',
-    cell: 'bg-white border-cyan-200',
-    selectedCell: 'bg-cyan-100 border-cyan-400'
+    primary: 'from-cyan-400 via-blue-500 to-teal-500',
+    secondary: 'from-blue-400 via-cyan-500 to-teal-400',
+    accent: 'bg-gradient-to-r from-cyan-500 to-blue-500',
+    background: 'bg-gradient-to-br from-cyan-100 via-blue-50 to-teal-100',
+    cell: 'bg-white border-2 border-cyan-200 shadow-lg hover:shadow-xl',
+    selectedCell: 'bg-gradient-to-br from-cyan-200 to-blue-200 border-2 border-cyan-400 shadow-xl',
+    text: 'text-gray-800',
+    button: 'from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700'
   },
   sunset: {
-    primary: 'from-orange-500 to-red-500',
-    secondary: 'from-orange-400 to-red-400',
-    accent: 'bg-orange-500',
-    background: 'bg-gradient-to-br from-orange-50 to-red-50',
-    cell: 'bg-white border-orange-200',
-    selectedCell: 'bg-orange-100 border-orange-400'
+    primary: 'from-orange-400 via-red-500 to-pink-500',
+    secondary: 'from-yellow-400 via-orange-500 to-red-400',
+    accent: 'bg-gradient-to-r from-orange-500 to-red-500',
+    background: 'bg-gradient-to-br from-orange-100 via-red-50 to-pink-100',
+    cell: 'bg-white border-2 border-orange-200 shadow-lg hover:shadow-xl',
+    selectedCell: 'bg-gradient-to-br from-orange-200 to-red-200 border-2 border-orange-400 shadow-xl',
+    text: 'text-gray-800',
+    button: 'from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700'
   },
   forest: {
-    primary: 'from-green-500 to-emerald-500',
-    secondary: 'from-green-400 to-emerald-400',
-    accent: 'bg-green-500',
-    background: 'bg-gradient-to-br from-green-50 to-emerald-50',
-    cell: 'bg-white border-green-200',
-    selectedCell: 'bg-green-100 border-green-400'
+    primary: 'from-green-400 via-emerald-500 to-teal-500',
+    secondary: 'from-lime-400 via-green-500 to-emerald-400',
+    accent: 'bg-gradient-to-r from-green-500 to-emerald-500',
+    background: 'bg-gradient-to-br from-green-100 via-emerald-50 to-teal-100',
+    cell: 'bg-white border-2 border-green-200 shadow-lg hover:shadow-xl',
+    selectedCell: 'bg-gradient-to-br from-green-200 to-emerald-200 border-2 border-green-400 shadow-xl',
+    text: 'text-gray-800',
+    button: 'from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700'
   }
 }
 
@@ -154,20 +163,38 @@ const GameCell = memo(({
 
   // Mémoriser les classes CSS pour éviter les recalculs
   const cellClasses = useMemo(() => {
-    const baseClasses = 'aspect-square rounded-xl font-bold text-lg transition-all duration-150'
+    const baseClasses = 'aspect-square rounded-2xl font-bold transition-all duration-300 transform flex items-center justify-center'
+    const sizeClasses = 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl'
     
     if (cell.value === null) {
-      return `${baseClasses} bg-gray-100 border-2 border-gray-200 cursor-default`
+      return `${baseClasses} ${sizeClasses} bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300 cursor-default shadow-md text-gray-400`
     }
     
+    // Couleurs vives selon la valeur du nombre
+    const valueColors = [
+      'from-red-400 to-pink-500',      // 1
+      'from-orange-400 to-red-500',    // 2
+      'from-yellow-400 to-orange-500', // 3
+      'from-green-400 to-yellow-500',  // 4
+      'from-blue-400 to-green-500',    // 5
+      'from-indigo-400 to-blue-500',   // 6
+      'from-purple-400 to-indigo-500', // 7
+      'from-pink-400 to-purple-500',   // 8
+      'from-rose-400 to-pink-500',     // 9
+      'from-cyan-400 to-rose-500'      // 10+
+    ]
+    
+    const colorIndex = Math.min(cell.value - 1, valueColors.length - 1)
+    const cellColor = valueColors[colorIndex]
+    
     const stateClasses = isSelected
-      ? `${theme.selectedCell} border-2 shadow-lg`
-      : `${theme.cell} border-2 hover:scale-105 hover:shadow-md cursor-pointer`
+      ? `bg-gradient-to-br ${cellColor} border-4 border-white shadow-2xl scale-110 ring-4 ring-yellow-300`
+      : `bg-gradient-to-br ${cellColor} border-2 border-white shadow-xl hover:scale-110 hover:shadow-2xl cursor-pointer hover:ring-2 hover:ring-white`
     
-    const tutorialClasses = isTutorial ? 'animate-pulse ring-2 ring-yellow-400' : ''
+    const tutorialClasses = isTutorial ? 'animate-bounce ring-4 ring-yellow-400' : ''
     
-    return `${baseClasses} ${stateClasses} ${tutorialClasses}`
-  }, [cell.value, isSelected, theme.selectedCell, theme.cell, isTutorial])
+    return `${baseClasses} ${sizeClasses} ${stateClasses} ${tutorialClasses} text-white font-black`
+  }, [cell.value, isSelected, isTutorial])
 
   // Mémoriser les propriétés d'animation pour éviter les recalculs
   const animationProps = useMemo(() => ({
@@ -179,10 +206,20 @@ const GameCell = memo(({
     }
   }), [cell.value, isSelected])
 
+  // Debug: log pour voir les valeurs des cellules
+  if (cell.value !== null) {
+    console.log(`🔢 Cellule [${cell.row},${cell.col}] = ${cell.value} (visible)`)
+  } else {
+    console.log(`⚪ Cellule [${cell.row},${cell.col}] = null (vide)`)
+  }
+
   return (
     <motion.button
       onClick={handleClick}
       className={cellClasses}
+      style={{
+        textShadow: cell.value !== null ? '2px 2px 4px rgba(0,0,0,0.5), -1px -1px 2px rgba(0,0,0,0.3)' : 'none'
+      }}
       {...animationProps}
       initial={{ opacity: 0, scale: 0.8 }}
       disabled={cell.value === null}
@@ -199,7 +236,8 @@ GameCell.displayName = 'GameCell'
 export default function CubeMatchUnified({ 
   onClose, 
   onScoreSubmit, 
-  initialConfig = {} 
+  initialConfig = {},
+  isFullPage = false 
 }: CubeMatchUnifiedProps) {
   // Hooks
   const { isMobile, isTablet } = useScreenSize()
@@ -302,7 +340,7 @@ export default function CubeMatchUnified({
       if (emptyCells.length === 0) return prevGrid
       
       // Spawn de nouveaux nombres - optimisé
-      const numbersToSpawn = Math.min(2, emptyCells.length)
+      const numbersToSpawn = Math.min(3, emptyCells.length) // Augmenté de 2 à 3
       if (numbersToSpawn === 0) return prevGrid
       
       // Créer une copie seulement si nécessaire
@@ -577,11 +615,15 @@ export default function CubeMatchUnified({
     console.log('🏗️ Initialisation de la grille...')
     initializeGrid()
     
-    // Spawn initial
+    // Spawn initial massif pour remplir la grille
     setTimeout(() => {
-      console.log('🎲 Premier spawn de nombres...')
-      spawnNumbers()
-    }, 1000)
+      console.log('🎲 Premier spawn de nombres (MASSIF)...')
+      // Spawn multiple pour remplir environ 50% de la grille
+      const halfGridSize = Math.floor((config.gridSize * config.gridSize) / 2)
+      for (let i = 0; i < halfGridSize; i++) {
+        setTimeout(() => spawnNumbers(), i * 50) // Petit délai pour l'animation
+      }
+    }, 100)
     
     // Timer principal
     if (!config.unlimitedTime) {
@@ -677,6 +719,14 @@ export default function CubeMatchUnified({
     spawnTimerRef.current = setInterval(spawnNumbers, config.spawnRate)
   }, [config.unlimitedTime, config.spawnRate, spawnNumbers, endGame])
   
+  // Démarrage automatique en mode pleine page
+  useEffect(() => {
+    if (isFullPage && gameState === 'menu') {
+      console.log('🚀 Démarrage automatique du jeu en mode pleine page')
+      startGame()
+    }
+  }, [isFullPage, gameState, startGame])
+  
   // Redémarrer
   const restartGame = useCallback(() => {
     setGameState('menu')
@@ -703,42 +753,51 @@ export default function CubeMatchUnified({
   
   // Rendu du menu principal
   const renderMenu = () => (
-    <div className={`min-h-screen ${currentTheme.background} flex items-center justify-center p-4`}>
+    <div className={`min-h-screen ${currentTheme.background} flex items-center justify-center p-4 relative overflow-hidden`}>
+      {/* Éléments décoratifs pour le menu */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-40 h-40 bg-pink-300/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-32 h-32 bg-purple-300/20 rounded-full blur-2xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-blue-300/20 rounded-full blur-2xl animate-pulse delay-2000"></div>
+      </div>
+      
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-md w-full"
+        className="bg-gradient-to-br from-white via-blue-50 to-purple-50 border-4 border-green-200 rounded-3xl shadow-2xl p-8 max-w-md w-full relative z-10"
       >
         <div className="text-center mb-8">
-          <div className={`w-20 h-20 bg-gradient-to-r ${currentTheme.primary} rounded-3xl flex items-center justify-center mx-auto mb-4`}>
-            <Gamepad2 className="w-10 h-10 text-white" />
+          <div className={`w-24 h-24 bg-gradient-to-r ${currentTheme.primary} rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg`}>
+            <Gamepad2 className="w-12 h-12 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">CubeMatch</h1>
-          <p className="text-gray-600">Défi mathématique ultime</p>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-3">
+            🎮 CubeMatch Kids
+          </h1>
+          <p className="text-gray-600 text-lg">Défi mathématique amusant !</p>
         </div>
         
         <div className="space-y-4">
           <button
             onClick={startGame}
-            className={`w-full bg-gradient-to-r ${currentTheme.primary} text-white py-4 rounded-2xl font-semibold text-lg hover:scale-105 transition-transform shadow-lg`}
+            className={`w-full bg-gradient-to-r ${currentTheme.button} text-white py-5 rounded-2xl font-bold text-xl hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl transform`}
           >
-            <Play className="w-6 h-6 inline-block mr-2" />
-            Jouer
+            <Play className="w-7 h-7 inline-block mr-3" />
+            Jouer Maintenant !
           </button>
           
           <button
             onClick={startTutorial}
-            className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white py-3 rounded-2xl font-medium hover:scale-105 transition-transform shadow-lg"
+            className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-4 rounded-2xl font-bold text-lg hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl transform"
           >
-            <Lightbulb className="w-5 h-5 inline-block mr-2" />
-            Tutoriel
+            <Lightbulb className="w-6 h-6 inline-block mr-3" />
+            Apprendre à Jouer
           </button>
           
           <button
             onClick={() => setGameState('settings')}
-            className="w-full bg-gray-100 text-gray-700 py-3 rounded-2xl font-medium hover:bg-gray-200 transition-colors"
+            className="w-full bg-gradient-to-r from-gray-400 to-gray-600 text-white py-4 rounded-2xl font-bold text-lg hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl transform"
           >
-            <Settings className="w-5 h-5 inline-block mr-2" />
+            <Settings className="w-6 h-6 inline-block mr-3" />
             Paramètres
           </button>
           
@@ -792,6 +851,53 @@ export default function CubeMatchUnified({
                   {diff === 'EASY' ? 'Facile' : diff === 'MEDIUM' ? 'Moyen' : 'Difficile'}
                 </button>
               ))}
+            </div>
+          </div>
+          
+          {/* Temps */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Temps de jeu</label>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Temps limité</span>
+                <input
+                  type="checkbox"
+                  checked={!config.unlimitedTime}
+                  onChange={(e) => setConfig(prev => ({ ...prev, unlimitedTime: !e.target.checked }))}
+                  className="rounded"
+                />
+              </div>
+              
+              {!config.unlimitedTime && (
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">
+                    Durée: {config.timeLimit} secondes
+                  </label>
+                  <input
+                    type="range"
+                    min="30"
+                    max="300"
+                    step="30"
+                    value={config.timeLimit}
+                    onChange={(e) => setConfig(prev => ({ ...prev, timeLimit: parseInt(e.target.value) }))}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-gray-400 mt-1">
+                    <span>30s</span>
+                    <span>5min</span>
+                  </div>
+                </div>
+              )}
+              
+              {config.unlimitedTime && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-green-600" />
+                    <span className="text-sm text-green-700 font-medium">Mode infini activé</span>
+                  </div>
+                  <p className="text-xs text-green-600 mt-1">Points réduits de 50%</p>
+                </div>
+              )}
             </div>
           </div>
           
@@ -887,7 +993,7 @@ export default function CubeMatchUnified({
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {theme === 'classic' ? 'Classique' : 
+                  {theme === 'rainbow' ? 'Arc-en-ciel' : 
                    theme === 'ocean' ? 'Océan' :
                    theme === 'sunset' ? 'Coucher' : 'Forêt'}
                 </button>
@@ -901,44 +1007,112 @@ export default function CubeMatchUnified({
   
   // Rendu du jeu
   const renderGame = () => (
-    <div className={`min-h-screen ${currentTheme.background} p-4`}>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+    <div className={`h-screen ${currentTheme.background} relative overflow-hidden flex flex-col`}>
+      {/* Éléments décoratifs animés */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Cercles flottants colorés */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-pink-300/20 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-purple-300/20 rounded-full blur-xl animate-pulse delay-1000"></div>
+        <div className="absolute bottom-32 left-1/4 w-20 h-20 bg-blue-300/20 rounded-full blur-xl animate-pulse delay-2000"></div>
+        <div className="absolute bottom-20 right-1/3 w-16 h-16 bg-yellow-300/20 rounded-full blur-xl animate-pulse delay-3000"></div>
+        
+        {/* Étoiles scintillantes */}
+        <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-yellow-400 rounded-full animate-ping delay-500"></div>
+        <div className="absolute top-3/4 left-1/4 w-1 h-1 bg-pink-400 rounded-full animate-ping delay-1500"></div>
+        <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-blue-400 rounded-full animate-ping delay-2500"></div>
+      </div>
+      {/* Barre de Contrôle Unique - Une Seule Ligne */}
+      <div className="flex items-center justify-between gap-4 p-3 relative z-10 ">
+        
+        {/* Section Gauche - Contrôles et Stats */}
         <div className="flex items-center gap-4">
           <button
             onClick={pauseGame}
-            className={`p-3 rounded-xl ${currentTheme.accent} text-white hover:scale-105 transition-transform`}
+            className={`p-3 rounded-xl ${currentTheme.accent} text-white hover:scale-110 transition-all duration-300 shadow-lg`}
           >
-            <Pause className="w-5 h-5" />
+            {gameState === 'paused' ? <Play className="w-6 h-6" /> : <Pause className="w-6 h-6" />}
           </button>
           
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl px-4 py-2">
-            <div className="text-sm text-gray-600">Score</div>
-            <div className="text-xl font-bold text-gray-900">{stats.score.toLocaleString()}</div>
-          </div>
-          
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl px-4 py-2">
-            <div className="text-sm text-gray-600">Niveau</div>
-            <div className="text-xl font-bold text-gray-900">{stats.level}</div>
-          </div>
-          
-          {!config.unlimitedTime && (
-            <div className="bg-white/80 backdrop-blur-sm rounded-xl px-4 py-2">
-              <div className="text-sm text-gray-600">Temps</div>
-              <div className="text-xl font-bold text-gray-900">{stats.timeLeft}s</div>
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-br from-yellow-100 to-orange-100 border border-yellow-300 rounded-xl px-3 py-2">
+              <div className="text-xs text-orange-600 font-semibold flex items-center gap-1">
+                <Trophy className="w-3 h-3" />
+                Score
+              </div>
+              <div className="text-lg font-bold text-orange-700">{stats.score.toLocaleString()}</div>
             </div>
-          )}
+            
+            <div className="bg-gradient-to-br from-blue-100 to-indigo-100 border border-blue-300 rounded-xl px-3 py-2">
+              <div className="text-xs text-blue-600 font-semibold flex items-center gap-1">
+                <Star className="w-3 h-3" />
+                Niveau
+              </div>
+              <div className="text-lg font-bold text-blue-700">{stats.level}</div>
+            </div>
+            
+            {!config.unlimitedTime && (
+              <div className="bg-gradient-to-br from-green-100 to-emerald-100 border border-green-300 rounded-xl px-3 py-2">
+                <div className="text-xs text-green-600 font-semibold flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  Temps
+                </div>
+                <div className="text-lg font-bold text-green-700">{stats.timeLeft}s</div>
+              </div>
+            )}
+          </div>
         </div>
         
-        <div className="flex items-center gap-2">
+        {/* Section Centre - Objectif */}
+        <div className="flex-1 flex justify-center">
+          <div className={`inline-flex items-center gap-3 bg-gradient-to-r ${currentTheme.primary} text-white px-6 py-3 rounded-2xl shadow-lg`}>
+            <Target className="w-5 h-5" />
+            <span className="text-lg font-bold">Objectif: {target}</span>
+            <span className="text-sm opacity-90">
+              {config.operator === 'ADD' ? '➕' : 
+               config.operator === 'SUB' ? '➖' :
+               config.operator === 'MUL' ? '✖️' :
+               config.operator === 'DIV' ? '➗' : '🔀'}
+            </span>
+          </div>
+        </div>
+        
+        {/* Section Droite - Actions et Contrôles */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => handleSubmit()}
+            disabled={selectedCells.length < 2}
+            className={`px-4 py-2 rounded-xl font-bold text-sm transition-all duration-300 shadow-lg ${
+              selectedCells.length < 2
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : `bg-gradient-to-r ${currentTheme.button} text-white hover:scale-110 transform`
+            }`}
+          >
+            ✅ Valider ({selectedCells.length})
+          </button>
+          
+          <button
+            onClick={() => setSelectedCells([])}
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-gray-400 to-gray-600 text-white font-bold text-sm hover:scale-110 transition-all duration-300 shadow-lg transform"
+          >
+            🗑️ Effacer
+          </button>
+          
+          <button
+            onClick={() => setGameState('settings')}
+            className="p-3 rounded-xl bg-gradient-to-br from-gray-400 to-gray-600 text-white hover:scale-110 transition-all duration-300 shadow-lg"
+            title="Paramètres"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
+          
           {config.hintsEnabled && (
             <button
               onClick={useHint}
               disabled={stats.hintsUsed >= 3}
-              className={`p-3 rounded-xl transition-all ${
+              className={`p-3 rounded-xl transition-all duration-300 shadow-lg ${
                 stats.hintsUsed >= 3 
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-yellow-500 text-white hover:scale-105'
+                  : 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white hover:scale-110'
               }`}
             >
               <Lightbulb className="w-5 h-5" />
@@ -948,7 +1122,7 @@ export default function CubeMatchUnified({
           {onClose && (
             <button
               onClick={onClose}
-              className="p-3 rounded-xl bg-red-500 text-white hover:scale-105 transition-transform"
+              className="p-3 rounded-xl bg-gradient-to-br from-red-400 to-red-600 text-white hover:scale-110 transition-all duration-300 shadow-lg"
             >
               <X className="w-5 h-5" />
             </button>
@@ -956,27 +1130,18 @@ export default function CubeMatchUnified({
         </div>
       </div>
       
-      {/* Target */}
-      <div className="text-center mb-6">
-        <div className={`inline-flex items-center gap-3 bg-gradient-to-r ${currentTheme.primary} text-white px-6 py-3 rounded-2xl shadow-lg`}>
-          <Target className="w-6 h-6" />
-          <span className="text-lg font-semibold">Objectif: {target}</span>
-          <span className="text-sm opacity-80">
-            ({config.operator === 'ADD' ? 'Addition' : 
-              config.operator === 'SUB' ? 'Soustraction' :
-              config.operator === 'MUL' ? 'Multiplication' :
-              config.operator === 'DIV' ? 'Division' : 'Mixte'})
-          </span>
-        </div>
-      </div>
       
-      {/* Grille */}
-      <div className="flex justify-center mb-6">
+      {/* Zone de Jeu Principale */}
+      <div className="flex-1 flex flex-col items-center justify-center p-4 relative z-10">
+        {/* Grille - Design Enfantin */}
         <div 
-          className="grid gap-2 p-4 bg-white/50 backdrop-blur-sm rounded-2xl shadow-lg"
+          className="grid gap-4 p-6 bg-gradient-to-br from-white via-blue-50 to-green-50 border-2 border-blue-200 rounded-3xl shadow-2xl"
           style={{ 
             gridTemplateColumns: `repeat(${config.gridSize}, minmax(0, 1fr))`,
-            maxWidth: isMobile ? '320px' : '400px'
+            width: isFullPage 
+              ? (isMobile ? '90vw' : '45vw') 
+              : (isMobile ? '90vw' : '400px'),
+            aspectRatio: '1'
           }}
         >
         {grid.map((row, rowIndex) =>
@@ -995,44 +1160,33 @@ export default function CubeMatchUnified({
           ))
         )}
         </div>
-      </div>
-      
-      {/* Actions */}
-      <div className="flex justify-center gap-4">
-        <button
-          onClick={() => handleSubmit()}
-          disabled={selectedCells.length < 2}
-          className={`px-6 py-3 rounded-xl font-semibold transition-all ${
-            selectedCells.length < 2
-              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              : `bg-gradient-to-r ${currentTheme.primary} text-white hover:scale-105 shadow-lg`
-          }`}
-        >
-          Valider ({selectedCells.length})
-        </button>
         
-        <button
-          onClick={() => setSelectedCells([])}
-          className="px-6 py-3 rounded-xl bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors"
-        >
-          Effacer
-        </button>
-      </div>
-      
-      {/* Stats */}
-      <div className="flex justify-center mt-6">
-        <div className="flex gap-4 bg-white/80 backdrop-blur-sm rounded-xl p-4">
-          <div className="text-center">
-            <div className="text-sm text-gray-600">Combo</div>
-            <div className="text-lg font-bold text-gray-900">{stats.combo}</div>
-          </div>
-          <div className="text-center">
-            <div className="text-sm text-gray-600">Vies</div>
-            <div className="text-lg font-bold text-red-600">{'❤️'.repeat(stats.lives)}</div>
-          </div>
-          <div className="text-center">
-            <div className="text-sm text-gray-600">Précision</div>
-            <div className="text-lg font-bold text-gray-900">{stats.accuracy}%</div>
+        {/* Stats en bas - Combo, Vies, Précision */}
+        <div className="flex justify-center mt-6">
+          <div className="flex gap-6 bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl p-4 shadow-lg">
+            <div className="text-center">
+              <div className="text-xs text-purple-600 font-semibold flex items-center gap-1 justify-center">
+                <Zap className="w-3 h-3" />
+                Combo
+              </div>
+              <div className="text-lg font-bold text-purple-700">{stats.combo}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-xs text-red-600 font-semibold flex items-center gap-1 justify-center">
+                <span className="text-sm">💖</span>
+                Vies
+              </div>
+              <div className="text-lg font-bold text-red-500">
+                {'❤️'.repeat(stats.lives)}
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-xs text-green-600 font-semibold flex items-center gap-1 justify-center">
+                <Award className="w-3 h-3" />
+                Précision
+              </div>
+              <div className="text-lg font-bold text-green-700">{stats.accuracy}%</div>
+            </div>
           </div>
         </div>
       </div>

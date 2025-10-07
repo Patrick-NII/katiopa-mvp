@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { ModalState, ModalProps } from '../components/modals/ModalSystem'
 
 export interface UseModalsReturn {
@@ -21,13 +21,71 @@ export const useModals = (): UseModalsReturn => {
   const [modals, setModals] = useState<ModalProps[]>([])
   const [modalStates, setModalStates] = useState<Record<string, ModalState>>({})
 
+  // Redimensionnement automatique lors du changement de taille d'écran
+  useEffect(() => {
+    const handleResize = () => {
+      setModalStates(prev => {
+        const updated = { ...prev }
+        
+        Object.keys(updated).forEach(modalId => {
+          const modal = modals.find(m => m.id === modalId)
+          if (modal && !updated[modalId].isFullscreen) {
+            // Recalculer la taille et position pour maintenir l'ergonomie
+            const newSize = getDefaultSize(modal.size || 'large')
+            const newPosition = getDefaultPosition(newSize)
+            
+            updated[modalId] = {
+              ...updated[modalId],
+              size: newSize,
+              position: newPosition,
+              originalSize: newSize,
+              originalPosition: newPosition
+            }
+          }
+        })
+        
+        return updated
+      })
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [modals])
+
   const getDefaultSize = (size: string) => {
+    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight
+    
+    // Calculs adaptatifs pour une meilleure ergonomie
+    const maxWidth = Math.min(viewportWidth * 0.9, 1200) // Max 90% de l'écran ou 1200px
+    const maxHeight = Math.min(viewportHeight * 0.85, 800) // Max 85% de l'écran ou 800px
+    
     switch (size) {
-      case 'small': return { width: 400, height: 300 }
-      case 'medium': return { width: 600, height: 400 }
-      case 'large': return { width: 800, height: 600 }
-      case 'fullscreen': return { width: window.innerWidth - 100, height: window.innerHeight - 100 }
-      default: return { width: 600, height: 400 }
+      case 'small': 
+        return { 
+          width: Math.min(400, maxWidth * 0.6), 
+          height: Math.min(300, maxHeight * 0.6) 
+        }
+      case 'medium': 
+        return { 
+          width: Math.min(800, maxWidth * 0.8), 
+          height: Math.min(600, maxHeight * 0.8) 
+        }
+      case 'large': 
+        return { 
+          width: maxWidth, 
+          height: maxHeight 
+        }
+      case 'fullscreen': 
+        return { 
+          width: viewportWidth - 40, // Marge minimale de 20px de chaque côté
+          height: viewportHeight - 40 
+        }
+      default: 
+        return { 
+          width: Math.min(800, maxWidth * 0.8), 
+          height: Math.min(600, maxHeight * 0.8) 
+        }
     }
   }
 
@@ -111,7 +169,7 @@ export const useModals = (): UseModalsReturn => {
   }, [])
 
   const openCubeMatchModal = useCallback(() => {
-    console.log('🎮 useModals: Ouverture du modal CubeMatch...')
+    console.log('🎮 useModals: Ouverture du modal CubeMatch en grand format...')
     
     setModals(prev => {
       const exists = prev.find(m => m.id === 'cubematch')
@@ -123,16 +181,17 @@ export const useModals = (): UseModalsReturn => {
       return [...prev, {
         id: 'cubematch',
         title: 'CubeMatch',
-        size: 'medium',
+        size: 'large', // Changé de 'medium' à 'large' pour ouverture par défaut en grand
         children: null // Will be handled by CubeMatchModal component
       }]
     })
 
-    const cubematchSize = { width: Math.min(window.innerWidth - 100, 1000), height: Math.min(window.innerHeight - 100, 700) }
+    // Utiliser la fonction getDefaultSize pour une taille optimale et cohérente
+    const cubematchSize = getDefaultSize('large')
     const centerPosition = getDefaultPosition(cubematchSize)
     
-    console.log('📐 Taille du modal:', cubematchSize)
-    console.log('📍 Position du modal:', centerPosition)
+    console.log('📐 Taille optimisée du modal:', cubematchSize)
+    console.log('📍 Position centrée du modal:', centerPosition)
 
     setModalStates(prev => {
       const newState = {
@@ -149,7 +208,7 @@ export const useModals = (): UseModalsReturn => {
           zIndex: 1000 + Object.keys(prev).length
         }
       }
-      console.log('🔄 Nouveau état des modals:', newState)
+      console.log('🔄 Nouveau état des modals (grand format):', newState)
       return newState
     })
   }, [])
