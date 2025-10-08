@@ -20,6 +20,7 @@ import userStatsRouter from './user-stats';
 import gameSessionsRouter from './game-sessions';
 import bubixDataRouter from './bubix-data';
 import settingsRouter from './settings';
+import seriesRouter from './series';
 
 const router = Router();
 
@@ -40,6 +41,9 @@ router.use('/user-stats', userStatsRouter);
 
 // 🎮 Sessions de jeu détaillées
 router.use('/sessions', gameSessionsRouter);
+
+// 🎯 Séries de calculs avec tracking détaillé
+router.use('/series', seriesRouter);
 
 // 🤖 Données pour BubiX AI
 router.use('/bubix-data', bubixDataRouter);

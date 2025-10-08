@@ -9,6 +9,7 @@ import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { requireAuth } from '../../middleware/auth';
 import { z } from 'zod';
+import { updateCubeMatchCompetences } from '../../services/cubematch-competence-mapper';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -84,6 +85,29 @@ const ScoreSchema = z.object({
   operatorSequence: z.string().optional(),  // JSON array of operator sequence
   moveTimings: z.string().optional(),       // JSON array of move timings
   errorPatterns: z.string().optional(),     // JSON array of error patterns
+  
+  // 🎯 NOUVEAUX CHAMPS - Système modulaire avancé
+  initialDifficulty: z.number().min(0.8).max(3.5).default(1.0),
+  finalDifficulty: z.number().min(0.8).max(3.5).default(1.0),
+  averageDifficulty: z.number().min(0.8).max(3.5).default(1.0),
+  difficultyProgression: z.array(z.number()).optional(),
+  flowScore: z.number().min(0).max(100).default(0),
+  cognitiveProfile: z.object({
+    speedVsAccuracy: z.string().optional(),
+    errorRecovery: z.string().optional(),
+    adaptability: z.string().optional(),
+    persistence: z.number().optional(),
+  }).optional(),
+  operatorDistribution: z.record(z.number()).optional(),
+  operatorAccuracy: z.record(z.number()).optional(),
+  bubixMetrics: z.any().optional(),
+  recommendations: z.object({
+    focusAreas: z.array(z.string()).optional(),
+    suggestedDifficulty: z.number().optional(),
+    suggestedOperators: z.array(z.string()).optional(),
+  }).optional(),
+  consecutiveErrors: z.number().min(0).default(0),
+  longDecompositionsCount: z.number().min(0).default(0),
 });
 
 /**
@@ -179,14 +203,51 @@ router.post('/', requireAuth, async (req, res) => {
         // Sequential data for BubiX
         target_numbers_used: validatedData.targetNumbersUsed,
         operator_sequence: validatedData.operatorSequence,
+        
+        // 🎯 NOUVEAUX CHAMPS - Système modulaire avancé
+        initial_difficulty: validatedData.initialDifficulty,
+        final_difficulty: validatedData.finalDifficulty,
+        average_difficulty: validatedData.averageDifficulty,
+        difficulty_progression: validatedData.difficultyProgression ? 
+          JSON.stringify(validatedData.difficultyProgression) : null,
+        flow_score: validatedData.flowScore,
+        engagement_score_v2: validatedData.engagementScore || 0,
+        cognitive_profile: validatedData.cognitiveProfile ? 
+          JSON.stringify(validatedData.cognitiveProfile) : null,
+        operator_distribution: validatedData.operatorDistribution ? 
+          JSON.stringify(validatedData.operatorDistribution) : null,
+        operator_accuracy: validatedData.operatorAccuracy ? 
+          JSON.stringify(validatedData.operatorAccuracy) : null,
+        bubix_metrics: validatedData.bubixMetrics ? 
+          JSON.stringify(validatedData.bubixMetrics) : null,
+        recommendations: validatedData.recommendations ? 
+          JSON.stringify(validatedData.recommendations) : null,
+        consecutive_errors: validatedData.consecutiveErrors,
+        long_decompositions_count: validatedData.longDecompositionsCount,
       }
     });
     
-    // Mise à jour des statistiques utilisateur en parallèle
-    await updateUserStats(userId, username, validatedData);
-    
-    // Mise à jour des statistiques globales en parallèle
-    await updateGlobalStats(validatedData);
+    // Mise à jour en parallèle: stats + compétences
+    await Promise.all([
+      // Statistiques utilisateur
+      updateUserStats(userId, username, validatedData),
+      
+      // Statistiques globales
+      updateGlobalStats(validatedData),
+      
+      // 🎯 NOUVEAU: Mise à jour des compétences du radar
+      updateCubeMatchCompetences(userId, {
+        operator: validatedData.operator,
+        score: validatedData.score,
+        level: validatedData.level,
+        accuracyRate: validatedData.accuracyRate,
+        averageMoveTimeMs: validatedData.averageMoveTimeMs,
+        comboMax: validatedData.comboMax,
+        totalMoves: validatedData.totalMoves,
+        successfulMoves: validatedData.successfulMoves,
+        difficulty: validatedData.difficulty
+      })
+    ]);
     
     console.log(`✅ Score enregistré avec ID: ${newScore.id}`);
     
