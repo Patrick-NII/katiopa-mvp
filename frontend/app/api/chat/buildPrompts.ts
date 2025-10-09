@@ -2,6 +2,7 @@
 
 import { getBubixPersona, getSubProfile, buildDynamicSystemPrompt, BubixPersonas } from './bubixPersona'
 import { formatGameData, getAvailableGames } from './game-data-config'
+import { BUBIX_RESPONSE_GUIDELINES } from './bubix-response-templates'
 
 export function buildPrompts({
   persona,
@@ -188,13 +189,19 @@ CE QU'IL FAUT FAIRE À LA PLACE :
 Les données ci-dessous contiennent DÉJÀ ces formulations qualitatives. 
 COPIE-LES EXACTEMENT. N'invente pas de nouveaux chiffres.
 
-EXEMPLE PARFAIT (ce qu'on veut) :
-"Milan excelle dans les calculs rapides et complexes dans CubeMatch, avec une belle maîtrise des additions. Dans NuméroMagic, il montre une bonne maîtrise du calcul mental en mode découverte, avec une très grande précision."
+TU AS AUSSI ACCÈS AU RADAR DES COMPÉTENCES :
+Chaque enfant a un radar avec 8 compétences décrites qualitativement (ex: "excellente maîtrise", "bonne maîtrise", "en progression").
+UTILISE ces descriptions qualitatives du radar pour enrichir ton analyse.
+
+EXEMPLE PARFAIT (avec radar + jeux) :
+"Milan montre une excellente maîtrise en mathématiques sur le radar. Dans CubeMatch, il excelle dans les calculs rapides et complexes, avec une belle constance dans les additions. Dans NuméroMagic, il démontre une bonne maîtrise du calcul mental en mode découverte, avec une très grande précision. Il progresse également bien en concentration, ce qui lui permet de rester focus pendant les défis."
 
 EXEMPLE INTERDIT (ne fais JAMAIS ça) :
-"Milan a atteint le niveau 7 avec un score de 1474 points dans CubeMatch et 461 points dans NuméroMagic."
+"Milan a atteint le niveau 7 avec un score de 1474 points dans CubeMatch et 461 points dans NuméroMagic. Son radar montre 8.5/10 en mathématiques."
 
 Abonnement actuel : ${user?.subscriptionType || 'FREE'} - Adapte tes suggestions en fonction.
+
+${BUBIX_RESPONSE_GUIDELINES}
 `}
 
 ## 📊 DONNÉES CONTEXTUELLES
@@ -208,6 +215,12 @@ ${childrenData ? childrenData.map(child => `
 
 **PERFORMANCES DANS LES JEUX:**
 ${formatGameData(child)}
+
+**RADAR DES COMPÉTENCES (pour analyse détaillée):**
+${child.radarData && child.radarData.length > 0 ? child.radarData.map((c: any) => {
+  const level = c.score < 3 ? 'débutant' : c.score < 5 ? 'en progression' : c.score < 7 ? 'bonne maîtrise' : c.score < 9 ? 'excellente maîtrise' : 'maîtrise exceptionnelle';
+  return `- ${c.name} : ${level}`;
+}).join('\n') : '- Radar pas encore initialisé'}
 `).join('\n') : 'Aucune donnée enfant disponible'}
 
 **DONNÉES DÉTAILLÉES DES ENFANTS (UTILISE CES INFORMATIONS DANS TES RÉPONSES) :**

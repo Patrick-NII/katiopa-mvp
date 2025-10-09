@@ -159,20 +159,64 @@ export function analyzeMathProgression(data: {
 }
 
 /**
- * Traduire un niveau de compétence (0-10) en description qualitative
+ * Traduire un niveau de compétence (0-10) en description qualitative VARIÉE
+ * 20+ formulations différentes pour éviter les répétitions
  */
-export function describeCompetenceLevel(score: number, competenceName: string): string {
-  if (score < 3) {
-    return `découvre ${competenceName} et pose les premières bases`;
-  } else if (score < 5) {
-    return `progresse bien en ${competenceName}`;
-  } else if (score < 7) {
-    return `maîtrise correctement ${competenceName}`;
-  } else if (score < 9) {
-    return `excelle en ${competenceName}`;
-  } else {
-    return `atteint un niveau exceptionnel en ${competenceName}`;
-  }
+export function describeCompetenceLevel(score: number, competenceName: string, context: 'strength' | 'improvement' | 'neutral' = 'neutral'): string {
+  const variations = {
+    veryWeak: [
+      `commence tout juste à découvrir ${competenceName}`,
+      `pose les toutes premières bases en ${competenceName}`,
+      `débute son apprentissage de ${competenceName}`
+    ],
+    weak: [
+      `découvre ${competenceName} avec intérêt`,
+      `construit progressivement ses bases en ${competenceName}`,
+      `s'initie à ${competenceName} à son rythme`
+    ],
+    developing: [
+      `progresse de façon encourageante en ${competenceName}`,
+      `développe ses capacités en ${competenceName}`,
+      `construit une bonne fondation en ${competenceName}`,
+      `monte en compétence en ${competenceName}`
+    ],
+    good: [
+      `maîtrise bien ${competenceName}`,
+      `montre de belles aptitudes en ${competenceName}`,
+      `dispose de solides bases en ${competenceName}`,
+      `s'en sort très bien en ${competenceName}`
+    ],
+    strong: [
+      `excelle en ${competenceName}`,
+      `montre de vraies forces en ${competenceName}`,
+      `fait preuve d'une belle maîtrise en ${competenceName}`,
+      `se démarque en ${competenceName}`
+    ],
+    veryStrong: [
+      `brille particulièrement en ${competenceName}`,
+      `atteint un niveau remarquable en ${competenceName}`,
+      `impressionne par sa maîtrise de ${competenceName}`,
+      `montre un talent certain en ${competenceName}`
+    ],
+    exceptional: [
+      `atteint un niveau exceptionnel en ${competenceName}`,
+      `se révèle particulièrement doué en ${competenceName}`,
+      `démontre des capacités remarquables en ${competenceName}`
+    ]
+  };
+  
+  let category: keyof typeof variations;
+  if (score < 1) category = 'veryWeak';
+  else if (score < 3) category = 'weak';
+  else if (score < 5) category = 'developing';
+  else if (score < 6.5) category = 'good';
+  else if (score < 8) category = 'strong';
+  else if (score < 9.5) category = 'veryStrong';
+  else category = 'exceptional';
+  
+  const options = variations[category];
+  const randomIndex = Math.floor(Math.random() * options.length);
+  return options[randomIndex];
 }
 
 /**

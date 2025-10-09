@@ -704,21 +704,44 @@ function generateDataInsights(childrenData: any[], activeConnections: any[] = []
       return;
     }
     
-    insights += `${child.firstName} ${child.lastName} (${child.age || 8} ans) :\n`
+    insights += `${child.firstName} ${child.lastName} (${child.age || 8} ans)\n\n`
     
-    // Analyse qualitative des mathématiques (basée sur les jeux)
+    // SECTION 1: ACTIVITÉS DANS LES JEUX
+    insights += "Dans les jeux :\n";
     const mathAnalysis = analyzeMathProgression({
       cubeMatchData: child.cubeMatchData,
       numeroMagicData: child.numeroMagicData,
       childName: child.firstName,
       age: child.age || 8
     });
-    
     insights += mathAnalysis + "\n";
     
-    // Activités pédagogiques (si pertinent)
-    if (child.activities && child.activities.length > 0) {
-      insights += `Il a également réalisé ${child.activities.length} activité${child.activities.length > 1 ? 's' : ''} pédagogique${child.activities.length > 1 ? 's' : ''} complémentaire${child.activities.length > 1 ? 's' : ''}.\n`;
+    // SECTION 2: VUE D'ENSEMBLE DES COMPÉTENCES (le "bulletin")
+    if (child.radarData && child.radarData.length > 0) {
+      insights += "\nVue d'ensemble des compétences (radar) :\n";
+      
+      // Forces principales (score >= 7)
+      const strengths = child.radarData.filter((c: any) => c.score >= 7);
+      if (strengths.length > 0) {
+        const strengthDescriptions = strengths.slice(0, 3).map((c: any) => 
+          describeCompetenceLevel(c.score, c.name.toLowerCase(), 'strength')
+        );
+        insights += `Forces : ${strengthDescriptions.join(', ')}.\n`;
+      }
+      
+      // Axes de développement (score < 5)
+      const toImprove = child.radarData.filter((c: any) => c.score < 5 && c.score > 0);
+      if (toImprove.length > 0) {
+        const improveNames = toImprove.slice(0, 2).map((c: any) => c.name.toLowerCase()).join(' et ');
+        insights += `À développer : ${improveNames}.\n`;
+      }
+      
+      // Progression solide (5-7)
+      const intermediate = child.radarData.filter((c: any) => c.score >= 5 && c.score < 7);
+      if (intermediate.length > 0) {
+        const intNames = intermediate.slice(0, 2).map((c: any) => c.name.toLowerCase()).join(' et ');
+        insights += `En bonne progression : ${intNames}.\n`;
+      }
     }
     
     insights += "\n"
@@ -765,10 +788,33 @@ async function getUserContext(userInfo: UserInfo): Promise<UserContext> {
         // Récupérer les connexions actives
         activeConnections = await getActiveConnections(userSession.accountId)
         
+        // Enrichir avec les données du radar pour chaque enfant
         if (childrenData.length > 0) {
-          childrenData.forEach((child, index) => {
-            console.log(`   Enfant ${index + 1}: ${child.firstName} (${child.activities?.length || 0} activités)`)
-          })
+          for (let i = 0; i < childrenData.length; i++) {
+            const child = childrenData[i];
+            console.log(`   Enfant ${i + 1}: ${child.firstName} (${child.activities?.length || 0} activités)`);
+            
+            // Récupérer les compétences du radar
+            try {
+              const competences = await prisma.competenceAssessment.findMany({
+                where: { userSessionId: child.id },
+                include: { competence: true }
+              });
+              
+              if (competences.length > 0) {
+                console.log(`   📊 ${competences.length} compétences radar trouvées pour ${child.firstName}`);
+                child.radarData = competences.map(c => ({
+                  competence: c.competence.type,
+                  name: c.competence.name,
+                  score: c.score,
+                  level: c.level,
+                  progress: c.progress
+                }));
+              }
+            } catch (error) {
+              console.error(`   ❌ Erreur récupération radar pour ${child.firstName}:`, error);
+            }
+          }
         } else {
           console.log('❌ Aucune donnée d\'enfant récupérée')
         }
