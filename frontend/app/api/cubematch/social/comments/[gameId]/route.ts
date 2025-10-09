@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { BACKEND_URL } from '@/lib/config';
 
 export async function GET(
   request: NextRequest,
@@ -10,7 +11,7 @@ export async function GET(
     const limit = searchParams.get('limit') || '20';
     
     // Proxy vers le backend
-    const backendUrl = `http://localhost:4000/api/cubematch/social/comments/${gameId}?limit=${limit}`;
+    const backendUrl = `${BACKEND_URL}/api/cubematch/social/comments/${gameId}?limit=${limit}`;
     
     const response = await fetch(backendUrl, {
       method: 'GET',
@@ -34,4 +35,3 @@ export async function GET(
     );
   }
 }
-

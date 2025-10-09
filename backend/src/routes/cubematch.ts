@@ -199,8 +199,11 @@ router.post('/scores', requireAuth, async (req, res) => {
       gameDurationSeconds = 0
     } = req.body;
 
-    // Validation des données
-    if (!score || !level || !timePlayedMs || !operator || !target) {
+    // Validation des données (accepter les valeurs 0)
+    const missingNumeric = [score, level, timePlayedMs, target].some(
+      (v) => v === undefined || v === null || Number.isNaN(v)
+    );
+    if (missingNumeric || !operator) {
       return res.status(400).json({ error: 'Données manquantes' });
     }
 

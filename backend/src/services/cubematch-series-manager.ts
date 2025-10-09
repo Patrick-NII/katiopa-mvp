@@ -34,6 +34,7 @@ export interface SeriesAttempt {
 export interface GameSessionData {
   userId: string;
   sessionId: string;
+  scoreId?: string; // 🎯 NOUVEAU: ID du score déjà créé pour éviter duplication
   score: number;
   level: number;
   timePlayedMs: number;
@@ -62,54 +63,136 @@ export interface GameSessionData {
  */
 export async function saveGameSessionWithSeries(data: GameSessionData): Promise<string> {
   return await prisma.$transaction(async (tx) => {
-    console.log(`🎯 Enregistrement session complète pour ${data.userId}...`);
-    
-    // 1. Créer le score principal
-    const score = await tx.cubeMatchScore.create({
-      data: {
-        user_id: data.userId,
-        username: 'Utilisateur', // Sera mis à jour par l'API
-        score: data.score,
-        level: data.level,
-        time_played_ms: BigInt(data.timePlayedMs),
-        operator: data.operator,
-        target: data.target,
-        allow_diagonals: data.allowDiagonals,
-        grid_size_rows: data.gridSize,
-        grid_size_cols: data.gridSize,
-        difficulty_level: data.difficulty,
-        total_moves: data.totalMoves,
-        successful_moves: data.successfulMoves,
-        failed_moves: data.failedMoves,
-        accuracy_rate: data.accuracyRate,
-        combo_max: data.comboMax,
-        cells_cleared: data.cellsCleared,
-        hints_used: data.hintsUsed,
-        session_id: data.sessionId,
-        consecutive_errors: data.consecutiveErrors,
-        long_decompositions_count: data.longDecompositionsCount,
-        auto_validation_enabled: data.autoValidationEnabled,
-        series_data: {
-          totalSeries: data.seriesData.length,
-          seriesSummary: data.seriesData.map(s => ({
-            attempts: s.attempts,
-            correct: s.correct,
-            accuracy: s.attempts > 0 ? (s.correct / s.attempts) * 100 : 0,
-            validationTimerMs: s.validationTimerMs
-          }))
-        }
-      }
+    console.log(`🎯 Enregistrement séries pour ${data.userId}...`);
+
+    // Calculs agrégés sur les séries et tentatives
+    const seriesSummaries = data.seriesData.map((series, index) => {
+      const attempts = data.attemptsData[index] || [];
+      const timeoutCount = attempts.filter(a => a.attemptType === 'timeout').length;
+      const longDecompositions = attempts.filter(a => a.isLongDecomposition).length;
+      const responseTimes = attempts.map(a => a.responseTimeMs);
+      const averageResponseMs = responseTimes.length > 0
+        ? Math.round(responseTimes.reduce((sum, value) => sum + value, 0) / responseTimes.length)
+        : 0;
+      const fastestResponseMs = responseTimes.length > 0 ? Math.min(...responseTimes) : null;
+      const slowestResponseMs = responseTimes.length > 0 ? Math.max(...responseTimes) : null;
+      const accuracy = series.attempts > 0 ? (series.correct / series.attempts) * 100 : 0;
+
+      return {
+        seriesNumber: index + 1,
+        attempts: series.attempts,
+        correct: series.correct,
+        accuracy,
+        validationTimerMs: series.validationTimerMs,
+        operator: series.operator,
+        target: series.target,
+        timeoutCount,
+        longDecompositions,
+        averageResponseMs,
+        fastestResponseMs,
+        slowestResponseMs
+      };
     });
 
-    console.log(`✅ Score créé: ${score.id}`);
+    const totalSeries = data.seriesData.length;
+    const totalAttempts = data.seriesData.reduce((sum, series) => sum + series.attempts, 0);
+    const totalCorrect = data.seriesData.reduce((sum, series) => sum + series.correct, 0);
+    const totalTimeouts = seriesSummaries.reduce((sum, summary) => sum + summary.timeoutCount, 0);
+    const totalLongDecompositions = seriesSummaries.reduce((sum, summary) => sum + summary.longDecompositions, 0);
+    const averageAccuracyRaw = totalAttempts > 0 ? (totalCorrect / totalAttempts) * 100 : 0;
+    const averageAccuracy = parseFloat(averageAccuracyRaw.toFixed(2));
+    const allResponseTimes = seriesSummaries
+      .flatMap(summary => {
+        const attempts = data.attemptsData[summary.seriesNumber - 1] || [];
+        return attempts.map(a => a.responseTimeMs);
+      });
+    const averageResponseTimeMs = allResponseTimes.length > 0
+      ? Math.round(allResponseTimes.reduce((sum, value) => sum + value, 0) / allResponseTimes.length)
+      : 0;
+    const averageValidationTimer = totalSeries > 0
+      ? Math.round(data.seriesData.reduce((sum, series) => sum + series.validationTimerMs, 0) / totalSeries)
+      : null;
+
+    const aggregatedSeriesPayload = {
+      totalSeries,
+      totalAttempts,
+      totalCorrect,
+      totalTimeouts,
+      totalLongDecompositions,
+      averageAccuracy,
+      averageResponseMs: averageResponseTimeMs,
+      series: seriesSummaries
+    };
+    
+    let scoreId: string;
+    
+    // 🎯 CORRECTION: Utiliser le scoreId existant ou créer un nouveau score
+    if (data.scoreId) {
+      console.log(`✅ Utilisation du score existant: ${data.scoreId}`);
+      scoreId = data.scoreId;
+      
+      // Mettre à jour le score avec les données de séries
+      await tx.cubeMatchScore.update({
+        where: { id: scoreId },
+        data: {
+          session_id: data.sessionId,
+          series_data: aggregatedSeriesPayload,
+          series_attempts: totalAttempts,
+          series_correct: totalCorrect,
+          series_accuracy: averageAccuracy,
+          validation_timer_ms: averageValidationTimer ?? undefined,
+          consecutive_errors: data.consecutiveErrors,
+          long_decompositions_count: data.longDecompositionsCount ?? totalLongDecompositions,
+          auto_validation_enabled: data.autoValidationEnabled
+        }
+      });
+    } else {
+      // Créer un nouveau score si aucun ID fourni (backward compatibility)
+      console.log(`⚠️ Aucun scoreId fourni, création d'un nouveau score (legacy mode)`);
+      const score = await tx.cubeMatchScore.create({
+        data: {
+          user_id: data.userId,
+          username: 'Utilisateur', // Sera mis à jour par l'API
+          score: data.score,
+          level: data.level,
+          time_played_ms: BigInt(data.timePlayedMs),
+          operator: data.operator,
+          target: data.target,
+          allow_diagonals: data.allowDiagonals,
+          grid_size_rows: data.gridSize,
+          grid_size_cols: data.gridSize,
+          difficulty_level: data.difficulty,
+          total_moves: data.totalMoves,
+          successful_moves: data.successfulMoves,
+          failed_moves: data.failedMoves,
+          accuracy_rate: data.accuracyRate,
+          combo_max: data.comboMax,
+          cells_cleared: data.cellsCleared,
+          hints_used: data.hintsUsed,
+          session_id: data.sessionId,
+          series_data: aggregatedSeriesPayload,
+          series_attempts: totalAttempts,
+          series_correct: totalCorrect,
+          series_accuracy: averageAccuracy,
+          validation_timer_ms: averageValidationTimer ?? undefined,
+          consecutive_errors: data.consecutiveErrors,
+          long_decompositions_count: data.longDecompositionsCount ?? totalLongDecompositions,
+          auto_validation_enabled: data.autoValidationEnabled
+        }
+      });
+
+      console.log(`✅ Score créé: ${score.id}`);
+      scoreId = score.id;
+    }
 
     // 2. Créer les séries détaillées
     const seriesPromises = data.seriesData.map(async (series, index) => {
+      const summary = seriesSummaries[index];
       const seriesRecord = await tx.cubeMatchSeries.create({
         data: {
           user_id: data.userId,
           session_id: data.sessionId,
-          score_id: score.id,
+          score_id: scoreId,
           series_number: index + 1,
           start_time: new Date(series.startTime),
           end_time: new Date(),
@@ -117,12 +200,15 @@ export async function saveGameSessionWithSeries(data: GameSessionData): Promise<
           attempts: series.attempts,
           correct_answers: series.correct,
           incorrect_answers: series.attempts - series.correct,
-          timeout_count: 0, // À calculer depuis les attempts
-          series_accuracy: series.attempts > 0 ? (series.correct / series.attempts) * 100 : 0,
+          timeout_count: summary.timeoutCount,
+          series_accuracy: summary.accuracy,
+          average_response_time_ms: summary.attempts > 0 ? summary.averageResponseMs : null,
+          fastest_response_ms: summary.fastestResponseMs,
+          slowest_response_ms: summary.slowestResponseMs,
           operator_used: series.operator,
           target_value: series.target,
           difficulty_level: series.difficulty,
-          long_decompositions: 0 // À calculer depuis les attempts
+          long_decompositions: summary.longDecompositions
         }
       });
 
@@ -157,8 +243,8 @@ export async function saveGameSessionWithSeries(data: GameSessionData): Promise<
     // 4. Mettre à jour les agrégations quotidiennes
     await updateDailyAggregates(tx, data);
 
-    console.log(`🎯 Session complète enregistrée: ${score.id}`);
-    return score.id;
+    console.log(`🎯 Session complète enregistrée: ${scoreId}`);
+    return scoreId;
   });
 }
 

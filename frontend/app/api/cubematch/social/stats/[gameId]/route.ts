@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { BACKEND_URL } from '@/lib/config';
 
 export async function GET(
   request: NextRequest,
@@ -8,7 +9,7 @@ export async function GET(
     const gameId = params.gameId;
     
     // Proxy vers le backend
-    const backendUrl = `http://localhost:4000/api/cubematch/social/stats/${gameId}`;
+    const backendUrl = `${BACKEND_URL}/api/cubematch/social/stats/${gameId}`;
     
     const response = await fetch(backendUrl, {
       method: 'GET',
@@ -32,4 +33,3 @@ export async function GET(
     );
   }
 }
-

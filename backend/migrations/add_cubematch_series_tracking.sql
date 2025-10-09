@@ -108,3 +108,4 @@ ALTER TABLE "cubematch_daily_aggregates" ADD CONSTRAINT "cubematch_daily_aggrega
 -- 8. Créer une contrainte unique pour éviter les doublons d'agrégation
 CREATE UNIQUE INDEX "cubematch_daily_aggregates_user_date_unique" 
     ON "cubematch_daily_aggregates"("user_id", "date");
+

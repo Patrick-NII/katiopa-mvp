@@ -7,7 +7,8 @@ import sessionsRoutes from './sessions';
 import trackingRoutes from './tracking';
 import experiencesRoutes from './experiences';
 // CubeMatch routes v2.0 - Architecture modulaire
-import cubematchV2Routes from './cubematch';
+import cubematchV2Routes from './cubematch/index'; // ✅ Utiliser le nouveau routeur modulaire
+import numeromagicRoutes from './numeromagic/index'; // 🔢 Routes NuméroMagic
 import emailRoutes from './emails';
 import reportRoutes from './reports';
 import transactionalEmailRoutes from './transactional-emails';
@@ -46,6 +47,9 @@ router.use('/experiences', experiencesRoutes);
 
 // Routes CubeMatch v2.0 - Architecture modulaire  
 router.use('/cubematch', cubematchV2Routes);
+
+// 🔢 Routes NuméroMagic
+router.use('/numeromagic', numeromagicRoutes);
 
 // Routes d'emails
 router.use('/emails', emailRoutes);

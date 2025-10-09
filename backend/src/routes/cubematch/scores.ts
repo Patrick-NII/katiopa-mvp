@@ -118,6 +118,7 @@ const ScoreSchema = z.object({
 router.post('/', requireAuth, async (req, res) => {
   try {
     console.log('🏆 Enregistrement nouveau score CubeMatch...');
+    console.log('📦 Données reçues:', JSON.stringify(req.body, null, 2));
     
     // Validation des données
     const validatedData = ScoreSchema.parse(req.body);
@@ -127,6 +128,14 @@ router.post('/', requireAuth, async (req, res) => {
     const username = req.user!.sessionId || req.user!.firstName || req.user!.username || 'Utilisateur';
     
     console.log(`👤 Score pour ${username} (${userId}): ${validatedData.score} points`);
+    console.log('🎯 Nouvelles métriques:', {
+      initialDifficulty: validatedData.initialDifficulty,
+      finalDifficulty: validatedData.finalDifficulty,
+      flowScore: validatedData.flowScore,
+      engagementScore: validatedData.engagementScore,
+      hasCognitiveProfile: !!validatedData.cognitiveProfile,
+      hasRecommendations: !!validatedData.recommendations
+    });
     
     // Enregistrement dans la base de données
     const newScore = await prisma.cubeMatchScore.create({
@@ -280,15 +289,21 @@ router.post('/', requireAuth, async (req, res) => {
  */
 async function updateUserStats(userId: string, username: string, scoreData: any) {
   try {
+    // 🎯 CORRECTION: Récupérer les stats existantes pour comparer
+    const existingStats = await prisma.cubeMatchUserStats.findUnique({
+      where: { user_id: userId }
+    });
+    
     await prisma.cubeMatchUserStats.upsert({
       where: { user_id: userId },
       update: {
         username: username,
         total_games: { increment: 1 },
         total_score: { increment: BigInt(scoreData.score) },
-        best_score: { set: Math.max(scoreData.score) }, // Prisma will handle max comparison
+        best_score: Math.max(existingStats?.best_score || 0, scoreData.score), // ✅ Comparaison correcte
         total_time_played: { increment: BigInt(scoreData.timePlayedMs) },
-        total_combo_max: { set: Math.max(scoreData.comboMax) },
+        total_combo_max: Math.max(existingStats?.total_combo_max || 0, scoreData.comboMax), // ✅ Comparaison correcte
+        highest_level: Math.max(existingStats?.highest_level || 1, scoreData.level), // ✅ Ajout du highest_level
         total_cells_cleared: { increment: scoreData.cellsCleared },
         total_hints_used: { increment: scoreData.hintsUsed },
         favorite_operator: scoreData.operator, // Update to latest

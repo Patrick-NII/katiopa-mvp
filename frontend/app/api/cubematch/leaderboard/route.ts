@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { BACKEND_URL } from '@/lib/config';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -6,7 +9,7 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get('limit') || '10';
     
     // Proxy vers le backend
-    const backendUrl = `http://localhost:4000/api/cubematch/leaderboard?limit=${limit}`;
+    const backendUrl = `${BACKEND_URL}/api/cubematch/leaderboard?limit=${limit}`;
     
     const response = await fetch(backendUrl, {
       method: 'GET',

@@ -85,6 +85,8 @@ model UserSession {
   gameScores                GameScore[]
   cubeMatchSeries           CubeMatchSeries[]
   cubeMatchDailyAggregates  CubeMatchDailyAggregate[]
+  numeroMagicScores         NumeroMagicScore[]
+  numeroMagicUserStats      NumeroMagicUserStats?
 }
 
 model UserProfile {
@@ -1118,4 +1120,153 @@ model CubeMatchDailyAggregate {
   @@unique([user_id, date])
   @@index([user_id, date])
   @@map("cubematch_daily_aggregates")
+}
+
+// 🎯 TABLES POUR LE JEU NUMÉROMAGIC
+
+model NumeroMagicScore {
+  id                      String   @id @default(uuid())
+  user_id                 String   @map("user_id")
+  session_id              String?  @map("session_id")
+  
+  // Informations de base
+  score                   Int      @default(0)
+  level                   Int      @default(1)
+  time_played_ms          Int      @map("time_played_ms")
+  
+  // Configuration du jeu
+  game_mode               String   @default("CLASSIC") @map("game_mode") // CLASSIC, TIMED, CHALLENGE
+  difficulty_level        String   @default("MEDIUM") @map("difficulty_level") // EASY, MEDIUM, HARD, EXPERT
+  max_number              Int      @default(100) @map("max_number")
+  operations_allowed      Json     @map("operations_allowed") // ["ADD", "SUB", "MUL", "DIV"]
+  
+  // Métriques de performance
+  total_rounds            Int      @default(0) @map("total_rounds")
+  successful_rounds       Int      @default(0) @map("successful_rounds")
+  failed_rounds           Int      @default(0) @map("failed_rounds")
+  accuracy_rate           Decimal  @default(0) @db.Decimal(5, 2) @map("accuracy_rate")
+  
+  // Métriques de temps
+  average_solve_time_ms   Int?     @map("average_solve_time_ms")
+  fastest_solve_ms        Int?     @map("fastest_solve_ms")
+  slowest_solve_ms        Int?     @map("slowest_solve_ms")
+  
+  // Combos et streaks
+  max_combo               Int      @default(0) @map("max_combo")
+  current_streak          Int      @default(0) @map("current_streak")
+  best_streak             Int      @default(0) @map("best_streak")
+  
+  // Métriques par opération
+  additions_count         Int      @default(0) @map("additions_count")
+  subtractions_count      Int      @default(0) @map("subtractions_count")
+  multiplications_count   Int      @default(0) @map("multiplications_count")
+  divisions_count         Int      @default(0) @map("divisions_count")
+  
+  additions_success       Int      @default(0) @map("additions_success")
+  subtractions_success    Int      @default(0) @map("subtractions_success")
+  multiplications_success Int      @default(0) @map("multiplications_success")
+  divisions_success       Int      @default(0) @map("divisions_success")
+  
+  // Données avancées
+  hints_used              Int      @default(0) @map("hints_used")
+  perfect_rounds          Int      @default(0) @map("perfect_rounds") // Rounds résolus sans erreur
+  numbers_discovered      Json?    @map("numbers_discovered") // Liste des nombres découverts
+  patterns_used           Json?    @map("patterns_used") // Patterns mathématiques utilisés
+  
+  // Métriques cognitives (pour BubiX)
+  cognitive_profile       Json?    @map("cognitive_profile")
+  engagement_score        Int      @default(0) @map("engagement_score")
+  flow_score              Int      @default(0) @map("flow_score")
+  
+  // Métadonnées
+  metadata                Json?
+  created_at              DateTime @default(now()) @map("created_at")
+  updated_at              DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  userSession             UserSession @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  rounds                  NumeroMagicRound[]
+  
+  @@index([user_id])
+  @@index([session_id])
+  @@index([created_at])
+  @@index([score])
+  @@map("numeromagic_scores")
+}
+
+model NumeroMagicRound {
+  id                      String   @id @default(uuid())
+  score_id                String   @map("score_id")
+  round_number            Int      @map("round_number")
+  
+  // Données du défi
+  target_number           Int      @map("target_number")
+  given_numbers           Json     @map("given_numbers") // Nombres donnés au joueur
+  operations_available    Json     @map("operations_available") // Opérations disponibles
+  
+  // Solution du joueur
+  player_solution         Json?    @map("player_solution") // Étapes de la solution
+  is_correct              Boolean  @map("is_correct")
+  solve_time_ms           Int      @map("solve_time_ms")
+  
+  // Métriques du round
+  attempts_count          Int      @default(1) @map("attempts_count")
+  hints_used_in_round     Int      @default(0) @map("hints_used_in_round")
+  operations_used         Json     @map("operations_used") // Opérations utilisées par le joueur
+  
+  // Performance
+  was_perfect             Boolean  @default(false) @map("was_perfect") // Résolu du premier coup sans aide
+  difficulty_rating       Decimal  @db.Decimal(3, 2) @map("difficulty_rating") // Difficulté perçue (0-10)
+  
+  // Timestamps
+  started_at              DateTime @default(now()) @map("started_at")
+  completed_at            DateTime? @map("completed_at")
+  
+  // Relations
+  score                   NumeroMagicScore @relation(fields: [score_id], references: [id], onDelete: Cascade)
+  
+  @@index([score_id])
+  @@index([round_number])
+  @@map("numeromagic_rounds")
+}
+
+model NumeroMagicUserStats {
+  id                      String   @id @default(uuid())
+  user_id                 String   @unique @map("user_id")
+  
+  // Stats globales
+  total_games             Int      @default(0) @map("total_games")
+  total_score             BigInt   @default(0) @map("total_score")
+  best_score              Int      @default(0) @map("best_score")
+  average_score           Decimal  @default(0) @db.Decimal(10, 2) @map("average_score")
+  
+  // Performance globale
+  total_rounds            Int      @default(0) @map("total_rounds")
+  total_successful        Int      @default(0) @map("total_successful")
+  global_accuracy         Decimal  @default(0) @db.Decimal(5, 2) @map("global_accuracy")
+  
+  // Records
+  best_streak             Int      @default(0) @map("best_streak")
+  best_combo              Int      @default(0) @map("best_combo")
+  fastest_solve_ms        Int?     @map("fastest_solve_ms")
+  
+  // Niveau et progression
+  current_level           Int      @default(1) @map("current_level")
+  total_experience        BigInt   @default(0) @map("total_experience")
+  
+  // Préférences
+  favorite_mode           String?  @map("favorite_mode")
+  preferred_difficulty    String?  @map("preferred_difficulty")
+  
+  // Timestamps
+  first_played_at         DateTime @default(now()) @map("first_played_at")
+  last_played_at          DateTime @default(now()) @map("last_played_at")
+  updated_at              DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  userSession             UserSession @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@index([user_id])
+  @@index([best_score])
+  @@map("numeromagic_user_stats")
 }

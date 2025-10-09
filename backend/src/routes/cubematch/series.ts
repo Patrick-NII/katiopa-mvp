@@ -47,6 +47,7 @@ const SeriesAttemptSchema = z.object({
 const GameSessionSchema = z.object({
   // Core game data
   sessionId: z.string(),
+  scoreId: z.string().optional(), // 🎯 CORRECTION: Accepter le scoreId pour éviter double insertion
   score: z.number().min(0),
   level: z.number().min(1),
   timePlayedMs: z.number().min(0),
@@ -93,30 +94,31 @@ router.post('/', requireAuth, async (req, res) => {
     console.log(`👤 Session pour ${username} (${userId}): ${validatedData.seriesData.length} séries`);
     
     // Préparer les données pour le service
-    const gameSessionData: GameSessionData = {
-      userId,
-      sessionId: validatedData.sessionId,
-      score: validatedData.score,
-      level: validatedData.level,
-      timePlayedMs: validatedData.timePlayedMs,
-      operator: validatedData.operator,
-      target: validatedData.target,
-      difficulty: validatedData.difficulty,
-      gridSize: validatedData.gridSize,
-      allowDiagonals: validatedData.allowDiagonals,
-      totalMoves: validatedData.totalMoves,
-      successfulMoves: validatedData.successfulMoves,
-      failedMoves: validatedData.failedMoves,
-      accuracyRate: validatedData.accuracyRate,
-      comboMax: validatedData.comboMax,
-      cellsCleared: validatedData.cellsCleared,
-      hintsUsed: validatedData.hintsUsed,
-      consecutiveErrors: validatedData.consecutiveErrors,
-      longDecompositionsCount: validatedData.longDecompositionsCount,
-      autoValidationEnabled: validatedData.autoValidationEnabled,
-      seriesData: validatedData.seriesData,
-      attemptsData: validatedData.attemptsData
-    };
+  const gameSessionData: GameSessionData = {
+    userId,
+    sessionId: validatedData.sessionId,
+    scoreId: validatedData.scoreId,
+    score: validatedData.score,
+    level: validatedData.level,
+    timePlayedMs: validatedData.timePlayedMs,
+    operator: validatedData.operator,
+    target: validatedData.target,
+    difficulty: validatedData.difficulty,
+    gridSize: validatedData.gridSize,
+    allowDiagonals: validatedData.allowDiagonals,
+    totalMoves: validatedData.totalMoves,
+    successfulMoves: validatedData.successfulMoves,
+    failedMoves: validatedData.failedMoves,
+    accuracyRate: validatedData.accuracyRate,
+    comboMax: validatedData.comboMax,
+    cellsCleared: validatedData.cellsCleared,
+    hintsUsed: validatedData.hintsUsed,
+    consecutiveErrors: validatedData.consecutiveErrors,
+    longDecompositionsCount: validatedData.longDecompositionsCount,
+    autoValidationEnabled: validatedData.autoValidationEnabled,
+    seriesData: validatedData.seriesData,
+    attemptsData: validatedData.attemptsData
+  };
     
     // Enregistrer avec transaction
     const scoreId = await saveGameSessionWithSeries(gameSessionData);

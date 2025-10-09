@@ -58,6 +58,8 @@ model UserSession {
   passwordResetTokens       PasswordResetToken[]
   performanceMetrics        PerformanceMetric[]
   userInteractions          UserInteraction[]
+  exerciseAttempts          ExerciseAttempt[]
+  competenceAssessments     CompetenceAssessment[]
   profile                   UserProfile?
   userPrompts               UserPrompt[]
   account                   Account                    @relation(fields: [accountId], references: [id])
@@ -75,6 +77,16 @@ model UserSession {
   learningCycles            LearningCycle[]
   communicationAnalytics    CommunicationAnalytics[]
   childPreferences          ChildPreferences?
+  gameLikes                 GameLike[]
+  gameComments              GameComment[]
+  commentLikes              CommentLike[]
+  gameShares                GameShare[]
+  gameViews                 GameView[]
+  gameScores                GameScore[]
+  cubeMatchSeries           CubeMatchSeries[]
+  cubeMatchDailyAggregates  CubeMatchDailyAggregate[]
+  numeroMagicScores         NumeroMagicScore[]
+  numeroMagicUserStats      NumeroMagicUserStats?
 }
 
 model UserProfile {
@@ -560,10 +572,40 @@ model CubeMatchScore {
   assist_enabled              Boolean? @default(true) @map("assist_enabled")
   hints_enabled               Boolean? @default(true) @map("hints_enabled")
   
+  // Nouveaux champs pour le système de séries et sessions
+  session_id                    String?   @map("session_id")
+  series_data                   Json?     @map("series_data")
+  validation_timer_ms           Int?      @default(5000) @map("validation_timer_ms")
+  series_attempts               Int?      @default(0) @map("series_attempts")
+  series_correct                Int?      @default(0) @map("series_correct")
+  series_accuracy               Decimal?  @default(0) @db.Decimal(5, 2) @map("series_accuracy")
+  consecutive_errors            Int?      @default(0) @map("consecutive_errors")
+  long_decompositions_count     Int?      @default(0) @map("long_decompositions_count")
+  auto_validation_enabled       Boolean?  @default(true) @map("auto_validation_enabled")
+  
+  // 🎯 NOUVEAUX CHAMPS - Système modulaire avancé
+  initial_difficulty            Decimal?  @default(1.0) @db.Decimal(5, 2) @map("initial_difficulty")
+  final_difficulty              Decimal?  @default(1.0) @db.Decimal(5, 2) @map("final_difficulty")
+  average_difficulty            Decimal?  @default(1.0) @db.Decimal(5, 2) @map("average_difficulty")
+  difficulty_progression        Json?     @map("difficulty_progression")
+  flow_score                    Int?      @default(0) @map("flow_score")
+  engagement_score_v2           Int?      @default(0) @map("engagement_score_v2")
+  cognitive_profile             Json?     @map("cognitive_profile")
+  operator_distribution         Json?     @map("operator_distribution")
+  operator_accuracy             Json?     @map("operator_accuracy")
+  bubix_metrics                 Json?     @map("bubix_metrics")
+  recommendations               Json?     @map("recommendations")
+
   created_at      DateTime    @default(now()) @map("created_at")
   updated_at      DateTime    @updatedAt @map("updated_at")
   userSession     UserSession @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  // Relations avec les nouvelles tables
+  series         CubeMatchSeries[]
 
+  @@index([session_id])
+  @@index([user_id, final_difficulty])
+  @@index([created_at])
   @@map("cubematch_scores")
 }
 
@@ -599,6 +641,7 @@ model CubeMatchUserStats {
   total_cells_cleared Int         @default(0)
   total_hints_used    Int         @default(0)
   favorite_operator   String      @default("ADD") @db.VarChar(10)
+  user_preferences    String?     @db.Text // Stockage JSON des paramètres utilisateur
   last_played         DateTime    @default(now())
   created_at          DateTime    @default(now())
   updated_at          DateTime    @updatedAt
@@ -744,6 +787,93 @@ enum Gender {
   UNKNOWN
 }
 
+enum CompetenceType {
+  MATHEMATIQUES
+  PROGRAMMATION
+  CREATIVITE
+  COLLABORATION
+  CONCENTRATION
+  RESOLUTION_PROBLEMES
+  COMMUNICATION
+  CONNAISSANCES_GENERALES
+  SENS_CRITIQUE
+  REFLEXION_LOGIQUE
+}
+
+enum ExerciseType {
+  QUIZ
+  INTERACTIF
+  CREATIF
+  COLLABORATIF
+  REFLEXION
+  PRATIQUE
+}
+
+model Competence {
+  id          String         @id @default(cuid())
+  type        CompetenceType @unique
+  name        String
+  description String
+  icon        String?
+  color       String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  exercises   Exercise[]
+  assessments CompetenceAssessment[]
+}
+
+model Exercise {
+  id           String         @id @default(cuid())
+  competenceId String
+  title        String
+  description  String
+  type         ExerciseType
+  difficulty   Int            @default(1) // 1-5
+  estimatedTime Int           @default(10) // minutes
+  instructions Json?          // Instructions détaillées
+  content      Json?          // Contenu de l'exercice
+  solution     Json?          // Solution/réponse attendue
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  competence   Competence     @relation(fields: [competenceId], references: [id])
+  attempts     ExerciseAttempt[]
+
+  @@unique([competenceId, title])
+}
+
+model ExerciseAttempt {
+  id           String    @id @default(cuid())
+  exerciseId   String
+  userSessionId String
+  score        Float     @default(0) // Score obtenu (0-100)
+  timeSpent    Int       @default(0) // Temps passé en secondes
+  answers      Json?     // Réponses données
+  feedback     Json?     // Feedback reçu
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  exercise     Exercise  @relation(fields: [exerciseId], references: [id])
+  userSession  UserSession @relation(fields: [userSessionId], references: [id])
+}
+
+model CompetenceAssessment {
+  id           String    @id @default(cuid())
+  competenceId String
+  userSessionId String
+  score        Float     @default(0) // Score global de la compétence (0-10)
+  level        String    @default("Débutant") // Niveau atteint
+  progress     Float     @default(0) // Progression (0-100)
+  lastUpdated  DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  competence   Competence @relation(fields: [competenceId], references: [id])
+  userSession  UserSession @relation(fields: [userSessionId], references: [id])
+
+  @@unique([competenceId, userSessionId])
+}
+
+
 enum UserType {
   CHILD
   PARENT
@@ -814,4 +944,329 @@ model ChildPreferences {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   userSession   UserSession @relation(fields: [userSessionId], references: [id], onDelete: Cascade)
+}
+
+// Modèles pour les fonctionnalités sociales de CubeMatch
+model GameLike {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String   @default("cubematch")
+  createdAt DateTime @default(now())
+  user      UserSession @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, gameId])
+}
+
+model GameComment {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String   @default("cubematch")
+  content   String
+  createdAt DateTime @default(now())
+  user      UserSession @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes     CommentLike[]
+}
+
+model CommentLike {
+  id        String   @id @default(cuid())
+  userId    String
+  commentId String
+  createdAt DateTime @default(now())
+  user      UserSession @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   GameComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, commentId])
+}
+
+model GameShare {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String   @default("cubematch")
+  createdAt DateTime @default(now())
+  user      UserSession @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GameView {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String   @default("cubematch")
+  createdAt DateTime @default(now())
+  user      UserSession @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GameScore {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String   @default("cubematch")
+  score     Int
+  createdAt DateTime @default(now())
+  user      UserSession @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model BubixAnalysis {
+  id          String   @id @default(cuid())
+  childId     String   // ID de la session enfant
+  competence  String   // Nom de la compétence analysée
+  analysis    String   // Analyse générée par OpenAI
+  metadata    Json     // Métadonnées (score, niveau, nom enfant, etc.)
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime // Date d'expiration (24h après création)
+  
+  // Index pour optimiser les requêtes
+  @@index([childId, competence, createdAt])
+  @@index([childId, createdAt])
+}
+
+model SavedBubixReport {
+  id          String   @id @default(cuid())
+  parentId    String   // ID du parent qui sauvegarde
+  childId     String   // ID de la session enfant
+  analysisId  String   // ID de l'analyse BubixAnalysis
+  title       String   // Titre personnalisé du rapport
+  notes       String?  // Notes personnelles du parent
+  tags        String[] // Tags pour organiser les rapports
+  isFavorite  Boolean  @default(false)
+  savedAt     DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Index pour optimiser les requêtes
+  @@index([parentId, savedAt])
+  @@index([parentId, childId, savedAt])
+  @@index([parentId, isFavorite])
+}
+
+// 🎯 NOUVELLES TABLES POUR LE SYSTÈME DE SÉRIES CUBEMATCH
+
+model CubeMatchSeries {
+  id                      String   @id @default(uuid())
+  user_id                 String   @map("user_id")
+  session_id              String?  @map("session_id")
+  score_id                String   @map("score_id")
+  series_number           Int      @map("series_number")
+  start_time              DateTime @map("start_time")
+  end_time                DateTime? @map("end_time")
+  validation_timer_ms     Int      @default(5000) @map("validation_timer_ms")
+  attempts                Int      @default(0)
+  correct_answers         Int      @default(0)
+  incorrect_answers       Int      @default(0)
+  timeout_count           Int      @default(0)
+  series_accuracy         Decimal  @default(0) @db.Decimal(5, 2) @map("series_accuracy")
+  average_response_time_ms Int?    @map("average_response_time_ms")
+  fastest_response_ms     Int?     @map("fastest_response_ms")
+  slowest_response_ms     Int?     @map("slowest_response_ms")
+  long_decompositions     Int      @default(0) @map("long_decompositions")
+  operator_used           String   @map("operator_used")
+  target_value            Int      @map("target_value")
+  difficulty_level        String   @map("difficulty_level")
+  created_at              DateTime @default(now()) @map("created_at")
+  updated_at              DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  userSession             UserSession @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  score                   CubeMatchScore @relation(fields: [score_id], references: [id], onDelete: Cascade)
+  attempts_detail         CubeMatchSeriesAttempt[]
+  
+  @@index([user_id])
+  @@index([session_id])
+  @@index([score_id])
+  @@map("cubematch_series")
+}
+
+model CubeMatchSeriesAttempt {
+  id                      String   @id @default(uuid())
+  series_id               String   @map("series_id")
+  attempt_number          Int      @map("attempt_number")
+  selected_numbers        Json     @map("selected_numbers")
+  target_value            Int      @map("target_value")
+  operator                String   @map("operator")
+  is_correct              Boolean  @map("is_correct")
+  response_time_ms        Int      @map("response_time_ms")
+  attempt_type            String   @map("attempt_type") // 'correct', 'incorrect', 'timeout'
+  numbers_count           Int      @map("numbers_count")
+  is_long_decomposition   Boolean  @default(false) @map("is_long_decomposition")
+  created_at              DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  series                  CubeMatchSeries @relation(fields: [series_id], references: [id], onDelete: Cascade)
+  
+  @@index([series_id])
+  @@map("cubematch_series_attempts")
+}
+
+model CubeMatchDailyAggregate {
+  id                      String   @id @default(uuid())
+  user_id                 String   @map("user_id")
+  date                    DateTime @db.Date
+  total_games             Int      @default(0) @map("total_games")
+  total_score             BigInt   @default(0) @map("total_score")
+  average_score           Decimal  @default(0) @db.Decimal(10, 2) @map("average_score")
+  best_score              Int      @default(0) @map("best_score")
+  total_time_played_ms    BigInt   @default(0) @map("total_time_played_ms")
+  average_accuracy        Decimal  @default(0) @db.Decimal(5, 2) @map("average_accuracy")
+  total_series            Int      @default(0) @map("total_series")
+  total_attempts          Int      @default(0) @map("total_attempts")
+  total_correct_answers   Int      @default(0) @map("total_correct_answers")
+  average_response_time_ms Int     @default(0) @map("average_response_time_ms")
+  long_decompositions_count Int    @default(0) @map("long_decompositions_count")
+  timeout_count           Int      @default(0) @map("timeout_count")
+  operators_used          Json?    @map("operators_used")
+  difficulty_levels       Json?    @map("difficulty_levels")
+  created_at              DateTime @default(now()) @map("created_at")
+  updated_at              DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  userSession             UserSession @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@unique([user_id, date])
+  @@index([user_id, date])
+  @@map("cubematch_daily_aggregates")
+}
+
+// 🎯 TABLES POUR LE JEU NUMÉROMAGIC
+
+model NumeroMagicScore {
+  id                      String   @id @default(uuid())
+  user_id                 String   @map("user_id")
+  session_id              String?  @map("session_id")
+  
+  // Informations de base
+  score                   Int      @default(0)
+  level                   Int      @default(1)
+  time_played_ms          Int      @map("time_played_ms")
+  
+  // Configuration du jeu
+  game_mode               String   @default("CLASSIC") @map("game_mode") // CLASSIC, TIMED, CHALLENGE
+  difficulty_level        String   @default("MEDIUM") @map("difficulty_level") // EASY, MEDIUM, HARD, EXPERT
+  max_number              Int      @default(100) @map("max_number")
+  operations_allowed      Json     @map("operations_allowed") // ["ADD", "SUB", "MUL", "DIV"]
+  
+  // Métriques de performance
+  total_rounds            Int      @default(0) @map("total_rounds")
+  successful_rounds       Int      @default(0) @map("successful_rounds")
+  failed_rounds           Int      @default(0) @map("failed_rounds")
+  accuracy_rate           Decimal  @default(0) @db.Decimal(5, 2) @map("accuracy_rate")
+  
+  // Métriques de temps
+  average_solve_time_ms   Int?     @map("average_solve_time_ms")
+  fastest_solve_ms        Int?     @map("fastest_solve_ms")
+  slowest_solve_ms        Int?     @map("slowest_solve_ms")
+  
+  // Combos et streaks
+  max_combo               Int      @default(0) @map("max_combo")
+  current_streak          Int      @default(0) @map("current_streak")
+  best_streak             Int      @default(0) @map("best_streak")
+  
+  // Métriques par opération
+  additions_count         Int      @default(0) @map("additions_count")
+  subtractions_count      Int      @default(0) @map("subtractions_count")
+  multiplications_count   Int      @default(0) @map("multiplications_count")
+  divisions_count         Int      @default(0) @map("divisions_count")
+  
+  additions_success       Int      @default(0) @map("additions_success")
+  subtractions_success    Int      @default(0) @map("subtractions_success")
+  multiplications_success Int      @default(0) @map("multiplications_success")
+  divisions_success       Int      @default(0) @map("divisions_success")
+  
+  // Données avancées
+  hints_used              Int      @default(0) @map("hints_used")
+  perfect_rounds          Int      @default(0) @map("perfect_rounds") // Rounds résolus sans erreur
+  numbers_discovered      Json?    @map("numbers_discovered") // Liste des nombres découverts
+  patterns_used           Json?    @map("patterns_used") // Patterns mathématiques utilisés
+  
+  // Métriques cognitives (pour BubiX)
+  cognitive_profile       Json?    @map("cognitive_profile")
+  engagement_score        Int      @default(0) @map("engagement_score")
+  flow_score              Int      @default(0) @map("flow_score")
+  
+  // Métadonnées
+  metadata                Json?
+  created_at              DateTime @default(now()) @map("created_at")
+  updated_at              DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  userSession             UserSession @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  rounds                  NumeroMagicRound[]
+  
+  @@index([user_id])
+  @@index([session_id])
+  @@index([created_at])
+  @@index([score])
+  @@map("numeromagic_scores")
+}
+
+model NumeroMagicRound {
+  id                      String   @id @default(uuid())
+  score_id                String   @map("score_id")
+  round_number            Int      @map("round_number")
+  
+  // Données du défi
+  target_number           Int      @map("target_number")
+  given_numbers           Json     @map("given_numbers") // Nombres donnés au joueur
+  operations_available    Json     @map("operations_available") // Opérations disponibles
+  
+  // Solution du joueur
+  player_solution         Json?    @map("player_solution") // Étapes de la solution
+  is_correct              Boolean  @map("is_correct")
+  solve_time_ms           Int      @map("solve_time_ms")
+  
+  // Métriques du round
+  attempts_count          Int      @default(1) @map("attempts_count")
+  hints_used_in_round     Int      @default(0) @map("hints_used_in_round")
+  operations_used         Json     @map("operations_used") // Opérations utilisées par le joueur
+  
+  // Performance
+  was_perfect             Boolean  @default(false) @map("was_perfect") // Résolu du premier coup sans aide
+  difficulty_rating       Decimal  @db.Decimal(3, 2) @map("difficulty_rating") // Difficulté perçue (0-10)
+  
+  // Timestamps
+  started_at              DateTime @default(now()) @map("started_at")
+  completed_at            DateTime? @map("completed_at")
+  
+  // Relations
+  score                   NumeroMagicScore @relation(fields: [score_id], references: [id], onDelete: Cascade)
+  
+  @@index([score_id])
+  @@index([round_number])
+  @@map("numeromagic_rounds")
+}
+
+model NumeroMagicUserStats {
+  id                      String   @id @default(uuid())
+  user_id                 String   @unique @map("user_id")
+  
+  // Stats globales
+  total_games             Int      @default(0) @map("total_games")
+  total_score             BigInt   @default(0) @map("total_score")
+  best_score              Int      @default(0) @map("best_score")
+  average_score           Decimal  @default(0) @db.Decimal(10, 2) @map("average_score")
+  
+  // Performance globale
+  total_rounds            Int      @default(0) @map("total_rounds")
+  total_successful        Int      @default(0) @map("total_successful")
+  global_accuracy         Decimal  @default(0) @db.Decimal(5, 2) @map("global_accuracy")
+  
+  // Records
+  best_streak             Int      @default(0) @map("best_streak")
+  best_combo              Int      @default(0) @map("best_combo")
+  fastest_solve_ms        Int?     @map("fastest_solve_ms")
+  
+  // Niveau et progression
+  current_level           Int      @default(1) @map("current_level")
+  total_experience        BigInt   @default(0) @map("total_experience")
+  
+  // Préférences
+  favorite_mode           String?  @map("favorite_mode")
+  preferred_difficulty    String?  @map("preferred_difficulty")
+  
+  // Timestamps
+  first_played_at         DateTime @default(now()) @map("first_played_at")
+  last_played_at          DateTime @default(now()) @map("last_played_at")
+  updated_at              DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  userSession             UserSession @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@index([user_id])
+  @@index([best_score])
+  @@map("numeromagic_user_stats")
 }

@@ -1,17 +1,18 @@
 import { NextResponse } from 'next/server';
+import { BACKEND_URL } from '@/lib/config';
 
 export async function GET() {
   try {
     // Charger les données depuis le backend
-    const statsResponse = await fetch('http://localhost:4000/api/cubematch/social/stats/cubematch-main', {
+    const statsResponse = await fetch(`${BACKEND_URL}/api/cubematch/social/stats/cubematch-main`, {
       headers: { 'Content-Type': 'application/json' }
     });
     
-    const commentsResponse = await fetch('http://localhost:4000/api/cubematch/social/comments/cubematch-main', {
+    const commentsResponse = await fetch(`${BACKEND_URL}/api/cubematch/social/comments/cubematch-main`, {
       headers: { 'Content-Type': 'application/json' }
     });
     
-    const leaderboardResponse = await fetch('http://localhost:4000/api/cubematch/leaderboard?limit=10', {
+    const leaderboardResponse = await fetch(`${BACKEND_URL}/api/cubematch/leaderboard?limit=10`, {
       headers: { 'Content-Type': 'application/json' }
     });
 

@@ -31,3 +31,5 @@ COMMENT ON COLUMN cubematch_scores.operator_distribution IS 'Distribution des op
 COMMENT ON COLUMN cubematch_scores.operator_accuracy IS 'Précision par opérateur';
 COMMENT ON COLUMN cubematch_scores.bubix_metrics IS 'Métriques formatées pour BubiX';
 COMMENT ON COLUMN cubematch_scores.recommendations IS 'Recommandations personnalisées générées';
+
+

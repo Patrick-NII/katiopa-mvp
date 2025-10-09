@@ -76,6 +76,29 @@ export interface ScoreData {
   operatorSequence?: string;  // JSON array
   moveTimings?: string;       // JSON array
   errorPatterns?: string;     // JSON array
+  
+  // 🎯 NOUVEAUX CHAMPS - Système modulaire avancé
+  initialDifficulty?: number;           // Difficulté de départ (0.8-3.5)
+  finalDifficulty?: number;             // Difficulté finale (0.8-3.5)
+  averageDifficulty?: number;           // Difficulté moyenne
+  difficultyProgression?: number[];     // Evolution de la difficulté
+  flowScore?: number;                   // Score de flow (0-100)
+  cognitiveProfile?: {                  // Profil cognitif
+    speedVsAccuracy?: string;
+    errorRecovery?: string;
+    adaptability?: string;
+    persistence?: number;
+  };
+  operatorDistribution?: Record<string, number>; // Distribution des opérateurs
+  operatorAccuracy?: Record<string, number>;     // Précision par opérateur
+  bubixMetrics?: any;                   // Métriques BubiX complètes
+  recommendations?: {                   // Recommandations générées
+    focusAreas?: string[];
+    suggestedDifficulty?: number;
+    suggestedOperators?: string[];
+  };
+  consecutiveErrors?: number;           // Erreurs consécutives max
+  longDecompositionsCount?: number;     // Nombre de décompositions longues
 }
 
 export interface LeaderboardEntry {

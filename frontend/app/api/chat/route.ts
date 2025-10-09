@@ -2,9 +2,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import * as jwt from 'jsonwebtoken'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import OpenAI from 'openai'
 import { buildPrompts } from './buildPrompts'
+import { 
+  analyzeMathProgression, 
+  describeCompetenceLevel,
+  generateChildQualitativeAnalysis 
+} from './qualitative-analysis'
 // Services backend temporairement désactivés - à réimplémenter si nécessaire
 // import { 
 //   BehavioralTrackingService, 
@@ -12,8 +17,6 @@ import { buildPrompts } from './buildPrompts'
 //   ChildPerformanceAnalysisService,
 //   PopupTrackingService 
 // } from '../../../backend/src/services/upgrade-tracking.service'
-
-const prisma = new PrismaClient()
 
 type ChatMsg = { role: 'system' | 'user' | 'assistant'; content: string }
 type ReqBody = { 
@@ -349,6 +352,96 @@ async function getActiveConnections(accountId: string): Promise<any[]> {
   }
 }
 
+// Fonction pour récupérer les données NuméroMagic d'un enfant
+async function getNumeroMagicData(childId: string, limit?: number): Promise<any> {
+  try {
+    console.log(`🔢 Récupération données NuméroMagic pour enfant ${childId}...`);
+    
+    // Récupérer les scores NuméroMagic
+    const numeroMagicScores = await prisma.numeroMagicScore.findMany({
+      where: {
+        user_id: childId
+      },
+      orderBy: {
+        created_at: 'desc'
+      },
+      ...(limit && { take: limit })
+    });
+
+    console.log(`🔍 NuméroMagic: ${numeroMagicScores.length} scores trouvés pour user_id ${childId}`);
+    if (numeroMagicScores.length > 0) {
+      console.log(`🔍 Exemple de score:`, numeroMagicScores[0]);
+    }
+
+    if (numeroMagicScores.length === 0) {
+      console.log('ℹ️ Aucune donnée NuméroMagic trouvée');
+      return null;
+    }
+
+    // Récupérer les stats utilisateur
+    const userStats = await prisma.numeroMagicUserStats.findUnique({
+      where: {
+        user_id: childId
+      }
+    });
+
+    // Calculer les statistiques
+    const totalGames = numeroMagicScores.length;
+    const totalScore = numeroMagicScores.reduce((sum: number, score: any) => sum + score.score, 0);
+    const bestScore = Math.max(...numeroMagicScores.map((s: any) => s.score));
+    const currentLevel = Math.max(...numeroMagicScores.map((s: any) => s.level));
+    const totalTimeMs = numeroMagicScores.reduce((sum: number, score: any) => sum + Number(score.time_played_ms), 0);
+    
+    // Mode préféré
+    const modeCounts = numeroMagicScores.reduce((acc: Record<string, number>, score: any) => {
+      acc[score.game_mode] = (acc[score.game_mode] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const favoriteMode = Object.entries(modeCounts)
+      .sort(([,a], [,b]) => (b as number) - (a as number))[0]?.[0] || 'CLASSIC';
+
+    // Difficulté préférée
+    const difficultyCounts = numeroMagicScores.reduce((acc: Record<string, number>, score: any) => {
+      acc[score.difficulty_level] = (acc[score.difficulty_level] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const preferredDifficulty = Object.entries(difficultyCounts)
+      .sort(([,a], [,b]) => (b as number) - (a as number))[0]?.[0] || 'EASY';
+
+    const lastPlayed = numeroMagicScores[0]?.created_at;
+
+    console.log(`✅ Données NuméroMagic récupérées: ${totalGames} parties, niveau ${currentLevel}`);
+
+    return {
+      game: 'NuméroMagic',
+      totalGames,
+      totalScore,
+      bestScore,
+      averageScore: totalGames > 0 ? totalScore / totalGames : 0,
+      currentLevel,
+      totalTimeMs,
+      averageTimePerGame: totalGames > 0 ? totalTimeMs / totalGames : 0,
+      favoriteMode,
+      preferredDifficulty,
+      lastPlayed,
+      recentScores: numeroMagicScores.slice(0, 5).map((score: any) => ({
+        score: score.score,
+        level: score.level,
+        gameMode: score.game_mode,
+        difficultyLevel: score.difficulty_level,
+        accuracyRate: Number(score.accuracy_rate),
+        createdAt: score.created_at
+      }))
+    };
+
+  } catch (error) {
+    console.error('❌ Erreur récupération données NuméroMagic:', error);
+    return null;
+  }
+}
+
 // Fonction pour récupérer les données CubeMatch d'un enfant
 async function getCubeMatchData(childId: string, limit?: number): Promise<any> {
   try {
@@ -421,6 +514,13 @@ function generateCubeMatchSummary(cubeMatchData: any): string {
   
   return `CubeMatch: ${cubeMatchData.totalGames} parties jouées, niveau ${cubeMatchData.currentLevel}, meilleur score ${cubeMatchData.bestScore}, opérateur préféré ${cubeMatchData.favoriteOperator}`;
 }
+
+// Fonction pour générer un résumé NuméroMagic
+function generateNumeroMagicSummary(numeroMagicData: any): string {
+  if (!numeroMagicData) return "Aucune donnée NuméroMagic disponible.";
+  
+  return `NuméroMagic: ${numeroMagicData.totalGames} parties jouées, niveau ${numeroMagicData.currentLevel}, meilleur score ${numeroMagicData.bestScore}, mode préféré ${numeroMagicData.favoriteMode}`;
+}
 async function getChildrenData(accountId: string, subscriptionType: string = 'FREE'): Promise<any> {
   try {
     console.log('🔍 Recherche enfants pour accountId:', accountId)
@@ -470,8 +570,14 @@ async function getChildrenData(accountId: string, subscriptionType: string = 'FR
     // Enrichir avec les données CubeMatch
     const enrichedChildren = await Promise.all(children.map(async (child) => {
       try {
-        // Récupérer les données CubeMatch
+        console.log(`🔍 Enrichissement enfant: ${child.firstName} (ID: ${child.id})`);
+        
+        // Récupérer les données des jeux
         const cubeMatchData = await getCubeMatchData(child.id, cubeMatchLimit);
+        console.log(`   CubeMatch: ${cubeMatchData ? 'Données trouvées' : 'Aucune donnée'}`);
+        
+        const numeroMagicData = await getNumeroMagicData(child.id, cubeMatchLimit);
+        console.log(`   NuméroMagic: ${numeroMagicData ? 'Données trouvées' : 'Aucune donnée'}`);
         
         return {
           id: child.id,
@@ -510,7 +616,11 @@ async function getChildrenData(accountId: string, subscriptionType: string = 'FR
           
           // Données CubeMatch
           cubeMatchData: cubeMatchData,
-          cubeMatchSummary: cubeMatchData ? generateCubeMatchSummary(cubeMatchData) : "Aucune donnée CubeMatch disponible."
+          cubeMatchSummary: cubeMatchData ? generateCubeMatchSummary(cubeMatchData) : "Aucune donnée CubeMatch disponible.",
+          
+          // Données NuméroMagic
+          numeroMagicData: numeroMagicData,
+          numeroMagicSummary: numeroMagicData ? generateNumeroMagicSummary(numeroMagicData) : "Aucune donnée NuméroMagic disponible."
         }
       } catch (error) {
         console.error(`❌ Erreur récupération données CubeMatch pour ${child.firstName}:`, error);
@@ -551,7 +661,11 @@ async function getChildrenData(accountId: string, subscriptionType: string = 'FR
           
           // Données CubeMatch (en cas d'erreur)
           cubeMatchData: null,
-          cubeMatchSummary: "Erreur lors de la récupération des données CubeMatch."
+          cubeMatchSummary: "Erreur lors de la récupération des données CubeMatch.",
+          
+          // Données NuméroMagic (en cas d'erreur)
+          numeroMagicData: null,
+          numeroMagicSummary: "Erreur lors de la récupération des données NuméroMagic."
         }
       }
     }));
@@ -582,132 +696,36 @@ function generateDataInsights(childrenData: any[], activeConnections: any[] = []
     return "Aucune donnée d'enfant disponible pour l'analyse."
   }
 
-  let insights = "📊 **ANALYSE DES DONNÉES ENFANTS**\n\n"
-  
-  // Informations sur les prompts générés
-  if (prompts && prompts.length > 0) {
-    insights += "## 📝 PROMPTS GÉNÉRÉS\n"
-    insights += `• **${prompts.length} prompts** générés au total\n`
-    
-    // Grouper par type
-    const promptsByType = prompts.reduce((acc: any, prompt: any) => {
-      acc[prompt.type] = (acc[prompt.type] || 0) + 1
-      return acc
-    }, {})
-    
-    Object.entries(promptsByType).forEach(([type, count]) => {
-      insights += `• **${type}**: ${count} prompts\n`
-    })
-    
-    // Derniers prompts
-    const recentPrompts = prompts.slice(0, 3)
-    insights += `• **Derniers prompts**:\n`
-    recentPrompts.forEach((prompt: any, index: number) => {
-      const date = new Date(prompt.createdAt).toLocaleDateString('fr-FR')
-      insights += `  ${index + 1}. ${prompt.type} (${date}) - ${prompt.status}\n`
-    })
-    insights += "\n"
-  } else {
-    insights += "## 📝 PROMPTS GÉNÉRÉS\n"
-    insights += "• Aucun prompt généré pour le moment\n\n"
-  }
-  
-  // Informations sur les connexions actives
-  if (activeConnections.length > 0) {
-    insights += "## 🔴 CONNEXIONS ACTIVES\n"
-    activeConnections.forEach(user => {
-      const timeAgo = Math.round((Date.now() - new Date(user.lastLoginAt).getTime()) / (1000 * 60))
-      insights += `• **${user.firstName} ${user.lastName}** (${user.userType}) - Connecté il y a ${timeAgo} minutes\n`
-    })
-    insights += "\n"
-  } else {
-    insights += "## 🔴 CONNEXIONS ACTIVES\n"
-    insights += "• Aucune connexion active détectée\n\n"
-  }
+  let insights = "ANALYSE DES ENFANTS (en langage naturel) :\n\n"
   
   childrenData.forEach((child, index) => {
-    // Vérifier que child et child.activities existent
-    if (!child || !child.activities) {
-      insights += `**${child?.firstName || 'Enfant'} ${child?.lastName || 'Inconnu'}**\n`
-      insights += `• Données d'activités non disponibles\n\n`
-      return
+    // Vérifier que child existe
+    if (!child) {
+      return;
     }
     
-    insights += `**${child.firstName} ${child.lastName}** (${child.age || 'N/A'} ans)\n`
+    insights += `${child.firstName} ${child.lastName} (${child.age || 8} ans) :\n`
     
-    // Vérifier si cet enfant est actuellement connecté
-    const isChildActive = activeConnections.some(active => 
-      active.firstName === child.firstName && active.lastName === child.lastName
-    )
+    // Analyse qualitative des mathématiques (basée sur les jeux)
+    const mathAnalysis = analyzeMathProgression({
+      cubeMatchData: child.cubeMatchData,
+      numeroMagicData: child.numeroMagicData,
+      childName: child.firstName,
+      age: child.age || 8
+    });
     
-    if (isChildActive) {
-      const activeUser = activeConnections.find(active => 
-        active.firstName === child.firstName && active.lastName === child.lastName
-      )
-      const timeAgo = Math.round((Date.now() - new Date(activeUser.lastLoginAt).getTime()) / (1000 * 60))
-      insights += `• **🟢 ACTUELLEMENT CONNECTÉ** (depuis ${timeAgo} minutes)\n`
-    } else {
-      insights += `• **🔴 Non connecté**\n`
-    }
+    insights += mathAnalysis + "\n";
     
-    // Statistiques générales
-    const totalActivities = child.activities.length
-    const totalSessions = 0 // Pas de sessions pour l'instant
-    const avgScore = child.activities.length > 0 
-      ? Math.round(child.activities.reduce((sum: number, a: any) => sum + (a.score || 0), 0) / child.activities.length)
-      : 0
-    
-    insights += `• ${totalActivities} activités réalisées\n`
-    insights += `• ${totalSessions} sessions d'apprentissage\n`
-    insights += `• Score moyen: ${avgScore}/100\n`
-    
-    // Données CubeMatch si disponibles
-    if (child.cubeMatchData && child.cubeMatchData.globalStats) {
-      const cm = child.cubeMatchData.globalStats;
-      insights += `• **CubeMatch** : ${cm.totalGames} parties, score total ${cm.totalScore.toLocaleString()}, niveau max ${cm.highestLevel}\n`
-      
-      // Statistiques par opération
-      if (child.cubeMatchData.operatorStats && child.cubeMatchData.operatorStats.length > 0) {
-        insights += `• **Opérations** : `
-        child.cubeMatchData.operatorStats.forEach((op: any, i: number) => {
-          const opNameMap: Record<string, string> = { 'ADD': 'Add', 'SUB': 'Sous', 'MUL': 'Mult', 'DIV': 'Div' };
-          const opName = opNameMap[op.operator] || op.operator;
-          insights += `${opName}(${op.games} parties, ${op.averageAccuracy.toFixed(1)}% précision)`
-          if (i < child.cubeMatchData.operatorStats.length - 1) insights += ', ';
-        });
-        insights += '\n';
-      }
-    }
-    
-    // Domaines les plus pratiqués
-    const domainStats = child.activities.reduce((acc: any, activity: any) => {
-      acc[activity.domain] = (acc[activity.domain] || 0) + 1
-      return acc
-    }, {})
-    
-    const topDomains = Object.entries(domainStats)
-      .sort(([,a]: any, [,b]: any) => b - a)
-      .slice(0, 3)
-      .map(([domain, count]: any) => `${domain} (${count} fois)`)
-      .join(', ')
-    
-    insights += `• Domaines préférés: ${topDomains}\n`
-    
-    // Dernière activité
-    if (child.activities.length > 0) {
-      const lastActivity = child.activities[0]
-      insights += `• Dernière activité: ${lastActivity.domain} - ${lastActivity.nodeKey} (${lastActivity.score}/100)\n`
-    }
-    
-    // Profil d'apprentissage
-    if (child.profile) {
-      insights += `• Objectifs: ${child.profile.learningGoals?.join(', ') || 'Non définis'}\n`
-      insights += `• Matières préférées: ${child.profile.preferredSubjects?.join(', ') || 'Non définies'}\n`
-      insights += `• Style d'apprentissage: ${child.profile.learningStyle || 'Non défini'}\n`
+    // Activités pédagogiques (si pertinent)
+    if (child.activities && child.activities.length > 0) {
+      insights += `Il a également réalisé ${child.activities.length} activité${child.activities.length > 1 ? 's' : ''} pédagogique${child.activities.length > 1 ? 's' : ''} complémentaire${child.activities.length > 1 ? 's' : ''}.\n`;
     }
     
     insights += "\n"
   })
+  
+  console.log('📊 INSIGHTS GÉNÉRÉS (extrait):', insights.substring(0, 500));
+  console.log('🔍 NuméroMagic dans insights?', insights.includes('NuméroMagic') ? 'OUI ✅' : 'NON ❌');
   
   return insights
 }
@@ -1899,6 +1917,13 @@ export async function POST(request: NextRequest) {
       temperature: persona === 'kid' ? 0.6 : 0.4,
       max_tokens: maxTokens,
     }
+    
+    console.log('🤖 Envoi à OpenAI:');
+    console.log('   Model:', model);
+    console.log('   Max tokens:', maxTokens);
+    console.log('   Messages count:', messages.length);
+    console.log('   System prompt length:', messages[0]?.content?.length || 0);
+    console.log('   System prompt contient "NuméroMagic"?', messages[0]?.content?.includes('NuméroMagic') ? 'OUI ✅' : 'NON ❌');
 
     const r = await fetch("https://api.openai.com/v1/chat/completions", {
       method: 'POST',

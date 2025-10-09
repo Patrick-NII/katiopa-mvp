@@ -6,8 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
+import { BACKEND_URL } from '@/lib/config';
 
 // Types pour le monitoring
 interface RequestMetrics {
@@ -44,8 +43,10 @@ async function handleRequest(
     const finalUrl = queryString ? `${backendUrl}?${queryString}` : backendUrl;
     
     // Vérifier le cache pour les requêtes GET
+    const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie') || '';
+
     if (method === 'GET') {
-      const cacheKey = `${finalUrl}:${request.headers.get('Cookie') || ''}`;
+      const cacheKey = `${finalUrl}:${cookieHeader}`;
       const cached = cache.get(cacheKey);
       
       if (cached && Date.now() - cached.timestamp < cached.ttl) {
@@ -61,9 +62,8 @@ async function handleRequest(
     };
     
     // Transférer les cookies d'authentification
-    const cookies = request.headers.get('Cookie');
-    if (cookies) {
-      headers['Cookie'] = cookies;
+    if (cookieHeader) {
+      headers['Cookie'] = cookieHeader;
     }
     
     // Transférer le body pour POST/PUT
@@ -94,7 +94,7 @@ async function handleRequest(
       duration,
       status: backendResponse.status,
       timestamp: new Date().toISOString(),
-      userId: extractUserIdFromCookies(cookies)
+      userId: extractUserIdFromCookies(cookieHeader)
     };
     
     console.log(`✅ [${method}] /${path} - ${backendResponse.status} (${duration}ms)`);
@@ -104,7 +104,7 @@ async function handleRequest(
     
     // Mettre en cache les réponses GET réussies
     if (method === 'GET' && backendResponse.ok && shouldCache(path)) {
-      const cacheKey = `${finalUrl}:${cookies || ''}`;
+      const cacheKey = `${finalUrl}:${cookieHeader}`;
       const ttl = getCacheTTL(path);
       
       cache.set(cacheKey, {
@@ -123,7 +123,7 @@ async function handleRequest(
     
     // Ajouter des headers de performance
     response.headers.set('X-Response-Time', `${duration}ms`);
-    response.headers.set('X-Cache', method === 'GET' && cache.has(`${finalUrl}:${cookies || ''}`) ? 'HIT' : 'MISS');
+    response.headers.set('X-Cache', method === 'GET' && cache.has(`${finalUrl}:${cookieHeader}`) ? 'HIT' : 'MISS');
     response.headers.set('X-API-Version', '2.0');
     
     return response;

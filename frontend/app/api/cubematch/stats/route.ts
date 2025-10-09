@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { BACKEND_URL } from '@/lib/config';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
+export const dynamic = 'force-dynamic';
 
 // GET - Récupérer les statistiques d'un jeu (proxy vers backend)
 export async function GET(request: NextRequest) {
@@ -15,10 +16,11 @@ export async function GET(request: NextRequest) {
     }
     
     // Proxy vers le backend
+    const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie') || '';
     const backendResponse = await fetch(url, {
       method: 'GET',
       headers: {
-        'Cookie': request.headers.get('Cookie') || ''
+        'Cookie': cookieHeader
       }
     });
 

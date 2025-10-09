@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
+import { BACKEND_URL } from '@/lib/config';
+
+export const dynamic = 'force-dynamic';
 
 // GET - Récupérer les likes d'un jeu (proxy vers backend)
 export async function GET(request: NextRequest) {
@@ -9,10 +11,11 @@ export async function GET(request: NextRequest) {
     const gameId = searchParams.get('gameId') || 'cubematch';
     
     // Proxy vers le backend
+    const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie') || '';
     const backendResponse = await fetch(`${BACKEND_URL}/api/cubematch/likes?gameId=${gameId}`, {
       method: 'GET',
       headers: {
-        'Cookie': request.headers.get('Cookie') || ''
+        'Cookie': cookieHeader
       }
     });
 
@@ -37,11 +40,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // Proxy vers le backend
+    const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie') || '';
     const backendResponse = await fetch(`${BACKEND_URL}/api/cubematch/likes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Cookie': request.headers.get('Cookie') || ''
+        'Cookie': cookieHeader
       },
       body: JSON.stringify(body)
     });

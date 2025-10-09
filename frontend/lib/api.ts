@@ -2,8 +2,9 @@
 // Supporte NEXT_PUBLIC_API_URL (prioritaire) puis NEXT_PUBLIC_API_BASE (fallback)
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
+  process.env.BACKEND_URL ||
   process.env.NEXT_PUBLIC_API_BASE ||
-  'http://localhost:4000';
+  'http://localhost:4000'; // Backend par défaut sur port 4000
 
 // Types pour l'API
 export interface LoginRequest {

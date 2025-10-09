@@ -3,7 +3,23 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useScreenSize } from '@/hooks/useScreenSize'
-import { cubeMatchAPI, type ScoreData, type GameSettings } from '@/lib/api/cubematch-v2'
+import { type ScoreData, type GameSettings } from '@/lib/api/cubematch-v2'
+import { cubeMatchService } from '@/lib/services/cubematch-service'
+import { SeriesCollector } from '@/lib/services/cubematch-series-api'
+// 🎯 Nouveau système de jeu modulaire
+import { 
+  createStandardConfig, 
+  MetricsCollector,
+  type Operator as NewOperator,
+  GridGenerator,
+  type GenerationContext,
+  SolvabilityValidator,
+  OperatorStrategyFactory,
+  AdvancedDifficultyModel,
+  AdvancedScoringModel,
+  AdvancedTimerModel,
+  AdaptiveModelsFactory
+} from '@/lib/game-config'
 import { 
   Gamepad2, 
   Trophy, 
@@ -171,22 +187,66 @@ const GameCell = memo(({
       return `${baseClasses} ${sizeClasses} bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300 cursor-default shadow-md text-gray-400`
     }
     
-    // Couleurs vives selon la valeur du nombre
-    const valueColors = [
-      'from-red-400 to-pink-500',      // 1
-      'from-orange-400 to-red-500',    // 2
-      'from-yellow-400 to-orange-500', // 3
-      'from-green-400 to-yellow-500',  // 4
-      'from-blue-400 to-green-500',    // 5
-      'from-indigo-400 to-blue-500',   // 6
-      'from-purple-400 to-indigo-500', // 7
-      'from-pink-400 to-purple-500',   // 8
-      'from-rose-400 to-pink-500',     // 9
-      'from-cyan-400 to-rose-500'      // 10+
-    ]
-    
-    const colorIndex = Math.min(cell.value - 1, valueColors.length - 1)
-    const cellColor = valueColors[colorIndex]
+     // Couleurs vives selon la valeur du nombre
+     const valueColors = [
+       'from-red-400 to-pink-500',      // 1
+       'from-orange-400 to-red-500',    // 2
+       'from-yellow-400 to-orange-500', // 3
+       'from-green-400 to-yellow-500',  // 4
+       'from-blue-400 to-green-500',    // 5
+       'from-indigo-400 to-blue-500',   // 6
+       'from-purple-400 to-indigo-500', // 7
+       'from-pink-400 to-purple-500',   // 8
+       'from-rose-400 to-pink-500',     // 9
+       'from-cyan-400 to-rose-500',     // 10
+       'from-emerald-400 to-cyan-500',  // 11
+       'from-teal-400 to-emerald-500',  // 12
+       'from-sky-400 to-teal-500',      // 13
+       'from-violet-400 to-sky-500',    // 14
+       'from-fuchsia-400 to-violet-500', // 15
+       'from-amber-400 to-fuchsia-500', // 16
+       'from-lime-400 to-amber-500',    // 17
+       'from-slate-400 to-lime-500',    // 18
+       'from-gray-400 to-slate-500',    // 19
+       'from-zinc-400 to-gray-500'      // 20+
+     ]
+     
+     // Pour les nombres > 20, utiliser des couleurs spéciales
+     let cellColor: string
+     if (cell.value <= 20) {
+       const colorIndex = Math.min(cell.value - 1, valueColors.length - 1)
+       cellColor = valueColors[colorIndex]
+     } else if (cell.value <= 50) {
+       // Nombres 21-50: couleurs dorées/orangées
+       const goldColors = [
+         'from-yellow-300 to-orange-400',
+         'from-orange-300 to-red-400',
+         'from-red-300 to-pink-400',
+         'from-pink-300 to-rose-400',
+         'from-rose-300 to-amber-400'
+       ]
+       cellColor = goldColors[(cell.value - 21) % goldColors.length]
+     } else if (cell.value <= 100) {
+       // Nombres 51-100: couleurs bleues/violettes
+       const blueColors = [
+         'from-blue-300 to-indigo-400',
+         'from-indigo-300 to-purple-400',
+         'from-purple-300 to-violet-400',
+         'from-violet-300 to-fuchsia-400',
+         'from-fuchsia-300 to-pink-400'
+       ]
+       cellColor = blueColors[(cell.value - 51) % blueColors.length]
+     } else {
+       // Nombres 101+: couleurs sombres et intenses
+       const darkColors = [
+         'from-gray-600 to-slate-700',
+         'from-slate-600 to-gray-700',
+         'from-zinc-600 to-gray-700',
+         'from-neutral-600 to-zinc-700',
+         'from-stone-600 to-neutral-700'
+       ]
+       cellColor = darkColors[(cell.value - 101) % darkColors.length]
+     }
     
     const stateClasses = isSelected
       ? `bg-gradient-to-br ${cellColor} border-4 border-white shadow-2xl scale-110 ring-4 ring-yellow-300`
@@ -254,12 +314,12 @@ export default function CubeMatchUnified({
     combo: 0,
     bestCombo: 0,
     lives: 3,
-    timeLeft: 60,
+    timeLeft: 180,
     cellsCleared: 0,
     totalMoves: 0,
     successfulMoves: 0,
     hintsUsed: 0,
-    accuracy: 100,
+    accuracy: 0,
     timePlayedMs: 0
   })
   
@@ -277,6 +337,126 @@ export default function CubeMatchUnified({
   const [maxLevel, setMaxLevel] = useState(1)
   const [showLevelUp, setShowLevelUp] = useState(false)
   const [showNewRecord, setShowNewRecord] = useState(false)
+  const [consecutiveErrors, setConsecutiveErrors] = useState(0)
+  const [currentSeries, setCurrentSeries] = useState<{
+    attempts: number
+    correct: number
+    startTime: number
+    timerId: NodeJS.Timeout | null
+  }>({
+    attempts: 0,
+    correct: 0,
+    startTime: 0,
+    timerId: null
+  })
+  const [timeRemaining, setTimeRemaining] = useState(0)
+  
+  // 🎯 Collecteur de séries pour le tracking détaillé
+  const seriesCollectorRef = useRef<SeriesCollector | null>(null)   // 🎯 Tracking des erreurs consécutives
+  const [previousConfig, setPreviousConfig] = useState<GameConfig>(config) // 🔧 Pour détecter les changements
+  
+  // 🎯 NOUVEAU SYSTÈME - Refs et états pour le système modulaire
+  const metricsCollectorRef = useRef<MetricsCollector | null>(null)
+  const difficultyModelRef = useRef<AdvancedDifficultyModel | null>(null)
+  const scoringModelRef = useRef<AdvancedScoringModel | null>(null)
+  const timerModelRef = useRef<AdvancedTimerModel | null>(null)
+  const [currentDifficulty, setCurrentDifficulty] = useState(1.0) // Difficulté continue du nouveau système
+  
+  // 🕐 Calculer le temps de validation selon niveau et difficulté
+  const getValidationTime = useCallback(() => {
+    const baseTime = 5000 // 5 secondes de base
+    const levelMultiplier = Math.max(0.5, 1 - (stats.level - 1) * 0.1) // Réduit avec le niveau
+    const difficultyMultiplier = {
+      'EASY': 1.5,
+      'MEDIUM': 1.0,
+      'HARD': 0.7
+    }[config.difficulty] || 1.0
+    
+    return Math.max(2000, baseTime * levelMultiplier * difficultyMultiplier) // Minimum 2 secondes
+  }, [stats.level, config.difficulty])
+  
+  // 🎯 Démarrer une nouvelle série de calculs
+  const startNewSeries = useCallback(() => {
+    // Nettoyer l'ancien timer s'il existe
+    if (currentSeries.timerId) {
+      clearTimeout(currentSeries.timerId)
+    }
+    
+    const validationTime = getValidationTime()
+    setTimeRemaining(validationTime / 1000) // Temps en secondes pour l'affichage
+    
+    // Démarrer une nouvelle série dans le collecteur
+    if (seriesCollectorRef.current) {
+      seriesCollectorRef.current.startSeries(
+        config.operator,
+        target,
+        config.difficulty,
+        validationTime
+      )
+    }
+    
+    // Timer visuel qui se met à jour chaque seconde
+    const visualTimer = setInterval(() => {
+      setTimeRemaining(prev => {
+        const newTime = prev - 1
+        if (newTime <= 0) {
+          clearInterval(visualTimer)
+          return 0
+        }
+        return newTime
+      })
+    }, 1000)
+    
+    setCurrentSeries({
+      attempts: 0,
+      correct: 0,
+      startTime: Date.now(),
+      timerId: setTimeout(() => {
+        // Temps écoulé - pénalité de précision
+        console.log(`⏰ Temps de validation écoulé (${validationTime}ms) - Pénalité de précision`)
+        
+        clearInterval(visualTimer)
+        setTimeRemaining(0)
+        
+        // Enregistrer le timeout dans le collecteur
+        if (seriesCollectorRef.current) {
+          seriesCollectorRef.current.recordAttempt(
+            [], // Pas de nombres sélectionnés pour un timeout
+            target,
+            config.operator,
+            false,
+            validationTime,
+            'timeout',
+            false
+          )
+        }
+        
+        setCurrentSeries(prev => ({
+          ...prev,
+          attempts: prev.attempts + 1,
+          timerId: null
+        }))
+        
+        // Calculer la nouvelle précision basée sur la série
+        setStats(prev => {
+          const newTotalMoves = prev.totalMoves + 1
+          const seriesAccuracy = currentSeries.attempts > 0 
+            ? (currentSeries.correct / (currentSeries.attempts + 1)) * 100 
+            : 0
+          const newAccuracy = Math.max(0, prev.accuracy - 5) // Pénalité de 5%
+          
+          return {
+            ...prev,
+            totalMoves: newTotalMoves,
+            accuracy: newAccuracy
+          }
+        })
+        
+        // Nettoyer la sélection
+        setSelectedCells([])
+      }, validationTime)
+    })
+  }, [currentSeries, getValidationTime, config.operator, config.difficulty, target])
   
   // Refs
   const gameLoopRef = useRef<NodeJS.Timeout>()
@@ -318,59 +498,540 @@ export default function CubeMatchUnified({
     return newGrid
   }, [config.gridSize])
   
-  // Générer un nombre aléatoire qui peut aider à atteindre le target
-  const generateRandomNumber = useCallback(() => {
-    // Déterminer le palier de difficulté basé sur le niveau
-    const difficultyTier = Math.floor((stats.level - 1) / 10) + 1 // Palier 1, 2, 3, etc.
-    
-    console.log(`🎲 Génération nombre - Niveau: ${stats.level}, Palier: ${difficultyTier}, Target actuel: ${target}`)
-    
-    if (difficultyTier === 1) {
-      // Niveau FACILE - Nombres de 1 à 20, mais proches du target
-      if (target <= 20) {
-        // Si target petit, générer des nombres qui peuvent le faire
-        const maxValue = Math.min(20, Math.max(1, target - 1))
-        const result = Math.floor(Math.random() * maxValue) + 1
-        console.log(`🎯 Palier FACILE (1-${maxValue}) - Target: ${target}, Résultat: ${result}`)
-        return result
-      } else {
-        // Target plus grand, générer des nombres normaux
-        const result = Math.floor(Math.random() * 20) + 1
-        console.log(`🎯 Palier FACILE (1-20) - Résultat: ${result}`)
-        return result
-      }
-    } else if (difficultyTier === 2) {
-      // Niveau MOYEN - Nombres de 21 à 50, adaptés au target
-      if (target >= 21 && target <= 50) {
-        // Target dans la plage, générer des nombres qui peuvent l'atteindre
-        const maxValue = Math.min(50, target)
-        const minValue = Math.max(21, Math.floor(target / 3))
-        const result = Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue
-        console.log(`🎯 Palier MOYEN (${minValue}-${maxValue}) - Target: ${target}, Résultat: ${result}`)
-        return result
-      } else {
-        // Target hors plage, générer des nombres normaux
-        const result = Math.floor(Math.random() * 30) + 21
-        console.log(`🎯 Palier MOYEN (21-50) - Résultat: ${result}`)
-        return result
-      }
-    } else {
-      // Niveau DIFFICILE - Nombres de 51+, adaptés au target
-      if (target >= 51) {
-        // Target élevé, générer des nombres qui peuvent l'atteindre
-        const maxValue = Math.min(200, target)
-        const minValue = Math.max(51, Math.floor(target / 4))
-        const result = Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue
-        console.log(`🎯 Palier DIFFICILE (${minValue}-${maxValue}) - Target: ${target}, Résultat: ${result}`)
-        return result
-      } else {
-        // Target plus petit, générer des nombres normaux
-        const result = Math.floor(Math.random() * 150) + 51
-        console.log(`🎯 Palier DIFFICILE (51-200) - Résultat: ${result}`)
-        return result
+  // 🧮 Obtenir tous les facteurs d'un nombre (défini en premier)
+  const getFactors = useCallback((num: number): number[] => {
+    const factors = []
+    for (let i = 1; i <= Math.sqrt(num); i++) {
+      if (num % i === 0) {
+        factors.push(i)
+        if (i !== num / i) {
+          factors.push(num / i)
+        }
       }
     }
-  }, [stats.level, target])
+    return factors.sort((a, b) => a - b)
+  }, [])
+
+  // 🧮 Calculer tous les résultats possibles d'une grille (VERSION ROBUSTE)
+  const calculateAllPossibleResults = useCallback((numbers: number[], operator: Operator): number[] => {
+    const results = new Set<number>()
+    
+    console.log(`🧮 Calcul résultats possibles - Nombres: [${numbers.join(', ')}], Opérateur: ${operator}`)
+    
+    // Vérifier qu'on a au moins 2 nombres
+    if (numbers.length < 2) {
+      console.warn('⚠️ Pas assez de nombres pour calculer des résultats')
+      return []
+    }
+    
+    // Tester toutes les combinaisons de 2 nombres
+    for (let i = 0; i < numbers.length; i++) {
+      for (let j = i + 1; j < numbers.length; j++) {
+        const num1 = numbers[i]
+        const num2 = numbers[j]
+        
+        // Vérifier que les nombres sont valides
+        if (typeof num1 !== 'number' || typeof num2 !== 'number' || isNaN(num1) || isNaN(num2)) {
+          console.warn(`⚠️ Nombre invalide détecté: ${num1}, ${num2}`)
+          continue
+        }
+        
+        switch (operator) {
+          case 'ADD':
+            const sum = num1 + num2
+            if (sum > 0 && Number.isInteger(sum)) {
+              results.add(sum)
+            }
+            break
+          
+          case 'SUB':
+            const diff1 = Math.abs(num1 - num2)
+            const diff2 = Math.abs(num2 - num1)
+            if (diff1 > 0 && Number.isInteger(diff1)) results.add(diff1)
+            if (diff2 > 0 && Number.isInteger(diff2) && diff2 !== diff1) results.add(diff2)
+            break
+          
+          case 'MUL':
+            const product = num1 * num2
+            if (product > 0 && Number.isInteger(product)) {
+              results.add(product)
+            }
+            break
+          
+          case 'DIV':
+            // Division dans les deux sens avec vérifications strictes
+            if (num2 !== 0 && num1 % num2 === 0) {
+              const div1 = num1 / num2
+              if (div1 > 0 && Number.isInteger(div1)) {
+                results.add(div1)
+              }
+            }
+            if (num1 !== 0 && num2 % num1 === 0) {
+              const div2 = num2 / num1
+              if (div2 > 0 && Number.isInteger(div2)) {
+                results.add(div2)
+              }
+            }
+            break
+          
+          case 'MIXED':
+            // Tester toutes les opérations avec vérifications
+            const mixedSum = num1 + num2
+            if (mixedSum > 0 && Number.isInteger(mixedSum)) results.add(mixedSum)
+            
+            const mixedDiff1 = Math.abs(num1 - num2)
+            const mixedDiff2 = Math.abs(num2 - num1)
+            if (mixedDiff1 > 0 && Number.isInteger(mixedDiff1)) results.add(mixedDiff1)
+            if (mixedDiff2 > 0 && Number.isInteger(mixedDiff2) && mixedDiff2 !== mixedDiff1) results.add(mixedDiff2)
+            
+            const mixedProduct = num1 * num2
+            if (mixedProduct > 0 && Number.isInteger(mixedProduct)) results.add(mixedProduct)
+            
+            if (num2 !== 0 && num1 % num2 === 0) {
+              const mixedDiv1 = num1 / num2
+              if (mixedDiv1 > 0 && Number.isInteger(mixedDiv1)) results.add(mixedDiv1)
+            }
+            if (num1 !== 0 && num2 % num1 === 0) {
+              const mixedDiv2 = num2 / num1
+              if (mixedDiv2 > 0 && Number.isInteger(mixedDiv2)) results.add(mixedDiv2)
+            }
+            break
+        }
+      }
+    }
+    
+    const resultsArray = Array.from(results).filter(r => r > 0 && Number.isInteger(r) && !isNaN(r))
+    console.log(`📊 Résultats possibles trouvés: [${resultsArray.join(', ')}] (${resultsArray.length} résultats)`)
+    
+    return resultsArray.sort((a, b) => a - b)
+  }, [])
+
+  // 🎯 Filtrer les résultats selon la difficulté
+  const filterResultsByDifficulty = useCallback((results: number[], tier: number): number[] => {
+    if (tier === 1) {
+      // Niveau facile: résultats 1-20
+      return results.filter(r => r >= 1 && r <= 20)
+    } else if (tier === 2) {
+      // Niveau moyen: résultats 1-50
+      return results.filter(r => r >= 1 && r <= 50)
+    } else {
+      // Niveau difficile: résultats 1-200
+      return results.filter(r => r >= 1 && r <= 200)
+    }
+  }, [])
+
+  // 🧠 NOUVELLE LOGIQUE : Utiliser le GridGenerator modulaire
+  const initializeGridWithNumbers = useCallback(() => {
+    console.log('🏗️ Création de la grille avec SYSTÈME MODULAIRE INTELLIGENT...')
+    
+    // Créer le contexte de génération
+    const context: GenerationContext = {
+      difficulty: currentDifficulty,
+      level: stats.level,
+      age: userAge || 6,
+      consecutiveErrors: consecutiveErrors,
+      accuracy: stats.accuracy
+    }
+    
+    // Créer le générateur avec RNG par défaut
+    const rng = { next: () => Math.random() }
+    const generator = new GridGenerator(rng, {
+      size: config.gridSize,
+      operator: config.operator as NewOperator,
+      difficulty: currentDifficulty,
+      context,
+      allowLongDecompositions: true,
+      minSolutions: 1,
+      maxSolutions: 3,
+      distractorStrategy: currentDifficulty > 2.0 ? 'misleading' : 
+                          currentDifficulty > 1.5 ? 'similar' : 'random'
+    })
+    
+    // Générer la grille
+    const result = generator.generate()
+    
+    // Convertir la grille au format de l'interface
+    const newGrid: Cell[][] = []
+    for (let row = 0; row < config.gridSize; row++) {
+      newGrid[row] = []
+      for (let col = 0; col < config.gridSize; col++) {
+        const generatedCell = result.grid[row][col]
+        newGrid[row][col] = {
+          id: `${row}-${col}`,
+          row,
+          col,
+          value: generatedCell.value || null,
+          bornAt: Date.now(),
+          selected: false
+        }
+      }
+    }
+    
+    console.log(`✅ Grille créée avec le système modulaire`)
+    console.log(`🎯 Target: ${result.target}`)
+    console.log(`📊 Solutions possibles: ${result.allSolutions.length}`)
+    console.log(`🎲 Complexité: ${result.metadata.complexity}`)
+    console.log(`🎲 Distracteurs: ${result.metadata.distractorCount}`)
+    
+    // Démarrer un nouveau round dans le collecteur de métriques
+    console.log('🎯 Démarrage nouveau round dans MetricsCollector:', !!metricsCollectorRef.current)
+    if (metricsCollectorRef.current) {
+      metricsCollectorRef.current.startRound(
+        config.operator as NewOperator,
+        result.target,
+        currentDifficulty
+      )
+      console.log('✅ Round démarré dans MetricsCollector:', config.operator, result.target, currentDifficulty)
+    } else {
+      console.warn('⚠️ MetricsCollector non disponible pour startRound')
+    }
+    
+    // Mettre à jour la grille ET le target
+    setGrid(newGrid)
+    setTarget(result.target)
+  }, [config.gridSize, config.operator, stats.level, stats.accuracy, consecutiveErrors, currentDifficulty, userAge])
+
+  // 🧠 LOGIQUE DYNAMIQUE : Recalculer le target selon les nombres restants avec le nouveau système
+  const updateTargetFromCurrentGrid = useCallback(() => {
+    // 🧮 Extraire tous les nombres actuellement dans la grille
+    const currentNumbers: number[] = []
+    grid.forEach(row => {
+      row.forEach(cell => {
+        if (cell.value !== null) {
+          currentNumbers.push(cell.value)
+        }
+      })
+    })
+    
+    if (currentNumbers.length === 0) {
+      console.log('🔄 Grille vide, génération d\'une nouvelle grille...')
+      initializeGridWithNumbers()
+      return
+    }
+    
+    console.log(`🎯 Recalcul target dynamique - Nombres restants: [${currentNumbers.join(', ')}], Opérateur: ${config.operator}`)
+    
+    // Utiliser le SolvabilityValidator pour trouver les solutions possibles
+    const validation = SolvabilityValidator.validateGrid(
+      currentNumbers,
+      target,
+      config.operator as NewOperator,
+      true // Autoriser les décompositions longues
+    )
+    
+    // Si le target actuel n'est pas solvable, en trouver un nouveau
+    if (!validation.solvable) {
+      console.warn('⚠️ Target actuel non solvable, recherche d\'un nouveau target...')
+      
+      // Calculer tous les résultats possibles
+      const possibleResults = calculateAllPossibleResults(currentNumbers, config.operator)
+      
+      if (possibleResults.length === 0) {
+        console.warn('⚠️ Aucun résultat possible, génération nouvelle grille')
+        initializeGridWithNumbers()
+        return
+      }
+      
+      // Choisir un nouveau target aléatoire
+      const newTarget = possibleResults[Math.floor(Math.random() * possibleResults.length)]
+      setTarget(newTarget)
+      console.log(`✅ Nouveau target: ${newTarget} (parmi ${possibleResults.length} résultats possibles)`)
+      
+      // Démarrer un nouveau round dans le collecteur
+      if (metricsCollectorRef.current) {
+        metricsCollectorRef.current.startRound(
+          config.operator as NewOperator,
+          newTarget,
+          currentDifficulty
+        )
+      }
+    } else {
+      console.log(`✅ Target actuel (${target}) toujours solvable avec ${validation.solutions.length} solution(s)`)
+    }
+  }, [grid, target, config.operator, currentDifficulty, calculateAllPossibleResults, initializeGridWithNumbers])
+
+  // 🧠 GÉNÉRATION INITIALE : Grille → Résultats possibles → Target
+  const generateTargetFromGrid = useCallback((gridNumbers: number[]): number => {
+    const difficultyTier = Math.floor((stats.level - 1) / 10) + 1
+    
+    console.log(`🎯 Génération target initial - Nombres: [${gridNumbers.join(', ')}], Opérateur: ${config.operator}`)
+    
+    // 🧮 CALCULER tous les résultats possibles de la grille
+    const possibleResults = calculateAllPossibleResults(gridNumbers, config.operator)
+    
+    if (possibleResults.length === 0) {
+      console.warn('⚠️ Aucun résultat possible trouvé, utilisation target par défaut')
+      return 10
+    }
+    
+    // 🎯 FILTRER les résultats selon le niveau de difficulté
+    const filteredResults = filterResultsByDifficulty(possibleResults, difficultyTier)
+    
+    if (filteredResults.length === 0) {
+      console.warn('⚠️ Aucun résultat adapté au niveau, utilisation de tous les résultats')
+      return possibleResults[Math.floor(Math.random() * possibleResults.length)]
+    }
+    
+    // 🎲 CHOISIR un target aléatoire parmi les résultats possibles
+    const selectedTarget = filteredResults[Math.floor(Math.random() * filteredResults.length)]
+    
+    console.log(`✅ Target initial sélectionné: ${selectedTarget} (parmi ${filteredResults.length} résultats possibles)`)
+    return selectedTarget
+  }, [stats.level, config.operator, calculateAllPossibleResults, filterResultsByDifficulty])
+
+  // 🔍 VÉRIFICATION DE SOLVABILITÉ EN TEMPS RÉEL
+  const checkCurrentSolvability = useCallback(() => {
+    // 🧮 Extraire tous les nombres actuellement dans la grille
+    const currentNumbers: number[] = []
+    grid.forEach(row => {
+      row.forEach(cell => {
+        if (cell.value !== null) {
+          currentNumbers.push(cell.value)
+        }
+      })
+    })
+    
+    if (currentNumbers.length === 0) {
+      return { isSolvable: false, reason: 'Grille vide' }
+    }
+    
+    // 🧮 CALCULER tous les résultats possibles avec les nombres restants
+    const possibleResults = calculateAllPossibleResults(currentNumbers, config.operator)
+    
+    if (possibleResults.length === 0) {
+      return { isSolvable: false, reason: 'Aucun résultat possible' }
+    }
+    
+    // 🎯 VÉRIFIER si le target actuel est atteignable
+    const isCurrentTargetSolvable = possibleResults.includes(target)
+    
+    if (!isCurrentTargetSolvable) {
+      console.warn(`⚠️ Target ${target} non atteignable avec les nombres restants: [${currentNumbers.join(', ')}]`)
+      console.log(`📊 Résultats possibles: [${possibleResults.join(', ')}]`)
+      return { 
+        isSolvable: false, 
+        reason: `Target ${target} non atteignable`,
+        possibleResults,
+        currentNumbers
+      }
+    }
+    
+    return { 
+      isSolvable: true, 
+      possibleResults, 
+      currentNumbers,
+      currentTarget: target
+    }
+  }, [grid, target, config.operator, calculateAllPossibleResults])
+
+  // 🔍 SURVEILLANCE DE LA SOLVABILITÉ EN TEMPS RÉEL
+  useEffect(() => {
+    if (gameState === 'playing' && grid.length > 0) {
+      const solvability = checkCurrentSolvability()
+      
+      if (!solvability.isSolvable && solvability.reason !== 'Grille vide') {
+        console.warn(`🚨 PROBLÈME DE SOLVABILITÉ DÉTECTÉ: ${solvability.reason}`)
+        // Corriger automatiquement le target
+        updateTargetFromCurrentGrid()
+      }
+    }
+  }, [grid, target, gameState, checkCurrentSolvability, updateTargetFromCurrentGrid])
+
+  // 🔍 FONCTION DE DEBUG : Afficher l'état complet de la grille
+  const debugGridState = useCallback(() => {
+    const currentNumbers: number[] = []
+    grid.forEach(row => {
+      row.forEach(cell => {
+        if (cell.value !== null) {
+          currentNumbers.push(cell.value)
+        }
+      })
+    })
+    
+    const possibleResults = calculateAllPossibleResults(currentNumbers, config.operator)
+    const solvability = checkCurrentSolvability()
+    
+    console.log('🔍 ÉTAT COMPLET DE LA GRILLE:')
+    console.log(`📊 Nombres dans la grille: [${currentNumbers.join(', ')}]`)
+    console.log(`🎯 Target actuel: ${target}`)
+    console.log(`🧮 Opérateur: ${config.operator}`)
+    console.log(`📈 Résultats possibles: [${possibleResults.join(', ')}]`)
+    console.log(`✅ Solvabilité: ${solvability.isSolvable ? 'OUI' : 'NON'} - ${solvability.reason || 'OK'}`)
+    console.log(`🎮 Niveau: ${stats.level} (Tier ${Math.floor((stats.level - 1) / 10) + 1})`)
+    console.log(`🎯 Précision: ${stats.accuracy}%`)
+    console.log(`❌ Erreurs consécutives: ${consecutiveErrors}`)
+    console.log(`🔥 Combo: ${stats.combo}`)
+    console.log(`⭐ Score: ${stats.score}`)
+    
+    return {
+      currentNumbers,
+      target,
+      operator: config.operator,
+      possibleResults,
+      solvability,
+      level: stats.level,
+      accuracy: stats.accuracy,
+      consecutiveErrors,
+      combo: stats.combo,
+      score: stats.score
+    }
+  }, [grid, target, config.operator, stats.level, stats.accuracy, stats.combo, stats.score, consecutiveErrors, calculateAllPossibleResults, checkCurrentSolvability])
+
+  // 🔧 DÉTECTER SI LES PARAMÈTRES AFFECTENT LE JEU
+  const hasGameAffectingChanges = useCallback((newConfig: GameConfig, oldConfig: GameConfig): boolean => {
+    // Paramètres qui affectent la génération de la grille
+    const gameAffectingParams = ['operator', 'difficulty', 'gridSize']
+    
+    for (const param of gameAffectingParams) {
+      if (newConfig[param as keyof GameConfig] !== oldConfig[param as keyof GameConfig]) {
+        console.log(`🔄 Changement détecté: ${param} (${oldConfig[param as keyof GameConfig]} → ${newConfig[param as keyof GameConfig]})`)
+        return true
+      }
+    }
+    
+    console.log('✅ Aucun changement affectant le jeu détecté')
+    return false
+  }, [])
+
+  // 🔧 GESTION INTELLIGENTE DES CHANGEMENTS DE CONFIG
+  const handleConfigChange = useCallback((newConfig: GameConfig) => {
+    const hasChanges = hasGameAffectingChanges(newConfig, previousConfig)
+    
+    if (hasChanges && gameState === 'playing') {
+      console.log('🔄 Paramètres affectant le jeu modifiés, regénération de la grille...')
+      setConfig(newConfig)
+      setPreviousConfig(newConfig)
+      // Regénérer la grille seulement si nécessaire
+      initializeGridWithNumbers()
+    } else {
+      console.log('✅ Paramètres non-affectants modifiés, pas de regénération')
+      setConfig(newConfig)
+      setPreviousConfig(newConfig)
+    }
+  }, [hasGameAffectingChanges, previousConfig, gameState, initializeGridWithNumbers])
+  
+  // 🧠 GÉNÉRATION INTELLIGENTE : Nombres qui permettent d'atteindre le target
+  const generateRandomNumber = useCallback(() => {
+    const difficultyTier = Math.floor((stats.level - 1) / 10) + 1
+    
+    console.log(`🎲 Génération INTELLIGENTE - Niveau: ${stats.level}, Opérateur: ${config.operator}, Target: ${target}`)
+    
+    // 🎯 LOGIQUE INTELLIGENTE par opérateur
+    switch (config.operator) {
+      case 'ADD':
+        return generateNumberForAddition(target, difficultyTier)
+      
+      case 'SUB':
+        return generateNumberForSubtraction(target, difficultyTier)
+      
+      case 'MUL':
+        return generateNumberForMultiplication(target, difficultyTier)
+      
+      case 'DIV':
+        return generateNumberForDivision(target, difficultyTier)
+      
+      case 'MIXED':
+        // Pour MIXED, on génère des nombres qui peuvent servir à plusieurs opérations
+        return generateNumberForMixed(target, difficultyTier)
+      
+      default:
+        return Math.floor(Math.random() * 10) + 1
+    }
+  }, [stats.level, target, config.operator])
+
+
+  // ➕ Génération pour ADDITION
+  const generateNumberForAddition = (target: number, tier: number): number => {
+    if (tier === 1) {
+      // Facile: nombres 1-20, max = target-1
+      const maxValue = Math.min(20, Math.max(1, target - 1))
+      return Math.floor(Math.random() * maxValue) + 1
+    } else if (tier === 2) {
+      // Moyen: nombres 1-50, max = target-1
+      const maxValue = Math.min(50, Math.max(1, target - 1))
+      return Math.floor(Math.random() * maxValue) + 1
+    } else {
+      // Difficile: nombres 1-200, max = target-1
+      const maxValue = Math.min(200, Math.max(1, target - 1))
+      return Math.floor(Math.random() * maxValue) + 1
+    }
+  }
+
+  // ➖ Génération pour SOUSTRACTION
+  const generateNumberForSubtraction = (target: number, tier: number): number => {
+    if (tier === 1) {
+      // Facile: nombres 1-20, doit permettre |a-b| = target
+      return Math.floor(Math.random() * 20) + 1
+    } else if (tier === 2) {
+      // Moyen: nombres 1-50
+      return Math.floor(Math.random() * 50) + 1
+    } else {
+      // Difficile: nombres 1-200
+      return Math.floor(Math.random() * 200) + 1
+    }
+  }
+
+  // ✖️ Génération pour MULTIPLICATION
+  const generateNumberForMultiplication = (target: number, tier: number): number => {
+    // 🎯 CRUCIAL: Générer des facteurs qui peuvent faire le target
+    const factors = getFactors(target)
+    
+    if (factors.length === 0) {
+      // Target premier, générer des nombres qui peuvent s'additionner pour l'atteindre
+      return generateNumberForAddition(target, tier)
+    }
+    
+    // Choisir un facteur aléatoire
+    const randomFactor = factors[Math.floor(Math.random() * factors.length)]
+    
+    // Ajuster selon le tier
+    if (tier === 1 && randomFactor > 20) {
+      return Math.floor(Math.random() * 20) + 1
+    } else if (tier === 2 && randomFactor > 50) {
+      return Math.floor(Math.random() * 50) + 1
+    } else if (tier >= 3 && randomFactor > 200) {
+      return Math.floor(Math.random() * 200) + 1
+    }
+    
+    return randomFactor
+  }
+
+  // ➗ Génération pour DIVISION
+  const generateNumberForDivision = (target: number, tier: number): number => {
+    // 🎯 CRUCIAL: Générer des nombres qui peuvent diviser pour donner le target
+    // Si target = 15, on peut avoir 30/2, 45/3, 60/4, etc.
+    const possibleDivisors = []
+    
+    for (let i = 1; i <= 20; i++) {
+      const dividend = target * i
+      if (tier === 1 && dividend <= 100) possibleDivisors.push(i)
+      else if (tier === 2 && dividend <= 500) possibleDivisors.push(i)
+      else if (tier >= 3 && dividend <= 2000) possibleDivisors.push(i)
+    }
+    
+    if (possibleDivisors.length > 0) {
+      return possibleDivisors[Math.floor(Math.random() * possibleDivisors.length)]
+    }
+    
+    // Fallback: nombre aléatoire dans la plage du tier
+    if (tier === 1) return Math.floor(Math.random() * 20) + 1
+    else if (tier === 2) return Math.floor(Math.random() * 50) + 1
+    else return Math.floor(Math.random() * 200) + 1
+  }
+
+  // 🔀 Génération pour MIXED
+  const generateNumberForMixed = (target: number, tier: number): number => {
+    // Pour MIXED, on génère des nombres polyvalents
+    const operations = ['ADD', 'MUL'] // Focus sur les plus courantes
+    const randomOp = operations[Math.floor(Math.random() * operations.length)]
+    
+    if (randomOp === 'ADD') {
+      return generateNumberForAddition(target, tier)
+    } else {
+      return generateNumberForMultiplication(target, tier)
+    }
+  }
+
   
   // Générer des nombres complexes pour les niveaux élevés
   const generateComplexNumber = useCallback(() => {
@@ -399,119 +1060,73 @@ export default function CubeMatchUnified({
     }
   }, [stats.level])
   
-  // Initialiser la grille avec des nombres - VERSION SIMPLIFIÉE
-  const initializeGridWithNumbers = useCallback(() => {
-    console.log('🏗️ Création de la grille avec nombres...')
+
+  // 🎲 Générer des nombres aléatoires pour la grille selon le niveau
+  const generateRandomGridNumbers = useCallback((tier: number, totalCells: number): number[] => {
+    const numbers: number[] = []
+    const numbersToGenerate = Math.floor(totalCells * 0.7) // 70% de la grille
     
-    // Créer la grille directement avec des nombres
-    const newGrid: Cell[][] = []
-    const totalCells = config.gridSize * config.gridSize
-    const numbersToSpawn = Math.floor(totalCells * 0.7) // 70% de la grille pour commencer avec plus de nombres
+    console.log(`🎲 Génération ${numbersToGenerate} nombres pour tier ${tier}`)
     
-    // Créer toutes les cellules
-    for (let row = 0; row < config.gridSize; row++) {
-      newGrid[row] = []
-      for (let col = 0; col < config.gridSize; col++) {
-        newGrid[row][col] = {
-          id: `${row}-${col}`,
-          row,
-          col,
-          value: null,
-          bornAt: Date.now()
+    for (let i = 0; i < numbersToGenerate; i++) {
+      let randomNumber: number
+      
+      if (tier === 1) {
+        // 🟢 FACILE: Principalement 1-10, quelques 11-15
+        if (Math.random() < 0.8) {
+          randomNumber = Math.floor(Math.random() * 10) + 1 // 80% chance: 1-10
+        } else {
+          randomNumber = Math.floor(Math.random() * 5) + 11 // 20% chance: 11-15
+        }
+      } else if (tier === 2) {
+        // 🟡 MOYEN: Mélange 1-20 et 21-40
+        if (Math.random() < 0.6) {
+          randomNumber = Math.floor(Math.random() * 20) + 1 // 60% chance: 1-20
+        } else {
+          randomNumber = Math.floor(Math.random() * 20) + 21 // 40% chance: 21-40
+        }
+      } else {
+        // 🔴 DIFFICILE: Principalement 20-100, quelques 101-200
+        if (Math.random() < 0.7) {
+          randomNumber = Math.floor(Math.random() * 81) + 20 // 70% chance: 20-100
+        } else {
+          randomNumber = Math.floor(Math.random() * 100) + 101 // 30% chance: 101-200
         }
       }
+      
+      numbers.push(randomNumber)
     }
     
-    // Ajouter des nombres aléatoirement
-    const positions: {row: number, col: number}[] = []
-    for (let row = 0; row < config.gridSize; row++) {
-      for (let col = 0; col < config.gridSize; col++) {
-        positions.push({ row, col })
-      }
-    }
-    
-    // Mélanger les positions
-    for (let i = positions.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [positions[i], positions[j]] = [positions[j], positions[i]]
-    }
-    
-    // Ajouter des nombres aux premières positions
-    for (let i = 0; i < numbersToSpawn; i++) {
-      const { row, col } = positions[i]
-      // Utiliser des nombres complexes pour certains spawns (20% de chance)
-      const useComplexNumber = Math.random() < 0.2 && stats.level >= 10
-      const newValue = useComplexNumber ? generateComplexNumber() : generateRandomNumber()
-      newGrid[row][col].value = newValue
-      newGrid[row][col].bornAt = Date.now()
-      console.log(`🎲 Nombre ${newValue} ajouté à [${row},${col}]`)
-    }
-    
-    console.log(`✅ Grille créée avec ${numbersToSpawn} nombres sur ${totalCells} cellules`)
-    setGrid(newGrid)
-  }, [config.gridSize, generateRandomNumber, generateComplexNumber, stats.level])
+    console.log(`🎲 Nombres générés (Tier ${tier}): [${numbers.join(', ')}]`)
+    return numbers
+  }, [])
   
-  // Générer un nouveau target avec difficulté adaptative et l'âge
-  const generateTarget = useCallback(() => {
-    // Déterminer le palier de difficulté basé sur le niveau
-    const difficultyTier = Math.floor((stats.level - 1) / 10) + 1 // Palier 1, 2, 3, etc.
-    const levelInTier = ((stats.level - 1) % 10) + 1 // Niveau dans le palier (1-10)
+
+  
+  // 🎯 CALCULER LA PRÉCISION AVANCÉE avec tracking détaillé
+  const calculateAdvancedAccuracy = useCallback((currentAccuracy: number, isCorrect: boolean, consecutiveErrors: number) => {
+    // Précision de base
+    let newAccuracy = currentAccuracy
     
-    console.log(`🎯 Génération target - Niveau: ${stats.level}, Palier: ${difficultyTier}, Opérateur: ${config.operator}`)
-    
-    if (difficultyTier === 1) {
-      // Niveau FACILE - Targets de 5 à 20 SEULEMENT
-      let result = Math.floor(Math.random() * 16) + 5
-      
-      // Pour les multiplications, s'assurer que le target est atteignable
-      if (config.operator === 'MUL') {
-        // Générer un target qui peut être atteint par multiplication de petits nombres
-        const multipliers = [2, 3, 4, 5, 6, 7, 8, 9, 10]
-        const mult1 = multipliers[Math.floor(Math.random() * multipliers.length)]
-        const mult2 = Math.floor(Math.random() * 10) + 1
-        result = mult1 * mult2
-        if (result > 20) result = 20 // Limiter à 20 pour le niveau facile
+    if (isCorrect) {
+      // Bonus pour réussite après erreurs
+      if (consecutiveErrors > 0) {
+        const recoveryBonus = Math.min(consecutiveErrors * 2, 10) // Max +10% pour récupération
+        newAccuracy = Math.min(newAccuracy + recoveryBonus, 100)
+        console.log(`🔄 Bonus récupération: +${recoveryBonus}% après ${consecutiveErrors} erreurs`)
       }
-      
-      console.log(`🎯 Target FACILE (5-20) - Opérateur: ${config.operator}, Résultat: ${result}`)
-      return result
-    } else if (difficultyTier === 2) {
-      // Niveau MOYEN - Targets de 21 à 50 SEULEMENT
-      let result = Math.floor(Math.random() * 30) + 21
-      
-      // Pour les multiplications, s'assurer que le target est atteignable
-      if (config.operator === 'MUL') {
-        // Générer un target qui peut être atteint par multiplication de nombres moyens
-        const multipliers = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-        const mult1 = multipliers[Math.floor(Math.random() * multipliers.length)]
-        const mult2 = Math.floor(Math.random() * 5) + 2
-        result = mult1 * mult2
-        if (result > 50) result = 50 // Limiter à 50 pour le niveau moyen
-      }
-      
-      console.log(`🎯 Target MOYEN (21-50) - Opérateur: ${config.operator}, Résultat: ${result}`)
-      return result
     } else {
-      // Niveau DIFFICILE - Targets de 51+ SEULEMENT
-      let result = Math.floor(Math.random() * 150) + 51
-      
-      // Pour les multiplications, s'assurer que le target est atteignable
-      if (config.operator === 'MUL') {
-        // Générer un target qui peut être atteint par multiplication de nombres élevés
-        const multipliers = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-        const mult1 = multipliers[Math.floor(Math.random() * multipliers.length)]
-        const mult2 = Math.floor(Math.random() * 10) + 3
-        result = mult1 * mult2
-        if (result < 51) result = 51 // Garantir minimum 51 pour niveau difficile
-      }
-      
-      console.log(`🎯 Target DIFFICILE (51-200) - Opérateur: ${config.operator}, Résultat: ${result}`)
-      return result
+      // Pénalité pour erreur
+      const errorPenalty = Math.min(5 + (consecutiveErrors * 2), 15) // Max -15% pour erreurs répétées
+      newAccuracy = Math.max(newAccuracy - errorPenalty, 0)
+      console.log(`❌ Pénalité erreur: -${errorPenalty}% (erreurs consécutives: ${consecutiveErrors})`)
     }
-  }, [stats.level, config.operator])
-  
-  // Calculer les points avec handicaps et bonus de difficulté
-  const calculateAdvancedPoints = useCallback((cells: Cell[], isCorrect: boolean) => {
+    
+    return Math.round(newAccuracy)
+  }, [])
+
+  // 🎯 CALCULER LES POINTS AVEC PRÉCISION ET ÉVOLUTION
+  const calculateAdvancedPoints = useCallback((cells: Cell[], isCorrect: boolean, moveTimeMs?: number) => {
     if (!isCorrect) return 0
     
     const values = cells.map(cell => cell.value!).filter(v => v !== null)
@@ -519,9 +1134,38 @@ export default function CubeMatchUnified({
     const combo = stats.combo
     const level = stats.level
     const age = userAge
+    const currentAccuracy = stats.accuracy
     
     // Points de base
     let basePoints = numCells * 10
+    
+    // 🎯 BONUS DE PRÉCISION (nouveau!)
+    let accuracyBonus = 1.0
+    if (currentAccuracy >= 95) {
+      accuracyBonus = 1.5 // Précision excellente
+    } else if (currentAccuracy >= 85) {
+      accuracyBonus = 1.3 // Précision très bonne
+    } else if (currentAccuracy >= 75) {
+      accuracyBonus = 1.1 // Précision bonne
+    } else if (currentAccuracy < 50) {
+      accuracyBonus = 0.7 // Précision faible = pénalité
+    }
+    
+    // 🚀 BONUS DE VITESSE (nouveau!)
+    let speedBonus = 1.0
+    if (moveTimeMs !== undefined) {
+      if (moveTimeMs < 1000) {
+        speedBonus = 2.0 // Ultra rapide (< 1s)
+      } else if (moveTimeMs < 2000) {
+        speedBonus = 1.5 // Rapide (< 2s)
+      } else if (moveTimeMs < 3000) {
+        speedBonus = 1.2 // Moyen (< 3s)
+      } else if (moveTimeMs < 5000) {
+        speedBonus = 1.0 // Normal (< 5s)
+      } else {
+        speedBonus = 0.8 // Lent (> 5s)
+      }
+    }
     
     // Multiplicateur de combo
     const comboMultiplier = 1 + (combo * 0.2)
@@ -546,15 +1190,29 @@ export default function CubeMatchUnified({
     const valueRange = maxValue - minValue
     const difficultyBonus = 1 + (valueRange / 50) // Plus les nombres sont éloignés, plus c'est difficile
     
-    // Bonus de complexité du calcul
+    // 🎯 BONUS DE COMPLEXITÉ PAR OPÉRATION (révisé)
     let complexityBonus = 1
-    if (config.operator === 'MUL') {
-      complexityBonus = 1.5 // Multiplication plus difficile
-    } else if (config.operator === 'DIV') {
-      complexityBonus = 1.8 // Division encore plus difficile
-    } else if (config.operator === 'MIXED') {
-      complexityBonus = 2.0 // Mixte le plus difficile
+    switch (config.operator) {
+      case 'ADD':
+        complexityBonus = 1.0 // Addition la plus simple
+        break
+      case 'SUB':
+        complexityBonus = 1.2 // Soustraction un peu plus difficile
+        break
+      case 'MUL':
+        complexityBonus = 1.5 // Multiplication plus difficile
+        break
+      case 'DIV':
+        complexityBonus = 2.0 // Division la plus difficile (résultats entiers)
+        break
+      case 'MIXED':
+        complexityBonus = 1.8 // Mixte difficile mais pas autant que division
+        break
+      default:
+        complexityBonus = 1.0
     }
+    
+    console.log(`🎯 Bonus complexité ${config.operator}: x${complexityBonus}`)
     
     // Handicap d'âge (plus l'utilisateur est jeune, plus les points sont élevés)
     const ageHandicap = age < 8 ? 1.5 : age < 12 ? 1.2 : 1.0
@@ -569,16 +1227,26 @@ export default function CubeMatchUnified({
       targetDifficultyBonus = 1.0 // Niveau facile (≤20)
     }
     
-    // Calcul final
-    const finalPoints = Math.round(
-      basePoints * 
+    // Calcul des multiplicateurs totaux
+    const totalMultiplier = 
       comboMultiplier * 
       levelMultiplier * 
       difficultyBonus * 
       complexityBonus * 
       ageHandicap * 
-      targetDifficultyBonus
-    )
+      targetDifficultyBonus *
+      speedBonus * // 🚀 Bonus de vitesse ajouté
+      accuracyBonus // 🎯 Bonus de précision ajouté
+    
+    // 🎯 CAP DE BONUS : Limiter à 2.5x le basePoints maximum
+    const MAX_BONUS_MULTIPLIER = 2.5
+    const cappedMultiplier = Math.min(totalMultiplier, MAX_BONUS_MULTIPLIER)
+    
+    // Calcul final avec cap appliqué
+    const finalPoints = Math.round(basePoints * cappedMultiplier)
+    
+    // Indicateur si le cap a été atteint
+    const wasCapped = totalMultiplier > MAX_BONUS_MULTIPLIER
     
     console.log(`🎯 Calcul de points avancé:`, {
       niveau: level,
@@ -591,7 +1259,14 @@ export default function CubeMatchUnified({
       complexityBonus: complexityBonus.toFixed(2),
       ageHandicap: ageHandicap.toFixed(2),
       targetDifficultyBonus: targetDifficultyBonus.toFixed(2),
-      finalPoints
+      speedBonus: speedBonus.toFixed(2),
+      accuracyBonus: accuracyBonus.toFixed(2),
+      totalMultiplier: totalMultiplier.toFixed(2),
+      cappedMultiplier: cappedMultiplier.toFixed(2),
+      wasCapped: wasCapped ? '⚠️ OUI (cap 2.5x appliqué)' : 'Non',
+      finalPoints,
+      moveTimeMs: moveTimeMs ? `${moveTimeMs}ms` : 'N/A',
+      currentAccuracy: `${currentAccuracy}%`
     })
     
     return finalPoints
@@ -655,44 +1330,85 @@ export default function CubeMatchUnified({
     })
   }, [gameState, config.gridSize, generateRandomNumber, generateComplexNumber, stats.level])
   
-  // Vérifier si une solution existe
+  // Vérifier si une solution existe (avec décompositions longues)
   const checkSolution = useCallback((cells: Cell[]): boolean => {
     if (cells.length < 2) return false
     
     const values = cells.map(cell => cell.value!).filter(v => v !== null)
     if (values.length < 2) return false
     
+    console.log(`🔍 Vérification solution avec ${values.length} nombres: [${values.join(', ')}] pour target ${target}`)
+    
     switch (config.operator) {
       case 'ADD':
-        return values.reduce((sum, val) => sum + val, 0) === target
+        // Addition: somme de tous les nombres
+        const sum = values.reduce((s, v) => s + v, 0)
+        const isAddValid = sum === target
+        console.log(`➕ Addition: ${values.join(' + ')} = ${sum} (${isAddValid ? 'VALID' : 'INVALID'})`)
+        return isAddValid
+        
       case 'SUB':
-        return values.length === 2 && Math.abs(values[0] - values[1]) === target
-      case 'MUL':
-        // Vérifier que la multiplication donne un résultat entier et égal au target
-        const product = values.reduce((prod, val) => prod * val, 1)
-        return product === target && Number.isInteger(product)
-      case 'DIV':
-        // Vérifier que la division donne un résultat entier et égal au target
+        // Soustraction: seulement 2 nombres pour soustraction
         if (values.length !== 2) return false
+        const diff = Math.abs(values[0] - values[1])
+        const isSubValid = diff === target
+        console.log(`➖ Soustraction: |${values[0]} - ${values[1]}| = ${diff} (${isSubValid ? 'VALID' : 'INVALID'})`)
+        return isSubValid
+        
+      case 'MUL':
+        // Multiplication: produit de tous les nombres
+        const product = values.reduce((p, v) => p * v, 1)
+        const isMulValid = product === target && Number.isInteger(product)
+        console.log(`✖️ Multiplication: ${values.join(' × ')} = ${product} (${isMulValid ? 'VALID' : 'INVALID'})`)
+        return isMulValid
+        
+      case 'DIV':
+        // Division: seulement 2 nombres pour division
+        if (values.length !== 2) return false
+        
+        // Éviter la division par zéro
+        if (values[1] === 0 || values[0] === 0) return false
+        
         const div1 = values[0] / values[1]
         const div2 = values[1] / values[0]
-        return (Number.isInteger(div1) && div1 === target) || (Number.isInteger(div2) && div2 === target)
+        
+        // Vérifier que le résultat est un entier ET égal au target
+        const isValidDiv1 = Number.isInteger(div1) && div1 === target && div1 > 0
+        const isValidDiv2 = Number.isInteger(div2) && div2 === target && div2 > 0
+        
+        console.log(`➗ Division: ${values[0]} ÷ ${values[1]} = ${div1} (${isValidDiv1 ? 'VALID' : 'INVALID'})`)
+        console.log(`➗ Division: ${values[1]} ÷ ${values[0]} = ${div2} (${isValidDiv2 ? 'VALID' : 'INVALID'})`)
+        
+        return isValidDiv1 || isValidDiv2
+        
       case 'MIXED':
-        // Essayer toutes les opérations
-        const sum = values.reduce((s, v) => s + v, 0)
-        const diff = values.length === 2 ? Math.abs(values[0] - values[1]) : 0
-        const prod = values.reduce((p, v) => p * v, 1)
+        // Mixte: essayer toutes les opérations possibles
+        const mixedSum = values.reduce((s, v) => s + v, 0)
+        const mixedDiff = values.length === 2 ? Math.abs(values[0] - values[1]) : 0
+        const mixedProd = values.reduce((p, v) => p * v, 1)
         
         // Division seulement si elle donne un entier
-        let div = 0
+        let mixedDiv = 0
         if (values.length === 2) {
           const div1 = values[0] / values[1]
           const div2 = values[1] / values[0]
-          if (Number.isInteger(div1)) div = div1
-          else if (Number.isInteger(div2)) div = div2
+          if (Number.isInteger(div1) && div1 > 0) mixedDiv = div1
+          else if (Number.isInteger(div2) && div2 > 0) mixedDiv = div2
         }
         
-        return sum === target || diff === target || prod === target || div === target
+        const isMixedValid = mixedSum === target || mixedDiff === target || mixedProd === target || mixedDiv === target
+        
+        console.log(`🔀 Mixte:`)
+        console.log(`  ➕ Addition: ${values.join(' + ')} = ${mixedSum} (${mixedSum === target ? 'VALID' : 'INVALID'})`)
+        if (values.length === 2) {
+          console.log(`  ➖ Soustraction: |${values[0]} - ${values[1]}| = ${mixedDiff} (${mixedDiff === target ? 'VALID' : 'INVALID'})`)
+          console.log(`  ➗ Division: ${mixedDiv} (${mixedDiv === target ? 'VALID' : 'INVALID'})`)
+        }
+        console.log(`  ✖️ Multiplication: ${values.join(' × ')} = ${mixedProd} (${mixedProd === target ? 'VALID' : 'INVALID'})`)
+        console.log(`🔀 Résultat mixte: ${isMixedValid ? 'VALID' : 'INVALID'}`)
+        
+        return isMixedValid
+        
       default:
         return false
     }
@@ -702,11 +1418,66 @@ export default function CubeMatchUnified({
   const handleSubmit = useCallback((cells: Cell[] = selectedCells) => {
     if (gameState !== 'playing') return
     
+    // 🕐 Calculer le temps de mouvement
+    const moveStartTime = cells.length > 0 ? Math.min(...cells.map(c => c.bornAt)) : Date.now()
+    const moveTimeMs = Date.now() - moveStartTime
+    
     const isCorrectSolution = checkSolution(cells)
     
     if (isCorrectSolution) {
-      // Solution correcte - Nouveau système de points avancé
-      const points = calculateAdvancedPoints(cells, true)
+      // 🎯 NOUVEAU SYSTÈME - Utiliser le modèle de scoring adaptatif
+      let points: number
+      const isLongDecomposition = cells.length >= 3
+      
+      if (scoringModelRef.current) {
+        points = scoringModelRef.current.points({
+          level: stats.level,
+          difficulty: currentDifficulty,
+          timeSinceRoundStartMs: moveTimeMs,
+          currentCombo: stats.combo,
+          accuracy: stats.accuracy,
+          isLongDecomposition
+        })
+      } else {
+        // Fallback au système existant
+        points = calculateAdvancedPoints(cells, true, moveTimeMs)
+      }
+      
+      // 🚀 GAIN DE TEMPS pour actions rapides
+      let timeBonus = 0
+      if (moveTimeMs < 2000) {
+        timeBonus = 3 // +3 secondes pour actions < 2s
+      } else if (moveTimeMs < 3000) {
+        timeBonus = 2 // +2 secondes pour actions < 3s
+      } else if (moveTimeMs < 5000) {
+        timeBonus = 1 // +1 seconde pour actions < 5s
+      }
+      
+      if (timeBonus > 0) {
+        console.log(`🚀 Bonus de temps: +${timeBonus}s pour action rapide (${moveTimeMs}ms)`)
+      }
+      
+      // 🎯 RÉINITIALISER les erreurs consécutives après succès
+      setConsecutiveErrors(0)
+      
+      // 🎯 NOUVEAU SYSTÈME - Enregistrer le round dans le collecteur de métriques
+      console.log('🎯 Enregistrement round réussi dans MetricsCollector:', !!metricsCollectorRef.current)
+      if (metricsCollectorRef.current) {
+        const selectedValues = cells.map(c => c.value!).filter(v => v !== null)
+        metricsCollectorRef.current.endRound({
+          wasSuccess: true,
+          selectedNumbers: selectedValues,
+          pointsEarned: points,
+          combo: stats.combo + 1,
+          accuracy: stats.accuracy
+        })
+        console.log('✅ Round enregistré:', selectedValues, '→', points, 'points')
+        
+        // Mettre à jour niveau et combo dans le collecteur
+        metricsCollectorRef.current.updateLevelAndCombo(stats.level, stats.combo + 1)
+      } else {
+        console.warn('⚠️ MetricsCollector non disponible pour endRound (succès)')
+      }
       
       // Batch les mises à jour de stats pour éviter les re-renders multiples
       setStats(prev => {
@@ -715,6 +1486,9 @@ export default function CubeMatchUnified({
         const newCombo = prev.combo + 1
         const newScore = prev.score + points
         const newLevel = Math.floor(newScore / 1000) + 1
+        
+        // 🎯 CALCULER LA NOUVELLE PRÉCISION AVANCÉE
+        const newAccuracy = calculateAdvancedAccuracy(prev.accuracy, true, consecutiveErrors)
         
         // Vérifier passage de niveau
         if (newLevel > prev.level) {
@@ -736,6 +1510,20 @@ export default function CubeMatchUnified({
           localStorage.setItem('cubematch-session-best', newScore.toString())
         }
         
+        // 🎯 NOUVEAU SYSTÈME - Mettre à jour la difficulté adaptative
+        if (difficultyModelRef.current) {
+          const newDifficulty = difficultyModelRef.current.update({
+            prev: currentDifficulty,
+            level: newLevel,
+            age: userAge || 6,
+            wasSuccess: true,
+            accuracyWindow: newAccuracy / 100,
+            consecutiveErrors: 0
+          })
+          setCurrentDifficulty(newDifficulty)
+          console.log(`📊 Difficulté mise à jour: ${currentDifficulty.toFixed(2)} → ${newDifficulty.toFixed(2)}`)
+        }
+        
         return {
           ...prev,
           score: newScore,
@@ -745,7 +1533,8 @@ export default function CubeMatchUnified({
           cellsCleared: prev.cellsCleared + cells.length,
           successfulMoves: newSuccessfulMoves,
           totalMoves: newTotalMoves,
-          accuracy: Math.round((newSuccessfulMoves / newTotalMoves) * 100)
+          accuracy: newAccuracy, // 🎯 Utiliser la précision avancée
+          timeLeft: Math.min(prev.timeLeft + timeBonus, config.unlimitedTime ? 999999 : config.timeLimit) // 🚀 Ajouter le bonus de temps
         }
       })
       
@@ -765,8 +1554,11 @@ export default function CubeMatchUnified({
         return newGrid
       })
       
-      // Générer un nouveau target (non-bloquant)
-      requestAnimationFrame(() => setTarget(generateTarget()))
+      // 🎯 RECALCULER LE TARGET DYNAMIQUEMENT après chaque coup réussi
+      requestAnimationFrame(() => {
+        console.log('🔄 Recalcul dynamique du target après coup réussi...')
+        updateTargetFromCurrentGrid()
+      })
       
       // Gestion du tutoriel
       if (isTutorialMode && tutorialStep === 0) {
@@ -783,15 +1575,51 @@ export default function CubeMatchUnified({
       }
       
     } else {
-      // Solution incorrecte - Batch les mises à jour
+      // Solution incorrecte - Gestion avancée des erreurs
+      const newConsecutiveErrors = consecutiveErrors + 1
+      setConsecutiveErrors(newConsecutiveErrors)
+      
+      console.log(`❌ Erreur détectée! Erreurs consécutives: ${newConsecutiveErrors}`)
+      
+      // 🎯 NOUVEAU SYSTÈME - Enregistrer l'erreur dans le collecteur de métriques
+      if (metricsCollectorRef.current) {
+        const selectedValues = cells.map(c => c.value!).filter(v => v !== null)
+        metricsCollectorRef.current.endRound({
+          wasSuccess: false,
+          selectedNumbers: selectedValues,
+          pointsEarned: 0,
+          combo: 0,
+          accuracy: stats.accuracy
+        })
+      }
+      
+      // 🎯 BAISSER SEULEMENT LA PRÉCISION (pas de vies ni temps)
       setStats(prev => {
         const newTotalMoves = prev.totalMoves + 1
+        
+        // 🎯 CALCULER LA NOUVELLE PRÉCISION AVANCÉE avec pénalité
+        const newAccuracy = calculateAdvancedAccuracy(prev.accuracy, false, newConsecutiveErrors)
+        
+        // 🎯 NOUVEAU SYSTÈME - Mettre à jour la difficulté adaptative (avec échec)
+        if (difficultyModelRef.current) {
+          const newDifficulty = difficultyModelRef.current.update({
+            prev: currentDifficulty,
+            level: prev.level,
+            age: userAge || 6,
+            wasSuccess: false,
+            accuracyWindow: newAccuracy / 100,
+            consecutiveErrors: newConsecutiveErrors
+          })
+          setCurrentDifficulty(newDifficulty)
+          console.log(`📊 Difficulté ajustée après erreur: ${currentDifficulty.toFixed(2)} → ${newDifficulty.toFixed(2)}`)
+        }
+        
         return {
           ...prev,
-          combo: 0,
-          lives: prev.lives - 1,
+          combo: 0, // Reset combo seulement
           totalMoves: newTotalMoves,
-          accuracy: Math.round((prev.successfulMoves / newTotalMoves) * 100)
+          accuracy: newAccuracy
+          // PAS de modification des lives ni timeLeft
         }
       })
       
@@ -803,7 +1631,7 @@ export default function CubeMatchUnified({
     
     // Nettoyer la sélection
     setSelectedCells([])
-  }, [gameState, selectedCells, checkSolution, calculateAdvancedPoints, config.soundEnabled, generateTarget, isTutorialMode, tutorialStep])
+  }, [gameState, selectedCells, checkSolution, calculateAdvancedPoints, config.soundEnabled, initializeGridWithNumbers, isTutorialMode, tutorialStep])
   
   // Gérer la sélection de cellules
   const handleCellClick = useCallback((cell: Cell) => {
@@ -819,16 +1647,112 @@ export default function CubeMatchUnified({
         // Sélectionner
         const newSelection = [...prev, cell]
         
-        // Vérifier automatiquement si c'est une solution (minimum 2 cellules)
-        if (config.autoSubmit && newSelection.length >= 2 && checkSolution(newSelection)) {
-          console.log('🎯 AUTO-VALIDATION: Solution détectée automatiquement!')
-          setTimeout(() => handleSubmit(newSelection), 100)
+        // 🎯 NOUVEAU SYSTÈME DE VALIDATION AVEC TIMER
+        if (newSelection.length === 1) {
+          // Premier clic - démarrer une nouvelle série
+          console.log('🎯 Premier clic - Démarrage d\'une nouvelle série de calculs')
+          startNewSeries()
+          return newSelection
+        }
+        
+        if (newSelection.length >= 2) {
+          // Vérifier si c'est une solution valide
+          const isCorrect = checkSolution(newSelection)
+          const values = newSelection.map(c => c.value!).filter(v => v !== null)
+          
+          if (isCorrect) {
+            console.log(`✅ Solution correcte détectée: [${values.join(', ')}]`)
+            
+            // Arrêter le timer et valider
+            if (currentSeries.timerId) {
+              clearTimeout(currentSeries.timerId)
+              setTimeRemaining(0) // Arrêter le timer visuel
+            }
+            
+            // Enregistrer la tentative correcte dans le collecteur
+            if (seriesCollectorRef.current) {
+              const responseTime = Date.now() - currentSeries.startTime
+              const isLongDecomposition = values.length >= 3
+              
+              seriesCollectorRef.current.recordAttempt(
+                values,
+                target,
+                config.operator,
+                true,
+                responseTime,
+                'correct',
+                isLongDecomposition
+              )
+            }
+            
+            // Mettre à jour la série
+            setCurrentSeries(prev => ({
+              ...prev,
+              attempts: prev.attempts + 1,
+              correct: prev.correct + 1,
+              timerId: null
+            }))
+            
+            // Calculer la précision de la série
+            const seriesAccuracy = ((currentSeries.correct + 1) / (currentSeries.attempts + 1)) * 100
+            
+            // Mettre à jour les stats avec la précision de la série
+            setStats(prev => ({
+              ...prev,
+              accuracy: seriesAccuracy,
+              totalMoves: prev.totalMoves + 1,
+              successfulMoves: prev.successfulMoves + 1
+            }))
+            
+            // Valider la solution
+            setTimeout(() => handleSubmit(newSelection), 100)
+          } else {
+            // Solution incorrecte
+            console.log(`❌ Solution incorrecte: [${values.join(', ')}]`)
+            
+            // Enregistrer la tentative incorrecte dans le collecteur
+            if (seriesCollectorRef.current) {
+              const responseTime = Date.now() - currentSeries.startTime
+              const isLongDecomposition = values.length >= 3
+              
+              seriesCollectorRef.current.recordAttempt(
+                values,
+                target,
+                config.operator,
+                false,
+                responseTime,
+                'incorrect',
+                isLongDecomposition
+              )
+            }
+            
+            // Mettre à jour la série
+            setCurrentSeries(prev => ({
+              ...prev,
+              attempts: prev.attempts + 1
+            }))
+            
+            // Calculer la nouvelle précision de la série
+            const newSeriesAccuracy = (currentSeries.correct / (currentSeries.attempts + 1)) * 100
+            
+            // Mettre à jour les stats
+            setStats(prev => ({
+              ...prev,
+              accuracy: newSeriesAccuracy,
+              totalMoves: prev.totalMoves + 1
+            }))
+            
+            // Nettoyer la sélection après l'erreur
+            setTimeout(() => {
+              setSelectedCells([])
+            }, 500)
+          }
         }
         
         return newSelection
       }
     })
-  }, [gameState, config.autoSubmit, checkSolution, handleSubmit])
+  }, [gameState, checkSolution, handleSubmit, startNewSeries, currentSeries])
   
   // Utiliser un indice
   const useHint = useCallback(() => {
@@ -887,9 +1811,10 @@ export default function CubeMatchUnified({
     // Optimisation: réduire le nombre de particules pour de meilleures performances
     const particleCount = isMobile ? 3 : 5
     const timestamp = Date.now()
+    const randomSuffix = Math.random().toString(36).substr(2, 9) // Ajout d'un ID unique
     
     const newParticles = Array.from({ length: particleCount }, (_, i) => ({
-      id: `particle-${timestamp}-${i}`,
+      id: `particle-${timestamp}-${randomSuffix}-${i}`, // ID garantit unique
       x: x + (Math.random() - 0.5) * (isMobile ? 60 : 100),
       y: y + (Math.random() - 0.5) * (isMobile ? 60 : 100)
     }))
@@ -923,6 +1848,26 @@ export default function CubeMatchUnified({
     console.log('🎮 Démarrage du jeu CubeMatch...')
     console.log('📊 Config actuelle:', config)
     
+    // Initialiser le collecteur de séries
+    const sessionId = `cubematch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    seriesCollectorRef.current = new SeriesCollector(sessionId)
+    console.log('🎯 Collecteur de séries initialisé:', sessionId)
+    
+    // 🎯 NOUVEAU SYSTÈME - Initialiser les modèles adaptatifs
+    const age = userAge || 6
+    console.log('🎯 Initialisation MetricsCollector avec sessionId:', sessionId, 'age:', age)
+    metricsCollectorRef.current = new MetricsCollector(sessionId, age, 1.0)
+    difficultyModelRef.current = AdaptiveModelsFactory.createDifficultyModel(age)
+    scoringModelRef.current = AdaptiveModelsFactory.createScoringModel(age)
+    timerModelRef.current = AdaptiveModelsFactory.createTimerModel(age)
+    setCurrentDifficulty(1.0)
+    console.log('✅ Modèles adaptatifs initialisés:', {
+      metricsCollector: !!metricsCollectorRef.current,
+      difficultyModel: !!difficultyModelRef.current,
+      scoringModel: !!scoringModelRef.current,
+      timerModel: !!timerModelRef.current
+    })
+    
     setGameState('playing')
     setGameStartTime(Date.now())
     setStats({
@@ -940,11 +1885,8 @@ export default function CubeMatchUnified({
       timePlayedMs: 0
     })
     
-    const newTarget = generateTarget()
-    console.log('🎯 Nouveau target généré:', newTarget)
-    setTarget(newTarget)
-    
-    console.log('🏗️ Initialisation de la grille avec nombres...')
+    console.log('🏗️ Initialisation de la grille avec NOUVELLE LOGIQUE...')
+    // La nouvelle logique génère la grille ET le target en même temps
     initializeGridWithNumbers()
     
     // Timer principal
@@ -970,7 +1912,7 @@ export default function CubeMatchUnified({
     }, config.spawnRate)
     
     console.log('✅ Jeu démarré avec succès!')
-  }, [config, generateTarget, initializeGrid, spawnNumbers])
+  }, [config, initializeGridWithNumbers, spawnNumbers])
   
   // Terminer le jeu
   const endGame = useCallback(async () => {
@@ -983,8 +1925,53 @@ export default function CubeMatchUnified({
     // Calculer le temps joué
     const timePlayedMs = gameStartTime > 0 ? Date.now() - gameStartTime : 0
     
+    // 🛡️ Protection: ne sauvegarder que si le jeu a vraiment été joué
+    if (gameStartTime === 0) {
+      console.warn('⚠️ Jeu non démarré correctement - pas de sauvegarde')
+      return
+    }
+
+    if (stats.totalMoves === 0) {
+      console.warn('⚠️ Aucun mouvement enregistré — sauvegarde quand même pour diagnostic')
+    }
+    
     // Sauvegarder le score
     try {
+      // Calculer le temps moyen par move
+      const averageMoveTimeMs = stats.totalMoves > 0 
+        ? Math.round(timePlayedMs / stats.totalMoves) 
+        : 0
+      
+      // 🎯 NOUVEAU SYSTÈME - Récupérer les métriques du collecteur
+      let bubixMetrics: any = null
+      let sessionMetrics: any = null
+      
+      console.log('🔍 Vérification metricsCollectorRef:', !!metricsCollectorRef.current)
+      
+      if (metricsCollectorRef.current) {
+        try {
+          console.log('📊 Finalisation des métriques de session...')
+          sessionMetrics = metricsCollectorRef.current.finalizeSession(stats.score)
+          console.log('✅ SessionMetrics finalisées:', {
+            totalRounds: sessionMetrics.totalRounds,
+            accuracy: sessionMetrics.accuracy,
+            finalDifficulty: sessionMetrics.finalDifficulty
+          })
+          
+          console.log('🧠 Génération des métriques BubiX...')
+          bubixMetrics = metricsCollectorRef.current.generateBubiXMetrics()
+          console.log('✅ BubiXMetrics générées:', {
+            flowScore: bubixMetrics.flowScore,
+            engagementScore: bubixMetrics.engagementScore,
+            cognitivePatterns: bubixMetrics.cognitivePatterns
+          })
+        } catch (error) {
+          console.error('❌ Erreur collecte métriques:', error)
+        }
+      } else {
+        console.warn('⚠️ MetricsCollector non initialisé!')
+      }
+      
       const scoreData: ScoreData = {
         score: stats.score,
         level: stats.level,
@@ -1001,12 +1988,70 @@ export default function CubeMatchUnified({
         totalMoves: stats.totalMoves,
         successfulMoves: stats.successfulMoves,
         accuracyRate: stats.accuracy,
+        averageMoveTimeMs: averageMoveTimeMs,
         soundEnabled: config.soundEnabled,
-        hintsEnabled: config.hintsEnabled
+        hintsEnabled: config.hintsEnabled,
+        // 🎯 NOUVELLES MÉTRIQUES du système modulaire
+        initialDifficulty: 1.0,
+        finalDifficulty: currentDifficulty,
+        averageDifficulty: sessionMetrics?.averageDifficulty || currentDifficulty,
+        difficultyProgression: sessionMetrics?.difficultyProgression || [],
+        flowScore: bubixMetrics?.flowScore || 0,
+        engagementScore: bubixMetrics?.engagementScore || 0,
+        cognitiveProfile: bubixMetrics?.cognitivePatterns || {},
+        operatorDistribution: sessionMetrics?.operatorDistribution || {},
+        operatorAccuracy: sessionMetrics?.operatorAccuracy || {},
+        bubixMetrics: bubixMetrics || {},
+        recommendations: bubixMetrics?.recommendations || {},
+        consecutiveErrors: consecutiveErrors,
+        longDecompositionsCount: sessionMetrics?.longDecompositionsCount || 0
       }
       
-      await cubeMatchAPI.saveScore(scoreData)
-      console.log('✅ Score sauvegardé avec succès')
+      console.log('💾 Tentative de sauvegarde score:', scoreData)
+      console.log('📊 SessionMetrics:', sessionMetrics)
+      console.log('🧠 BubiXMetrics:', bubixMetrics)
+      
+      // Sauvegarder le score principal (service centralisé façon Bubix)
+      const saveResult = await cubeMatchService.saveScore(scoreData)
+      console.log('✅ Score sauvegardé avec succès, ID:', saveResult)
+      
+      // 🎯 Récupérer l'ID du score créé
+      const scoreId = saveResult?.scoreId
+      
+      // Envoyer les données de séries détaillées (si le score a été créé)
+      if (seriesCollectorRef.current && scoreId) {
+        try {
+          console.log('📊 Envoi des séries avec scoreId:', scoreId)
+          const seriesResult = await seriesCollectorRef.current.saveSession({
+            scoreId: scoreId, // 🎯 CORRECTION: Passer le scoreId pour éviter double insertion
+            score: stats.score,
+            level: stats.level,
+            operator: config.operator,
+            target: target,
+            difficulty: config.difficulty,
+            gridSize: config.gridSize,
+            allowDiagonals: config.allowDiagonals,
+            totalMoves: stats.totalMoves,
+            successfulMoves: stats.successfulMoves,
+            failedMoves: stats.totalMoves - stats.successfulMoves,
+            accuracyRate: stats.accuracy,
+            comboMax: stats.bestCombo,
+            cellsCleared: stats.cellsCleared,
+            hintsUsed: stats.hintsUsed,
+            consecutiveErrors: consecutiveErrors,
+            longDecompositionsCount: sessionMetrics?.longDecompositionsCount || 0,
+            autoValidationEnabled: true
+          })
+          
+          if (seriesResult.success) {
+            console.log('✅ Données de séries enregistrées avec succès:', seriesResult.scoreId)
+          } else {
+            console.warn('⚠️ Erreur enregistrement séries:', seriesResult.message)
+          }
+        } catch (error) {
+          console.error('❌ Erreur envoi données séries:', error)
+        }
+      }
       
       // Callback pour le parent
       if (onScoreSubmit) {
@@ -1015,8 +2060,11 @@ export default function CubeMatchUnified({
       
     } catch (error) {
       console.error('❌ Erreur sauvegarde score:', error)
+      
+      // 🎯 CORRECTION: Afficher un message d'erreur à l'utilisateur
+      alert('⚠️ Impossible de sauvegarder le score. Vérifie que le backend CubeMatch est accessible (BACKEND_URL).')
     }
-  }, [gameStartTime, stats, config, target, onScoreSubmit])
+  }, [gameStartTime, stats, config, target, onScoreSubmit, consecutiveErrors, currentDifficulty, userAge])
   
   // Mettre en pause
   const pauseGame = useCallback(() => {
@@ -1224,7 +2272,7 @@ export default function CubeMatchUnified({
                     {(['EASY', 'MEDIUM', 'HARD'] as Difficulty[]).map(diff => (
                       <button
                         key={diff}
-                        onClick={() => setConfig(prev => ({ ...prev, difficulty: diff }))}
+                        onClick={() => handleConfigChange({ ...config, difficulty: diff })}
                         className={`py-2 px-2 rounded-lg text-xs font-medium transition-colors ${
                           config.difficulty === diff
                             ? `bg-gradient-to-r ${currentTheme.primary} text-white`
@@ -1244,7 +2292,7 @@ export default function CubeMatchUnified({
                     {(['ADD', 'SUB', 'MUL', 'DIV', 'MIXED'] as Operator[]).map(op => (
                       <button
                         key={op}
-                        onClick={() => setConfig(prev => ({ ...prev, operator: op }))}
+                        onClick={() => handleConfigChange({ ...config, operator: op })}
                         className={`py-2 px-1 rounded-lg text-xs font-medium transition-colors ${
                           config.operator === op
                             ? `bg-gradient-to-r ${currentTheme.primary} text-white`
@@ -1267,7 +2315,7 @@ export default function CubeMatchUnified({
                     min="4"
                     max="8"
                     value={config.gridSize}
-                    onChange={(e) => setConfig(prev => ({ ...prev, gridSize: parseInt(e.target.value) }))}
+                    onChange={(e) => handleConfigChange({ ...config, gridSize: parseInt(e.target.value) })}
                     className="w-full"
                   />
                 </div>
@@ -1287,7 +2335,7 @@ export default function CubeMatchUnified({
                   <input
                     type="checkbox"
                     checked={!config.unlimitedTime}
-                    onChange={(e) => setConfig(prev => ({ ...prev, unlimitedTime: !e.target.checked }))}
+                    onChange={(e) => handleConfigChange({ ...config, unlimitedTime: !e.target.checked })}
                     className="w-4 h-4 text-blue-600 rounded"
                   />
                 </div>
@@ -1303,7 +2351,7 @@ export default function CubeMatchUnified({
                       max="300"
                       step="30"
                       value={config.timeLimit}
-                      onChange={(e) => setConfig(prev => ({ ...prev, timeLimit: parseInt(e.target.value) }))}
+                      onChange={(e) => handleConfigChange({ ...config, timeLimit: parseInt(e.target.value) })}
                       className="w-full"
                     />
                     <div className="flex justify-between text-xs text-gray-400 mt-1">
@@ -1345,7 +2393,7 @@ export default function CubeMatchUnified({
                   max="10000"
                   step="500"
                   value={config.spawnRate}
-                  onChange={(e) => setConfig(prev => ({ ...prev, spawnRate: parseInt(e.target.value) }))}
+                  onChange={(e) => handleConfigChange({ ...config, spawnRate: parseInt(e.target.value) })}
                   className="w-full"
                 />
                 <div className="flex justify-between text-xs text-gray-400 mt-1">
@@ -1368,7 +2416,7 @@ export default function CubeMatchUnified({
                   <input
                     type="checkbox"
                     checked={config.soundEnabled}
-                    onChange={(e) => setConfig(prev => ({ ...prev, soundEnabled: e.target.checked }))}
+                    onChange={(e) => handleConfigChange({ ...config, soundEnabled: e.target.checked })}
                     className="w-4 h-4 text-blue-600 rounded"
                   />
                 </div>
@@ -1378,7 +2426,7 @@ export default function CubeMatchUnified({
                   <input
                     type="checkbox"
                     checked={config.hintsEnabled}
-                    onChange={(e) => setConfig(prev => ({ ...prev, hintsEnabled: e.target.checked }))}
+                    onChange={(e) => handleConfigChange({ ...config, hintsEnabled: e.target.checked })}
                     className="w-4 h-4 text-blue-600 rounded"
                   />
                 </div>
@@ -1388,7 +2436,7 @@ export default function CubeMatchUnified({
                   <input
                     type="checkbox"
                     checked={config.allowDiagonals}
-                    onChange={(e) => setConfig(prev => ({ ...prev, allowDiagonals: e.target.checked }))}
+                    onChange={(e) => handleConfigChange({ ...config, allowDiagonals: e.target.checked })}
                     className="w-4 h-4 text-blue-600 rounded"
                   />
                 </div>
@@ -1406,7 +2454,7 @@ export default function CubeMatchUnified({
                 {(Object.keys(THEMES) as Array<keyof typeof THEMES>).map(theme => (
                   <button
                     key={theme}
-                    onClick={() => setConfig(prev => ({ ...prev, theme }))}
+                    onClick={() => handleConfigChange({ ...config, theme })}
                     className={`py-2 px-3 rounded-lg text-xs font-medium transition-colors capitalize ${
                       config.theme === theme
                         ? `bg-gradient-to-r ${THEMES[theme].primary} text-white`
@@ -1464,6 +2512,29 @@ export default function CubeMatchUnified({
               )}
             </div>
             
+            {/* Card Précision avec Timer */}
+            <div className="bg-gradient-to-br from-green-400 via-emerald-500 to-teal-500 border-2 border-green-500 rounded-2xl px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <div className="text-xl text-white font-bold flex items-center gap-2 mb-1">
+                <Star className="w-4 h-4" />
+                Précision
+              </div>
+              <div className="text-xl font-black text-white drop-shadow-lg">{stats.accuracy}%</div>
+              <div className={`text-lg font-semibold ${consecutiveErrors > 0 ? 'text-red-100' : 'text-green-100'}`}>
+                Erreurs: {consecutiveErrors}
+              </div>
+              {/* Timer et série en cours */}
+              {currentSeries.timerId && (
+                <div className="mt-2 pt-2 border-t border-green-300">
+                  <div className="text-sm text-green-100">
+                    Série: {currentSeries.correct}/{currentSeries.attempts}
+                  </div>
+                  <div className={`text-xs font-bold ${timeRemaining <= 2 ? 'text-red-200 animate-pulse' : 'text-green-200'}`}>
+                    Timer: {timeRemaining.toFixed(1)}s
+                  </div>
+                </div>
+              )}
+            </div>
+            
             {/* Card Niveau */}
             <div className="bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-500 border-2 border-blue-500 rounded-2xl px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
               <div className="text-xl text-white font-bold flex items-center gap-2 mb-1">
@@ -1491,22 +2562,23 @@ export default function CubeMatchUnified({
                 <div className="text-6xl font-black text-white drop-shadow-lg">∞</div>
               </div>
             )}
+                  
         </div>
+        
         
         {/* Section Centre - Objectif */}
         <div className="flex-1 flex justify-center items-center h-full">
-          <div className={`inline-flex items-center gap-3 bg-gradient-to-r ${currentTheme.primary} text-white px-6 py-2 rounded-2xl shadow-lg transform -translate-x-32 mt-20`}>
-            <Target className="w-5 h-5" />
-            <span className="text-lg font-bold text-white">Trouve le chiffre ({target}) en utilisant une opération</span>
-            <span className="text-lg font-bold text-white">
-              {config.operator === 'ADD' ? 'Addition' : 
-               config.operator === 'SUB' ? 'Soustraction' :
-               config.operator === 'MUL' ? 'Multiplication' :
-               config.operator === 'DIV' ? 'Division' : 'Mixte'}
-            </span>
-          </div>
-        </div>
-        
+                <div className={`inline-flex items-center gap-3 bg-gradient-to-r ${currentTheme.primary} text-white px-4 py-11 rounded-2xl shadow-lg transform -translate-x-32 mt-16 -ml-16`}>
+                  <Target className="w-8 h-8" />
+                  <span className="text-xl font-bold text-white">Trouve ({target}) avec une</span>
+                  <span className="text-xl font-bold text-white">
+                    {config.operator === 'ADD' ? 'Addition' : 
+                    config.operator === 'SUB' ? 'Soustraction' :
+                    config.operator === 'MUL' ? 'Multiplication' :
+                    config.operator === 'DIV' ? 'Division' : 'Mixte'}
+                  </span>
+                </div>
+              </div>
         {/* Section Droite - Actions et Contrôles */}
         <div className="flex items-center gap-3 h-full">
           <button
@@ -1790,6 +2862,16 @@ export default function CubeMatchUnified({
   // Rendu principal
   return (
     <div className="relative">
+      {/* 🔍 Bouton de debug (visible seulement en développement) */}
+      {process.env.NODE_ENV === 'development' && gameState === 'playing' && (
+        <button
+          onClick={debugGridState}
+          className="fixed bottom-4 right-4 "
+        >
+          
+        </button>
+      )}
+      
       {gameState === 'menu' && renderMenu()}
       {gameState === 'settings' && renderSettings()}
       {gameState === 'playing' && renderGame()}

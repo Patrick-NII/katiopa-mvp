@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
+import { BACKEND_URL } from '@/lib/config';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,9 +9,10 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get('limit') || '10';
     
     // Transférer la requête au backend avec les cookies d'authentification
+    const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie') || '';
     const backendResponse = await fetch(`${BACKEND_URL}/api/cubematch/user-scores?limit=${limit}`, {
       headers: {
-        'Cookie': request.headers.get('Cookie') || ''
+        'Cookie': cookieHeader
       }
     });
 
@@ -27,4 +29,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
-

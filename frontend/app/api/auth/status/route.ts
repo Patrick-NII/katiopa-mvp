@@ -1,16 +1,18 @@
 import { NextResponse, NextRequest } from 'next/server';
+import { BACKEND_URL } from '@/lib/config';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
     console.log('🔐 Vérification du statut d\'authentification...');
     
     // Transférer les cookies au backend pour vérification
+    const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie') || '';
     const backendResponse = await fetch(`${BACKEND_URL}/api/auth/verify`, {
       method: 'GET',
       headers: {
-        'Cookie': request.headers.get('Cookie') || ''
+        'Cookie': cookieHeader
       }
     });
 

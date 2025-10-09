@@ -18,9 +18,19 @@ const prisma = new PrismaClient();
 type Operator = 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'MIXED';
 
 /**
- * Types des compétences CubeAI
+ * Types des compétences du radar (doivent correspondre à l'enum Prisma CompetenceType)
+ * 
+ * RADAR À 8 CÔTÉS - COLLABORATION et REFLEXION_LOGIQUE temporairement désactivées
  */
-type CompetenceType = 'logique' | 'numerique' | 'vitesse' | 'problemes' | 'spatial' | 'verbal' | 'social';
+type CompetenceType = 
+  | 'MATHEMATIQUES'           // 1. Mathématiques
+  | 'PROGRAMMATION'           // 2. Programmation
+  | 'CREATIVITE'              // 3. Créativité
+  | 'CONCENTRATION'           // 4. Concentration
+  | 'RESOLUTION_PROBLEMES'    // 5. Résolution de problèmes
+  | 'COMMUNICATION'           // 6. Communication
+  | 'CONNAISSANCES_GENERALES' // 7. Connaissances générales
+  | 'SENS_CRITIQUE';          // 8. Sens critique
 
 /**
  * Structure de mapping opérateur → compétences
@@ -34,48 +44,49 @@ interface CubeMatchCompetenceMapping {
 }
 
 /**
- * 🗺️ Mapping des opérateurs vers les compétences
+ * 🗺️ Mapping des opérateurs vers les compétences du radar (8 côtés)
  * 
- * Logique:
- * - Addition/Soustraction → Logique mathématique
- * - Multiplication/Division → Calcul numérique
- * - Tous → Vitesse (temps de réaction)
+ * Logique CubeMatch → Compétences Radar:
+ * - Addition/Soustraction → Mathématiques + Concentration
+ * - Multiplication/Division → Mathématiques + Concentration (tables de multiplication)
+ * - Tous → Concentration (temps de réaction)
  * - Niveaux élevés → Résolution de problèmes
+ * - Mode MIXED → Résolution de problèmes + Sens critique
  */
 const OPERATOR_COMPETENCE_MAP: Record<Operator, CubeMatchCompetenceMapping> = {
   'ADD': {
     operator: 'ADD',
     competences: {
-      primary: 'logique',
-      secondary: ['numerique', 'vitesse']
+      primary: 'MATHEMATIQUES',
+      secondary: ['CONCENTRATION', 'SENS_CRITIQUE']
     }
   },
   'SUB': {
     operator: 'SUB',
     competences: {
-      primary: 'logique',
-      secondary: ['numerique', 'vitesse']
+      primary: 'MATHEMATIQUES',
+      secondary: ['CONCENTRATION', 'SENS_CRITIQUE']
     }
   },
   'MUL': {
     operator: 'MUL',
     competences: {
-      primary: 'numerique',
-      secondary: ['logique', 'vitesse']
+      primary: 'MATHEMATIQUES',
+      secondary: ['CONCENTRATION', 'RESOLUTION_PROBLEMES']
     }
   },
   'DIV': {
     operator: 'DIV',
     competences: {
-      primary: 'numerique',
-      secondary: ['logique', 'vitesse']
+      primary: 'MATHEMATIQUES',
+      secondary: ['CONCENTRATION', 'RESOLUTION_PROBLEMES']
     }
   },
   'MIXED': {
     operator: 'MIXED',
     competences: {
-      primary: 'logique',
-      secondary: ['numerique', 'vitesse', 'problemes']
+      primary: 'RESOLUTION_PROBLEMES',
+      secondary: ['MATHEMATIQUES', 'CONCENTRATION', 'SENS_CRITIQUE']
     }
   }
 };

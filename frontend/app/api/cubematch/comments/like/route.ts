@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { BACKEND_URL } from '@/lib/config';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
+export const dynamic = 'force-dynamic';
 
 // POST - Ajouter/retirer un like sur un commentaire (proxy vers backend)
 export async function POST(request: NextRequest) {
@@ -8,11 +9,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // Proxy vers le backend
+    const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie') || '';
     const backendResponse = await fetch(`${BACKEND_URL}/api/cubematch/comments/like`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Cookie': request.headers.get('Cookie') || ''
+        'Cookie': cookieHeader
       },
       body: JSON.stringify(body)
     });
