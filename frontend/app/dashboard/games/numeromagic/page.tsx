@@ -116,6 +116,58 @@ export default function NumeroMagicPage() {
   // Génération de round
   // ========================================
 
+  // Fonction pour calculer TOUS les résultats possibles avec les nombres donnés
+  const calculateAllPossibleResults = useCallback((numbers: number[]): number[] => {
+    const results = new Set<number>();
+    
+    // Ajouter les nombres eux-mêmes
+    numbers.forEach(num => results.add(num));
+    
+    // Calculer toutes les combinaisons de 2 nombres
+    for (let i = 0; i < numbers.length; i++) {
+      for (let j = 0; j < numbers.length; j++) {
+        if (i === j) continue;
+        
+        const a = numbers[i];
+        const b = numbers[j];
+        
+        // Opérations de base
+        results.add(a + b);
+        results.add(a - b);
+        results.add(b - a);
+        results.add(a * b);
+        
+        // Divisions (seulement si résultat entier)
+        if (b !== 0 && Number.isInteger(a / b)) results.add(a / b);
+        if (a !== 0 && Number.isInteger(b / a)) results.add(b / a);
+        
+        // Combinaisons de 3 nombres
+        const remainingNumbers = numbers.filter((_, idx) => idx !== i && idx !== j);
+        for (const c of remainingNumbers) {
+          // (a op b) op c
+          results.add(a + b + c);
+          results.add(a + b - c);
+          results.add(a - b + c);
+          results.add(a * b + c);
+          results.add(a * b - c);
+          results.add(a + b * c);
+          results.add(a - b * c);
+          
+          // Divisions avec 3 nombres
+          if (a + b !== 0 && Number.isInteger(c / (a + b))) results.add(c / (a + b));
+          if (a * b !== 0 && Number.isInteger(c / (a * b))) results.add(c / (a * b));
+          if (c !== 0 && Number.isInteger((a + b) / c)) results.add((a + b) / c);
+          if (c !== 0 && Number.isInteger((a * b) / c)) results.add((a * b) / c);
+        }
+      }
+    }
+    
+    // Filtrer les résultats positifs et raisonnables (éviter les nombres trop grands)
+    return Array.from(results)
+      .filter(result => result > 0 && result <= 1000 && Number.isInteger(result))
+      .sort((a, b) => a - b);
+  }, []);
+
   const generateRound = useCallback(() => {
     const maxNum = difficulty === 'EASY' ? 20 : difficulty === 'MEDIUM' ? 50 : difficulty === 'HARD' ? 100 : 200
     const numbersCount = difficulty === 'EASY' ? 3 : difficulty === 'MEDIUM' ? 4 : 5
@@ -126,22 +178,52 @@ export default function NumeroMagicPage() {
       numbers.push(Math.floor(Math.random() * maxNum) + 1)
     }
     
-    // Générer un nombre cible atteignable
-    const target = Math.floor(Math.random() * (maxNum * 2)) + 1
+    // Calculer TOUS les résultats possibles
+    const possibleResults = calculateAllPossibleResults(numbers);
     
-    setGameState(prev => ({
-      ...prev,
-      targetNumber: target,
-      givenNumbers: [...numbers],
-      availableNumbers: [...numbers],
-      selectedNumbers: [],
-      currentResult: null,
-      selectedOperation: null,
-      roundNumber: prev.roundNumber + 1
-    }))
+    if (possibleResults.length === 0) {
+      // Fallback : utiliser une combinaison simple
+      const target = numbers[0] + numbers[1];
+      console.log(`🎯 Fallback - Cible: ${target}, Nombres: [${numbers.join(', ')}]`);
+      
+      setGameState(prev => ({
+        ...prev,
+        targetNumber: target,
+        givenNumbers: [...numbers],
+        availableNumbers: [...numbers],
+        selectedNumbers: [],
+        currentResult: null,
+        selectedOperation: null,
+        roundNumber: prev.roundNumber + 1
+      }));
+    } else {
+      // Choisir une cible parmi les résultats possibles
+      // Éviter les cibles trop faciles (comme les nombres eux-mêmes)
+      const challengingTargets = possibleResults.filter(result => 
+        !numbers.includes(result) && result > Math.max(...numbers) / 2
+      );
+      
+      const target = challengingTargets.length > 0 
+        ? challengingTargets[Math.floor(Math.random() * challengingTargets.length)]
+        : possibleResults[Math.floor(Math.random() * possibleResults.length)];
+      
+      console.log(`🎯 Round généré - Cible: ${target}, Nombres: [${numbers.join(', ')}]`);
+      console.log(`📊 ${possibleResults.length} résultats possibles: [${possibleResults.slice(0, 10).join(', ')}${possibleResults.length > 10 ? '...' : ''}]`);
+      
+      setGameState(prev => ({
+        ...prev,
+        targetNumber: target,
+        givenNumbers: [...numbers],
+        availableNumbers: [...numbers],
+        selectedNumbers: [],
+        currentResult: null,
+        selectedOperation: null,
+        roundNumber: prev.roundNumber + 1
+      }));
+    }
 
     setRoundStartTime(Date.now())
-  }, [difficulty])
+  }, [difficulty, calculateAllPossibleResults])
 
   // ========================================
   // Démarrage du jeu
